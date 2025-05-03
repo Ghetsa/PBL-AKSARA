@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\UserModel;
@@ -13,7 +14,7 @@ class UserController extends Controller
             'title' => 'Manajemen User',
             'list' => ['Dashboard', 'User']
         ];
-        
+
         return view('user.index', compact('data', 'breadcrumb'));
     }
 
@@ -48,7 +49,7 @@ class UserController extends Controller
     {
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $id,
+            'email' => 'required|email|unique:users,email,' . $id . ',user_id',
             'role' => 'required',
             'status' => 'required'
         ]);
