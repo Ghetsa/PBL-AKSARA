@@ -1,6 +1,6 @@
-{{-- @extends('layouts.template')
+@extends('layouts.template')
 
-@section('content') --}}
+@section('content')
     <div class="card card-outline card-primary">
         <div class="card-header">
             <h3 class="card-title">Tambah User</h3> 
@@ -72,10 +72,10 @@
             </form>
         </div>
     </div>
-{{-- @endsection
+@endsection
 
 @push('css')
 @endpush
 
 @push('js')
-@endpush --}}
+@endpush

@@ -12,7 +12,7 @@ class UserController extends Controller
         $data = UserModel::all();
         $breadcrumb = (object)[
             'title' => 'Manajemen User',
-            'list' => ['Dashboard', 'User']
+            'list' => ['User']
         ];
 
         return view('user.index', compact('data', 'breadcrumb'));

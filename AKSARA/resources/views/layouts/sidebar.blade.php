@@ -1,4 +1,138 @@
-<!-- Menu -->
+<nav class="pc-sidebar">
+  <div class="navbar-wrapper">
+      <div class="m-header">
+          <a href="{{ url('/') }}" class="b-brand text-primary">
+              <img src="{{ asset('assets/images/logo-dark.svg') }}" class="img-fluid logo-lg" alt="logo">
+          </a>
+      </div>
+      <div class="navbar-content">
+          <ul class="pc-navbar">
+              <li class="pc-item">
+                  <a href="{{ url('/') }}" class="pc-link">
+                      <span class="pc-micon"><i class="ti ti-dashboard"></i></span>
+                      <span class="pc-mtext">Dashboard</span>
+                  </a>
+              </li>
+
+              <li class="pc-item pc-caption">
+                  <label>Data Pengguna</label>
+                  <i class="ti ti-dashboard"></i>
+              </li>
+              <li class="pc-item">
+                  <a href="{{ url('/user') }}" class="pc-link">
+                      <span class="pc-micon"><i class="ti ti-typography"></i></span>
+                      <span class="pc-mtext">Data User</span>
+                  </a>
+              </li>
+              <li class="pc-item pc-caption">
+                  <label>Akademik</label>
+                  <i class="ti ti-news"></i>
+              </li>
+              <li class="pc-item">
+                  <a href="{{ url('/prodi') }}" class="pc-link">
+                      <span class="pc-micon"><i class="ti ti-book"></i></span>
+                      <span class="pc-mtext">Data Program Studi</span>
+                  </a>
+              </li>
+              <li class="pc-item">
+                  <a href="{{ url('/prodi') }}" class="pc-link">
+                      <span class="pc-micon"><i class="ti ti-lock"></i></span>
+                      <span class="pc-mtext">Data Periode Semester</span>
+                  </a>
+              </li>
+
+              <li class="pc-item pc-caption">
+                  <label>Data Lomba</label>
+                  <i class="ti ti-brand-chrome"></i>
+              </li>
+              <li class="pc-item">
+                <a href="{{ url('/lomba') }}" class="pc-link">
+                    <span class="pc-micon"><i class="ti ti-lock"></i></span>
+                    <span class="pc-mtext">Verifikasi</span>
+                </a>
+              </li>
+              <li class="pc-item">
+                <a href="{{ url('/lomba') }}" class="pc-link">
+                    <span class="pc-micon"><i class="ti ti-lock"></i></span>
+                    <span class="pc-mtext">Rekomendasi Lomba</span>
+                </a>
+              </li>
+              <li class="pc-item pc-caption">
+                  <label>Data Prestasi</label>
+                  <i class="ti ti-brand-chrome"></i>
+              </li>
+              <li class="pc-item">
+                <a href="{{ url('/prestasi') }}" class="pc-link">
+                    <span class="pc-micon"><i class="ti ti-lock"></i></span>
+                    <span class="pc-mtext">Prestasi</span>
+                </a>
+              </li>
+              <li class="pc-item">
+                <a href="{{ url('/prestasi') }}" class="pc-link">
+                    <span class="pc-micon"><i class="ti ti-lock"></i></span>
+                    <span class="pc-mtext">Laporan & Analisis</span>
+                </a>
+              </li>
+              <li class="pc-item pc-caption">
+                  <label>Akun</label>
+                  <i class="ti ti-brand-chrome"></i>
+              </li>
+              <li class="pc-item">
+                <a href="{{ url('/admin') }}" class="pc-link">
+                    <span class="pc-micon"><i class="ti ti-user"></i></span>
+                    <span class="pc-mtext">Profil</span>
+                </a>
+              </li>
+              <li class="pc-item">
+                <a href="{{ url('/admin') }}" class="pc-link">
+                    <span class="pc-micon"><i class="ti ti-logout"></i></span>
+                    <span class="pc-mtext">Logout</span>
+                </a>
+              </li>
+              {{-- <li class="pc-item pc-hasmenu">
+                  <a href="#!" class="pc-link">
+                      <span class="pc-micon"><i class="ti ti-menu"></i></span>
+                      <span class="pc-mtext">Menu levels</span>
+                      <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
+                  </a>
+                  <ul class="pc-submenu">
+                      <li class="pc-item"><a class="pc-link" href="#!">Level 2.1</a></li>
+                      <li class="pc-item pc-hasmenu">
+                          <a href="#!" class="pc-link">Level 2.2<span class="pc-arrow"><i data-feather="chevron-right"></i></span></a>
+                          <ul class="pc-submenu">
+                              <li class="pc-item"><a class="pc-link" href="#!">Level 3.1</a></li>
+                              <li class="pc-item"><a class="pc-link" href="#!">Level 3.2</a></li>
+                              <li class="pc-item pc-hasmenu">
+                                  <a href="#!" class="pc-link">Level 3.3<span class="pc-arrow"><i data-feather="chevron-right"></i></span></a>
+                                  <ul class="pc-submenu">
+                                      <li class="pc-item"><a class="pc-link" href="#!">Level 4.1</a></li>
+                                      <li class="pc-item"><a class="pc-link" href="#!">Level 4.2</a></li>
+                                  </ul>
+                              </li>
+                          </ul>
+                      </li>
+                      <li class="pc-item pc-hasmenu">
+                          <a href="#!" class="pc-link">Level 2.3<span class="pc-arrow"><i data-feather="chevron-right"></i></span></a>
+                          <ul class="pc-submenu">
+                              <li class="pc-item"><a class="pc-link" href="#!">Level 3.1</a></li>
+                              <li class="pc-item"><a class="pc-link" href="#!">Level 3.2</a></li>
+                              <li class="pc-item pc-hasmenu">
+                                  <a href="#!" class="pc-link">Level 3.3<span class="pc-arrow"><i data-feather="chevron-right"></i></span></a>
+                                  <ul class="pc-submenu">
+                                      <li class="pc-item"><a class="pc-link" href="#!">Level 4.1</a></li>
+                                      <li class="pc-item"><a class="pc-link" href="#!">Level 4.2</a></li>
+                                  </ul>
+                              </li>
+                          </ul>
+                      </li>
+                  </ul>
+              </li> --}}
+          </ul>
+      </div>
+  </div>
+</nav>
+
+{{-- <!-- Menu -->
 
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
   <div class="app-brand demo">
@@ -469,4 +603,4 @@
     </div>
   </nav>
 
-  <!-- / Navbar -->
+  <!-- / Navbar --> --}}
