@@ -1,0 +1,32 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class PrestasiModel extends Model
+{
+    use HasFactory;
+
+    protected $table = 'prestasi';
+    protected $primaryKey = 'prestasi_id';
+    public $timestamps = true;
+
+    protected $fillable = [
+        'mahasiswa_id',
+        'nama_prestasi',
+        'kategori',
+        'penyelenggara',
+        'tingkat',
+        'tahun',
+        'file_bukti',
+        'status_verifikasi',
+        'catatan_verifikasi',
+    ];
+
+    public function mahasiswa()
+    {
+        return $this->belongsTo(MahasiswaModel::class, 'mahasiswa_id', 'mahasiswa_id');
+    }
+}

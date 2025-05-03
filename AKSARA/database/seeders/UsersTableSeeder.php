@@ -34,20 +34,38 @@ class UsersTableSeeder extends Seeder
         //     'updated_at' => now()
         // ]
 
-        [
-            'nama' => 'Ghetsa',
-            'email' => 'ghetsa@example.com',
-            'password' => bcrypt('12345'),
-            'role' => 'mahasiswa',
-            'status' => 'aktif',
-            'created_at' => now(),
-            'updated_at' => now()
-        ],
+        // [
+        //     'nama' => 'Ghetsa',
+        //     'email' => 'ghetsa@example.com',
+        //     'password' => bcrypt('12345'),
+        //     'role' => 'mahasiswa',
+        //     'status' => 'aktif',
+        //     'created_at' => now(),
+        //     'updated_at' => now()
+        // ],
         [
             'nama' => 'Wawan',
             'email' => 'wawan@example.com',
             'password' => bcrypt('12345'),
             'role' => 'dosen',
+            'status' => 'aktif',
+            'created_at' => now(),
+            'updated_at' => now()
+        ],
+        [
+            'nama' => 'Sony',
+            'email' => 'soni@example.com',
+            'password' => bcrypt('12345'),
+            'role' => 'admin',
+            'status' => 'aktif',
+            'created_at' => now(),
+            'updated_at' => now()
+        ],
+        [
+            'nama' => 'Reika',
+            'email' => 'reika@example.com',
+            'password' => bcrypt('12345'),
+            'role' => 'Mahasiswa',
             'status' => 'aktif',
             'created_at' => now(),
             'updated_at' => now()
