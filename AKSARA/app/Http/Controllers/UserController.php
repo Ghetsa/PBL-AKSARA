@@ -13,7 +13,7 @@ class UserController extends Controller
     public function index()
     {
         $data = UserModel::all();
-        $breadcrumb = (object)[
+        $breadcrumb = (object) [
             'title' => 'Manajemen User',
             'list' => ['Dashboard', 'User']
         ];
@@ -23,7 +23,7 @@ class UserController extends Controller
 
     public function create()
     {
-        $breadcrumb = (object)[
+        $breadcrumb = (object) [
             'title' => 'Tambah User',
             'list' => ['User', 'Tambah']
         ];
@@ -92,7 +92,15 @@ class UserController extends Controller
     public function edit($id)
     {
         $data = UserModel::findOrFail($id);
-        return view('user.edit', compact('data'));
+
+        switch ($data->role) {
+            case 'admin':
+                return view('user.edit_admin', compact('data'));
+            case 'dosen':
+                return view('user.edit_dosen', compact('data'));
+            case 'mahasiswa':
+                return view('user.edit_mahasiswa', compact('data'));
+        }
     }
 
     public function update(Request $request, $id)

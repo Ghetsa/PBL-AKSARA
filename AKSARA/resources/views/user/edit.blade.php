@@ -22,12 +22,11 @@ horizontal">
                     <div class="form-group row">
                         <label for="role" class="col-sm-2 col-form-label">Role</label>
                         <div class="col-sm-10">
-                            <select class="form-control @error('role') is-invalid @enderror" id="role" name="role"
-                                required>
+                            <select class="form-control @error('role') is-invalid @enderror" id="role" name="role" required>
                                 <option value="">- Pilih Role -</option>
-                                <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
-                                <option value="mahasiswa" {{ old('role') == 'mahasiswa' ? 'selected' : '' }}>Mahasiswa</option>
-                                <option value="dosen" {{ old('role') == 'dosen' ? 'selected' : '' }}>Dosen</option>
+                                <option value="admin" {{ old('role', $data->role) == 'admin' ? 'selected' : '' }}>Admin</option>
+                                <option value="mahasiswa" {{ old('role', $data->role) == 'mahasiswa' ? 'selected' : '' }}>Mahasiswa</option>
+                                <option value="dosen" {{ old('role', $data->role) == 'dosen' ? 'selected' : '' }}>Dosen</option>
                             </select>
                             @error('role')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -59,8 +58,8 @@ horizontal">
                         <div class="col-sm-10">
                             <select class="form-control @error('status') is-invalid @enderror" id="status" name="status" required>
                                 <option value="">- Pilih Status -</option>
-                                <option value="1" {{ old('status') == '1' ? 'selected' : '' }}>aktif</option>
-                                <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>nonaktif</option> 
+                                <option value="aktif" {{ old('status', $data->status) == 'aktif' ? 'selected' : '' }}>aktif</option>
+                                <option value="nonaktif" {{ old('status', $data->status) == 'nonaktif' ? 'selected' : '' }}>nonaktif</option>
                             </select>
                             @error('status')
                                 <div class="invalid-feedback">{{ $message }}</div>

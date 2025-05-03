@@ -55,8 +55,8 @@
                     <div class="col-sm-10">
                         <select class="form-control @error('status') is-invalid @enderror" id="status" name="status" required>
                             <option value="">- Pilih Status -</option>
-                            <option value="1" {{ old('status') == '1' ? 'selected' : '' }}>Aktif</option>
-                            <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>Nonaktif</option>
+                            <option value="aktif" {{ old('status') == 'aktif' ? 'selected' : '' }}>Aktif</option>
+                            <option value="nonaktif" {{ old('status') == 'nonaktif' ? 'selected' : '' }}>Nonaktif</option>
                         </select>
                         @error('status')
                             <div class="invalid-feedback">{{ $message }}</div>
