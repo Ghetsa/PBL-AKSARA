@@ -20,7 +20,12 @@ class UserController extends Controller
 
     public function create()
     {
-        return view('user.create');
+        $breadcrumb = (object)[
+            'title' => 'Tambah User',
+            'list' => ['Tambah  User']
+        ];
+
+        return view('user.create', compact('breadcrumb'));
     }
 
     public function store(Request $request)

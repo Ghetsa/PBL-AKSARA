@@ -3,7 +3,7 @@
 @section('content')
     <div class="card card-outline card-primary">
         <div class="card-header">
-            <h3 class="card-title">Tambah User</h3> 
+            <h4 class="card-title">Tambah User</h4> 
             <div class="card-tools"></div>
         </div>
         <div class="card-body">
