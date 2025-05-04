@@ -14,6 +14,43 @@
                 </div>
 
                 <div class="card-body">
+                    @if (session('success'))
+                        <div class="alert alert-success">{{ session('success') }}</div>
+                    @endif
+                    @if (session('error'))
+                        <div class="alert alert-danger">{{ session('error') }}</div>
+                    @endif
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group row">
+                                <label class="col-1 control-label col-form-label">Filter Role:</label>
+                                <div class="col-3">
+                                    <select class="form-control" id="role" name="role" required>
+                                        <option value="">- Semua -</option>
+                                        <option value="mahasiswa">Mahasiswa</option>
+                                        <option value="dosen">Dosen</option>
+                                        <option value="admin">Admin</option>
+                                    </select>
+                                    <small class="form-text text-muted">Role Pengguna</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>    
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group row">
+                                <label class="col-1 control-label col-form-label">Filter Status:</label>
+                                <div class="col-3">
+                                    <select class="form-control" id="status" name="status" required>
+                                        <option value="">- Semua -</option>
+                                        <option value="aktif">Aktif</option>
+                                        <option value="nonaktif">Nonaktif</option>
+                                    </select>
+                                    <small class="form-text text-muted">Status Pengguna</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>    
                     <table class="table table-bordered table-hover" id="table_user">
                         <thead>
                             <tr>
@@ -63,9 +100,10 @@
                     "url": "{{ url('user/list') }}",
                     "dataType": "json",
                     "type": "POST",
-                    // "data": function (d) { 
-                    //     d.level_id = $('#level_id').val();
-                    //  }
+                    "data": function (d) { 
+                        d.role = $('#role').val(),
+                        d.status = $('#status').val();
+                     }
                 },
                 columns: [
                     {
@@ -106,7 +144,11 @@
                 ]
             });
 
-            $('#level_id').on('change', function () { 
+            $('#role').on('change', function () { 
+                dataUser.ajax.reload();
+            });
+
+            $('#status').on('change', function () { 
                 dataUser.ajax.reload();
             });
             

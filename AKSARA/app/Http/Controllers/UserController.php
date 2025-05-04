@@ -16,7 +16,7 @@ class UserController extends Controller
         $data = UserModel::all();
         $breadcrumb = (object) [
             'title' => 'Manajemen User',
-            'list' => ['Dashboard', 'User']
+            'list' => ['User']
         ];
 
         return view('user.index', compact('data', 'breadcrumb'));
@@ -27,10 +27,15 @@ class UserController extends Controller
     {
         $users = UserModel::select('user_id', 'nama', 'email', 'role', 'status');
 
-        // // Filter data user berdasarkan level_id
-        // if ($request->level_id) {
-        //     $users->where('level_id', $request->level_id);
-        // }
+        // Filter data user berdasarkan role
+        if ($request->role) {
+            $users->where('role', $request->role);
+        }
+
+        // Filter data user berdasarkan status
+        if ($request->status) {
+            $users->where('status', $request->status);
+        }
 
         return DataTables::of($users)
             // menambahkan kolom index / no urut (default nama kolom: DT_Rowindex)
