@@ -8,6 +8,7 @@ use App\Models\DosenModel;
 use App\Models\MahasiswaModel;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -201,4 +202,171 @@ class UserController extends Controller
         UserModel::destroy($id);
         return redirect()->route('user.index')->with('success', 'User berhasil dihapus');
     }
+
+
+    public function create_ajax()
+    {
+        $roles = ['admin', 'dosen', 'mahasiswa'];
+        return view('user.create_ajax')->with('roles', $roles);
+    }
+
+    public function store_ajax(Request $request)
+    {
+        if ($request->ajax() || $request->wantsJson()) {
+            $validator = Validator::make($request->all(), [
+                'nama' => 'required|string|max:255',
+                'email' => 'required|email|unique:users,email',
+                'password' => 'required|string|min:6',
+                'role' => 'required|in:admin,dosen,mahasiswa',
+                'status' => 'required|in:aktif,nonaktif',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Validasi gagal.',
+                    'msgField' => $validator->errors()
+                ]);
+            }
+
+            if ($request->role == 'dosen') {
+                $dosenRules = [
+                    'nip' => 'required|string|max:50',
+                    'bidang_keahlian' => 'required|string|max:50',
+                ];
+                $request->validate($dosenRules);
+            } elseif ($request->role == 'admin') {
+                $request->validate([
+                    'nip' => 'required|string|max:50',
+                ]);
+            } elseif ($request->role == 'mahasiswa') {
+                $request->validate([
+                    'nim' => 'required|string|max:50|unique:mahasiswa,nim',
+                    'prodi_id' => 'required|exists:prodi,prodi_id',
+                    'periode_id' => 'required|exists:periode,periode_id',
+                ]);
+            }
+
+            $user = UserModel::create([
+                'nama' => $request->nama,
+                'email' => $request->email,
+                'password' => bcrypt($request->password),
+                'role' => $request->role,
+                'status' => $request->status,
+            ]);
+
+            if ($request->role == 'admin') {
+                AdminModel::create([
+                    'user_id' => $user->user_id,
+                    'nip' => $request->nip
+                ]);
+            } elseif ($request->role == 'dosen') {
+                DosenModel::create([
+                    'user_id' => $user->user_id,
+                    'nip' => $request->nip,
+                    'bidang_keahlian' => $request->bidang_keahlian
+                ]);
+            } elseif ($request->role == 'mahasiswa') {
+                MahasiswaModel::create([
+                    'user_id' => $user->user_id,
+                    'nim' => $request->nim,
+                    'prodi_id' => $request->prodi_id,
+                    'periode_id' => $request->periode_id,
+                ]);
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'User berhasil ditambahkan'
+            ]);
+        }
+
+        return redirect('/');
+    }
+
+
+    public function edit_ajax(string $id)
+    {
+        $user = UserModel::find($id);
+        $roles = ['admin', 'dosen', 'mahasiswa'];
+
+        return view('user.edit_ajax', ['user' => $user, 'roles' => $roles]);
+    }
+
+    public function update_ajax(Request $request, $id)
+    {
+        if ($request->ajax() || $request->wantsJson()) {
+            $validator = Validator::make($request->all(), [
+                'nama' => 'required|string|max:255',
+                'email' => 'required|email|unique:users,email,' . $id . ',user_id',
+                'role' => 'required|in:admin,dosen,mahasiswa',
+                'status' => 'required|in:aktif,nonaktif',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Validasi gagal.',
+                    'msgField' => $validator->errors()
+                ]);
+            }
+
+            if ($request->role == 'dosen') {
+                $request->validate([
+                    'nip' => 'required|string|max:50',
+                    'bidang_keahlian' => 'required|string|max:50',
+                ]);
+            } elseif ($request->role == 'admin') {
+                $request->validate([
+                    'nip' => 'required|string|max:50',
+                ]);
+            } elseif ($request->role == 'mahasiswa') {
+                $request->validate([
+                    'nim' => 'required|string|max:50|unique:mahasiswa,nim,' . $id . ',user_id',
+                    'prodi_id' => 'required|exists:prodi,prodi_id',
+                    'periode_id' => 'required|exists:periode,periode_id',
+                ]);
+            }
+
+            $user = UserModel::findOrFail($id);
+            $user->update([
+                'nama' => $request->nama,
+                'email' => $request->email,
+                'role' => $request->role,
+                'status' => $request->status,
+            ]);
+
+            if ($request->role == 'admin') {
+                AdminModel::updateOrCreate(
+                    ['user_id' => $user->user_id],
+                    ['nip' => $request->nip]
+                );
+            } elseif ($request->role == 'dosen') {
+                DosenModel::updateOrCreate(
+                    ['user_id' => $user->user_id],
+                    [
+                        'nip' => $request->nip,
+                        'bidang_keahlian' => $request->bidang_keahlian
+                    ]
+                );
+            } elseif ($request->role == 'mahasiswa') {
+                MahasiswaModel::updateOrCreate(
+                    ['user_id' => $user->user_id],
+                    [
+                        'nim' => $request->nim,
+                        'prodi_id' => $request->prodi_id,
+                        'periode_id' => $request->periode_id,
+                    ]
+                );
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'User berhasil diupdate'
+            ]);
+        }
+
+        return redirect('/');
+    }
+
 }
