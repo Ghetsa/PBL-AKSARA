@@ -2,6 +2,9 @@
 <html lang="en">
 <head>
     <title>@yield('title', 'Sample Page | Mantis Bootstrap 5 Admin Template')</title>
+    
+    <meta name="csrf-token" content="{{ csrf_token() }}"> <!-- Untuk mengirimkan token Laravel CSRF pada setiap request ajax -->
+    
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -17,7 +20,12 @@
     <link rel="stylesheet" href="{{ asset('mantis/dist/assets/fonts/material.css') }}">
     <link rel="stylesheet" href="{{ asset('mantis/dist/assets/css/style.css') }}" id="main-style-link">
     <link rel="stylesheet" href="{{ asset('mantis/dist/assets/css/style-preset.css') }}">
+      <!-- DataTables -->
+    <link rel="stylesheet" href="{{ asset('mantis/dist/assets/css/plugins/dataTables.bootstrap5.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('mantis/dist/assets/css/plugins/responsive.bootstrap5.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('mantis/dist/assets/css/plugins/buttons.bootstrap5.min.css') }}">
     @yield('page-css')
+    @stack('css')
 </head>
 <body data-pc-preset="preset-1" data-pc-direction="ltr" data-pc-theme="light">
     <div class="loader-bg">
@@ -31,15 +39,39 @@
         <div class="pc-content">
             @include('layouts.breadcrumb')
             @yield('content')
-            </div>
+        </div>
     </div>
     @include('layouts.footer')
+    <!-- jQuery -->
+    {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}} 
+    <script src="{{ asset('mantis/dist/assets/js/plugins/jquery/jquery.min.js') }}"></script>
+
     <script src="{{ asset('mantis/dist/assets/js/plugins/popper.min.js') }}"></script>
     <script src="{{ asset('mantis/dist/assets/js/plugins/simplebar.min.js') }}"></script>
     <script src="{{ asset('mantis/dist/assets/js/plugins/bootstrap.min.js') }}"></script>
     <script src="{{ asset('mantis/dist/assets/js/fonts/custom-font.js') }}"></script>
     <script src="{{ asset('mantis/dist/assets/js/pcoded.js') }}"></script>
     <script src="{{ asset('mantis/dist/assets/js/plugins/feather.min.js') }}"></script>
+
+    <!-- DataTables & Plugins -->
+    <script src="{{ asset('mantis/dist/assets/js/plugins/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('mantis/dist/assets/js/plugins/dataTables.bootstrap5.min.js') }}"></script>
+    <script src="{{ asset('mantis/dist/assets/js/plugins/dataTables.responsive.min.js') }}"></script>
+    <script src="{{ asset('mantis/dist/assets/js/plugins/responsive.bootstrap5.min.js') }}"></script>
+    <script src="{{ asset('mantis/dist/assets/js/plugins/dataTables.buttons.min.js') }}"></script>
+    <script src="{{ asset('mantis/dist/assets/js/plugins/buttons.bootstrap5.min.js') }}"></script>
+    <script src="{{ asset('mantis/dist/assets/js/plugins//jszip.min.js') }}"></script>
+    <script src="{{ asset('mantis/dist/assets/js/plugins//pdfmake.min.js') }}"></script>
+    <script src="{{ asset('mantis/dist/assets/js/plugins//vfs_fonts.js') }}"></script>
+    <script src="{{ asset('mantis/dist/assets/js/plugins/buttons.html5.min.js') }}"></script>
+    <script src="{{ asset('mantis/dist/assets/js/plugins/buttons.print.min.js') }}"></script>
+    <script src="{{ asset('mantis/dist/assets/js/plugins/buttons.colVis.min.js') }}"></script>
+
+    <script>
+        // Untuk mengirimkan token Laravel CSRF pada setiap request ajax
+        $.ajaxSetup({headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}});
+    </script>
+    @stack('js')
 
     <script>layout_change('light');</script>
     <script>change_box_container('false');</script>

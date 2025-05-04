@@ -2,7 +2,7 @@
   <div class="navbar-wrapper">
       <div class="m-header">
           <a href="{{ url('/') }}" class="b-brand text-primary">
-              <img src="{{ asset('assets/images/logo-dark.svg') }}" class="img-fluid logo-lg" alt="logo">
+              <img src="{{ asset('mantis/dist/assets/images/logo-dark.svg') }}" class="img-fluid logo-lg" alt="logo">
           </a>
       </div>
       <div class="navbar-content">
@@ -20,7 +20,7 @@
               </li>
               <li class="pc-item">
                   <a href="{{ url('/user') }}" class="pc-link">
-                      <span class="pc-micon"><i class="ti ti-typography"></i></span>
+                      <span class="pc-micon"><i class="ti ti-users"></i></span>
                       <span class="pc-mtext">Data User</span>
                   </a>
               </li>
@@ -63,7 +63,7 @@
               </li>
               <li class="pc-item">
                 <a href="{{ url('/prestasi') }}" class="pc-link">
-                    <span class="pc-micon"><i class="ti ti-lock"></i></span>
+                    <span class="pc-micon"><i class="ti ti-crown"></i></span>
                     <span class="pc-mtext">Prestasi</span>
                 </a>
               </li>

@@ -14,7 +14,7 @@
                 </div>
 
                 <div class="card-body">
-                    <table class="table table-bordered table-hover">
+                    <table class="table table-bordered table-hover" id="table_user">
                         <thead>
                             <tr>
                                 <th>ID</th>
@@ -25,7 +25,7 @@
                                 <th>Aksi</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        {{-- <tbody>
                             @foreach ($data as $item)
                                 <tr>
                                     <td>{{ $item->user_id }}</td>
@@ -45,10 +45,71 @@
                                     </td>
                                 </tr>
                             @endforeach
-                        </tbody>
+                        </tbody> --}}
                     </table>
                 </div>
             </div>
         </div>
     </section>
 @endsection
+
+@push('js')
+    <script>
+        $(document).ready(function() {
+            var dataUser = $('#table_user').DataTable({
+                // serverSide: true, jika ingin menggunakan server side processing
+                serverSide: true,
+                ajax: {
+                    "url": "{{ url('user/list') }}",
+                    "dataType": "json",
+                    "type": "POST",
+                    // "data": function (d) { 
+                    //     d.level_id = $('#level_id').val();
+                    //  }
+                },
+                columns: [
+                    {
+                        data: "DT_RowIndex", // nomor urut dari laravel datatable addIndexColumn()
+                        className: "text-center",
+                        orderable: false,
+                        searchable: false
+                    },{
+                        data: "nama",
+                        className: "",
+                        // orderable: true, jika ingin kolom ini bisa diurutkan
+                        orderable: true,
+                        // searchable: true, jika ingin kolom ini bisa dicari
+                        searchable: true
+                    },{
+                        data: "email",
+                        className: "",
+                        orderable: true,
+                        searchable: true
+                    },{
+                        // mengambil data level hasil dari ORM berelasi
+                        data: "role",
+                        className: "",
+                        orderable: false,
+                        searchable: false
+                    },{
+                        // mengambil data level hasil dari ORM berelasi
+                        data: "status",
+                        className: "",
+                        orderable: false,
+                        searchable: false
+                    },{
+                        data: "aksi",
+                        className: "",
+                        orderable: false,   // orderable: true, jika ingin kolom ini bisa diurutkan
+                        searchable: false   // searchable: true, jika ingin kolom ini bisa dicari
+                    }
+                ]
+            });
+
+            $('#level_id').on('change', function () { 
+                dataUser.ajax.reload();
+            });
+            
+        });
+    </script>
+@endpush
