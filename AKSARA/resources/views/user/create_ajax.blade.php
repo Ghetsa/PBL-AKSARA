@@ -1,268 +1,296 @@
-<form action="{{ url('/user/ajax') }}" method="POST" id="form-tambah">
-    @csrf
-    <div id="modal-master" class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
+{{-- Modal Create User (dipindahkan dari index.blade.php) --}}
+  <div class="modal fade" id="modalCreateUser" tabindex="-1" aria-labelledby="modalCreateUserLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg"> {{-- Buat modal lebih lebar jika perlu --}}
+          <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Tambah Data User</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h5 class="modal-title" id="modalCreateUserLabel">Tambah User Baru</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="form-group">
-                    <label>Level Pengguna</label>
-                    <select name="level_id" id="level_id" class="form-control" required>
-                        <option value="">- Pilih Level -</option>
-                        @foreach($level as $l)
-                            <option value="{{ $l->level_id }}">{{ $l->level_nama }}</option>
-                        @endforeach
+              {{-- Pindahkan form dari create.blade.php ke sini --}}
+              <form id="formCreateUser" class="form-horizontal" method="POST" action="{{ route('user.store') }}">
+                @csrf {{-- CSRF token tetap diperlukan untuk AJAX POST --}}
+                <div class="form-group row mb-3">
+                  <label for="nama" class="col-sm-2 col-form-label">Nama</label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control" id="nama" name="nama" required>
+                    {{-- Error message akan ditambahkan oleh jQuery Validation --}}
+                  </div>
+                </div>
+                <div class="form-group row mb-3">
+                  <label for="email" class="col-sm-2 col-form-label">Email</label>
+                  <div class="col-sm-10">
+                    <input type="email" class="form-control" id="email" name="email" required>
+                  </div>
+                </div>
+                <div class="form-group row mb-3">
+                  <label for="password" class="col-sm-2 col-form-label">Password</label>
+                  <div class="col-sm-10">
+                    <input type="password" class="form-control" id="password" name="password" required>
+                  </div>
+                </div>
+                <div class="form-group row mb-3">
+                  <label for="role_modal" class="col-sm-2 col-form-label">Role</label>
+                  <div class="col-sm-10">
+                    {{-- Beri ID unik untuk select role di modal --}}
+                    <select class="form-select" id="role_modal" name="role" required>
+                      <option value="">- Pilih Role -</option>
+                      <option value="admin">Admin</option>
+                      <option value="mahasiswa">Mahasiswa</option>
+                      <option value="dosen">Dosen</option>
                     </select>
-                    <small id="error-level_id" class="error-text form-text text-danger"></small>
+                  </div>
                 </div>
-                <div class="form-group">
-                    <label>Username</label>
-                    <input value="" type="text" name="username" id="username" class="form-control" required>
-                    <small id="error-username" class="error-text form-text text-danger"></small>
-                </div>
-                <div class="form-group">
-                    <label>Nama</label>
-                    <input value="" type="text" name="nama" id="nama" class="form-control" required>
-                    <small id="error-nama" class="error-text form-text text-danger"></small>
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input value="" type="password" name="password" id="password" class="form-control" required>
-                    <small id="error-password" class="error-text form-text text-danger"></small>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" data-dismiss="modal" class="btn btn-warning">Batal</button>
-                <button type="submit" class="btn btn-primary">Simpan</button>
-            </div>
-        </div>
-    </div>
-    </form>
-    <script>
-        $(document).ready(function() {
-            $("#form-tambah").validate({
-                rules: {
-                    level_id: {required: true, number: true},
-                    username: {required: true, minlength: 3, maxlength: 20},
-                    nama: {required: true, minlength: 3, maxlength: 100},
-                    password: {required: true, minlength: 6, maxlength: 20}
-                },
-                submitHandler: function(form) {
-                    $.ajax({
-                        url: form.action,
-                        type: form.method,
-                        data: $(form).serialize(),
-                        success: function(response) {
-                            if(response.status){
-                                $('#myModal').modal('hide');
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Berhasil',
-                                    text: response.message
-                                });
-                                dataUser.ajax.reload();
-                            } else {
-                                $('.error-text').text('');
-                                $.each(response.msgField, function(prefix, val) {
-                                    $('#error-'+prefix).text(val[0]);
-                                });
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Terjadi Kesalahan',
-                                    text: response.message
-                                });
-                            }
-                        }
-                    });
-                    return false;
-                },
-                errorElement: 'span',
-                errorPlacement: function (error, element) {
-                    error.addClass('invalid-feedback');
-                    element.closest('.form-group').append(error);
-                },
-                highlight: function (element, errorClass, validClass) {
-                    $(element).addClass('is-invalid');
-                },
-                unhighlight: function (element, errorClass, validClass) {
-                    $(element).removeClass('is-invalid');
-                }
-            });
-        });
-    </script>
-
-{{-- <!-- Modal Bootstrap 5 -->
-<div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-scrollable">
-      <div class="modal-content">
-              
-    <div class="card card-outline card-primary">
-        <div class="card-header">
-            <h4 class="card-title">Tambah User</h4>
-            <div class="card-tools"></div>
-        </div>
-        <div class="card-body">
-            <form id="form-tambah-user" class="form-horizontal">
-                @csrf
-                <div class="form-group row">
-                    <label for="nama" class="col-sm-2 col-form-label">Nama</label>
+    
+                {{-- Field tambahan --}}
+                <div id="form-nip-modal" style="display: none;">
+                  <div class="form-group row mb-3">
+                    <label for="nip" class="col-sm-2 col-form-label">NIP</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="nama" name="nama" value="{{ old('nama') }}" required>
-                        <span id="error-nama" class="error-text text-danger"></span>
+                      <input type="text" class="form-control" id="nip" name="nip">
                     </div>
+                  </div>
                 </div>
-                <div class="form-group row">
-                    <label for="email" class="col-sm-2 col-form-label">Email</label>
+                <div id="form-keahlian-modal" style="display: none;">
+                  <div class="form-group row mb-3">
+                    <label for="bidang_keahlian" class="col-sm-2 col-form-label">Bidang Keahlian</label>
                     <div class="col-sm-10">
-                        <input type="email" class="form-control" id="email" name="email" value="{{ old('email') }}" required>
-                        <span id="error-email" class="error-text text-danger"></span>
+                      <input type="text" class="form-control" id="bidang_keahlian" name="bidang_keahlian">
                     </div>
+                  </div>
                 </div>
-                <div class="form-group row">
-                    <label for="password" class="col-sm-2 col-form-label">Password</label>
+                <div id="form-nim-modal" style="display: none;">
+                  <div class="form-group row mb-3">
+                    <label for="nim" class="col-sm-2 col-form-label">NIM</label>
                     <div class="col-sm-10">
-                        <input type="password" class="form-control" id="password" name="password" required>
-                        <span id="error-password" class="error-text text-danger"></span>
+                      <input type="text" class="form-control" id="nim" name="nim">
                     </div>
+                  </div>
                 </div>
-                <div class="form-group row">
-                    <label for="role" class="col-sm-2 col-form-label">Role</label>
-                    <div class="col-sm-10">
-                        <select class="form-control" id="role" name="role" required>
-                            <option value="">- Pilih Role -</option>
-                            <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
-                            <option value="mahasiswa" {{ old('role') == 'mahasiswa' ? 'selected' : '' }}>Mahasiswa</option>
-                            <option value="dosen" {{ old('role') == 'dosen' ? 'selected' : '' }}>Dosen</option>
-                        </select>
-                        <span id="error-role" class="error-text text-danger"></span>
+                <div id="form-prodi_id-modal" style="display: none;">
+                    <div class="form-group row mb-3">
+                        <label for="prodi_id" class="col-sm-2 col-form-label">Prodi</label> {{-- Ganti label for --}}
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="prodi_id" name="prodi_id">
+                        </div>
+                        </div>
                     </div>
-                </div>
-                <div class="form-group row">
-                    <label for="status" class="col-sm-2 col-form-label">Status</label>
-                    <div class="col-sm-10">
-                        <select class="form-control" id="status" name="status" required>
+                    <div id="form-periode_id-modal" style="display: none;">
+                        <div class="form-group row mb-3">
+                        <label for="periode_id" class="col-sm-2 col-form-label">Periode</label> {{-- Ganti label for --}}
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="periode_id" name="periode_id">
+                        </div>
+                        </div>
+                    </div>
+                    {{-- End Field tambahan --}}
+        
+                    <div class="form-group row mb-3">
+                        <label for="status" class="col-sm-2 col-form-label">Status</label>
+                        <div class="col-sm-10">
+                        <select class="form-select" id="status" name="status" required>
                             <option value="">- Pilih Status -</option>
-                            <option value="aktif" {{ old('status') == 'aktif' ? 'selected' : '' }}>Aktif</option>
-                            <option value="nonaktif" {{ old('status') == 'nonaktif' ? 'selected' : '' }}>Nonaktif</option>
+                            <option value="aktif" selected>Aktif</option> {{-- Default ke aktif --}}
+                            <option value="nonaktif">Nonaktif</option>
                         </select>
-                        <span id="error-status" class="error-text text-danger"></span>
+                        </div>
                     </div>
+                    {{-- Tombol submit dipindahkan ke modal footer --}}
+                    </form>
                 </div>
-                <div class="form-group row">
-                    <div class="col-sm-10 offset-sm-2">
-                        <button type="submit" class="btn btn-primary">Simpan</button>
-                        <a class="btn btn-secondary ml-2" href="{{ route('user.index') }}" id="btn-kembali">Kembali</a>
-                    </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    {{-- Tombol submit form --}}
+                    <button type="submit" class="btn btn-primary" form="formCreateUser">Simpan</button>
                 </div>
-            </form>
-        </div>
-    </div>
+                </div>
+            </div>
+            </div>
+        
+        @push('js')
+            <script>
+            $(document).ready(function() {
+                // ----- LOGIKA MODAL CREATE USER -----
+        
+                const modalCreate = new bootstrap.Modal(document.getElementById('modalCreateUser'));
+                const formCreate = $('#formCreateUser');
+                const modalElement = document.getElementById('modalCreateUser');
+        
+                // Fungsi untuk menampilkan/menyembunyikan field tambahan di modal
+                function toggleAdditionalFormsModal() {
+                const role = $('#role_modal').val(); // Ambil dari select di modal
+                const formNip = $('#form-nip-modal');
+                const formKeahlian = $('#form-keahlian-modal');
+                const formNim = $('#form-nim-modal');
+                const formProdi_id = $('#form-prodi_id-modal');
+                const formPeriode = $('#form-periode_id-modal');
+        
+                // Reset semua ke hidden dulu
+                formNip.hide();
+                formKeahlian.hide();
+                formNim.hide();
+                formProdi_id.hide();
+                formPeriode.hide();
+        
+                // Reset required attribute jika ada
+                formNip.find('input').prop('required', false);
+                formKeahlian.find('input').prop('required', false);
+                formNim.find('input').prop('required', false);
+                formProdi_id.find('input').prop('required', false);
+                formPeriode.find('input').prop('required', false);
+        
+                if (role === 'admin') {
+                    formNip.show();
+                    formNip.find('input').prop('required', true); // NIP wajib untuk admin
+                } else if (role === 'dosen') {
+                    formNip.show();
+                    formKeahlian.show();
+                    formNip.find('input').prop('required', true); // NIP wajib untuk dosen
+                    formKeahlian.find('input').prop
+                    ('required', true); // Keahlian wajib untuk dosen
+                } else if (role === 'mahasiswa') {
+                    formNim.show();
+                    formProdi_id.show();
+                    formPeriode.show();
+                    formNim.find('input').prop('required', true); // NIM wajib untuk mahasiswa
+                    formProdi_id.find('input').prop('required', true); // Prodi wajib untuk mahasiswa
+                    formPeriode.find('input').prop('required', true); // Periode wajib untuk mahasiswa
+                }
+            }
 
-    <script>
-        $(document).ready(function() {
-            $("#form-tambah-user").validate({
+            // Event listener untuk select role di modal
+            $('#role_modal').on('change', toggleAdditionalFormsModal);
+
+            // Inisialisasi state field tambahan saat modal pertama kali dibuka
+            modalElement.addEventListener('show.bs.modal', function (event) {
+                toggleAdditionalFormsModal(); // Panggil fungsi toggle saat modal akan tampil
+            });
+
+            // Reset form dan validasi saat modal ditutup
+            modalElement.addEventListener('hidden.bs.modal', function (event) {
+                formCreate.trigger('reset'); // Reset nilai form
+                formCreate.validate().resetForm(); // Reset pesan error validasi
+                formCreate.find('.is-invalid').removeClass('is-invalid'); // Hapus class invalid
+                formCreate.find('.is-valid').removeClass('is-valid'); // Hapus class valid
+                toggleAdditionalFormsModal(); // Panggil lagi untuk menyembunyikan field tambahan
+            });
+
+            // Inisialisasi jQuery Validation
+            formCreate.validate({
                 rules: {
                     nama: {
-                        required: true
+                        required: true,
+                        minlength: 3
                     },
                     email: {
                         required: true,
                         email: true
+                        // Jika perlu validasi unique email via AJAX:
                     },
                     password: {
                         required: true,
-                        minlength: 6
+                        minlength: 6 // Atur minimal panjang password
                     },
-                    role: {
+                    role: {                      
                         required: true
                     },
                     status: {
                         required: true
+                    },
+                    nip: {
+                        // required akan di-set dinamis oleh toggleAdditionalFormsModal
+                        digits: true // Contoh: hanya boleh angka
+                    },
+                    nim: {
+                        // required akan di-set dinamis
+                        digits: true
                     }
                 },
                 messages: {
                     nama: {
-                        required: "Nama harus diisi."
+                        required: "Nama tidak boleh kosong",
+                        minlength: "Nama minimal harus 3 karakter"
                     },
                     email: {
-                        required: "Email harus diisi.",
-                        email: "Format email tidak valid."
+                        required: "Email tidak boleh kosong",
+                        email: "Format email tidak valid"
+                        // remote: "Email sudah terdaftar"
                     },
                     password: {
-                        required: "Password harus diisi.",
-                        minlength: "Password minimal 6 karakter."
+                        required: "Password tidak boleh kosong",
+                        minlength: "Password minimal harus 6 karakter"
                     },
-                    role: {
-                        required: "Role harus dipilih."
+                    role: "Silakan pilih role",
+                    status: "Silakan pilih status",
+                    nip : {
+                        required: "NIP wajib diisi untuk role ini",
+                        digits: "NIP hanya boleh berisi angka"
                     },
-                    status: {
-                        required: "Status harus dipilih."
+                    nim : {
+                        required: "NIM wajib diisi untuk role ini",
+                        digits: "NIM hanya boleh berisi angka"
+                    },
+                    bidang_keahlian: {
+                        required: "Bidang keahlian wajib diisi untuk Dosen"
+                    },
+                        prodi_id: {
+                        required: "Prodi wajib diisi untuk Mahasiswa"
+                    },
+                        periode_id: {
+                        required: "Periode wajib diisi untuk Mahasiswa"
                     }
                 },
-                errorElement: 'span',
-                errorPlacement: function(error, element) {
-                    error.addClass('invalid-feedback');
-                    $(`#error-${element.attr('name')}`).text(error.text());
-                },
-                highlight: function(element, errorClass, validClass) {
-                    $(element).addClass('is-invalid');
-                },
-                unhighlight: function(element, errorClass, validClass) {
-                    $(element).removeClass('is-invalid');
-                    $(`#error-${element.attr('name')}`).text('');
-                },
                 submitHandler: function(form) {
+                    // Jika form valid, kirim data via AJAX
                     $.ajax({
-                        url: "{{ route('user.store') }}",
-                        type: "POST",
-                        data: $(form).serialize(),
-                        dataType: 'json',
+                        url: $(form).attr('action'), // Ambil URL dari atribut action form
+                        method: $(form).attr('method'), // Ambil method dari atribut method form
+                        data: $(form).serialize(), // Ambil semua data form
+                        dataType: 'json', // Harapkan response JSON dari server
+                        beforeSend: function() {
+                            // Tampilkan loading atau disable tombol submit
+                            $(form).find('button[type="submit"]').prop('disabled', true).text('Menyimpan...');
+                        },
                         success: function(response) {
-                            if (response.status) {
+                            // Tutup modal
+                            modalCreate.hide();
+
+                            // Tampilkan notifikasi sukses (Gunakan SweetAlert jika ada)
+                            if (typeof Swal !== 'undefined') {
                                 Swal.fire({
                                     icon: 'success',
                                     title: 'Berhasil!',
                                     text: response.message,
-                                    showConfirmButton: false,
-                                    timer: 1500
-                                }).then(function() {
-                                    window.location.href = "{{ route('user.index') }}";
                                 });
                             } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Gagal!',
-                                    text: response.message
-                                });
+                                alert(response.message);
                             }
+
+                            // Reload DataTable untuk melihat data baru
+                            dataUser.ajax.reload();
                         },
                         error: function(xhr, status, error) {
-                            var errors = xhr.responseJSON.errors;
-                            $('.is-invalid').removeClass('is-invalid');
-                            $('.error-text').text('');
-                            $.each(errors, function(key, value) {
-                                $(`#${key}`).addClass('is-invalid');
-                                $(`#error-${key}`).text(value[0]);
-                            });
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Validasi Gagal!',
-                                text: 'Mohon periksa kembali input Anda.'
-                            });
+                            // Tangani error jika ada
+                            console.error(xhr.responseText);
+                            var err = JSON.parse(xhr.responseText);
+                            if (typeof Swal !== 'undefined') {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Oops...',
+                                    text: err.message,
+                                });
+                            } else {
+                                alert('Terjadi kesalahan saat menyimpan data.');
+                            }
+                        },
+                        complete: function() {
+                            // Aktifkan kembali tombol submit dan ubah teksnya
+                            $(form).find('button[type="submit"]').prop('disabled', false).text('Simpan');
                         }
                     });
-                    return false;
                 }
             });
 
-            $('#btn-kembali').on('click', function(e) {
-                e.preventDefault();
-                window.location.href = $(this).attr('href');
-            });
-        });
+        }); // End document ready
     </script>
-      </div>
-    </div>
-  </div> --}}
+@endpush

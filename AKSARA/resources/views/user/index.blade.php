@@ -11,7 +11,9 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h3 class="card-title">Data User</h3>
                     <a href="{{ route('user.create') }}" class="btn btn-primary btn-sm">Tambah</a>
-                    <button onclick="modalAction('{{ url('user/create_ajax') }}')" class="btn btn-sm btn-success mt-1">Tambah Ajax</button>
+                    <button type="button" class="btn btn-primary btn-sm" id="btn-tambah-user" data-bs-toggle="modal" data-bs-target="#modalCreateUser">
+                        Tambah Ajax
+                    </button>
                 </div>
 
                 <div class="card-body">
@@ -63,49 +65,22 @@
                                 <th>Aksi</th>
                             </tr>
                         </thead>
-                        {{-- <tbody>
-                            @foreach ($data as $item)
-                                <tr>
-                                    <td>{{ $item->user_id }}</td>
-                                    <td>{{ $item->nama }}</td>
-                                    <td>{{ $item->email }}</td>
-                                    <td>{{ $item->role }}</td>
-                                    <td>{{ $item->status }}</td>
-                                    <td>
-                                        <a href="{{ route('user.edit', $item->user_id) }}"
-                                            class="btn btn-warning btn-sm">Edit</a>
-                                        <form action="{{ route('user.destroy', $item->user_id) }}" method="POST"
-                                            style="display:inline;">
-                                            @csrf @method('DELETE')
-                                            <button class="btn btn-danger btn-sm"
-                                                onclick="return confirm('Hapus user ini?')">Hapus</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody> --}}
                     </table>
                 </div>
             </div>
         </div>
     </section>
-<div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" data-width="75%" aria-hidden="true"></div>
+    @include('user.create_ajax')
+</div>
 @endsection
 
 @push('js')
     <script>
-        // function modalAction(url = '') {
-        //     $('#myModal').load(url, function () {
-        //         const modal = new bootstrap.Modal(document.getElementById('myModal'));
-        //         modal.show();
-        //     });
-        // }
-        function modalAction(url = '') {
+        function modalAction() {
             $('#myModal').load(url, function() {
                 $('#myModal').modal('show');
             });
         }
-
 
         var dataUser
         $(document).ready(function() {

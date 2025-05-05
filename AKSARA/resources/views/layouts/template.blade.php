@@ -74,16 +74,54 @@
     <script src="{{ asset('mantis/dist/assets/js/plugins/buttons.print.min.js') }}"></script>
     <script src="{{ asset('mantis/dist/assets/js/plugins/buttons.colVis.min.js') }}"></script>
 
-    <!-- jQuery Validation Plugin -->
+    {{-- jQuery Validation Plugin --}}
     <script src="{{ asset('mantis/dist/assets/js/plugins/jquery-validation/jquery.validate.min.js') }}"></script>
     <script src="{{ asset('mantis/dist/assets/js/plugins/jquery-validation/additional-methods.min.js') }}"></script>
-
-    <!-- SweetAlert2 -->
+    {{-- <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/additional-methods.min.js"></script> --}}
+    {{-- Optional: SweetAlert2 untuk notifikasi yang lebih baik --}}
+    {{-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> --}}
     <script src="{{ asset('mantis/dist/assets/js/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
 
     <script>
         // Untuk mengirimkan token Laravel CSRF pada setiap request ajax
         $.ajaxSetup({headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}});
+
+        // Kustomisasi default message jQuery Validation agar lebih sesuai Bootstrap 5
+        $.extend($.validator.messages, {
+            required: "Kolom ini wajib diisi.",
+            remote: "Harap perbaiki kolom ini.",
+            email: "Harap masukkan format email yang valid.",
+            url: "Harap masukkan format URL yang valid.",
+            date: "Harap masukkan format tanggal yang valid.",
+            dateISO: "Harap masukkan format tanggal (ISO) yang valid.",
+            number: "Harap masukkan angka yang valid.",
+            digits: "Harap masukkan hanya digit.",
+            creditcard: "Harap masukkan nomor kartu kredit yang valid.",
+            equalTo: "Harap masukkan nilai yang sama lagi.",
+            accept: "Harap masukkan nilai dengan ekstensi yang valid.",
+            maxlength: $.validator.format("Harap masukkan tidak lebih dari {0} karakter."),
+            minlength: $.validator.format("Harap masukkan setidaknya {0} karakter."),
+            rangelength: $.validator.format("Harap masukkan nilai antara {0} dan {1} karakter."),
+            range: $.validator.format("Harap masukkan nilai antara {0} dan {1}."),
+            max: $.validator.format("Harap masukkan nilai kurang dari atau sama dengan {0}."),
+            min: $.validator.format("Harap masukkan nilai lebih dari atau sama dengan {0}.")
+        });
+
+        // Kustomisasi penempatan error dan highlight untuk Bootstrap 5
+        $.validator.setDefaults({
+            errorElement: 'span',
+            errorPlacement: function (error, element) {
+                error.addClass('invalid-feedback');
+                element.closest('.col-sm-10').append(error); // Sesuaikan selector jika struktur form berbeda
+            },
+            highlight: function (element, errorClass, validClass) {
+                $(element).addClass('is-invalid').removeClass('is-valid');
+            },
+            unhighlight: function (element, errorClass, validClass) {
+                $(element).removeClass('is-invalid').addClass('is-valid');
+            }
+        });
     </script>
     @stack('js')
 
