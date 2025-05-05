@@ -14,7 +14,7 @@ class DosenModel extends Model
         'nip',
         'bidang_keahlian',
         'created_at',
-        'update_at',
+        'updated_at',
     ];
 
     public function user()

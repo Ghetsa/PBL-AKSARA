@@ -6,6 +6,8 @@ use App\Models\UserModel;
 use App\Models\AdminModel;
 use App\Models\DosenModel;
 use App\Models\MahasiswaModel;
+use App\Models\PrestasiModel;
+use App\Models\ProdiModel;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
@@ -88,6 +90,10 @@ class UserController extends Controller
                 'nim' => 'required|string|max:50|unique:mahasiswa,nim',
                 'prodi_id' => 'required|exists:prodi,prodi_id',
                 'periode_id' => 'required|exists:periode,periode_id',
+                'bidang_minat' => 'nullable|string',
+                'keahlian' => 'nullable|string',
+                'sertifikasi' => 'nullable|string',
+                'pengalaman' => 'nullable|string',
             ]);
         }
 
@@ -116,6 +122,10 @@ class UserController extends Controller
                 'nim' => $request->nim,
                 'prodi_id' => $request->prodi_id,
                 'periode_id' => $request->periode_id,
+                'bidang_minat' => $request->bidang_minat,
+                'keahlian' => $request->keahlian,
+                'sertifikasi' => $request->sertifikasi,
+                'pengalaman' => $request->pengalaman,
             ]);
         }
 
@@ -195,6 +205,10 @@ class UserController extends Controller
                     'nim' => $request->nim,
                     'prodi_id' => $request->prodi_id,
                     'periode_id' => $request->periode_id,
+                    'bidang_minat' => $request->bidang_minat,
+                    'keahlian' => $request->keahlian,
+                    'sertifikasi' => $request->sertifikasi,
+                    'pengalaman' => $request->pengalaman,
                 ]
             );
         }
