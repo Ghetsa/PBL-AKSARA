@@ -24,6 +24,13 @@
     <link rel="stylesheet" href="{{ asset('mantis/dist/assets/css/plugins/dataTables.bootstrap5.min.css') }}">
     <link rel="stylesheet" href="{{ asset('mantis/dist/assets/css/plugins/responsive.bootstrap5.min.css') }}">
     <link rel="stylesheet" href="{{ asset('mantis/dist/assets/css/plugins/buttons.bootstrap5.min.css') }}">
+
+    <!-- SweetAlert2 CDN -->
+    {{-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> --}}
+    {{-- <link rel="stylesheet" href="{{ asset('mantis/dist/assets/css/plugins/themes/borderless.css') }}">
+    <link rel="stylesheet" href="{{ asset('mantis/dist/assets/css/plugins/themes/embed-iframe.css') }}"> --}}
+
+
     @yield('page-css')
     @stack('css')
 </head>
@@ -44,11 +51,11 @@
     @include('layouts.footer')
     <!-- jQuery -->
     {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}} 
-    <script src="{{ asset('mantis/dist/assets/js/plugins/jquery/jquery.min.js') }}"></script>
-
     <script src="{{ asset('mantis/dist/assets/js/plugins/popper.min.js') }}"></script>
-    <script src="{{ asset('mantis/dist/assets/js/plugins/simplebar.min.js') }}"></script>
+    <script src="{{ asset('mantis/dist/assets/js/plugins/jquery/jquery.min.js') }}"></script>
     <script src="{{ asset('mantis/dist/assets/js/plugins/bootstrap.min.js') }}"></script>
+
+    <script src="{{ asset('mantis/dist/assets/js/plugins/simplebar.min.js') }}"></script>
     <script src="{{ asset('mantis/dist/assets/js/fonts/custom-font.js') }}"></script>
     <script src="{{ asset('mantis/dist/assets/js/pcoded.js') }}"></script>
     <script src="{{ asset('mantis/dist/assets/js/plugins/feather.min.js') }}"></script>
@@ -66,6 +73,13 @@
     <script src="{{ asset('mantis/dist/assets/js/plugins/buttons.html5.min.js') }}"></script>
     <script src="{{ asset('mantis/dist/assets/js/plugins/buttons.print.min.js') }}"></script>
     <script src="{{ asset('mantis/dist/assets/js/plugins/buttons.colVis.min.js') }}"></script>
+
+    <!-- jQuery Validation Plugin -->
+    <script src="{{ asset('mantis/dist/assets/js/plugins/jquery-validation/jquery.validate.min.js') }}"></script>
+    <script src="{{ asset('mantis/dist/assets/js/plugins/jquery-validation/additional-methods.min.js') }}"></script>
+
+    <!-- SweetAlert2 -->
+    <script src="{{ asset('mantis/dist/assets/js/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
 
     <script>
         // Untuk mengirimkan token Laravel CSRF pada setiap request ajax

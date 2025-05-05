@@ -54,78 +54,79 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
+                </div>
 
-                    <div id="form-nip" style="display: none;">
-                        <div class="form-group row">
-                            <label for="nip" class="col-sm-2 col-form-label">NIP</label>
-                            <div class="col-sm-10">
-                                <input type="text" class="form-control" id="nip" name="nip"
-                                    value="{{ old('nip') }}">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="form-keahlian" style="display: none;">
-                        <div class="form-group row">
-                            <label for="bidang_keahlian" class="col-sm-2 col-form-label">Bidang Keahlian</label>
-                            <div class="col-sm-10">
-                                <input type="text" class="form-control" id="bidang_keahlian" name="bidang_keahlian"
-                                    value="{{ old('bidang_keahlian') }}">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="form-nim" style="display: none;">
-                        <div class="form-group row">
-                            <label for="nim" class="col-sm-2 col-form-label">NIM</label>
-                            <div class="col-sm-10">
-                                <input type="text" class="form-control" id="nim" name="nim"
-                                    value="{{ old('nim') }}">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="form-prodi_id" style="display: none;">
-                        <div class="form-group row">
-                            <label for="nip" class="col-sm-2 col-form-label">Prodi</label>
-                            <div class="col-sm-10">
-                                <input type="text" class="form-control" id="prodi_id" name="prodi_id"
-                                    value="{{ old('prodi_id') }}">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="form-periode_id" style="display: none;">
-                        <div class="form-group row">
-                            <label for="nip" class="col-sm-2 col-form-label">Periode</label>
-                            <div class="col-sm-10">
-                                <input type="text" class="form-control" id="periode_id" name="periode_id"
-                                    value="{{ old('periode_id') }}">
-                            </div>
-                        </div>
-                    </div>
-
+                <div id="form-nip" style="display: none;">
                     <div class="form-group row">
-                        <label for="status" class="col-sm-2 col-form-label">Status</label>
+                        <label for="nip" class="col-sm-2 col-form-label">NIP</label>
                         <div class="col-sm-10">
-                            <select class="form-control @error('status') is-invalid @enderror" id="status"
-                                name="status" required>
-                                <option value="">- Pilih Status -</option>
-                                <option value="aktif" {{ old('status') == 'aktif' ? 'selected' : '' }}>Aktif</option>
-                                <option value="nonaktif" {{ old('status') == 'nonaktif' ? 'selected' : '' }}>Nonaktif
-                                </option>
-                            </select>
-                            @error('status')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                            <input type="text" class="form-control" id="nip" name="nip"
+                                value="{{ old('nip') }}">
                         </div>
                     </div>
+                </div>
+
+                <div id="form-keahlian" style="display: none;">
                     <div class="form-group row">
-                        <div class="col-sm-10 offset-sm-2">
-                            <button type="submit" class="btn btn-primary">Simpan</button>
-                            <a class="btn btn-secondary ml-2" href="{{ route('user.index') }}">Kembali</a>
+                        <label for="bidang_keahlian" class="col-sm-2 col-form-label">Bidang Keahlian</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="bidang_keahlian" name="bidang_keahlian"
+                                value="{{ old('bidang_keahlian') }}">
                         </div>
                     </div>
+                </div>
+
+                <div id="form-nim" style="display: none;">
+                    <div class="form-group row">
+                        <label for="nim" class="col-sm-2 col-form-label">NIM</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="nim" name="nim"
+                                value="{{ old('nim') }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="form-prodi_id" style="display: none;">
+                    <div class="form-group row">
+                        <label for="nip" class="col-sm-2 col-form-label">Prodi</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="prodi_id" name="prodi_id"
+                                value="{{ old('prodi_id') }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="form-periode_id" style="display: none;">
+                    <div class="form-group row">
+                        <label for="nip" class="col-sm-2 col-form-label">Periode</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="periode_id" name="periode_id"
+                                value="{{ old('periode_id') }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label for="status" class="col-sm-2 col-form-label">Status</label>
+                    <div class="col-sm-10">
+                        <select class="form-control @error('status') is-invalid @enderror" id="status"
+                            name="status" required>
+                            <option value="">- Pilih Status -</option>
+                            <option value="aktif" {{ old('status') == 'aktif' ? 'selected' : '' }}>Aktif</option>
+                            <option value="nonaktif" {{ old('status') == 'nonaktif' ? 'selected' : '' }}>Nonaktif
+                            </option>
+                        </select>
+                        @error('status')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-10 offset-sm-2">
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                        <a class="btn btn-secondary ml-2" href="{{ route('user.index') }}">Kembali</a>
+                    </div>
+                </div>
             </form>
         </div>
     </div>
