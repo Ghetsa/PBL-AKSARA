@@ -18,6 +18,7 @@ class AdminModel extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(UserModel::class, 'user_id', 'user_id');
     }
+    
 }

@@ -191,7 +191,7 @@
                 <i class="ti ti-wallet"></i>
                 <span>Billing</span>
               </a>
-              <a href="#!" class="dropdown-item">
+              <a href="../logout" class="dropdown-item">
                 <i class="ti ti-power"></i>
                 <span>Logout</span>
               </a>

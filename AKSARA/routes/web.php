@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\AuthController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -12,7 +13,16 @@ use App\Http\Controllers\UserController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+Route::get('/login', [AuthController::class, 'login'])->name('login');
+Route::post('/postlogin', [AuthController::class, 'postlogin']);
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+// Route::get('login', [AuthController::class, 'login'])->name('login');
+// Route::post('login', [AuthController::class, 'postlogin']);
+// Route::get('logout', [AuthController::class, 'logout'])->middleware('auth');
+
+Route::get('register', [AuthController::class, 'register'])->name('register');
+Route::post('register', [AuthController::class, 'postregister']);
 Route::get('/', function () {
     return view('welcome');
 });
