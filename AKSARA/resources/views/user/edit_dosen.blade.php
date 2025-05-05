@@ -1,9 +1,9 @@
-{{-- @extends('layouts.template')
+@extends('layouts.template')
 
-@section('content') --}}
+@section('content')
     <div class="card card-outline card-primary">
         <div class="card-header">
-            <h3 class="card-title">Edit user</h3>
+            <h4 class="card-title">Edit User</h4>
             <div class="card-tools"></div>
         </div>
         <div class="card-body">
@@ -14,25 +14,51 @@
                 </div>
                 <a href="{{ url('user') }}" class="btn btn-sm btn-default mt-2">Kembali</a>
             @else
-                <form method="POST" action="{{ url('/user/' . $data->user_id) }}" class="form
-horizontal">
+                <form method="POST" action="{{ url('/user/' . $data->user_id) }}" class="form horizontal">
                     @csrf
-                    {!! method_field('PUT') !!} <!-- tambahkan baris ini untuk proses edit yang butuh
-                                                                                            method PUT -->
+                    {!! method_field('PUT') !!}
+                                                                                                                    method PUT -->
                     <div class="form-group row">
                         <label for="role" class="col-sm-2 col-form-label">Role</label>
                         <div class="col-sm-10">
-                            <select class="form-control @error('role') is-invalid @enderror" id="role" name="role" required>
+                            <select class="form-control @error('role') is-invalid @enderror" id="role" name="role"
+                                required>
                                 <option value="">- Pilih Role -</option>
-                                <option value="admin" {{ old('role', $data->role) == 'admin' ? 'selected' : '' }}>Admin</option>
-                                <option value="mahasiswa" {{ old('role', $data->role) == 'mahasiswa' ? 'selected' : '' }}>Mahasiswa</option>
-                                <option value="dosen" {{ old('role', $data->role) == 'dosen' ? 'selected' : '' }}>Dosen</option>
+                                <option value="admin" {{ old('role', $data->role) == 'admin' ? 'selected' : '' }}>Admin
+                                </option>
+                                <option value="mahasiswa" {{ old('role', $data->role) == 'mahasiswa' ? 'selected' : '' }}>
+                                    Mahasiswa</option>
+                                <option value="dosen" {{ old('role', $data->role) == 'dosen' ? 'selected' : '' }}>Dosen
+                                </option>
                             </select>
                             @error('role')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
                     </div>
+
+                    <div class="form-group row">
+                        <label class="col-1 control-label col-form-label">NIP</label>
+                        <div class="col-11">
+                            <input type="text" class="form-control" id="nip" name="nip"
+                                value="{{ old('nip', $data->dosen->nip) }}" required>
+                            @error('nip')
+                                <small class="form-text text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-1 control-label col-form-label">Bidang Keahlian</label>
+                        <div class="col-11">
+                            <input type="text" class="form-control" id="bidang_keahlian" name="bidang_keahlian"
+                                value="{{ old('bidang_keahlian', $data->dosen->bidang_keahlian) }}" required>
+                            @error('bidang_keahlian')
+                                <small class="form-text text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+                    </div>
+
                     <div class="form-group row">
                         <label class="col-1 control-label col-form-label">Nama</label>
                         <div class="col-11">
@@ -43,6 +69,7 @@ horizontal">
                             @enderror
                         </div>
                     </div>
+
                     <div class="form-group row">
                         <label class="col-1 control-label col-form-label">Email</label>
                         <div class="col-11">
@@ -53,19 +80,24 @@ horizontal">
                             @enderror
                         </div>
                     </div>
+
                     <div class="form-group row">
                         <label for="role" class="col-sm-2 col-form-label">Status</label>
                         <div class="col-sm-10">
-                            <select class="form-control @error('status') is-invalid @enderror" id="status" name="status" required>
+                            <select class="form-control @error('status') is-invalid @enderror" id="status" name="status"
+                                required>
                                 <option value="">- Pilih Status -</option>
-                                <option value="aktif" {{ old('status', $data->status) == 'aktif' ? 'selected' : '' }}>aktif</option>
-                                <option value="nonaktif" {{ old('status', $data->status) == 'nonaktif' ? 'selected' : '' }}>nonaktif</option>
+                                <option value="aktif" {{ old('status', $data->status) == 'aktif' ? 'selected' : '' }}>aktif
+                                </option>
+                                <option value="nonaktif" {{ old('status', $data->status) == 'nonaktif' ? 'selected' : '' }}>
+                                    nonaktif</option>
                             </select>
                             @error('status')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
                     </div>
+
                     <div class="form-group row">
                         <label class="col-1 control-label col-form-label">Password</label>
                         <div class="col-11">
@@ -78,6 +110,7 @@ horizontal">
                             @enderror
                         </div>
                     </div>
+
                     <div class="form-group row">
                         <label class="col-1 control-label col-form-label"></label>
                         <div class="col-11">
@@ -89,9 +122,9 @@ horizontal">
             @endempty
         </div>
     </div>
-{{-- @endsection --}}
+@endsection
 
-{{-- @push('css')
+@push('css')
 @endpush
 @push('js')
-@endpush --}}
+@endpush

@@ -126,13 +126,18 @@ class UserController extends Controller
     {
         $data = UserModel::findOrFail($id);
 
+        $breadcrumb = (object) [
+            'title' => 'Edit user',
+            'list' => ['User', 'Edit']
+        ];
+
         switch ($data->role) {
             case 'admin':
-                return view('user.edit_admin', compact('data'));
+                return view('user.edit_admin', compact('breadcrumb', 'data'));
             case 'dosen':
-                return view('user.edit_dosen', compact('data'));
+                return view('user.edit_dosen', compact('breadcrumb', 'data'));
             case 'mahasiswa':
-                return view('user.edit_mahasiswa', compact('data'));
+                return view('user.edit_mahasiswa', compact('breadcrumb', 'data'));
         }
     }
 
@@ -368,5 +373,4 @@ class UserController extends Controller
 
         return redirect('/');
     }
-
 }
