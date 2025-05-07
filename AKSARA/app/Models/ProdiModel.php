@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ProdiModel extends Model
 {
-    protected $table = 'prodi';
+    protected $table = 'program_studi';
     protected $primaryKey = 'prodi_id';
     public $timestamps = true;
 
