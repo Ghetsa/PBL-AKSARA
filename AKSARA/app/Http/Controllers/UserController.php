@@ -34,35 +34,35 @@ class UserController extends Controller
     public function list(Request $request)
     {
         $users = UserModel::select('user_id', 'nama', 'email', 'role', 'status');
-    
+
         // Filter data user berdasarkan role
         if (!empty($request->role)) {
             $users->where('role', $request->role);
         }
-    
+
         // Filter data user berdasarkan status
         if (!empty($request->status)) {
             $users->where('status', $request->status);
         }
-    
+
         return DataTables::of($users)
             ->addIndexColumn()
             ->addColumn('aksi', function ($user) {
                 // Ubah tombol Detail agar memanggil modalAction dengan route show_ajax
                 $btn = '<button onclick="modalAction(\'' . e(route('user.show_ajax', $user->user_id)) . '\')" class="btn btn-info btn-sm">Detail</button> ';
-    
+
                 // Ubah tombol Edit agar memanggil modalAction dengan route edit_ajax
                 $btn .= '<button onclick="modalAction(\'' . e(route('user.edit_ajax', $user->user_id)) . '\')" class="btn btn-warning btn-sm">Edit</button> ';
-    
+
                 // Tombol Hapus tetap menggunakan deleteConfirmAjax yang sudah memanggil modalAction
                 $btn .= '<button onclick="deleteConfirmAjax(' . e($user->user_id) . ')" class="btn btn-danger btn-sm">Hapus</button>';
-    
+
                 return $btn;
             })
             ->rawColumns(['aksi'])
             ->make(true);
     }
-    
+
 
     public function create()
     {
@@ -238,13 +238,6 @@ class UserController extends Controller
         return redirect()->route('user.index')->with('success', 'User berhasil dihapus');
     }
 
-
-    // public function create_ajax()
-    // {
-    //     $roles = ['admin', 'dosen', 'mahasiswa'];
-    //     return view('user.create_ajax')->with('roles', $roles);
-    // }
-
     public function create_ajax()
     {
         $roles = ['admin', 'dosen', 'mahasiswa'];
@@ -347,8 +340,8 @@ class UserController extends Controller
         $prodi = [];
         $periode = [];
         if ($user->role === 'mahasiswa') {
-             $prodi = ProdiModel::select('prodi_id', 'nama')->get();
-             $periode = PeriodeModel::select('periode_id', 'semester', 'tahun_akademik')->get();
+            $prodi = ProdiModel::select('prodi_id', 'nama')->get();
+            $periode = PeriodeModel::select('periode_id', 'semester', 'tahun_akademik')->get();
         }
 
         // Lewatkan data user, prodi, dan periode ke view
@@ -358,9 +351,9 @@ class UserController extends Controller
     // Method update_ajax untuk memproses submit form edit dari modal
     public function update_ajax(Request $request, $id)
     {
-         // Pastikan request datang dari AJAX
+        // Pastikan request datang dari AJAX
         if (!($request->ajax() || $request->wantsJson())) {
-             return response()->json(['message' => 'Invalid request'], 400);
+            return response()->json(['message' => 'Invalid request'], 400);
         }
 
         // Temukan user yang akan diupdate
@@ -391,8 +384,8 @@ class UserController extends Controller
             $rules['nim'] = 'required|string|max:50|unique:mahasiswa,nim,' . $user->user_id . ',user_id';
             $rules['prodi_id'] = 'required|exists:program_studi,prodi_id';
             $rules['periode_id'] = 'required|exists:periode,periode_id';
-             $rules['bidang_minat'] = 'required|string|max:255'; // Tambahkan validasi bidang minat
-             $rules['keahlian_mahasiswa'] = 'required|string|max:255'; // Tambahkan validasi keahlian mahasiswa
+            $rules['bidang_minat'] = 'required|string|max:255'; // Tambahkan validasi bidang minat
+            $rules['keahlian_mahasiswa'] = 'required|string|max:255'; // Tambahkan validasi keahlian mahasiswa
         }
 
         // Lakukan validasi
@@ -433,7 +426,7 @@ class UserController extends Controller
                     'bidang_keahlian' => $request->bidang_keahlian
                 ]
             );
-             // Hapus relasi admin/mahasiswa jika ada
+            // Hapus relasi admin/mahasiswa jika ada
             $user->admin()->delete();
             $user->mahasiswa()->delete();
         } elseif ($user->role == 'mahasiswa') {
@@ -443,11 +436,11 @@ class UserController extends Controller
                     'nim' => $request->nim,
                     'prodi_id' => $request->prodi_id,
                     'periode_id' => $request->periode_id,
-                     'bidang_minat' => $request->bidang_minat, // Simpan bidang minat
-                     'keahlian_mahasiswa' => $request->keahlian_mahasiswa // Simpan keahlian mahasiswa
+                    'bidang_minat' => $request->bidang_minat, // Simpan bidang minat
+                    'keahlian_mahasiswa' => $request->keahlian_mahasiswa // Simpan keahlian mahasiswa
                 ]
             );
-             // Hapus relasi admin/dosen jika ada
+            // Hapus relasi admin/dosen jika ada
             $user->admin()->delete();
             $user->dosen()->delete();
         }
