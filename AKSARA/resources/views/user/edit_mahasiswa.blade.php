@@ -123,6 +123,50 @@
                     </div>
 
                     <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Bidang Minat</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="bidang_minat" name="bidang_minat"
+                                value="{{ old('bidang_minat', $data->bidang_minat ?? ' ') }}" required>
+                            @error('bidang_minat')
+                                <small class="form-text text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Keahlian</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="keahlian" name="keahlian"
+                                value="{{ old('keahlian', $data->keahlian ?? ' ') }}" required>
+                            @error('keahlian')
+                                <small class="form-text text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Sertifikasi</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="sertifikasi" name="sertifikasi"
+                                value="{{ old('sertifikasi', $data->sertifikasi ?? ' ') }}" required>
+                            @error('sertifikasi')
+                                <small class="form-text text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Pengalaman</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="sertifikasi" name="sertifikasi"
+                                value="{{ old('pengalaman', $data->pengalaman ?? ' ') }}" required>
+                            @error('pengalaman')
+                                <small class="form-text text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
                         <label class="col-sm-2 col-form-label"></label>
                         <div class="col-sm-10">
                             <button type="submit" class="btn btn-primary btn-sm">Simpan</button>

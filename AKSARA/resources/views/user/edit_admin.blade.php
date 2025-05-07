@@ -17,7 +17,7 @@
                 <form method="POST" action="{{ url('/user/' . $data->user_id) }}" class="form horizontal">
                     @csrf
                     {!! method_field('PUT') !!}
-            
+
                     <div class="form-group row">
                         <label for="role" class="col-sm-2 col-form-label">Role</label>
                         <div class="col-sm-10">
