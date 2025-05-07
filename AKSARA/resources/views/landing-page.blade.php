@@ -2,37 +2,139 @@
 <html lang="en">
 <head>
     <title>@yield('title', 'AKSARA')</title>
-    
-    <meta name="csrf-token" content="{{ csrf_token() }}"> <!-- Untuk mengirimkan token Laravel CSRF pada setiap request ajax -->
-    
-    <meta charset="utf-8">
+
+    <meta name="csrf-token" content="{{ csrf_token() }}"> <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="description" content="Mantis is made using Bootstrap 5 design framework. Download the free admin template & use it for your project.">
-    <meta name="keywords" content="Mantis, Dashboard UI Kit, Bootstrap 5, Admin Template, Admin Dashboard, CRM, CMS, Bootstrap Admin Template">
-    <meta name="author" content="CodedThemes">
+    <meta name="description" content="Sistem Informasi Pencatatan Prestasi">
+    <meta name="keywords" content="Sistem Informasi, Pencatatan Prestasi, Mahasiswa, Dashboard">
+    <meta name="author" content="Tim Pengembang">
 
     <link rel="icon" href="{{ asset('mantis/dist/assets/images/favicon.svg') }}" type="image/x-icon">
-    <link rel="stylesheet" href="[https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap](https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap)" id="main-font-link">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" id="main-font-link">
     <link rel="stylesheet" href="{{ asset('mantis/dist/assets/fonts/tabler-icons.min.css') }}">
     <link rel="stylesheet" href="{{ asset('mantis/dist/assets/fonts/feather.css') }}">
     <link rel="stylesheet" href="{{ asset('mantis/dist/assets/fonts/fontawesome.css') }}">
     <link rel="stylesheet" href="{{ asset('mantis/dist/assets/fonts/material.css') }}">
     <link rel="stylesheet" href="{{ asset('mantis/dist/assets/css/style.css') }}" id="main-style-link">
     <link rel="stylesheet" href="{{ asset('mantis/dist/assets/css/style-preset.css') }}">
-      <!-- DataTables -->
     <link rel="stylesheet" href="{{ asset('mantis/dist/assets/css/plugins/dataTables.bootstrap5.min.css') }}">
     <link rel="stylesheet" href="{{ asset('mantis/dist/assets/css/plugins/responsive.bootstrap5.min.css') }}">
     <link rel="stylesheet" href="{{ asset('mantis/dist/assets/css/plugins/buttons.bootstrap5.min.css') }}">
 
-    <!-- SweetAlert2 CDN -->
-    {{-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> --}}
-    {{-- <link rel="stylesheet" href="{{ asset('mantis/dist/assets/css/plugins/themes/borderless.css') }}">
-    <link rel="stylesheet" href="{{ asset('mantis/dist/assets/css/plugins/themes/embed-iframe.css') }}"> --}}
+    <link rel="stylesheet" href="{{ asset('mantis/dist/assets/css/plugins/sweetalert2/sweetalert2.min.css') }}">
 
-
+    <style>
+        /* Beberapa penyesuaian gaya tambahan agar lebih serasi dengan Mantis */
+        .display-4 {
+            font-weight: 700;
+            color: #2c3e50; /* Warna heading gelap khas Mantis */
+        }
+        .lead {
+            color: #6c757d; /* Warna teks muted Bootstrap */
+        }
+        .btn-primary {
+            background-color: #4c51bf; /* Warna primer Mantis */
+            border-color: #4c51bf;
+        }
+        .btn-primary:hover {
+            background-color: #3b419e;
+            border-color: #3b419e;
+        }
+        .btn-outline-secondary {
+            color: #6c757d;
+            border-color: #6c757d;
+        }
+        .btn-outline-secondary:hover {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            color: #fff;
+        }
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        .card-text {
+            color: #6c757d;
+        }
+        .bg-light-mantis {
+            background-color: #f8f9fa; /* Warna background light khas Bootstrap */
+        }
+        .footer {
+            background-color: #343a40; /* Warna footer gelap khas Bootstrap */
+            color: #fff;
+            padding: 2rem 0;
+            text-align: center;
+            margin-top: 3rem;
+        }
+        .footer a {
+            color: #fff;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            color: #eee;
+        }
+        .illustration-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        /* Styling untuk Navbar */
+        .navbar {
+            background-color: #fff; /* Warna background navbar Mantis (light) */
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Efek shadow tipis navbar Mantis */
+            padding: 1rem 0;
+        }
+        .navbar-brand {
+            color: #4c51bf; /* Warna brand primer Mantis */
+            font-weight: 600;
+            font-size: 1.5rem;
+        }
+        .navbar-nav .nav-link {
+            color: #555; /* Warna link navbar Mantis */
+            margin-left: 1rem;
+        }
+        .navbar-nav .nav-link:hover, .navbar-nav .nav-link.active {
+            color: #4c51bf; /* Warna hover/aktif link navbar Mantis */
+        }
+        .navbar-toggler {
+            border: none;
+        }
+        .navbar-toggler:focus {
+            box-shadow: none;
+        }
+    </style>
 </head>
 <body data-pc-preset="preset-1" data-pc-direction="ltr" data-pc-theme="light">
+    <nav class="navbar navbar-expand-lg bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="#">AKSARA</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">Beranda</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Fitur</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Tentang</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-primary ms-lg-3" href="{{ route('login') }}">Masuk</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-outline-secondary ms-2" href="{{ route('register') }}">Daftar</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
     <div class="container mt-5">
         <div class="row align-items-center">
             <div class="col-md-6">
@@ -40,38 +142,37 @@
                 <p class="lead text-muted mb-4">
                     Platform terintegrasi untuk mencatat, mengelola, dan memantau prestasi mahasiswa secara efisien dan real-time.
                 </p>
-                <a href="{{ route('login') }}" class="btn btn-primary btn-lg me-2">Masuk</a>
-                <a href="{{ route('register') }}" class="btn btn-outline-secondary btn-lg">Daftar</a>
+                {{-- Tombol Masuk dan Daftar dipindahkan ke Navbar --}}
             </div>
-            <div class="col-md-6 text-center">
-                <img src="{{ asset('assets/images/illustration.svg') }}" alt="Ilustrasi Prestasi" class="img-fluid" style="max-height: 400px;">
+            <div class="col-md-6 illustration-container">
+                <img src="{{ asset('mantis/dist/assets/images/slider/img-slide-1.jpg') }}" alt="Ilustrasi Prestasi" class="img-fluid" style="max-height: 400px;">
             </div>
         </div>
 
         <hr class="my-5">
 
         <div class="row text-center">
-            <div class="col-md-4">
+            <div class="col-md-4 mb-4">
                 <div class="card shadow-sm border-0">
-                    <div class="card-body">
+                    <div class="card-body py-4">
                         <i class="fas fa-trophy fa-3x text-primary mb-3"></i>
                         <h5 class="card-title">Pencatatan Prestasi</h5>
                         <p class="card-text">Catat setiap pencapaian mahasiswa dengan mudah dan terstruktur.</p>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-4 mb-4">
                 <div class="card shadow-sm border-0">
-                    <div class="card-body">
+                    <div class="card-body py-4">
                         <i class="fas fa-chart-line fa-3x text-success mb-3"></i>
                         <h5 class="card-title">Analisis Data</h5>
                         <p class="card-text">Pantau perkembangan prestasi melalui grafik dan laporan interaktif.</p>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-4 mb-4">
                 <div class="card shadow-sm border-0">
-                    <div class="card-body">
+                    <div class="card-body py-4">
                         <i class="fas fa-users fa-3x text-warning mb-3"></i>
                         <h5 class="card-title">Manajemen Pengguna</h5>
                         <p class="card-text">Kelola peran dan akses pengguna sesuai kebutuhan institusi.</p>
@@ -80,19 +181,20 @@
             </div>
         </div>
     </div>
-    @include('layouts.footer')
-    <!-- jQuery -->
-    {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}} 
-    <script src="{{ asset('mantis/dist/assets/js/plugins/popper.min.js') }}"></script>
-    <script src="{{ asset('mantis/dist/assets/js/plugins/jquery/jquery.min.js') }}"></script>
-    <script src="{{ asset('mantis/dist/assets/js/plugins/bootstrap.min.js') }}"></script>
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; {{ date('Y') }} Sistem Informasi Pencatatan Prestasi. All rights reserved. | Design by <a href="#">Tim Pengembang</a></p>
+        </div>
+    </footer>
 
+    <script src="{{ asset('mantis/dist/assets/js/plugins/jquery/jquery.min.js') }}"></script>
+    <script src="{{ asset('mantis/dist/assets/js/plugins/popper.min.js') }}"></script>
+    <script src="{{ asset('mantis/dist/assets/js/plugins/bootstrap.min.js') }}"></script>
     <script src="{{ asset('mantis/dist/assets/js/plugins/simplebar.min.js') }}"></script>
     <script src="{{ asset('mantis/dist/assets/js/fonts/custom-font.js') }}"></script>
     <script src="{{ asset('mantis/dist/assets/js/pcoded.js') }}"></script>
     <script src="{{ asset('mantis/dist/assets/js/plugins/feather.min.js') }}"></script>
 
-    <!-- DataTables & Plugins -->
     <script src="{{ asset('mantis/dist/assets/js/plugins/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('mantis/dist/assets/js/plugins/dataTables.bootstrap5.min.js') }}"></script>
     <script src="{{ asset('mantis/dist/assets/js/plugins/dataTables.responsive.min.js') }}"></script>
@@ -109,10 +211,8 @@
     {{-- jQuery Validation Plugin --}}
     <script src="{{ asset('mantis/dist/assets/js/plugins/jquery-validation/jquery.validate.min.js') }}"></script>
     <script src="{{ asset('mantis/dist/assets/js/plugins/jquery-validation/additional-methods.min.js') }}"></script>
-    {{-- <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/additional-methods.min.js"></script> --}}
+
     {{-- Optional: SweetAlert2 untuk notifikasi yang lebih baik --}}
-    {{-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> --}}
     <script src="{{ asset('mantis/dist/assets/js/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
 
     <script>

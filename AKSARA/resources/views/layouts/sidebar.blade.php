@@ -53,7 +53,7 @@
               </li>
               <li class="pc-item">
                 <a href="{{ url('/lomba') }}" class="pc-link">
-                    <span class="pc-micon"><i class="ti ti-lock"></i></span>
+                    <span class="pc-micon"><i class="ti ti-award"></i></span>
                     <span class="pc-mtext">Rekomendasi Lomba</span>
                 </a>
               </li>
@@ -63,7 +63,7 @@
               </li>
               <li class="pc-item">
                 <a href="{{ url('/prestasi') }}" class="pc-link">
-                    <span class="pc-micon"><i class="ti ti-crown"></i></span>
+                    <span class="pc-micon"><i class="ti ti-trophy"></i></span>
                     <span class="pc-mtext">Prestasi</span>
                 </a>
               </li>
