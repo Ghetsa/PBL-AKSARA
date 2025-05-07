@@ -36,30 +36,29 @@ class UserController extends Controller
         $users = UserModel::select('user_id', 'nama', 'email', 'role', 'status');
 
         // Filter data user berdasarkan role
-        if ($request->role) {
+        if (!empty($request->role)) {
             $users->where('role', $request->role);
         }
 
         // Filter data user berdasarkan status
-        if ($request->status) {
+        if (!empty($request->status)) {
             $users->where('status', $request->status);
         }
 
         return DataTables::of($users)
-            // menambahkan kolom index / no urut (default nama kolom: DT_Rowindex)
             ->addIndexColumn()
-            ->addColumn('aksi', function ($user) {  // menambahkan kolom aksi
-                $btn = '<a href="' . url('/user/' . $user->user_id) . '" class="btn btn-info btn-sm">Detail</a> ';
-                $btn .= '<a href="' . url('/user/' . $user->user_id . '/edit') . '" class="btn btn-warning btn-sm">Edit</a> ';
-                $btn .= '<form class="d-inline-block" method="POST" action="' .
-                    url('/user/' . $user->user_id) . '">'
-                    . csrf_field() . method_field('DELETE') .
-                    '<button type="submit" class="btn btn-danger btn-sm" onclick="return confirm(\'Apakah Anda yakin menghapus data ini?\');">Hapus</button></form>';
+            ->addColumn('aksi', function ($user) {
+                // Ubah onclick untuk menggunakan modalAction yang dimodifikasi
+                $btn = '<button onclick="modalAction(\'' . e(url('/user/' . $user->user_id . '/show_ajax')) . '\')" class="btn btn-info btn-sm">Detail</button> ';
+                $btn .= '<button onclick="modalAction(\'' . e(url('/user/' . $user->user_id . '/edit_ajax')) . '\')" class="btn btn-warning btn-sm">Edit</button> ';
+                // Panggil fungsi deleteConfirmAjax yang akan memuat konten konfirmasi ke modal
+                $btn .= '<button onclick="deleteConfirmAjax(' . e($user->user_id) . ')" class="btn btn-danger btn-sm">Hapus</button>';
                 return $btn;
             })
-            ->rawColumns(['aksi']) // memberitahu bahwa kolom aksi adalah html
+            ->rawColumns(['aksi'])
             ->make(true);
     }
+
     public function create()
     {
         $breadcrumb = (object) [
@@ -409,6 +408,60 @@ class UserController extends Controller
             ]);
         }
 
+        return redirect('/');
+    }
+
+    public function confirm_ajax($id)
+    {
+        $user = UserModel::find($id);
+
+        // Kita tetap kembalikan view, biarkan blade yang menangani jika $user kosong
+        // Meskipun mengembalikan 404 JSON lebih 'standard' untuk API,
+        // tapi jika ini loading konten modal, kembalikan view yang ada errornya juga valid.
+        // Jika Anda ingin 404 JSON untuk panggilan non-AJAX langsung, tambahkan check $request->ajax()
+        return view('user.confirm_ajax', compact('user'));
+    }
+
+    // INI METODE delete_ajax ANDA, BIARKAN SEPERTI INI
+    public function delete_ajax(Request $request, $id)
+    {
+        if ($request->ajax() || $request->wantsJson()) {
+            $user = UserModel::find($id);
+
+            if ($user) {
+                try {
+                    // Hapus relasi jika ada (sesuaikan dengan model Anda)
+                    if ($user->admin) {
+                        $user->admin->delete();
+                    }
+                    if ($user->dosen) {
+                        $user->dosen->delete();
+                    }
+                    if ($user->mahasiswa) {
+                        $user->mahasiswa->delete();
+                    }
+
+                    $user->delete(); // Hapus data user utama
+
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'Data berhasil dihapus'
+                    ]);
+                } catch (\Exception $e) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Gagal menghapus data: ' . $e->getMessage()
+                    ], 500);
+                }
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data tidak ditemukan'
+                ], 404); // Kembalikan 404 jika user tidak ditemukan
+            }
+        }
+
+        // Jika bukan AJAX, redirect
         return redirect('/');
     }
 }

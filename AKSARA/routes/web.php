@@ -49,6 +49,8 @@ Route::group(['prefix' => 'user', 'as' => 'user.'], function () {
     Route::get('/{id}/edit', [UserController::class, 'edit'])->name('edit');
     Route::put('/{id}', [UserController::class, 'update'])->name('update');
     Route::delete('/{id}', [UserController::class, 'destroy'])->name('destroy');
+    Route::get('/{id}/confirm_ajax', [UserController::class, 'confirm_ajax'])->name('confirm_ajax');
+    Route::delete('/{id}/delete-ajax', [UserController::class, 'delete_ajax'])->name('delete_ajax');
 });
 
 Route::group(['prefix' => 'prodi', 'as' => 'prodi.'], function () {
