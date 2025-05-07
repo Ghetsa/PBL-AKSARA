@@ -126,6 +126,39 @@
                     </div>
                 </div>
 
+                <div id="form-bidang_minat" class="form-group row" style="display: block;">
+                    <label for="bidang_minat" class="col-sm-2 col-form-label">Bidang Minat</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control @error('bidang_minat') is-invalid @enderror"
+                            id="bidang_minat" name="bidang_minat" value="{{ old('bidang_minat') }}">
+                        @error('bidang_minat')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+
+                <div id="form-keahlian-mahasiswa" class="form-group row" style="display: block;">
+                    <label for="keahlian" class="col-sm-2 col-form-label">Keahlian</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control @error('keahlian') is-invalid @enderror" id="keahlian"
+                            name="keahlian" value="{{ old('keahlian') }}">
+                        @error('keahlian')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+
+                <div id="form-pengalaman" class="form-group row" style="display: block;">
+                    <label for="pengalaman" class="col-sm-2 col-form-label">Pengalaman</label>
+                    <div class="col-sm-10">
+                        <textarea class="form-control @error('pengalaman') is-invalid @enderror" id="pengalaman"
+                            name="pengalaman">{{ old('pengalaman') }}</textarea>
+                        @error('pengalaman')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+
                 <div class="form-group row">
                     <label for="status" class="col-sm-2 col-form-label">Status</label>
                     <div class="col-sm-10">
@@ -164,6 +197,8 @@
             const formNim = document.getElementById('form-nim');
             const formProdi_id = document.getElementById('form-prodi_id');
             const formPeriode = document.getElementById('form-periode_id');
+            const formBidangMinat = document.getElementById('form-bidang_minat');
+            const formKeahlianMahasiswa = document.getElementById('form-keahlian-mahasiswa');
 
             function toggleAdditionalForms() {
                 const role = roleSelect.value;
@@ -173,6 +208,8 @@
                     formKeahlian.style.display = 'none';
                     formProdi_id.style.display = 'none';
                     formPeriode.style.display = 'none';
+                    formBidangMinat.style.display = 'none';
+                    formKeahlianMahasiswa.style.display = 'none';
                 }
 
                 if (role === 'admin') {
@@ -181,6 +218,8 @@
                     formKeahlian.style.display = 'none';
                     formProdi_id.style.display = 'none';
                     formPeriode.style.display = 'none';
+                    formBidangMinat.style.display = 'none';
+                    formKeahlianMahasiswa.style.display = 'none';
                 }
                 if (role === 'dosen') {
                     formNip.style.display = 'block';
@@ -188,6 +227,8 @@
                     formKeahlian.style.display = 'block';
                     formProdi_id.style.display = 'none';
                     formPeriode.style.display = 'none';
+                    formBidangMinat.style.display = 'none';
+                    formKeahlianMahasiswa.style.display = 'none';
                 }
                 if (role === 'mahasiswa') {
                     formNip.style.display = 'none';
@@ -195,6 +236,8 @@
                     formNim.style.display = 'block';
                     formProdi_id.style.display = 'block';
                     formPeriode.style.display = 'block';
+                    formBidangMinat.style.display = 'block';
+                    formKeahlianMahasiswa.style.display = 'block';
                 }
             }
 
