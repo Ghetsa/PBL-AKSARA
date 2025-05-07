@@ -93,6 +93,22 @@
                         </div>
                     </div>
                 </div>
+                <div id="form-bidang_minat-modal" style="display: none;">
+                    <div class="form-group row mb-3">
+                        <label for="bidang_minat" class="col-sm-2 col-form-label">Bidang Minat</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="bidang_minat" name="bidang_minat">
+                        </div>
+                    </div>
+                </div>
+                <div id="form-keahlian-mahasiswa-modal" style="display: none;">
+                    <div class="form-group row mb-3">
+                        <label for="keahlian" class="col-sm-2 col-form-label">Keahlian Mahasiswa</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="keahlian_mahasiswa" name="keahlian_mahassiwa">
+                        </div>
+                    </div>
+                </div>
                     {{-- End Field tambahan --}}
         
                     <div class="form-group row mb-3">
@@ -134,6 +150,8 @@
                 const formNim = $('#form-nim-modal');
                 const formProdi_id = $('#form-prodi_id-modal');
                 const formPeriode = $('#form-periode_id-modal');
+                const formBidang_Minat = $('#form-bidang_minat-modal');
+                const formKeahlianMahasiswa = $('#form-keahlian-mahasiswa-modal');
         
                 // Reset semua ke hidden dulu
                 formNip.hide();
@@ -141,6 +159,8 @@
                 formNim.hide();
                 formProdi_id.hide();
                 formPeriode.hide();
+                formBidang_Minat.hide();
+                formKeahlianMahasiswa.hide();
         
                 // Reset required attribute jika ada
                 formNip.find('input').prop('required', false);
@@ -148,6 +168,8 @@
                 formNim.find('input').prop('required', false);
                 formProdi_id.find('input').prop('required', false);
                 formPeriode.find('input').prop('required', false);
+                formBidang_Minat.find('input').prop('required', false);
+                formKeahlianMahasiswa.find('input').prop('required', false);
         
                 if (role === 'admin') {
                     formNip.show();
@@ -165,6 +187,8 @@
                     formNim.find('input').prop('required', true); // NIM wajib untuk mahasiswa
                     formProdi_id.find('input').prop('required', true); // Prodi wajib untuk mahasiswa
                     formPeriode.find('input').prop('required', true); // Periode wajib untuk mahasiswa
+                    formBidang_Minat.find('input').prop('required', true); // Bidang Minat Wajib untuk mahasiswa
+                    formKeahlianMahasiswa.find('input').prop('required', true); // Keahlian mahasiswa Wajib untuk mahasiswa
                 }
             }
 
@@ -248,6 +272,12 @@
                     },
                         periode_id: {
                         required: "Periode wajib diisi untuk Mahasiswa"
+                    },
+                        bidang_Minat: {
+                        required: "Bidang Minat wajib diisi untuk Mahasiswa"
+                    },
+                        keahlian_mahasiswa: {
+                        required: "Keahlian mahasiswa wajib diisi untuk Mahasiswa"
                     }
                 },
                 submitHandler: function(form) {
