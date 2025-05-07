@@ -32,6 +32,10 @@ Route::get('/', function () {
 
     return view('landing-page', compact('breadcrumb'));
 });
+
+Route::get('/dashboard', function () {
+    return view('dashboard'); })->middleware('auth')->name('dashboard');
+
 Route::group(['prefix' => 'user', 'as' => 'user.'], function () {
     Route::get('/', [UserController::class, 'index'])->name('index');
     Route::post('/list', [UserController::class, 'list'])->name('list');
