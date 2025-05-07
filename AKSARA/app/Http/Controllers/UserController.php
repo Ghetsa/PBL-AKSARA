@@ -134,23 +134,28 @@ class UserController extends Controller
 
     public function edit($id)
     {
-        $data = UserModel::findOrFail($id);
+        $data = UserModel::findOrFail($id); // Ambil user berdasarkan ID
 
         $breadcrumb = (object) [
             'title' => 'Edit user',
             'list' => ['User', 'Edit']
         ];
 
+        // Muat data relasi (admin, dosen, atau mahasiswa) ke dalam objek $data
         switch ($data->role) {
             case 'admin':
+                $data->load('admin'); // Muat relasi 'admin'
                 return view('user.edit_admin', compact('breadcrumb', 'data'));
             case 'dosen':
+                $data->load('dosen'); // Muat relasi 'dosen'
                 return view('user.edit_dosen', compact('breadcrumb', 'data'));
             case 'mahasiswa':
+                $data->load('mahasiswa'); // Muat relasi 'mahasiswa'
                 return view('user.edit_mahasiswa', compact('breadcrumb', 'data'));
+            default:
+                abort(404, 'User role not supported for editing.');
         }
     }
-
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
