@@ -43,11 +43,14 @@ Route::group(['prefix' => 'user', 'as' => 'user.'], function () {
     Route::get('/', [UserController::class, 'index'])->name('index');
     Route::post('/list', [UserController::class, 'list'])->name('list');
     Route::get('/create', [UserController::class, 'create'])->name('create');
+    Route::post('/', [UserController::class, 'store'])->name('store'); // Non-AJAX store
     Route::get('/create_ajax', [UserController::class, 'create_ajax'])->name('create_ajax');
-    Route::post('/', [UserController::class, 'store'])->name('store');
+    Route::post('/store_ajax', [UserController::class, 'store_ajax'])->name('store_ajax'); // Jika Anda punya route store_ajax terpisah
     Route::get('/{id}', [UserController::class, 'show'])->name('show');
+    Route::get('/{id}/show_ajax', [UserController::class, 'show_ajax'])->name('show_ajax');
     Route::get('/{id}/edit', [UserController::class, 'edit'])->name('edit');
-    Route::put('/{id}', [UserController::class, 'update'])->name('update');
+    Route::get('/{id}/edit_ajax', [UserController::class, 'edit_ajax'])->name('edit_ajax');
+    Route::put('/{id}/update_ajax', [UserController::class, 'update_ajax'])->name('update_ajax');
     Route::delete('/{id}', [UserController::class, 'destroy'])->name('destroy');
     Route::get('/{id}/confirm_ajax', [UserController::class, 'confirm_ajax'])->name('confirm_ajax');
     Route::delete('/{id}/delete-ajax', [UserController::class, 'delete_ajax'])->name('delete_ajax');

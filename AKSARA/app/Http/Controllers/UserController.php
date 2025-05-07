@@ -34,30 +34,35 @@ class UserController extends Controller
     public function list(Request $request)
     {
         $users = UserModel::select('user_id', 'nama', 'email', 'role', 'status');
-
+    
         // Filter data user berdasarkan role
         if (!empty($request->role)) {
             $users->where('role', $request->role);
         }
-
+    
         // Filter data user berdasarkan status
         if (!empty($request->status)) {
             $users->where('status', $request->status);
         }
-
+    
         return DataTables::of($users)
             ->addIndexColumn()
             ->addColumn('aksi', function ($user) {
-                // Ubah onclick untuk menggunakan modalAction yang dimodifikasi
-                $btn = '<button onclick="modalAction(\'' . e(url('/user/' . $user->user_id . '/show_ajax')) . '\')" class="btn btn-info btn-sm">Detail</button> ';
-                $btn .= '<button onclick="modalAction(\'' . e(url('/user/' . $user->user_id . '/edit_ajax')) . '\')" class="btn btn-warning btn-sm">Edit</button> ';
-                // Panggil fungsi deleteConfirmAjax yang akan memuat konten konfirmasi ke modal
+                // Ubah tombol Detail agar memanggil modalAction dengan route show_ajax
+                $btn = '<button onclick="modalAction(\'' . e(route('user.show_ajax', $user->user_id)) . '\')" class="btn btn-info btn-sm">Detail</button> ';
+    
+                // Ubah tombol Edit agar memanggil modalAction dengan route edit_ajax
+                $btn .= '<button onclick="modalAction(\'' . e(route('user.edit_ajax', $user->user_id)) . '\')" class="btn btn-warning btn-sm">Edit</button> ';
+    
+                // Tombol Hapus tetap menggunakan deleteConfirmAjax yang sudah memanggil modalAction
                 $btn .= '<button onclick="deleteConfirmAjax(' . e($user->user_id) . ')" class="btn btn-danger btn-sm">Hapus</button>';
+    
                 return $btn;
             })
             ->rawColumns(['aksi'])
             ->make(true);
     }
+    
 
     public function create()
     {
@@ -329,96 +334,137 @@ class UserController extends Controller
 
     public function edit_ajax(string $id)
     {
-        $user = UserModel::find($id);
-        $roles = ['admin', 'dosen', 'mahasiswa'];
+        // Temukan user beserta relasinya
+        $user = UserModel::with(['admin', 'dosen', 'mahasiswa'])->find($id);
 
-        return view('user.edit_ajax', ['user' => $user, 'roles' => $roles]);
-    }
-
-    public function update_ajax(Request $request, $id)
-    {
-        if ($request->ajax() || $request->wantsJson()) {
-            $validator = Validator::make($request->all(), [
-                'nama' => 'required|string|max:255',
-                'email' => 'required|email|unique:users,email,' . $id . ',user_id',
-                'role' => 'required|in:admin,dosen,mahasiswa',
-                'status' => 'required|in:aktif,nonaktif',
-            ]);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Validasi gagal.',
-                    'msgField' => $validator->errors()
-                ]);
-            }
-
-            if ($request->role == 'dosen') {
-                $request->validate([
-                    'nip' => 'required|string|max:50',
-                    'bidang_keahlian' => 'required|string|max:50',
-                ]);
-            } elseif ($request->role == 'admin') {
-                $request->validate([
-                    'nip' => 'required|string|max:50',
-                ]);
-            } elseif ($request->role == 'mahasiswa') {
-                $request->validate([
-                    'nim' => 'required|string|max:50|unique:mahasiswa,nim,' . $id . ',user_id',
-                    'prodi_id' => 'required|exists:program_studi,prodi_id',
-                    'periode_id' => 'required|exists:periode,periode_id',
-                ]);
-            }
-
-            $user = UserModel::findOrFail($id);
-            $user->update([
-                'nama' => $request->nama,
-                'email' => $request->email,
-                'role' => $request->role,
-                'status' => $request->status,
-            ]);
-
-            if ($request->role == 'admin') {
-                AdminModel::updateOrCreate(
-                    ['user_id' => $user->user_id],
-                    ['nip' => $request->nip]
-                );
-            } elseif ($request->role == 'dosen') {
-                DosenModel::updateOrCreate(
-                    ['user_id' => $user->user_id],
-                    [
-                        'nip' => $request->nip,
-                        'bidang_keahlian' => $request->bidang_keahlian
-                    ]
-                );
-            } elseif ($request->role == 'mahasiswa') {
-                MahasiswaModel::updateOrCreate(
-                    ['user_id' => $user->user_id],
-                    [
-                        'nim' => $request->nim,
-                        'prodi_id' => $request->prodi_id,
-                        'periode_id' => $request->periode_id,
-                    ]
-                );
-            }
-
-            return response()->json([
-                'status' => true,
-                'message' => 'User berhasil diupdate'
-            ]);
+        // Jika user tidak ditemukan, kembalikan view error
+        if (!$user) {
+            // Mengembalikan view kosong atau view error minimalis
+            return view('user.edit_ajax', ['user' => null]);
         }
 
-        return redirect('/');
+        // Ambil data prodi dan periode jika user adalah mahasiswa
+        $prodi = [];
+        $periode = [];
+        if ($user->role === 'mahasiswa') {
+             $prodi = ProdiModel::select('prodi_id', 'nama')->get();
+             $periode = PeriodeModel::select('periode_id', 'semester', 'tahun_akademik')->get();
+        }
+
+        // Lewatkan data user, prodi, dan periode ke view
+        return view('user.edit_ajax', compact('user', 'prodi', 'periode'));
     }
 
+    // Method update_ajax untuk memproses submit form edit dari modal
+    public function update_ajax(Request $request, $id)
+    {
+         // Pastikan request datang dari AJAX
+        if (!($request->ajax() || $request->wantsJson())) {
+             return response()->json(['message' => 'Invalid request'], 400);
+        }
+
+        // Temukan user yang akan diupdate
+        $user = UserModel::find($id);
+
+        if (!$user) {
+            return response()->json(['message' => 'User tidak ditemukan'], 404);
+        }
+
+        // Aturan validasi umum
+        $rules = [
+            'nama' => 'required|string|max:255',
+            // Validasi unique email, kecualikan user yang sedang diedit
+            'email' => 'required|email|unique:users,email,' . $user->user_id . ',user_id',
+            'status' => 'required|in:aktif,nonaktif',
+            // Role tidak divalidasi di sini karena tidak diubah di form edit AJAX
+            // Password hanya divalidasi jika diisi
+            'password' => 'nullable|string|min:6',
+        ];
+
+        // Aturan validasi khusus berdasarkan role user yang sedang diedit
+        if ($user->role == 'dosen') {
+            $rules['nip_dosen'] = 'required|string|max:50'; // Gunakan nama field dari form
+            $rules['bidang_keahlian'] = 'required|string|max:50';
+        } elseif ($user->role == 'admin') {
+            $rules['nip_admin'] = 'required|string|max:50'; // Gunakan nama field dari form
+        } elseif ($user->role == 'mahasiswa') {
+            $rules['nim'] = 'required|string|max:50|unique:mahasiswa,nim,' . $user->user_id . ',user_id';
+            $rules['prodi_id'] = 'required|exists:program_studi,prodi_id';
+            $rules['periode_id'] = 'required|exists:periode,periode_id';
+             $rules['bidang_minat'] = 'required|string|max:255'; // Tambahkan validasi bidang minat
+             $rules['keahlian_mahasiswa'] = 'required|string|max:255'; // Tambahkan validasi keahlian mahasiswa
+        }
+
+        // Lakukan validasi
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validasi gagal.',
+                'errors' => $validator->errors() // Gunakan 'errors' untuk konsistensi
+            ], 422); // Status 422 Unprocessable Entity untuk error validasi
+        }
+
+        // Update data user utama
+        $user->nama = $request->nama;
+        $user->email = $request->email;
+        $user->status = $request->status;
+        // Update password hanya jika diisi
+        if ($request->filled('password')) {
+            $user->password = bcrypt($request->password);
+        }
+        $user->save();
+
+        // Update data relasi berdasarkan role user
+        if ($user->role == 'admin') {
+            AdminModel::updateOrCreate(
+                ['user_id' => $user->user_id],
+                ['nip' => $request->nip_admin] // Gunakan nama field dari form
+            );
+            // Hapus relasi dosen/mahasiswa jika ada (jika role sebelumnya bukan admin)
+            $user->dosen()->delete();
+            $user->mahasiswa()->delete();
+        } elseif ($user->role == 'dosen') {
+            DosenModel::updateOrCreate(
+                ['user_id' => $user->user_id],
+                [
+                    'nip' => $request->nip_dosen, // Gunakan nama field dari form
+                    'bidang_keahlian' => $request->bidang_keahlian
+                ]
+            );
+             // Hapus relasi admin/mahasiswa jika ada
+            $user->admin()->delete();
+            $user->mahasiswa()->delete();
+        } elseif ($user->role == 'mahasiswa') {
+            MahasiswaModel::updateOrCreate(
+                ['user_id' => $user->user_id],
+                [
+                    'nim' => $request->nim,
+                    'prodi_id' => $request->prodi_id,
+                    'periode_id' => $request->periode_id,
+                     'bidang_minat' => $request->bidang_minat, // Simpan bidang minat
+                     'keahlian_mahasiswa' => $request->keahlian_mahasiswa // Simpan keahlian mahasiswa
+                ]
+            );
+             // Hapus relasi admin/dosen jika ada
+            $user->admin()->delete();
+            $user->dosen()->delete();
+        }
+        // Catatan: Logika di atas mengasumsikan role tidak berubah.
+        // Jika role bisa berubah, logika updateOrCreate dan penghapusan relasi perlu disesuaikan.
+        // Kode Anda tampaknya mengasumsikan role tidak berubah di form edit AJAX.
+
+        // Kembalikan respons sukses JSON
+        return response()->json([
+            'status' => true,
+            'message' => 'User berhasil diupdate'
+        ]);
+    }
     public function confirm_ajax($id)
     {
         $user = UserModel::find($id);
 
-        // Kita tetap kembalikan view, biarkan blade yang menangani jika $user kosong
-        // Meskipun mengembalikan 404 JSON lebih 'standard' untuk API,
-        // tapi jika ini loading konten modal, kembalikan view yang ada errornya juga valid.
-        // Jika Anda ingin 404 JSON untuk panggilan non-AJAX langsung, tambahkan check $request->ajax()
         return view('user.confirm_ajax', compact('user'));
     }
 
