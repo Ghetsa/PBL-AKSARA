@@ -33,22 +33,13 @@
         .lead {
             color: #6c757d; /* Warna teks muted Bootstrap */
         }
-        .btn-primary {
-            background-color: #4c51bf; /* Warna primer Mantis */
-            border-color: #4c51bf;
-        }
         .btn-primary:hover {
-            background-color: #3b419e;
-            border-color: #3b419e;
+            border-radius: 10%;
+            background-color: #2c3e50
         }
         .btn-outline-secondary {
             color: #6c757d;
             border-color: #6c757d;
-        }
-        .btn-outline-secondary:hover {
-            background-color: #6c757d;
-            border-color: #6c757d;
-            color: #fff;
         }
         .card-title {
             font-size: 1.25rem;
@@ -87,8 +78,9 @@
             padding: 1rem 0;
         }
         .navbar-brand {
-            color: #4c51bf; /* Warna brand primer Mantis */
-            font-weight: 600;
+            /* color: #2c3e50; */
+            color: #343a40;
+            font-weight: 800;
             font-size: 1.5rem;
         }
         .navbar-nav .nav-link {
@@ -96,7 +88,7 @@
             margin-left: 1rem;
         }
         .navbar-nav .nav-link:hover, .navbar-nav .nav-link.active {
-            color: #4c51bf; /* Warna hover/aktif link navbar Mantis */
+            color: white
         }
         .navbar-toggler {
             border: none;
@@ -115,20 +107,20 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
+                    {{-- <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="#">Beranda</a>
+                    </li> --}}
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-primary ms-lg-3" href="#">Fitur</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Fitur</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Tentang</a>
+                        <a class="nav-link btn btn-primary ms-lg-3" href="#">Tentang</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link btn btn-primary ms-lg-3" href="{{ route('login') }}">Masuk</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link btn btn-outline-secondary ms-2" href="{{ route('register') }}">Daftar</a>
+                        <a class="nav-link btn btn-primary ms-lg-3" href="{{ route('register') }}">Daftar</a>
                     </li>
                 </ul>
             </div>

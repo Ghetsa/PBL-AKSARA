@@ -17,7 +17,6 @@
                 <form method="POST" action="{{ url('/user/' . $data->user_id) }}" class="form horizontal">
                     @csrf
                     {!! method_field('PUT') !!}
-                                                                                                                    method PUT -->
                     <div class="form-group row">
                         <label for="role" class="col-sm-2 col-form-label">Role</label>
                         <div class="col-sm-10">
@@ -38,10 +37,10 @@
                     </div>
 
                     <div class="form-group row">
-                        <label class="col-1 control-label col-form-label">NIP</label>
-                        <div class="col-11">
+                        <label class="col-sm-2 col-form-label">NIP</label>
+                        <div class="col-sm-10">
                             <input type="text" class="form-control" id="nip" name="nip"
-                                value="{{ old('nip', $data->dosen->nip) }}" required>
+                                value="{{ old('nip', $data->dosen->nip ?? ' ') }}" required>
                             @error('nip')
                                 <small class="form-text text-danger">{{ $message }}</small>
                             @enderror
@@ -50,9 +49,9 @@
 
                     <div class="form-group row">
                         <label class="col-1 control-label col-form-label">Bidang Keahlian</label>
-                        <div class="col-11">
+                        <div class="col-sm-10">
                             <input type="text" class="form-control" id="bidang_keahlian" name="bidang_keahlian"
-                                value="{{ old('bidang_keahlian', $data->dosen->bidang_keahlian) }}" required>
+                                value="{{ old('bidang_keahlian', $data->dosen->bidang_keahlian ?? '')}}" required>
                             @error('bidang_keahlian')
                                 <small class="form-text text-danger">{{ $message }}</small>
                             @enderror
@@ -61,7 +60,7 @@
 
                     <div class="form-group row">
                         <label class="col-1 control-label col-form-label">Nama</label>
-                        <div class="col-11">
+                        <div class="col-sm-10">
                             <input type="text" class="form-control" id="nama" name="nama"
                                 value="{{ old('nama', $data->nama) }}" required>
                             @error('nama')
@@ -72,7 +71,7 @@
 
                     <div class="form-group row">
                         <label class="col-1 control-label col-form-label">Email</label>
-                        <div class="col-11">
+                        <div class="col-sm-10">
                             <input type="text" class="form-control" id="email" name="email"
                                 value="{{ old('email', $data->email) }}" required>
                             @error('email')
@@ -100,7 +99,7 @@
 
                     <div class="form-group row">
                         <label class="col-1 control-label col-form-label">Password</label>
-                        <div class="col-11">
+                        <div class="col-sm-10">
                             <input type="password" class="form-control" id="password" name="password">
                             @error('password')
                                 <small class="form-text text-danger">{{ $message }}</small>
@@ -113,7 +112,7 @@
 
                     <div class="form-group row">
                         <label class="col-1 control-label col-form-label"></label>
-                        <div class="col-11">
+                        <div class="col-sm-10">
                             <button type="submit" class="btn btn-primary btn-sm">Simpan</button>
                             <a class="btn btn-sm btn-default ml-1" href="{{ url('user') }}">Kembali</a>
                         </div>
