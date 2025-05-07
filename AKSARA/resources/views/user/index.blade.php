@@ -10,10 +10,10 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h3 class="card-title">Data User</h3>
-                    <a href="{{ route('user.create') }}" class="btn btn-primary btn-sm">Tambah</a>
-                    <button type="button" class="btn btn-primary btn-sm" id="btn-tambah-user" data-bs-toggle="modal" data-bs-target="#modalCreateUser">
-                        Tambah Ajax
-                    </button>
+                    <div class="card-tools">
+                        <a href="{{ route('user.create') }}" class="btn btn-success btn-sm">Tambah</a>
+                        <button type="button" class="btn btn-primary btn-sm" id="btn-tambah-user" data-bs-toggle="modal" data-bs-target="#modalCreateUser">Tambah Ajax</button>
+                    </div>
                 </div>
 
                 <div class="card-body">

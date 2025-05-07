@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>@yield('title', 'Sample Page | Mantis Bootstrap 5 Admin Template')</title>
+    <title>@yield('title', 'AKSARA')</title>
     
     <meta name="csrf-token" content="{{ csrf_token() }}"> <!-- Untuk mengirimkan token Laravel CSRF pada setiap request ajax -->
     

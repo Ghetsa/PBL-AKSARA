@@ -13,6 +13,7 @@ use App\Http\Controllers\AuthController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+
 Route::get('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/postlogin', [AuthController::class, 'postlogin']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -24,7 +25,12 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('register', [AuthController::class, 'register'])->name('register');
 Route::post('register', [AuthController::class, 'postregister']);
 Route::get('/', function () {
-    return view('welcome');
+    $breadcrumb = (object) [
+        'title' => 'Lading Page',
+        'list' => ['User']
+    ];
+
+    return view('landing-page', compact('breadcrumb'));
 });
 Route::group(['prefix' => 'user', 'as' => 'user.'], function () {
     Route::get('/', [UserController::class, 'index'])->name('index');
