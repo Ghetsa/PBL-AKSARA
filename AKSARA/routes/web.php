@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProdiController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -34,7 +36,8 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    return view('dashboard'); })->middleware('auth')->name('dashboard');
+    return view('dashboard');
+})->middleware('auth')->name('dashboard');
 
 Route::group(['prefix' => 'user', 'as' => 'user.'], function () {
     Route::get('/', [UserController::class, 'index'])->name('index');
@@ -46,4 +49,16 @@ Route::group(['prefix' => 'user', 'as' => 'user.'], function () {
     Route::get('/{id}/edit', [UserController::class, 'edit'])->name('edit');
     Route::put('/{id}', [UserController::class, 'update'])->name('update');
     Route::delete('/{id}', [UserController::class, 'destroy'])->name('destroy');
+});
+
+Route::group(['prefix' => 'prodi', 'as' => 'prodi.'], function () {
+    Route::get('/', [ProdiController::class, 'index'])->name('index');
+    Route::post('/list', [ProdiController::class, 'list'])->name('list');
+    Route::get('/create', [UserController::class, 'create'])->name('create');
+    Route::get('/create_ajax', [UserController::class, 'create_ajax'])->name('create_ajax');
+    Route::post('/', [ProdiController::class, 'store'])->name('store');
+    Route::get('/{id}', [ProdiController::class, 'show'])->name('show');
+    Route::get('/{id}/edit', [ProdiController::class, 'edit'])->name('edit');
+    Route::put('/{id}', [ProdiController::class, 'update'])->name('update');
+    Route::delete('/{id}', [ProdiController::class, 'destroy'])->name('destroy');
 });

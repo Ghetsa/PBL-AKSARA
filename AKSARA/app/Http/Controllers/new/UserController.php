@@ -18,16 +18,12 @@ class UserController extends Controller
     public function index()
     {
         $data = UserModel::all();
-        $prodi = ProdiModel::select('prodi_id', 'kode', 'nama')->get();
-        $periode = PeriodeModel::select('periode_id', 'semester', 'tahun_akademik')->get();
-        $roles = ['admin', 'dosen', 'mahasiswa'];
-
         $breadcrumb = (object) [
             'title' => 'Manajemen User',
             'list' => ['User']
         ];
 
-        return view('user.index', compact('data', 'breadcrumb', 'prodi', 'periode', 'roles'));
+        return view('user.index', compact('data', 'breadcrumb'));
     }
 
     // Ambil data user dalam bentuk json untuk datatables
@@ -60,6 +56,7 @@ class UserController extends Controller
             ->rawColumns(['aksi']) // memberitahu bahwa kolom aksi adalah html
             ->make(true);
     }
+
     public function create()
     {
         $breadcrumb = (object) [
@@ -95,7 +92,7 @@ class UserController extends Controller
         } elseif ($request->role == 'mahasiswa') {
             $request->validate([
                 'nim' => 'required|string|max:50|unique:mahasiswa,nim',
-                'prodi_id' => 'required|exists:program_studi,prodi_id',
+                'prodi_id' => 'required|exists:prodi,prodi_id',
                 'periode_id' => 'required|exists:periode,periode_id',
                 'bidang_minat' => 'nullable|string',
                 'keahlian' => 'nullable|string',
@@ -141,28 +138,23 @@ class UserController extends Controller
 
     public function edit($id)
     {
-        $data = UserModel::findOrFail($id); // Ambil user berdasarkan ID
+        $data = UserModel::findOrFail($id);
 
         $breadcrumb = (object) [
             'title' => 'Edit user',
             'list' => ['User', 'Edit']
         ];
 
-        // Muat data relasi (admin, dosen, atau mahasiswa) ke dalam objek $data
         switch ($data->role) {
             case 'admin':
-                $data->load('admin'); // Muat relasi 'admin'
                 return view('user.edit_admin', compact('breadcrumb', 'data'));
             case 'dosen':
-                $data->load('dosen'); // Muat relasi 'dosen'
                 return view('user.edit_dosen', compact('breadcrumb', 'data'));
             case 'mahasiswa':
-                $data->load('mahasiswa'); // Muat relasi 'mahasiswa'
                 return view('user.edit_mahasiswa', compact('breadcrumb', 'data'));
-            default:
-                abort(404, 'User role not supported for editing.');
         }
     }
+
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
@@ -184,7 +176,7 @@ class UserController extends Controller
         } elseif ($request->role == 'mahasiswa') {
             $request->validate([
                 'nim' => 'required|string|max:50|unique:mahasiswa,nim,' . $id . ',user_id',
-                'prodi_id' => 'required|exists:program_studi,prodi_id',
+                'prodi_id' => 'required|exists:prodi,prodi_id',
                 'periode_id' => 'required|exists:periode,periode_id',
             ]);
         }
@@ -235,12 +227,6 @@ class UserController extends Controller
     }
 
 
-    // public function create_ajax()
-    // {
-    //     $roles = ['admin', 'dosen', 'mahasiswa'];
-    //     return view('user.create_ajax')->with('roles', $roles);
-    // }
-
     public function create_ajax()
     {
         $roles = ['admin', 'dosen', 'mahasiswa'];
@@ -285,7 +271,7 @@ class UserController extends Controller
             } elseif ($request->role == 'mahasiswa') {
                 $request->validate([
                     'nim' => 'required|string|max:50|unique:mahasiswa,nim',
-                    'prodi_id' => 'required|exists:program_studi,prodi_id',
+                    'prodi_id' => 'required|exists:prodi,prodi_id',
                     'periode_id' => 'required|exists:periode,periode_id',
                 ]);
             }
@@ -366,7 +352,7 @@ class UserController extends Controller
             } elseif ($request->role == 'mahasiswa') {
                 $request->validate([
                     'nim' => 'required|string|max:50|unique:mahasiswa,nim,' . $id . ',user_id',
-                    'prodi_id' => 'required|exists:program_studi,prodi_id',
+                    'prodi_id' => 'required|exists:prodi,prodi_id',
                     'periode_id' => 'required|exists:periode,periode_id',
                 ]);
             }

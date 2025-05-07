@@ -86,43 +86,37 @@
                     </div>
                 </div>
 
-                <div id="form-prodi_id" style="display: none;">
-                    <div class="form-group row">
-                        <label for="prodi_id" class="col-sm-2 col-form-label">Prodi</label>
-                        <div class="col-sm-10">
-                            <select class="form-control @error('prodi_id') is-invalid @enderror" id="prodi_id" name="prodi_id" required>
-                                <option value="">- Pilih Prodi -</option>
-                                @foreach($prodi as $item)
-                                    <option value="{{ $item->prodi_id }}">{{ $item->nama }}</option>
-                                @endforeach
-                                {{-- <option value="1" {{ old('prodi_id') == '1' ? 'selected' : '' }}>Informatika</option>
-                                <option value="2" {{ old('prodi_id') == '2' ? 'selected' : '' }}>Sistem Informasi</option> --}}
-                            </select>
-                            @error('prodi_id')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
+                <div id="form-prodi_id" class="form-group row" style="display: none;">
+                    <label for="prodi_id" class="col-sm-2 col-form-label">Prodi</label>
+                    <div class="col-sm-10">
+                        <select class="form-control @error('prodi_id') is-invalid @enderror" id="prodi_id" name="prodi_id"
+                            required>
+                            <option value="">- Pilih Prodi -</option>
+                            <option value="1" {{ old('prodi_id') == '1' ? 'selected' : '' }}>Informatika
+                            </option>
+                            <option value="2" {{ old('prodi_id') == '2' ? 'selected' : '' }}>Sistem
+                                Informasi</option>
+                        </select>
+                        @error('prodi_id')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                 </div>
 
-                <div id="form-periode_id" style="display: none;">
-                    <div class="form-group row">
-                        <label for="periode_id" class="col-sm-2 col-form-label">Periode</label>
-                        <div class="col-sm-10">
-                            <select class="form-control @error('periode_id') is-invalid @enderror" id="periode_id" name="periode_id" required>
-                                <option value="">- Pilih Periode -</option>
-                                @foreach($periode as $item)
-                                    <option value="{{ $item->periode_id }}">{{ $item->tahun_akademik }} / {{ $item->semester }}</option>
-                                @endforeach
-                                {{-- <option value="1" {{ old('periode_id') == '1' ? 'selected' : '' }}>2024/2025
-                                </option>
-                                <option value="2" {{ old('periode_id') == '2' ? 'selected' : '' }}>2025/2026
-                                </option> --}}
-                            </select>
-                            @error('periode_id')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
+                <div id="form-periode_id" class="form-group row" style="display: none;">
+                    <label for="periode_id" class="col-sm-2 col-form-label">Periode</label>
+                    <div class="col-sm-10">
+                        <select class="form-control @error('periode_id') is-invalid @enderror" id="periode_id"
+                            name="periode_id" required>
+                            <option value="">- Pilih Periode -</option>
+                            <option value="1" {{ old('periode_id') == '1' ? 'selected' : '' }}>2024/2025
+                            </option>
+                            <option value="2" {{ old('periode_id') == '2' ? 'selected' : '' }}>2025/2026
+                            </option>
+                        </select>
+                        @error('periode_id')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                 </div>
 

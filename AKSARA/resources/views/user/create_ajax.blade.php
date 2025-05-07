@@ -69,20 +69,30 @@
                 </div>
                 <div id="form-prodi_id-modal" style="display: none;">
                     <div class="form-group row mb-3">
-                        <label for="prodi_id" class="col-sm-2 col-form-label">Prodi</label> {{-- Ganti label for --}}
+                        <label for="prodi_id" class="col-sm-2 col-form-label">Prodi</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control" id="prodi_id" name="prodi_id">
-                        </div>
+                            <select class="form-control @error('prodi_id') is-invalid @enderror" id="prodi_id" name="prodi_id" required>
+                                <option value="">- Pilih Prodi -</option>
+                                @foreach($prodi as $item)
+                                    <option value="{{ $item->prodi_id }}">{{ $item->nama }}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
-                    <div id="form-periode_id-modal" style="display: none;">
-                        <div class="form-group row mb-3">
+                </div>
+                <div id="form-periode_id-modal" style="display: none;">
+                    <div class="form-group row mb-3">
                         <label for="periode_id" class="col-sm-2 col-form-label">Periode</label> {{-- Ganti label for --}}
                         <div class="col-sm-10">
-                            <input type="text" class="form-control" id="periode_id" name="periode_id">
-                        </div>
+                            <select class="form-control @error('periode_id') is-invalid @enderror" id="periode_id" name="periode_id" required>
+                                <option value="">- Pilih Periode -</option>
+                                @foreach($periode as $item)
+                                    <option value="{{ $item->periode_id }}">{{ $item->tahun_akademik }} / {{ $item->semester }}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
+                </div>
                     {{-- End Field tambahan --}}
         
                     <div class="form-group row mb-3">
