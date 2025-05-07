@@ -17,6 +17,7 @@
                 <form method="POST" action="{{ url('/user/' . $data->user_id) }}" class="form horizontal">
                     @csrf
                     {!! method_field('PUT') !!}
+                                                                                                                    method PUT -->
                     <div class="form-group row">
                         <label for="role" class="col-sm-2 col-form-label">Role</label>
                         <div class="col-sm-10">
@@ -37,7 +38,7 @@
                     </div>
 
                     <div class="form-group row">
-                        <label class="col-sm-2 col-form-label">NIP</label>
+                        <label class="col-1 control-label col-form-label">NIP</label>
                         <div class="col-sm-10">
                             <input type="text" class="form-control" id="nip" name="nip"
                                 value="{{ old('nip', $data->dosen->nip ?? ' ') }}" required>

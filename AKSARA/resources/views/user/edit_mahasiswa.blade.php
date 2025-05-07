@@ -38,10 +38,10 @@
                     </div>
 
                     <div class="form-group row">
-                        <label class="col-1 control-label col-form-label">NIM</label>
-                        <div class="col-11">
+                        <label class="col-sm-2 col-form-label">NIM</label>
+                        <div class="col-sm-10">
                             <input type="text" class="form-control" id="nim" name="nim"
-                                value="{{ old('nim', $data->mahasiswa->nim) }}" required>
+                                value="{{ old('nim', $data->mahasiswa->nim ?? ' ') }}" required>
                             @error('nim')
                                 <small class="form-text text-danger">{{ $message }}</small>
                             @enderror
@@ -49,30 +49,30 @@
                     </div>
 
                     <div class="form-group row">
-                        <label class="col-1 control-label col-form-label">Prodi</label>
-                        <div class="col-11">
+                        <label class="col-sm-2 col-form-label">Prodi</label>
+                        <div class="col-sm-10">
                             <input type="text" class="form-control" id="prodi_id" name="prodi_id"
-                                value="{{ old('prodi_id', $data->mahasiswa->prodi_id) }}" required>
-                            @error('bidang_keahlian')
+                                value="{{ old('prodi_id', $data->mahasiswa->prodi_id ?? ' ') }}" required>
+                            @error('prodi_id')
                                 <small class="form-text text-danger">{{ $message }}</small>
                             @enderror
                         </div>
                     </div>
 
                     <div class="form-group row">
-                        <label class="col-1 control-label col-form-label">Periode</label>
-                        <div class="col-11">
-                            <input type="text" class="form-control" id="prodi_id" name="prodi_id"
-                                value="{{ old('prodi_id', $data->mahasiswa->prodi_id) }}" required>
-                            @error('bidang_keahlian')
+                        <label class="col-sm-2 col-form-label">Periode</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="periode_id" name="periode_id"
+                                value="{{ old('periode_id', $data->mahasiswa->periode_id ?? ' ') }}" required>
+                            @error('perio')
                                 <small class="form-text text-danger">{{ $message }}</small>
                             @enderror
                         </div>
                     </div>
 
                     <div class="form-group row">
-                        <label class="col-1 control-label col-form-label">Nama</label>
-                        <div class="col-11">
+                        <label class="col-sm-2 col-form-label">Nama</label>
+                        <div class="col-sm-10">
                             <input type="text" class="form-control" id="nama" name="nama"
                                 value="{{ old('nama', $data->nama) }}" required>
                             @error('nama')
@@ -82,8 +82,8 @@
                     </div>
 
                     <div class="form-group row">
-                        <label class="col-1 control-label col-form-label">Email</label>
-                        <div class="col-11">
+                        <label class="col-sm-2 col-form-label">Email</label>
+                        <div class="col-sm-10">
                             <input type="text" class="form-control" id="email" name="email"
                                 value="{{ old('email', $data->email) }}" required>
                             @error('email')
@@ -110,8 +110,8 @@
                     </div>
 
                     <div class="form-group row">
-                        <label class="col-1 control-label col-form-label">Password</label>
-                        <div class="col-11">
+                        <label class="col-sm-2 col-form-label">Password</label>
+                        <div class="col-sm-10">
                             <input type="password" class="form-control" id="password" name="password">
                             @error('password')
                                 <small class="form-text text-danger">{{ $message }}</small>
@@ -123,8 +123,8 @@
                     </div>
 
                     <div class="form-group row">
-                        <label class="col-1 control-label col-form-label"></label>
-                        <div class="col-11">
+                        <label class="col-sm-2 col-form-label"></label>
+                        <div class="col-sm-10">
                             <button type="submit" class="btn btn-primary btn-sm">Simpan</button>
                             <a class="btn btn-sm btn-default ml-1" href="{{ url('user') }}">Kembali</a>
                         </div>
