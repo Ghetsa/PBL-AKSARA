@@ -50,7 +50,7 @@ class UserController extends Controller
             ->addIndexColumn()
             ->addColumn('aksi', function ($user) {
                 // Ubah tombol Detail agar memanggil modalAction dengan route show_ajax
-                $btn = '<button onclick="modalAction(\'' . e(route('user.show_ajax', $user->user_id)) . '\')" class="btn btn-info btn-sm">Detail</button> ';
+                $btn = '<button onclick="modalAction(\'' . e(route('user.show', $user->user_id)) . '\')" class="btn btn-info btn-sm">Detail</button> ';
 
                 // Ubah tombol Edit agar memanggil modalAction dengan route edit_ajax
                 $btn .= '<button onclick="modalAction(\'' . e(route('user.edit_ajax', $user->user_id)) . '\')" class="btn btn-warning btn-sm">Edit</button> ';
@@ -503,5 +503,19 @@ class UserController extends Controller
 
         // Jika bukan AJAX, redirect
         return redirect('/');
+    }
+    public function show($id)
+    {
+        $user = UserModel::with(['admin', 'dosen', 'mahasiswa'])->find($id);
+
+        if (!$user) {
+            if (request()->ajax() || request()->wantsJson()) {
+                return response()->json(['status' => false, 'message' => 'Data User tidak ditemukan.'], 404);
+            }
+            // Jika bukan AJAX, bisa redirect atau abort
+            return abort(404, 'Data User tidak ditemukan.');
+        }
+
+        return view('user.show_ajax', compact('user'));
     }
 }
