@@ -175,7 +175,7 @@
     </div>
     <footer class="footer">
         <div class="container">
-            <p>&copy; {{ date('Y') }} Sistem Informasi Pencatatan Prestasi. All rights reserved. | Design by <a href="#">Tim Pengembang</a></p>
+            <p>&copy; {{ date('Y') }} Aplikasi Kompetensi & Sarana Apresiasi. All rights reserved. | Design by <a href="#">Kelompok 4</a></p>
         </div>
     </footer>
 
