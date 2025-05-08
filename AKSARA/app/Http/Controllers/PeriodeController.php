@@ -20,8 +20,9 @@ class PeriodeController extends Controller
             'title' => 'Data periode semester',
             'list' => ['Periode']
         ];
+        $activeMenu = 'periode';
 
-        return view('periode.index', compact('data', 'breadcrumb'));
+        return view('periode.index', compact('data', 'breadcrumb', 'activeMenu'));
     }
 
     // Ambil data periode dalam bentuk json untuk datatables

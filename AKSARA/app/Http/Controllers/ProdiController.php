@@ -19,8 +19,9 @@ class ProdiController extends Controller
             'title' => 'Data Program Studi',
             'list' => ['Prodi']
         ];
+        $activeMenu = 'prodi';
 
-        return view('prodi.index', compact('data', 'breadcrumb'));
+        return view('prodi.index', compact('data', 'breadcrumb', 'activeMenu'));
     }
 
     // Ambil data prodi dalam bentuk json untuk datatables
@@ -86,15 +87,6 @@ class ProdiController extends Controller
         }
 
         return redirect('/');
-        // $validated = $request->validate([
-        //     'nama' => 'required|string|max:255',
-        // ]);
-
-        // $prodi = ProdiModel::create([
-        //     'nama' => $validated['nama'],
-        // ]);
-
-        // return redirect()->route('prodi.index')->with('success', 'Data program studi berhasil ditambahkan');
     }
 
     // public function edit($id)

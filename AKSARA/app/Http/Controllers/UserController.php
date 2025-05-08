@@ -21,13 +21,14 @@ class UserController extends Controller
         $prodi = ProdiModel::select('prodi_id', 'kode', 'nama')->get();
         $periode = PeriodeModel::select('periode_id', 'semester', 'tahun_akademik')->get();
         $roles = ['admin', 'dosen', 'mahasiswa'];
+        $activeMenu = 'user';
 
         $breadcrumb = (object) [
             'title' => 'Manajemen User',
             'list' => ['User']
         ];
 
-        return view('user.index', compact('data', 'breadcrumb', 'prodi', 'periode', 'roles'));
+        return view('user.index', compact('data', 'breadcrumb', 'prodi', 'periode', 'roles', 'activeMenu'));
     }
 
     // Ambil data user dalam bentuk json untuk datatables
