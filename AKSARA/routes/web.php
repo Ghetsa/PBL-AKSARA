@@ -59,11 +59,13 @@ Route::group(['prefix' => 'user', 'as' => 'user.'], function () {
 Route::group(['prefix' => 'prodi', 'as' => 'prodi.'], function () {
     Route::get('/', [ProdiController::class, 'index'])->name('index');
     Route::post('/list', [ProdiController::class, 'list'])->name('list');
-    Route::get('/create', [UserController::class, 'create'])->name('create');
-    Route::get('/create_ajax', [UserController::class, 'create_ajax'])->name('create_ajax');
+    Route::get('/create', [ProdiController::class, 'create'])->name('create');
+    Route::post('/store_ajax', [ProdiController::class, 'store_ajax'])->name('store_ajax'); // Jika Anda punya route store_ajax terpisah
     Route::post('/', [ProdiController::class, 'store'])->name('store');
     Route::get('/{id}', [ProdiController::class, 'show'])->name('show');
     Route::get('/{id}/edit', [ProdiController::class, 'edit'])->name('edit');
     Route::put('/{id}', [ProdiController::class, 'update'])->name('update');
-    Route::delete('/{id}', [ProdiController::class, 'destroy'])->name('destroy');
+    // Route::delete('/{id}', [ProdiController::class, 'destroy'])->name('destroy');
+    Route::get('/{id}/confirm_ajax', [ProdiController::class, 'confirm_ajax'])->name('confirm_ajax');
+    Route::delete('/{id}/delete-ajax', [ProdiController::class, 'delete_ajax'])->name('delete_ajax');
 });

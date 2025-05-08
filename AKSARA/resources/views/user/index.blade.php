@@ -1,5 +1,4 @@
-{{-- File: resources/views/user/index.blade.php --}}
-@extends('layouts.template') {{-- Pastikan ini mengarah ke layout utama Anda --}}
+@extends('layouts.template')
 
 @section('content')
     <section class="content">

@@ -1,201 +1,179 @@
-@extends('layouts.template')
+<form id="formCreateProdi" class="form-horizontal" method="POST" action="{{ route('prodi.store_ajax') }}">
+    @csrf
 
-@section('content')
-    <div class="card card-outline card-primary">
-        <div class="card-header">
-            <h4 class="card-title">Tambah User</h4>
-            <div class="card-tools"></div>
-        </div>
-        <div class="card-body">
-            <form method="POST" action="{{ route('user.store') }}" class="form-horizontal">
-                @csrf
-                <div class="form-group row">
-                    <label for="nama" class="col-sm-2 col-form-label">Nama</label>
-                    <div class="col-sm-10">
-                        <input type="text" class="form-control @error('nama') is-invalid @enderror" id="nama"
-                            name="nama" value="{{ old('nama') }}" required>
-                        @error('nama')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label for="email" class="col-sm-2 col-form-label">Email</label>
-                    <div class="col-sm-10">
-                        <input type="email" class="form-control @error('email') is-invalid @enderror" id="email"
-                            name="email" value="{{ old('email') }}" required>
-                        @error('email')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label for="password" class="col-sm-2 col-form-label">Password</label>
-                    <div class="col-sm-10">
-                        <input type="password" class="form-control @error('password') is-invalid @enderror" id="password"
-                            name="password" required>
-                        @error('password')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
-
-                <div class="form-group row">
-                    <label for="role" class="col-sm-2 col-form-label">Role</label>
-                    <div class="col-sm-10">
-                        <select class="form-control @error('role') is-invalid @enderror" id="role" name="role"
-                            required>
-                            <option value="">- Pilih Role -</option>
-                            <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
-                            <option value="mahasiswa" {{ old('role') == 'mahasiswa' ? 'selected' : '' }}>Mahasiswa</option>
-                            <option value="dosen" {{ old('role') == 'dosen' ? 'selected' : '' }}>Dosen</option>
-                        </select>
-                        @error('role')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
-
-                <div id="form-nip" style="display: none;">
-                    <div class="form-group row">
-                        <label for="nip" class="col-sm-2 col-form-label">NIP</label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" id="nip" name="nip"
-                                value="{{ old('nip') }}">
-                        </div>
-                    </div>
-                </div>
-
-                <div id="form-keahlian" style="display: none;">
-                    <div class="form-group row">
-                        <label for="bidang_keahlian" class="col-sm-2 col-form-label">Bidang Keahlian</label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" id="bidang_keahlian" name="bidang_keahlian"
-                                value="{{ old('bidang_keahlian') }}">
-                        </div>
-                    </div>
-                </div>
-
-                <div id="form-nim" style="display: none;">
-                    <div class="form-group row">
-                        <label for="nim" class="col-sm-2 col-form-label">NIM</label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" id="nim" name="nim"
-                                value="{{ old('nim') }}">
-                        </div>
-                    </div>
-                </div>
-
-                <div id="form-prodi_id" class="form-group row" style="display: none;">
-                    <label for="prodi_id" class="col-sm-2 col-form-label">Prodi</label>
-                    <div class="col-sm-10">
-                        <select class="form-control @error('prodi_id') is-invalid @enderror" id="prodi_id" name="prodi_id"
-                            required>
-                            <option value="">- Pilih Prodi -</option>
-                            <option value="1" {{ old('prodi_id') == '1' ? 'selected' : '' }}>Informatika
-                            </option>
-                            <option value="2" {{ old('prodi_id') == '2' ? 'selected' : '' }}>Sistem
-                                Informasi</option>
-                        </select>
-                        @error('prodi_id')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
-
-                <div id="form-periode_id" class="form-group row" style="display: none;">
-                    <label for="periode_id" class="col-sm-2 col-form-label">Periode</label>
-                    <div class="col-sm-10">
-                        <select class="form-control @error('periode_id') is-invalid @enderror" id="periode_id"
-                            name="periode_id" required>
-                            <option value="">- Pilih Periode -</option>
-                            <option value="1" {{ old('periode_id') == '1' ? 'selected' : '' }}>2024/2025
-                            </option>
-                            <option value="2" {{ old('periode_id') == '2' ? 'selected' : '' }}>2025/2026
-                            </option>
-                        </select>
-                        @error('periode_id')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
-
-                <div class="form-group row">
-                    <label for="status" class="col-sm-2 col-form-label">Status</label>
-                    <div class="col-sm-10">
-                        <select class="form-control @error('status') is-invalid @enderror" id="status" name="status"
-                            required>
-                            <option value="">- Pilih Status -</option>
-                            <option value="aktif" {{ old('status') == 'aktif' ? 'selected' : '' }}>Aktif</option>
-                            <option value="nonaktif" {{ old('status') == 'nonaktif' ? 'selected' : '' }}>Nonaktif
-                            </option>
-                        </select>
-                        @error('status')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <div class="col-sm-10 offset-sm-2">
-                        <button type="submit" class="btn btn-primary">Simpan</button>
-                        <a class="btn btn-secondary ml-2" href="{{ route('user.index') }}">Kembali</a>
-                    </div>
-                </div>
-            </form>
-        </div>
+    <div class="modal-header">
+        <h5 class="modal-title" id="myModalLabel">Tambah Program Studi Baru</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
-@endsection
 
-@push('css')
-@endpush
+    <div class="modal-body">
+        {{-- Field Kode Prodi --}}
+        <div class="form-group row mb-3">
+            <label for="kode" class="col-sm-2 col-form-label">Kode Prodi</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="kode" name="kode" required>
+                <span class="invalid-feedback error-text" id="error-kode"></span> 
+            </div>
+        </div>
+        {{-- Field Nama Prodi --}}
+        <div class="form-group row mb-3">
+            <label for="nama" class="col-sm-2 col-form-label">Nama Prodi</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="nama" name="nama" required>
+                <span class="invalid-feedback error-text" id="error-nama"></span> 
+            </div>
+        </div>
+    </div> {{-- Akhir dari modal-body --}}
 
-@push('js')
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const roleSelect = document.getElementById('role');
-            const formNip = document.getElementById('form-nip');
-            const formKeahlian = document.getElementById('form-keahlian');
-            const formNim = document.getElementById('form-nim');
-            const formProdi_id = document.getElementById('form-prodi_id');
-            const formPeriode = document.getElementById('form-periode_id');
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+        <button type="submit" class="btn btn-primary">Simpan</button>
+    </div>
 
-            function toggleAdditionalForms() {
-                const role = roleSelect.value;
-                if (role === '') {
-                    formNip.style.display = 'none';
-                    formNim.style.display = 'none';
-                    formKeahlian.style.display = 'none';
-                    formProdi_id.style.display = 'none';
-                    formPeriode.style.display = 'none';
-                }
+</form>
 
-                if (role === 'admin') {
-                    formNip.style.display = 'block';
-                    formNim.style.display = 'none';
-                    formKeahlian.style.display = 'none';
-                    formProdi_id.style.display = 'none';
-                    formPeriode.style.display = 'none';
+<script>
+    $(document).ready(function () {
+
+        // Ambil form dengan ID yang benar
+        const formCreate = $('#formCreateProdi');
+
+        // Inisialisasi jQuery Validation untuk FORM DI DALAM MODAL
+        // Pastikan ignore hidden fields diaktifkan saat inisialisasi
+        formCreate.validate({
+            rules: {
+                kode: { required: true, minlength: 3 },
+                nama: { required: true, minlength: 5 }
+            },
+            messages: {
+                kode: { required: "Kode program studi tidak boleh kosong", minlength: "Kode program studi minimal 5 karakter" },
+                nama: { required: "Nama program studi tidak boleh kosong", minlength: "Nama program studi minimal harus 3 karakter" }
+            },
+
+            // --- AJAX Submission ---
+            submitHandler: function (form) {
+                // Reset tampilan error sebelum submit
+                $('.error-text').text('');
+                $('.is-invalid').removeClass('is-invalid');
+
+                $.ajax({
+                    url: $(form).attr('action'),
+                    method: $(form).attr('method'),
+                    data: $(form).serialize(),
+                    dataType: 'json',
+                    beforeSend: function () {
+                        $(form).find('button[type="submit"]').prop('disabled', true).text('Menyimpan...');
+                    },
+                    success: function (response) {
+                        // Tutup modal utama (#myModal)
+                        $("#myModal").modal('hide');
+
+                        // Tampilkan notifikasi sukses menggunakan SweetAlert2
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil!',
+                                text: response.message,
+                            });
+                        } else {
+                            alert(response.message); // Fallback alert
+                        }
+
+                        // Reload DataTable
+                        // Pastikan variabel dataProdi dapat diakses (sudah dideklarasikan di index.blade.php)
+                        if (typeof dataProdi !== 'undefined' && dataProdi.ajax) {
+                            dataProdi.ajax.reload();
+                        } else {
+                            console.error("DataTable object 'dataProdi' not found or misconfigured.");
+                            // Fallback: reload halaman jika DataTable tidak bisa di-reload
+                            window.location.reload();
+                        }
+
+                        // Reset form setelah sukses
+                        form.reset(); // Reset nilai field form
+                        formCreate.validate().resetForm(); // Reset validasi jQuery
+                        formCreate.find('.is-invalid').removeClass('is-invalid'); // Hapus class invalid
+                        formCreate.find('.is-valid').removeClass('is-valid'); // Hapus class valid
+                    },
+                    error: function (xhr, status, error) {
+                        // Aktifkan kembali tombol submit
+                        $(form).find('button[type="submit"]').prop('disabled', false).text('Simpan');
+
+                        // Tangani error (terutama validasi dari Laravel)
+                        let errorMessage = 'Terjadi kesalahan saat menyimpan data.';
+                        let errors = {};
+
+                        if (xhr.responseJSON) {
+                            if (xhr.responseJSON.message) {
+                                errorMessage = xhr.responseJSON.message;
+                            }
+                            if (xhr.responseJSON.errors) {
+                                errors = xhr.responseJSON.errors;
+                            }
+                        } else {
+                            // Error selain JSON (misal 500 HTML response)
+                            errorMessage = 'Error: ' + xhr.status + ' ' + xhr.statusText + '. Cek console browser untuk detail.';
+                            console.error("AJAX Error Response:", xhr.responseText);
+                        }
+
+                        $('.error-text').text('');
+                        // Tambahkan class is-invalid ke field yang error
+                        $('.form-control, .form-select').removeClass('is-invalid').removeClass('is-valid'); // Hapus dulu semua state validasi
+                        $.each(errors, function (key, value) {
+                            $('#error-' + key).text(value[0]).show(); // Tampilkan pesan
+                            $('#' + key).addClass('is-invalid'); // Tambahkan class is-invalid
+                        });
+                        if (Object.keys(errors).length === 0) { // Jika tidak ada error validasi spesifik
+                            if (typeof Swal !== 'undefined') {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Oops...',
+                                    text: errorMessage,
+                                });
+                            } else {
+                                alert(errorMessage); // Fallback alert
+                            }
+                        } else {
+                            if (xhr.responseJSON.message && Object.keys(errors).length > 0) {
+                                console.warn("General message alongside validation errors:", xhr.responseJSON.message);
+                                // Opsional: tampilkan pesan umum di atas form atau di SweetAlert terpisah
+                            }
+                            // Biarkan pesan validasi di field terlihat oleh user
+                        }
+                    }
+                });
+            },
+            // --- Validasi Styling ---
+            errorElement: 'span', // Element yang digunakan untuk pesan error
+            errorPlacement: function (error, element) {
+                // Temukan span error-text yang terkait dengan element ini
+                let errorSpan = $('#error-' + element.attr('name'));
+                if (errorSpan.length) {
+                    // Jika span error-text ada, masukkan pesan error ke sana
+                    errorSpan.text(error.text()).show(); // Pastikan span terlihat
+                } else {
+                    // Jika tidak ada span error-text, fallback ke penempatan default Bootstrap
+                    error.addClass('invalid-feedback');
+                    element.closest('.form-group').append(error);
+                    console.warn("Missing span.error-text for field:", element.attr('name'));
                 }
-                if (role === 'dosen') {
-                    formNip.style.display = 'block';
-                    formNim.style.display = 'none';
-                    formKeahlian.style.display = 'block';
-                    formProdi_id.style.display = 'none';
-                    formPeriode.style.display = 'none';
-                }
-                if (role === 'mahasiswa') {
-                    formNip.style.display = 'none';
-                    formKeahlian.style.display = 'none';
-                    formNim.style.display = 'block';
-                    formProdi_id.style.display = 'block';
-                    formPeriode.style.display = 'block';
-                }
+            },
+            highlight: function (element, errorClass, validClass) {
+                // Tambahkan class is-invalid ke element form yang error
+                $(element).addClass('is-invalid');
+                // Hapus class is-valid
+                $(element).removeClass('is-valid');
+                // Pastikan span error-text yang terkait terlihat (jika ada)
+                $('#error-' + $(element).attr('name')).show();
+            },
+            unhighlight: function (element, errorClass, validClass) {
+                // Hapus class is-invalid dari element form yang valid
+                $(element).removeClass('is-invalid');
+                // Tambahkan class is-valid (opsional, untuk feedback sukses)
+                $(element).addClass('is-valid');
+                // Kosongkan dan sembunyikan span error-text yang terkait
+                $('#error-' + $(element).attr('name')).text('').hide();
             }
-
-            roleSelect.addEventListener('change', toggleAdditionalForms);
-
-            // Tampilkan saat reload form lama (misal gagal validasi)
-            toggleAdditionalForms();
         });
-    </script>
-@endpush
+    }); // End document ready
+</script>

@@ -11,6 +11,7 @@ class ProdiModel extends Model
     public $timestamps = true;
 
     protected $fillable = [
+        'kode',
         'nama',
     ];
 }
