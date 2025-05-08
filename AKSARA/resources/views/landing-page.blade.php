@@ -130,9 +130,9 @@
     <div class="container mt-5">
         <div class="row align-items-center">
             <div class="col-md-6">
-                <h1 class="display-4 fw-bold mb-3">Sistem Informasi Pencatatan Prestasi</h1>
+                <h1 class="display-4 fw-bold mb-3">Aplikasi Kompetensi & Sarana Apresiasi</h1>
                 <p class="lead text-muted mb-4">
-                    Platform terintegrasi untuk mencatat, mengelola, dan memantau prestasi mahasiswa secara efisien dan real-time.
+                    AKSARA merupakan platform sistem informasi pencatatan prestasi yang terintegrasi untuk mencatat, mengelola, dan memantau prestasi mahasiswa secara efisien dan real-time.
                 </p>
                 {{-- Tombol Masuk dan Daftar dipindahkan ke Navbar --}}
             </div>
