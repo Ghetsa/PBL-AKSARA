@@ -1,31 +1,31 @@
-{{-- resources/views/prodi/edit_ajax_form.blade.php --}}
-<form id="formEditProdi" class="form-horizontal" method="POST" action="{{ route('prodi.update', $prodi->prodi_id) }}"> 
+{{-- resources/views/periode/edit_ajax_form.blade.php --}}
+<form id="formEditPeriode" class="form-horizontal" method="POST" action="{{ route('periode.update', $periode->periode_id) }}"> 
     @csrf
-    @method('PUT') {{-- Penting untuk method update --}}
+    @method('PUT') 
 
     <div class="modal-header">
-        <h5 class="modal-title" id="myModalLabel">Edit Program Studi</h5>
+        <h5 class="modal-title" id="myModalLabel">Edit Periode Semester</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
 
     <div class="modal-body">
-        {{-- Field Kode Prodi --}}
+        {{-- Field Semester --}}
         <div class="form-group row mb-3">
-            <label for="edit_kode" class="col-sm-2 col-form-label">Kode Prodi</label>
-            <div class="col-sm-10">
-                <input type="text" class="form-control" id="edit_kode" name="kode" value="{{ $prodi->kode }}" required>
-                <span class="invalid-feedback error-text" id="error-edit-kode"></span>
+            <label for="edit_semester" class="col-sm-3 col-form-label">Semester</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" id="edit_semester" name="semester" value="{{ $periode->semester }}" required>
+                <span class="invalid-feedback error-text" id="error-edit-semester"></span>
             </div>
         </div>
-        {{-- Field Nama Prodi --}}
+        {{-- Field Tahun Akademik --}}
         <div class="form-group row mb-3">
-            <label for="edit_nama" class="col-sm-2 col-form-label">Nama Prodi</label>
-            <div class="col-sm-10">
-                <input type="text" class="form-control" id="edit_nama" name="nama" value="{{ $prodi->nama }}" required>
-                <span class="invalid-feedback error-text" id="error-edit-nama"></span>
+            <label for="edit_tahun" class="col-sm-3 col-form-label">Tahun Akademik</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" id="edit_tahun" name="tahun_akademik" value="{{ $periode->tahun_akademik }}" required>
+                <span class="invalid-feedback error-text" id="error-edit-tahun"></span>
             </div>
         </div>
-    </div> {{-- Akhir dari modal-body --}}
+    </div> 
 
     <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
@@ -36,21 +36,21 @@
 <script>
 $(document).ready(function () {
     // Ambil form dengan ID yang benar
-    const formEdit = $('#formEditProdi');
+    const formEdit = $('#formEditPeriode');
 
     formEdit.validate({
         rules: {
-            kode: { required: true, minlength: 3 }, // Sesuaikan dengan validasi controller
-            nama: { required: true, minlength: 5 }  // Sesuaikan dengan validasi controller
+            semester: { required: true, minlength: 3 }, // Sesuaikan dengan validasi controller
+            tahun_akademik: { required: true, minlength: 5 }  // Sesuaikan dengan validasi controller
         },
         messages: {
-            kode: {
-                required: "Kode program studi tidak boleh kosong",
-                minlength: "Kode program studi minimal 3 karakter" // Sesuaikan
+            semester: {
+                required: "Semester program studi tidak boleh kosong",
+                minlength: "Semester program studi minimal 3 karakter" 
             },
-            nama: {
-                required: "Nama program studi tidak boleh kosong",
-                minlength: "Nama program studi minimal 5 karakter" // Sesuaikan
+            tahun_akademik: {
+                required: "Tahun Akademik program studi tidak boleh kosong",
+                minlength: "Tahun Akademik program studi minimal 5 karakter" 
             }
         },
         submitHandler: function (form) {
@@ -79,10 +79,10 @@ $(document).ready(function () {
                             alert(response.message);
                         }
 
-                        if (typeof dataProdi !== 'undefined' && dataProdi.ajax) {
-                            dataProdi.ajax.reload(null, false); // Reload DataTable tanpa reset paging
+                        if (typeof dataPeriode !== 'undefined' && dataPeriode.ajax) {
+                            dataPeriode.ajax.reload(null, false); // Reload DataTable tanpa reset paging
                         } else {
-                            console.error("DataTable object 'dataProdi' not found or misconfigured. Attempting page reload.");
+                            console.error("DataTable object 'dataPeriode' not found or misconfigured. Attempting page reload.");
                             window.location.reload();
                         }
                     } else {
@@ -123,7 +123,7 @@ $(document).ready(function () {
                     $.each(errors, function (key, value) {
                         // Sesuaikan ID error span dan input field jika berbeda
                         $('#error-edit-' + key).text(value[0]).show();
-                        $('#edit_' + key).addClass('is-invalid'); // ID input harus unik, misal #edit_kode
+                        $('#edit_' + key).addClass('is-invalid'); // ID input harus unik, misal #edit_semester
                     });
 
                     if (Object.keys(errors).length === 0) {
@@ -142,7 +142,7 @@ $(document).ready(function () {
         },
         errorElement: 'span',
         errorPlacement: function (error, element) {
-            let errorSpan = $('#error-edit-' + element.attr('name')); // error-edit-kode, error-edit-nama
+            let errorSpan = $('#error-edit-' + element.attr('name')); // error-edit-semester, error-edit-tahun_akademik
             if (errorSpan.length) {
                 errorSpan.text(error.text()).show();
             } else {

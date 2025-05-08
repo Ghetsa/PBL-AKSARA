@@ -1,4 +1,4 @@
-<form id="formCreateProdi" class="form-horizontal" method="POST" action="{{ route('prodi.store_ajax') }}">
+<form id="formCreatePeriode" class="form-horizontal" method="POST" action="{{ route('periode.store_ajax') }}">
     @csrf
 
     <div class="modal-header">
@@ -7,20 +7,20 @@
     </div>
 
     <div class="modal-body">
-        {{-- Field Kode Prodi --}}
+        {{-- Field semester --}}
         <div class="form-group row mb-3">
-            <label for="kode" class="col-sm-3 col-form-label">Kode Program Studi</label>
+            <label for="semester" class="col-sm-3 col-form-label">Semester</label>
             <div class="col-sm-9">
-                <input type="text" class="form-control" id="kode" name="kode" required>
-                <span class="invalid-feedback error-text" id="error-kode"></span> 
+                <input type="text" class="form-control" id="semester" name="semester" required>
+                <span class="invalid-feedback error-text" id="error-semester"></span> 
             </div>
         </div>
-        {{-- Field Nama Prodi --}}
+        {{-- Field tahun akademik --}}
         <div class="form-group row mb-3">
-            <label for="nama" class="col-sm-3 col-form-label">Nama Program Studi</label>
+            <label for="tahun_akademik" class="col-sm-3 col-form-label">Tahun Akademik</label>
             <div class="col-sm-9">
-                <input type="text" class="form-control" id="nama" name="nama" required>
-                <span class="invalid-feedback error-text" id="error-nama"></span> 
+                <input type="text" class="form-control" id="tahun_akademik" name="tahun_akademik" required>
+                <span class="invalid-feedback error-text" id="error-tahun_akademik"></span> 
             </div>
         </div>
     </div> {{-- Akhir dari modal-body --}}
@@ -36,18 +36,18 @@
     $(document).ready(function () {
 
         // Ambil form dengan ID yang benar
-        const formCreate = $('#formCreateProdi');
+        const formCreate = $('#formCreatePeriode');
 
         // Inisialisasi jQuery Validation untuk FORM DI DALAM MODAL
         // Pastikan ignore hidden fields diaktifkan saat inisialisasi
         formCreate.validate({
             rules: {
-                kode: { required: true, minlength: 3 },
-                nama: { required: true, minlength: 5 }
+                semester: { required: true, minlength: 3 },
+                tahun_akademik: { required: true, minlength: 4 }
             },
             messages: {
-                kode: { required: "Kode program studi tidak boleh kosong", minlength: "Kode program studi minimal 5 karakter" },
-                nama: { required: "Nama program studi tidak boleh kosong", minlength: "Nama program studi minimal harus 3 karakter" }
+                semester: { required: "semester program studi tidak boleh kosong", minlength: "semester program studi minimal 5 karakter" },
+                tahun_akademik: { required: "tahun_akademik program studi tidak boleh kosong", minlength: "tahun_akademik program studi minimal harus 3 karakter" }
             },
 
             // --- AJAX Submission ---
@@ -80,11 +80,11 @@
                         }
 
                         // Reload DataTable
-                        // Pastikan variabel dataProdi dapat diakses (sudah dideklarasikan di index.blade.php)
-                        if (typeof dataProdi !== 'undefined' && dataProdi.ajax) {
-                            dataProdi.ajax.reload();
+                        // Pastikan variabel dataPeriode dapat diakses (sudah dideklarasikan di index.blade.php)
+                        if (typeof dataPeriode !== 'undefined' && dataPeriode.ajax) {
+                            dataPeriode.ajax.reload();
                         } else {
-                            console.error("DataTable object 'dataProdi' not found or misconfigured.");
+                            console.error("DataTable object 'dataPeriode' not found or misconfigured.");
                             // Fallback: reload halaman jika DataTable tidak bisa di-reload
                             window.location.reload();
                         }

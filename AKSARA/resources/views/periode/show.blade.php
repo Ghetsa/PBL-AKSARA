@@ -1,7 +1,5 @@
-{{-- resources/views/prodi/show_ajax.blade.php --}}
-
 <div class="modal-header">
-    <h5 class="modal-title" id="myModalLabel">Detail Program Studi</h5>
+    <h5 class="modal-title" id="myModalLabel">Detail Periode Semester</h5>
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 </div>
 
@@ -9,16 +7,16 @@
     <table class="table table-bordered table-striped">
         <tbody>
             <tr>
-                <th style="width: 30%;">ID Prodi</th>
-                <td>{{ $prodi->prodi_id }}</td> 
+                <th style="width: 30%;">ID Periode</th>
+                <td>{{ $periode->periode_id }}</td> 
             </tr>
             <tr>
-                <th>Kode Prodi</th>
-                <td>{{ $prodi->kode }}</td>
+                <th>Semester</th>
+                <td>{{ $periode->semester }}</td>
             </tr>
             <tr>
-                <th>Nama Prodi</th>
-                <td>{{ $prodi->nama }}</td>
+                <th>Tahun Akademik</th>
+                <td>{{ $periode->tahun_akademik }}</td>
             </tr>
         </tbody>
     </table>
