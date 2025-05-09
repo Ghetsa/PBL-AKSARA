@@ -344,17 +344,12 @@ class UserController extends Controller
         $roles = ['admin', 'dosen', 'mahasiswa'];
         $prodi = ProdiModel::select('prodi_id', 'kode', 'nama')->get();
         $periode = PeriodeModel::select('periode_id', 'semester', 'tahun_akademik')->get();
-        // $activeMenu = 'user'; 
-        // $breadcrumb = (object) ['title' => 'Edit User', 'list' => ['User', 'Edit']];
 
         return view('user.edit_ajax', compact('user', 'roles', 'prodi', 'periode'));
     }
 
     public function update_ajax(Request $request, $user_id)
     {
-        Log::info('Update AJAX Headers: ', $request->headers->all());
-        Log::info('Is AJAX request: ' . ($request->ajax() ? 'Yes' : 'No'));
-        Log::info('Wants JSON: ' . ($request->wantsJson() ? 'Yes' : 'No'));
         if (!($request->ajax() || $request->wantsJson())) {
             return response()->json(['status' => false, 'message' => 'Akses tidak diizinkan.'], 403);
         }
@@ -380,20 +375,20 @@ class UserController extends Controller
         $roleRules = [];
         if ($request->role == 'admin') {
             $roleRules = [
-                'nip' => ['required', 'string', 'max:50', Rule::unique('admin', 'nip')->ignore($user->admin->admin_id ?? null, 'admin_id')], // Sesuaikan PK admin dan unique check
+                'nip' => ['required', 'string', 'max:50', Rule::unique('admin', 'nip')->ignore($user->admin->admin_id ?? null, 'admin_id')],
             ];
         } elseif ($request->role == 'dosen') {
             $roleRules = [
-                'nip' => ['required', 'string', 'max:50', Rule::unique('dosen', 'nip')->ignore($user->dosen->dosen_id ?? null, 'dosen_id')], // Sesuaikan PK dosen dan unique check
-                'bidang_keahlian' => 'required|string|max:255', // Max disamakan dengan nama prodi
+                'nip' => ['required', 'string', 'max:50', Rule::unique('dosen', 'nip')->ignore($user->dosen->dosen_id ?? null, 'dosen_id')],
+                'bidang_keahlian' => 'required|string|max:255',
             ];
         } elseif ($request->role == 'mahasiswa') {
             $roleRules = [
-                'nim' => ['required', 'string', 'max:50', Rule::unique('mahasiswa', 'nim')->ignore($user->mahasiswa->mahasiswa_id ?? null, 'mahasiswa_id')], // Sesuaikan PK mahasiswa
+                'nim' => ['required', 'string', 'max:50', Rule::unique('mahasiswa', 'nim')->ignore($user->mahasiswa->mahasiswa_id ?? null, 'mahasiswa_id')],
                 'prodi_id' => 'required|exists:program_studi,prodi_id',
                 'periode_id' => 'required|exists:periode,periode_id',
-                'bidang_minat' => 'nullable|string|max:255',      // Opsional atau required?
-                'keahlian_mahasiswa' => 'nullable|string|max:255', // Opsional atau required?
+                'bidang_minat' => 'required|string|max:255',
+                'keahlian_mahasiswa' => 'required|string|max:255',
             ];
         }
 
@@ -403,12 +398,11 @@ class UserController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Validasi gagal.',
-                'errors' => $validator->errors() // 'errors' lebih standar daripada 'msgField'
+                'errors' => $validator->errors()
             ], 422);
         }
 
         try {
-            // DB::beginTransaction(); // Pertimbangkan transaksi
 
             $userData = [
                 'nama' => $request->nama,
@@ -421,9 +415,9 @@ class UserController extends Controller
             }
             $user->update($userData);
 
-            // Hapus data role lama jika role berubah (opsional, tergantung struktur DB)
-            // Misalnya, jika admin berubah jadi dosen, data di tabel admin mungkin perlu dihapus atau di-flag.
-            // Untuk simple update, kita update atau create data role spesifik.
+            // Hapus data role lama jika role berubah 
+            // Jika admin berubah jadi dosen, data di tabel admin mungkin perlu dihapus atau di-flag.
+            // Untuk simple update, update atau create data role spesifik.
 
             if ($request->role == 'admin') {
                 AdminModel::updateOrCreate(
@@ -472,7 +466,7 @@ class UserController extends Controller
             ], 500);
         }
     }
-    // Method list() Anda sudah ada dan memanggil route user.edit_ajax, ini sudah benar.
+
     // public function edit_ajax(string $id)
     // {
     //     // Temukan user beserta relasinya

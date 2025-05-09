@@ -98,8 +98,6 @@
 @endsection
 
 @push('js')
-    {{-- Pastikan library jQuery, Bootstrap JS, DataTables JS, jQuery Validation, SweetAlert2 sudah dimuat sebelumnya di layouts.template --}}
-
     <script>
         // Fungsi untuk memuat konten AJAX ke dalam modal utama (#myModal)
         function modalAction(url) {
