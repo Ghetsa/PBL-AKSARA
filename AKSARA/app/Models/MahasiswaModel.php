@@ -11,13 +11,13 @@ class MahasiswaModel extends Model
 
     protected $table = 'mahasiswa';
     protected $primaryKey = 'mahasiswa_id';
+    public $timestamps = false;
 
     protected $fillable = [
         'user_id',
         'nim',
         'prodi_id',
         'periode_id',
-        'bidang_minat',
     ];
 
     public function user()
@@ -27,7 +27,7 @@ class MahasiswaModel extends Model
 
     public function prodi()
     {
-        return $this->belongsTo(ProgramStudiModel::class, 'prodi_id', 'prodi_id');
+        return $this->belongsTo(ProdiModel::class, 'prodi_id', 'prodi_id');
     }
 
     public function periode()

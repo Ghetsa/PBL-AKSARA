@@ -269,15 +269,14 @@ class UserController extends Controller
             if ($validator->fails()) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Validasi gagal.',
-                    'msgField' => $validator->errors()
+                    'message' => 'Validasi gagal',
+                    'errors' => $validator->errors()
                 ]);
             }
 
             if ($request->role == 'dosen') {
                 $dosenRules = [
                     'nip' => 'required|string|max:50',
-                    'bidang_keahlian' => 'required|string|max:50',
                 ];
                 $request->validate($dosenRules);
             } elseif ($request->role == 'admin') {
@@ -309,7 +308,6 @@ class UserController extends Controller
                 DosenModel::create([
                     'user_id' => $user->user_id,
                     'nip' => $request->nip,
-                    'bidang_keahlian' => $request->bidang_keahlian
                 ]);
             } elseif ($request->role == 'mahasiswa') {
                 MahasiswaModel::create([
