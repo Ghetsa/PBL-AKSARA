@@ -9,6 +9,7 @@ use App\Models\MahasiswaModel;
 use App\Models\PeriodeModel;
 use App\Models\PrestasiModel;
 use App\Models\ProdiModel;
+use App\Models\KeahlianModel;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
@@ -95,7 +96,6 @@ class UserController extends Controller
         if ($request->role == 'dosen') {
             $request->validate([
                 'nip' => 'required|string|max:50',
-                'bidang_keahlian' => 'required|string|max:50',
             ]);
         } elseif ($request->role == 'admin') {
             $request->validate([
@@ -105,11 +105,7 @@ class UserController extends Controller
             $request->validate([
                 'nim' => 'required|string|max:50|unique:mahasiswa,nim',
                 'prodi_id' => 'required|exists:program_studi,prodi_id',
-                'periode_id' => 'required|exists:periode,periode_id',
-                'bidang_minat' => 'nullable|string',
-                'keahlian' => 'nullable|string',
-                'sertifikasi' => 'nullable|string',
-                'pengalaman' => 'nullable|string',
+                'periode_id' => 'required|exists:periode,periode_id'
             ]);
         }
 
@@ -130,18 +126,14 @@ class UserController extends Controller
             DosenModel::create([
                 'user_id' => $user->user_id,
                 'nip' => $request->nip,
-                'bidang_keahlian' => $request->bidang_keahlian
+                // 'bidang_keahlian' => $request->bidang_keahlian
             ]);
         } elseif ($validated['role'] == 'mahasiswa') {
             MahasiswaModel::create([
                 'user_id' => $user->user_id,
                 'nim' => $request->nim,
                 'prodi_id' => $request->prodi_id,
-                'periode_id' => $request->periode_id,
-                'bidang_minat' => $request->bidang_minat,
-                'keahlian' => $request->keahlian,
-                'sertifikasi' => $request->sertifikasi,
-                'pengalaman' => $request->pengalaman,
+                'periode_id' => $request->periode_id
             ]);
         }
 
@@ -184,7 +176,6 @@ class UserController extends Controller
         if ($request->role == 'dosen') {
             $request->validate([
                 'nip' => 'required|string|max:50',
-                'bidang_keahlian' => 'required|string|max:50',
             ]);
         } elseif ($request->role == 'admin') {
             $request->validate([
@@ -216,7 +207,7 @@ class UserController extends Controller
                 ['user_id' => $user->user_id],
                 [
                     'nip' => $request->nip,
-                    'bidang_keahlian' => $request->bidang_keahlian
+                    // 'bidang_keahlian' => $request->bidang_keahlian
                 ]
             );
         } elseif ($validated['role'] == 'mahasiswa') {
@@ -225,11 +216,7 @@ class UserController extends Controller
                 [
                     'nim' => $request->nim,
                     'prodi_id' => $request->prodi_id,
-                    'periode_id' => $request->periode_id,
-                    'bidang_minat' => $request->bidang_minat,
-                    'keahlian' => $request->keahlian,
-                    'sertifikasi' => $request->sertifikasi,
-                    'pengalaman' => $request->pengalaman,
+                    'periode_id' => $request->periode_id
                 ]
             );
         }
@@ -329,7 +316,7 @@ class UserController extends Controller
 
     public function edit_ajax($user_id)
     {
-        $user = UserModel::with(['admin', 'dosen', 'mahasiswa.prodi', 'mahasiswa.periode', 'mahasiswa.keahlian', 'dosen.keahlian'])
+        $user = UserModel::with(['admin', 'dosen', 'mahasiswa.prodi', 'mahasiswa.periode'])
             ->find($user_id);
 
         if (!$user) {
@@ -340,10 +327,11 @@ class UserController extends Controller
         }
 
         $roles = ['admin', 'dosen', 'mahasiswa'];
+        $keahlian = KeahlianModel::all();
         $prodi = ProdiModel::select('prodi_id', 'kode', 'nama')->get();
         $periode = PeriodeModel::select('periode_id', 'semester', 'tahun_akademik')->get();
 
-        return view('user.edit_ajax', compact('user', 'roles', 'prodi', 'periode'));
+        return view('user.edit_ajax', compact('user', 'roles', 'prodi', 'periode', 'keahlian'));
     }
 
     public function update_ajax(Request $request, $user_id)
@@ -371,26 +359,23 @@ class UserController extends Controller
 
         // Aturan validasi tambahan berdasarkan role
         $roleRules = [];
-        if ($request->role == 'admin') {
+
+        if ($request->role === 'admin') {
             $roleRules = [
                 'nip' => ['required', 'string', 'max:50', Rule::unique('admin', 'nip')->ignore($user->admin->admin_id ?? null, 'admin_id')],
             ];
-        } elseif ($request->role == 'dosen') {
+        } elseif ($request->role === 'dosen') {
             $roleRules = [
                 'nip' => ['required', 'string', 'max:50', Rule::unique('dosen', 'nip')->ignore($user->dosen->dosen_id ?? null, 'dosen_id')],
-                'keahlian_id' => 'required|string|max:255',
             ];
-        } elseif ($request->role == 'mahasiswa') {
+        } elseif ($request->role === 'mahasiswa') {
             $roleRules = [
                 'nim' => ['required', 'string', 'max:50', Rule::unique('mahasiswa', 'nim')->ignore($user->mahasiswa->mahasiswa_id ?? null, 'mahasiswa_id')],
                 'prodi_id' => 'required|exists:program_studi,prodi_id',
-                'periode_id' => 'required|exists:periode,periode_id',
-                'keahlian_id' => 'required|exists:periode,periode_id',
-                'bidang_minat' => 'required|string|max:255',
-                'sertifikasi' => 'required|string|max:255',
-                'pengalaman' => 'required|string|max:255',
+                'periode_id' => 'required|exists:periode,periode_id'
             ];
         }
+
 
         $validator = Validator::make($request->all(), array_merge($baseRules, $roleRules));
 
@@ -415,51 +400,34 @@ class UserController extends Controller
             }
             $user->update($userData);
 
-            // Hapus data role lama jika role berubah 
-            // Jika admin berubah jadi dosen, data di tabel admin mungkin perlu dihapus atau di-flag.
-            // Untuk simple update, update atau create data role spesifik.
-
-            if ($request->role == 'admin') {
-                AdminModel::updateOrCreate(
+            if ($request->role == 'dosen') {
+                DosenModel::updateOrCreate(
                     ['user_id' => $user->user_id],
                     ['nip' => $request->nip]
                 );
-                // Hapus data dosen/mahasiswa jika sebelumnya adalah itu
-                if ($user->dosen)
-                    $user->dosen->delete();
-                if ($user->mahasiswa)
-                    $user->mahasiswa->delete();
-            } elseif ($request->role == 'dosen') {
-                DosenModel::updateOrCreate(
-                    ['user_id' => $user->user_id],
-                    [
-                        'nip' => $request->nip,
-                        'keahlian_id' => $request->keahlian_id,
-                    ]
-                );
+
                 if ($user->admin)
                     $user->admin->delete();
                 if ($user->mahasiswa)
                     $user->mahasiswa->delete();
-            } elseif ($request->role == 'mahasiswa') {
+            }
+            if ($request->role == 'mahasiswa') {
                 MahasiswaModel::updateOrCreate(
                     ['user_id' => $user->user_id],
                     [
                         'nim' => $request->nim,
                         'prodi_id' => $request->prodi_id,
-                        'periode_id' => $request->periode_id,
-                        'keahlian_id' => $request->keahlian_id,
-                        'bidang_minat' => $request->bidang_minat,
-                        'sertifikasi' => $request->sertifikasi,
-                        'pengalaman' => $request->pengalaman,
+                        'periode_id' => $request->periode_id
                     ]
                 );
+            
+                // Hapus data admin dan dosen jika sebelumnya user punya
                 if ($user->admin)
                     $user->admin->delete();
                 if ($user->dosen)
                     $user->dosen->delete();
             }
-
+            
             // DB::commit();
             return response()->json([
                 'status' => true,
@@ -475,7 +443,7 @@ class UserController extends Controller
         }
     }
 
-    
+
 
     public function confirm_ajax($id)
     {
@@ -510,7 +478,7 @@ class UserController extends Controller
                         'message' => 'Data berhasil dihapus'
                     ]);
                 } catch (\Exception $e) {
-                    return response()->json([   
+                    return response()->json([
                         'status' => false,
                         'message' => 'Gagal menghapus data: ' . $e->getMessage()
                     ], 500);
@@ -526,7 +494,7 @@ class UserController extends Controller
         // Jika bukan AJAX, redirect
         return redirect('/');
     }
-    
+
     public function show_ajax($user_id)
     {
         // Eager load relasi untuk menampilkan data terkait role
@@ -535,8 +503,6 @@ class UserController extends Controller
             'dosen', // Relasi ke DosenModel
             'mahasiswa.prodi', // Relasi ke MahasiswaModel lalu ke ProdiModel
             'mahasiswa.periode', // Relasi ke MahasiswaModel lalu ke PeriodeModel
-            'mahasiswa.keahlian', // Relasi ke MahasiswaModel lalu ke PeriodeModel
-            'dosen.keahlian' // Relasi ke MahasiswaModel lalu ke PeriodeModel
         ])
             ->find($user_id);
 
@@ -547,11 +513,8 @@ class UserController extends Controller
             return abort(404, 'Data user tidak ditemukan.');
         }
 
-        // $activeMenu = 'user'; // Jika diperlukan oleh view
-        // $breadcrumb = (object) ['title' => 'Detail User', 'list' => ['User', 'Detail']];
-
+        
         return view('user.show_ajax', compact('user'));
     }
 
-    // Ambil data user dalam bentuk json untuk datatables
 }
