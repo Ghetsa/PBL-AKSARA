@@ -679,7 +679,9 @@ class UserController extends Controller
             'admin', // Relasi ke AdminModel
             'dosen', // Relasi ke DosenModel
             'mahasiswa.prodi', // Relasi ke MahasiswaModel lalu ke ProdiModel
-            'mahasiswa.periode' // Relasi ke MahasiswaModel lalu ke PeriodeModel
+            'mahasiswa.periode', // Relasi ke MahasiswaModel lalu ke PeriodeModel
+            'mahasiswa.keahlian', // Relasi ke MahasiswaModel lalu ke PeriodeModel
+            'dosen.keahlian' // Relasi ke MahasiswaModel lalu ke PeriodeModel
         ])
             ->find($user_id);
 

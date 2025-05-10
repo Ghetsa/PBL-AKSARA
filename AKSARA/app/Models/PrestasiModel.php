@@ -11,7 +11,8 @@ class PrestasiModel extends Model
 
     protected $table = 'prestasi';
     protected $primaryKey = 'prestasi_id';
-    public $timestamps = true;
+
+    public $timestamps = false;
 
     protected $fillable = [
         'mahasiswa_id',
@@ -29,4 +30,16 @@ class PrestasiModel extends Model
     {
         return $this->belongsTo(MahasiswaModel::class, 'mahasiswa_id', 'mahasiswa_id');
     }
+
+    public function feedbackDosen()
+    {
+        return $this->hasMany(FeedbackDosenModel::class, 'prestasi_id', 'prestasi_id');
+    }
+
+    protected $casts = [
+        'kategori' => 'string',
+        'tingkat' => 'string',
+        'status_verifikasi' => 'string',
+        'tahun' => 'integer',
+    ];
 }

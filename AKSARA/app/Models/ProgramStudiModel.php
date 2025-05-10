@@ -5,22 +5,22 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class PeriodeModel extends Model
+class ProgramStudiModel extends Model
 {
     use HasFactory;
 
-    protected $table = 'periode';
-    protected $primaryKey = 'periode_id';
+    protected $table = 'program_studi';
+    protected $primaryKey = 'prodi_id';
 
     public $timestamps = false;
 
     protected $fillable = [
-        'semester',
-        'tahun_akademik',
+        'kode',
+        'nama',
     ];
 
     public function mahasiswa()
     {
-        return $this->hasMany(MahasiswaModel::class, 'periode_id', 'periode_id');
+        return $this->hasMany(MahasiswaModel::class, 'prodi_id', 'prodi_id');
     }
 }

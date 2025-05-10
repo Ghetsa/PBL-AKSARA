@@ -11,7 +11,9 @@ class LombaModel extends Model
 
     protected $table = 'lomba';
     protected $primaryKey = 'lomba_id';
-    public $timestamps = true;
+
+    const CREATED_AT = 'create_at';
+    const UPDATED_AT = 'update_at';
 
     protected $fillable = [
         'nama_lomba',
@@ -26,8 +28,27 @@ class LombaModel extends Model
         'diinput_oleh',
     ];
 
-    public function user()
+    protected $casts = [
+        'pembukaan_pendaftaran' => 'date',
+        'batas_pendaftaran' => 'date',
+        'kategori' => 'string',
+        'tingkat' => 'string',
+        'status_verifikasi' => 'string',
+        'tahun' => 'integer',
+    ];
+
+    public function inputBy()
     {
         return $this->belongsTo(UserModel::class, 'diinput_oleh', 'user_id');
+    }
+
+    public function pendaftar()
+    {
+        return $this->hasMany(PendaftaranLombaModel::class, 'lomba_id', 'lomba_id');
+    }
+
+    public function rekomendasi()
+    {
+        return $this->hasMany(RekomendasiLombaModel::class, 'lomba_id', 'lomba_id');
     }
 }

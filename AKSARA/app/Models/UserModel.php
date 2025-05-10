@@ -2,38 +2,33 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory; // Tambahkan ini jika Anda menggunakan Model Factories
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Notifications\Notifiable;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class UserModel extends Authenticatable implements JWTSubject
 {
-    use Notifiable;
+    use HasFactory, Notifiable;
 
     protected $table = 'users';
     protected $primaryKey = 'user_id';
-    protected $fillable = ['nama', 'email', 'password', 'role', 'status'];
-    protected $hidden = ['password'];
+
+    protected $fillable = [
+        'nama',
+        'email',
+        'password',
+        'role',
+        'status',
+    ];
+
+    protected $hidden = [
+        'password',
+    ];
 
     protected $casts = [
         'password' => 'hashed',
-        // Tambahkan 'email_verified_at' => 'datetime', jika Anda menggunakan fitur verifikasi email
     ];
-    public function admin()
-    {
-        return $this->hasOne(AdminModel::class, 'user_id', 'user_id');
-    }
-    public function dosen()
-    {
-        return $this->hasOne(DosenModel::class, 'user_id', 'user_id');
-    }
-
-    public function mahasiswa()
-    {
-        return $this->hasOne(MahasiswaModel::class, 'user_id', 'user_id');
-    }
-
 
     public function getJWTIdentifier()
     {
@@ -44,4 +39,13 @@ class UserModel extends Authenticatable implements JWTSubject
     {
         return [];
     }
+
+    public function admin() { return $this->hasOne(AdminModel::class, 'user_id', 'user_id'); }
+    public function dosen() { return $this->hasOne(DosenModel::class, 'user_id', 'user_id'); }
+    public function mahasiswa() { return $this->hasOne(MahasiswaModel::class, 'user_id', 'user_id'); }
+    public function keahlian() { return $this->hasMany(KeahlianModel::class, 'user_id', 'user_id'); }
+    public function minat() { return $this->hasMany(MinatModel::class, 'user_id', 'user_id'); }
+    public function pengalaman() { return $this->hasMany(PengalamanModel::class, 'user_id', 'user_id'); }
+    public function notifikasi() { return $this->hasMany(NotifikasiModel::class, 'user_id', 'user_id'); }
+    public function lombaDiinput() { return $this->hasMany(LombaModel::class, 'diinput_oleh', 'user_id'); }
 }

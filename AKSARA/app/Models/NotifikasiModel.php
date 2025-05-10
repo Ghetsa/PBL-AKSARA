@@ -5,23 +5,29 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class AdminModel extends Model
+class NotifikasiModel extends Model
 {
     use HasFactory;
 
-    protected $table = 'admin';
-    protected $primaryKey = 'admin_id';
+    protected $table = 'notifikasi';
+    protected $primaryKey = 'notifikasi_id';
 
     const CREATED_AT = 'create_at';
     const UPDATED_AT = 'update_at';
 
     protected $fillable = [
         'user_id',
-        'nip',
+        'judul',
+        'isi',
+        'status_baca',
     ];
 
     public function user()
     {
         return $this->belongsTo(UserModel::class, 'user_id', 'user_id');
     }
+
+    protected $casts = [
+        'status_baca' => 'string',
+    ];
 }
