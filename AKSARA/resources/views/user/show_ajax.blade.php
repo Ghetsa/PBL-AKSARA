@@ -48,7 +48,7 @@
                 </tr>
                 <tr>
                     <th>Bidang Keahlian</th>
-                    <td>{{ $user->dosen->bidang_keahlian ?: '-' }}</td>
+                    <td>{{ $user->dosen->keahlian->keahlian_nama ?: '-' }}</td>
                 </tr>
             @elseif($user->role == 'mahasiswa' && $user->mahasiswa)
                 <tr>
@@ -75,7 +75,15 @@
                 </tr>
                 <tr>
                     <th>Keahlian Mahasiswa</th>
-                    <td>{{ $user->mahasiswa->keahlian_mahasiswa ?: '-' }}</td>
+                    <td>{{ $user->mahasiswa->keahlian->keahlian_nama ?: '-' }}</td>
+                </tr>
+                <tr>
+                    <th>Sertifikasi</th>
+                    <td>{{ $user->mahasiswa->sertifikasi ?: '-' }}</td>
+                </tr>
+                <tr>
+                    <th>Pengalaman</th>
+                    <td>{{ $user->mahasiswa->pengalaman ?: '-' }}</td>
                 </tr>
             @endif
         </tbody>

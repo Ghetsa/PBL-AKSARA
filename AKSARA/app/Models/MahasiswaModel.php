@@ -40,4 +40,10 @@ class MahasiswaModel extends Model
     {
         return $this->belongsTo(PeriodeModel::class, 'periode_id');
     }
+
+
+    public function keahlian()
+    {
+        return $this->belongsTo(KeahlianModel::class, 'keahlian_id', 'keahlian_id');
+    }
 }

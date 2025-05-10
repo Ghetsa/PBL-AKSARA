@@ -34,6 +34,7 @@ class UserModel extends Authenticatable implements JWTSubject
         return $this->hasOne(MahasiswaModel::class, 'user_id', 'user_id');
     }
 
+
     public function getJWTIdentifier()
     {
         return $this->getKey();

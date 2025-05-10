@@ -12,7 +12,7 @@ class DosenModel extends Model
     protected $fillable = [
         'user_id',
         'nip',
-        'bidang_keahlian',
+        'keahlian_id',
         'created_at',
         'updated_at',
     ];
@@ -20,5 +20,10 @@ class DosenModel extends Model
     public function user()
     {
         return $this->belongsTo(UserModel::class, 'user_id', 'user_id');
+    }
+        
+    public function keahlian()
+    {
+        return $this->belongsTo(KeahlianModel::class, 'keahlian_id', 'keahlian_id');
     }
 }
