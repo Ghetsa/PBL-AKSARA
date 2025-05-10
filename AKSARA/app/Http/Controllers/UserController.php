@@ -331,7 +331,7 @@ class UserController extends Controller
 
     public function edit_ajax($user_id)
     {
-        $user = UserModel::with(['admin', 'dosen', 'mahasiswa.prodi', 'mahasiswa.periode'])
+        $user = UserModel::with(['admin', 'dosen', 'mahasiswa.prodi', 'mahasiswa.periode', 'mahasiswa.keahlian', 'dosen.keahlian'])
             ->find($user_id);
 
         if (!$user) {
@@ -380,15 +380,17 @@ class UserController extends Controller
         } elseif ($request->role == 'dosen') {
             $roleRules = [
                 'nip' => ['required', 'string', 'max:50', Rule::unique('dosen', 'nip')->ignore($user->dosen->dosen_id ?? null, 'dosen_id')],
-                'bidang_keahlian' => 'required|string|max:255',
+                'keahlian_id' => 'required|string|max:255',
             ];
         } elseif ($request->role == 'mahasiswa') {
             $roleRules = [
                 'nim' => ['required', 'string', 'max:50', Rule::unique('mahasiswa', 'nim')->ignore($user->mahasiswa->mahasiswa_id ?? null, 'mahasiswa_id')],
                 'prodi_id' => 'required|exists:program_studi,prodi_id',
                 'periode_id' => 'required|exists:periode,periode_id',
+                'keahlian_id' => 'required|exists:periode,periode_id',
                 'bidang_minat' => 'required|string|max:255',
-                'keahlian_mahasiswa' => 'required|string|max:255',
+                'sertifikasi' => 'required|string|max:255',
+                'pengalaman' => 'required|string|max:255',
             ];
         }
 
@@ -425,18 +427,22 @@ class UserController extends Controller
                     ['nip' => $request->nip]
                 );
                 // Hapus data dosen/mahasiswa jika sebelumnya adalah itu
-                if ($user->dosen) $user->dosen->delete();
-                if ($user->mahasiswa) $user->mahasiswa->delete();
+                if ($user->dosen)
+                    $user->dosen->delete();
+                if ($user->mahasiswa)
+                    $user->mahasiswa->delete();
             } elseif ($request->role == 'dosen') {
                 DosenModel::updateOrCreate(
                     ['user_id' => $user->user_id],
                     [
                         'nip' => $request->nip,
-                        'bidang_keahlian' => $request->bidang_keahlian
+                        'keahlian_id' => $request->keahlian_id,
                     ]
                 );
-                if ($user->admin) $user->admin->delete();
-                if ($user->mahasiswa) $user->mahasiswa->delete();
+                if ($user->admin)
+                    $user->admin->delete();
+                if ($user->mahasiswa)
+                    $user->mahasiswa->delete();
             } elseif ($request->role == 'mahasiswa') {
                 MahasiswaModel::updateOrCreate(
                     ['user_id' => $user->user_id],
@@ -444,12 +450,16 @@ class UserController extends Controller
                         'nim' => $request->nim,
                         'prodi_id' => $request->prodi_id,
                         'periode_id' => $request->periode_id,
+                        'keahlian_id' => $request->keahlian_id,
                         'bidang_minat' => $request->bidang_minat,
-                        'keahlian_mahasiswa' => $request->keahlian_mahasiswa,
+                        'sertifikasi' => $request->sertifikasi,
+                        'pengalaman' => $request->pengalaman,
                     ]
                 );
-                if ($user->admin) $user->admin->delete();
-                if ($user->dosen) $user->dosen->delete();
+                if ($user->admin)
+                    $user->admin->delete();
+                if ($user->dosen)
+                    $user->dosen->delete();
             }
 
             // DB::commit();

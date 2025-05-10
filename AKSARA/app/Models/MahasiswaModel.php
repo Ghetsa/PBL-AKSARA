@@ -17,8 +17,8 @@ class MahasiswaModel extends Model
         'nim',
         'prodi_id',
         'periode_id',
+        'keahlian_id',
         'bidang_minat',
-        'keahlian',
         'sertifikasi',
         'pengalaman',
     ];
