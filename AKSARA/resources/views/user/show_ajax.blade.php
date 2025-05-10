@@ -46,10 +46,6 @@
                     <th>NIP Dosen</th>
                     <td>{{ $user->dosen->nip ?: '-' }}</td>
                 </tr>
-                <tr>
-                    <th>Bidang Keahlian</th>
-                    <td>{{ $user->dosen->keahlian->keahlian_nama ?: '-' }}</td>
-                </tr>
             @elseif($user->role == 'mahasiswa' && $user->mahasiswa)
                 <tr>
                     <th>NIM</th>
@@ -68,22 +64,6 @@
                             -
                         @endif
                     </td>
-                </tr>
-                <tr>
-                    <th>Bidang Minat</th>
-                    <td>{{ $user->mahasiswa->bidang_minat ?: '-' }}</td>
-                </tr>
-                <tr>
-                    <th>Keahlian Mahasiswa</th>
-                    <td>{{ $user->mahasiswa->keahlian->keahlian_nama ?: '-' }}</td>
-                </tr>
-                <tr>
-                    <th>Sertifikasi</th>
-                    <td>{{ $user->mahasiswa->sertifikasi ?: '-' }}</td>
-                </tr>
-                <tr>
-                    <th>Pengalaman</th>
-                    <td>{{ $user->mahasiswa->pengalaman ?: '-' }}</td>
                 </tr>
             @endif
         </tbody>
