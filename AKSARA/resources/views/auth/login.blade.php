@@ -33,7 +33,7 @@
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-end mb-4">
               <h3 class="mb-0"><b>Login</b></h3>
-              <a href="#" class="link-primary">Don't have an account?</a>
+              <a href="{{ route('register') }}" class="link-primary">Belum punya akun?</a>
             </div>
 
             <form id="loginForm" method="POST" action="{{ url('postlogin') }}">
@@ -51,7 +51,7 @@
                   <input class="form-check-input input-primary" type="checkbox" id="customCheckc1">
                   <label class="form-check-label text-muted" for="customCheckc1">Keep me signed in</label>
                 </div>
-                <h5 class="text-secondary f-w-400">Forgot Password?</h5>
+                <h5 class="text-secondary f-w-400">Lupa Password?</h5>
               </div>
               <div class="d-grid mt-4">
                 <button type="submit" class="btn btn-primary" id="btnLogin">Login</button>
@@ -59,9 +59,9 @@
             </form>
 
             <div class="saprator mt-3">
-              <span>Login with</span>
+              <span>AKSARA</span>
             </div>
-            <div class="row">
+            {{-- <div class="row">
               <div class="col-4">
                 <div class="d-grid">
                   <button type="button" class="btn mt-2 btn-light-primary bg-light text-muted">
@@ -83,7 +83,7 @@
                   </button>
                 </div>
               </div>
-            </div>
+            </div> --}}
           </div>
         </div>
 

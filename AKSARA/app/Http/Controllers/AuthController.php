@@ -10,6 +10,8 @@ use App\Models\UserModel;
 use App\Models\MahasiswaModel;
 use App\Models\DosenModel;
 use App\Models\AdminModel;
+use App\Models\PeriodeModel;
+use App\Models\ProdiModel;
 
 class AuthController extends Controller
 {
@@ -82,7 +84,9 @@ class AuthController extends Controller
 
     public function register()
     {
-        return view('auth.register');
+        $prodi = ProdiModel::select('prodi_id', 'kode', 'nama')->get();
+        $periode = PeriodeModel::select('periode_id', 'semester', 'tahun_akademik')->get();
+        return view('auth.register', compact('prodi', 'periode'));
     }
 
     public function postregister(Request $request)

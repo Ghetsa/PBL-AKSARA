@@ -183,14 +183,6 @@
                 <i class="ti ti-user"></i>
                 <span>View Profile</span>
               </a>
-              <a href="#!" class="dropdown-item">
-                <i class="ti ti-clipboard-list"></i>
-                <span>Social Profile</span>
-              </a>
-              <a href="#!" class="dropdown-item">
-                <i class="ti ti-wallet"></i>
-                <span>Billing</span>
-              </a>
               <a href="../logout" class="dropdown-item">
                 <i class="ti ti-power"></i>
                 <span>Logout</span>

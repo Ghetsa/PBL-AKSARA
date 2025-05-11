@@ -66,10 +66,10 @@
         </div>
         <div id="form-prodi_id-modal" style="display: none;">
             <div class="form-group row mb-3">
-                <label for="prodi_id" class="col-sm-2 col-form-label">Prodi</label>
+                <label for="prodi_id" class="col-sm-2 col-form-label">Program Studi</label>
                 <div class="col-sm-10">
                     <select class="form-select" id="prodi_id" name="prodi_id">
-                        <option value="">- Pilih Prodi -</option>
+                        <option value="">- Pilih Program Studi -</option>
                         @if(isset($prodi))
                             @foreach($prodi as $item)
                                 <option value="{{ $item->prodi_id }}">{{ $item->nama }}</option>
