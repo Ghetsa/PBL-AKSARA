@@ -37,7 +37,7 @@ class AuthController extends Controller
                     'status' => true,
                     'message' => 'Login Mahasiswa Berhasil',
                     // Arahkan ke halaman user setelah login berhasil
-                    'redirect' => route('user.index')
+                    'redirect' => route('dashboardMHS')
                 ]);
             }
 
@@ -49,7 +49,7 @@ class AuthController extends Controller
                     'status' => true,
                     'message' => 'Login Dosen Berhasil',
                     // Arahkan ke halaman user setelah login berhasil
-                    'redirect' => route('user.index')
+                    'redirect' => route('dashboardDSN')
                 ]);
             }
 
@@ -61,7 +61,7 @@ class AuthController extends Controller
                     'status' => true,
                     'message' => 'Login Admin Berhasil',
                     // Arahkan ke halaman user setelah login berhasil
-                    'redirect' => route('user.index')
+                    'redirect' => route('dashboard')
                 ]);
             }
 
