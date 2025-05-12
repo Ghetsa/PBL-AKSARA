@@ -212,22 +212,40 @@
             </div>
           </div>
         </li>
+        @php
+      $role = Auth::user()->role;
+      switch ($role) {
+        case 'mahasiswa':
+        $avatar = asset('mantis/dist/assets/images/user/1.jpg');
+        break;
+        case 'admin':
+        $avatar = asset('mantis/dist/assets/images/user/2.jpg');
+        break;
+        case 'dosen':
+        $avatar = asset('mantis/dist/assets/images/user/3.jpg');
+        break;
+        default:
+        $avatar = asset('mantis/dist/assets/images/user/avatar-2.jpg'); // fallback
+        break;
+      }
+    @endphp
+
         <li class="dropdown pc-h-item header-user-profile">
           <a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#" role="button"
             aria-haspopup="false" data-bs-auto-close="outside" aria-expanded="false">
-            <img src="{{ asset('mantis/dist/assets/images/user/avatar-2.jpg') }}" alt="user-image" class="user-avtar">
-            <span>Stebin Ben</span>
+            <img src="{{ $avatar }}" alt="user-image" class="user-avtar"> {{-- GANTI DI SINI --}}
+            <span>{{ Auth::user()->nama }}</span>
           </a>
+
           <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown">
             <div class="dropdown-header">
               <div class="d-flex mb-1">
                 <div class="flex-shrink-0">
-                  <img src="{{ asset('mantis/dist/assets/images/user/avatar-2.jpg') }}" alt="user-image"
-                    class="user-avtar wid-35">
+                  <img src="{{ $avatar }}" alt="user-image" class="user-avtar wid-35">
                 </div>
                 <div class="flex-grow-1 ms-3">
-                  <h6 class="mb-1">Stebin Ben</h6>
-                  <span>UI/UX Designer</span>
+                  <h6 class="mb-1">{{ Auth::user()->nama }}</h6>
+                  <span>{{ ucfirst($role) ?? 'User' }}</span>
                 </div>
                 <a href="{{ route('logout') }}"
                   onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
