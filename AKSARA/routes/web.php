@@ -27,7 +27,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // Route::get('logout', [AuthController::class, 'logout'])->middleware('auth');
 
 Route::get('register', [AuthController::class, 'register'])->name('register');
-Route::post('register', [AuthController::class, 'postregister']);
+Route::post('/register', [AuthController::class, 'postregister'])->name('register');
 Route::get('/', function () {
     $breadcrumb = (object) [
         'title' => 'Landing Page',

@@ -96,7 +96,9 @@ class AuthController extends Controller
                 'nama' => 'required|string|max:255',
                 'email' => 'required|email|max:255|unique:users,email',
                 'password' => 'required|string|min:5|max:255',
-                'role' => 'required|in:admin,mahasiswa,dosen',
+                'nim' => 'required|string|max:20|unique:mahasiswa,nim',
+                'prodi_id' => 'required|exists:program_studi,prodi_id',
+                'periode_id' => 'required|exists:periode,periode_id',
             ]);
 
             if ($validator->fails()) {
@@ -107,12 +109,21 @@ class AuthController extends Controller
                 ]);
             }
 
-            UserModel::create([
+            // Simpan ke tabel users
+            $user = UserModel::create([
                 'nama' => $request->nama,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
-                'role' => $request->role,
+                'role' => 'mahasiswa',
                 'status' => 'aktif',
+            ]);
+
+            // Simpan ke tabel mahasiswa
+            MahasiswaModel::create([
+                'user_id' => $user->user_id,
+                'nim' => $request->nim,
+                'prodi_id' => $request->prodi_id,
+                'periode_id' => $request->periode_id,
             ]);
 
             return response()->json([
@@ -124,4 +135,5 @@ class AuthController extends Controller
 
         return redirect('register');
     }
+
 }
