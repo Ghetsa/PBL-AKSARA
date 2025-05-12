@@ -11,6 +11,8 @@ class DosenModel extends Model
 
     protected $table = 'dosen';
     protected $primaryKey = 'dosen_id';
+    public $timestamps = false;
+
 
     protected $fillable = [
         'user_id',

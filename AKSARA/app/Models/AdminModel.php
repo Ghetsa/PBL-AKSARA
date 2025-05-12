@@ -11,9 +11,7 @@ class AdminModel extends Model
 
     protected $table = 'admin';
     protected $primaryKey = 'admin_id';
-
-    const CREATED_AT = 'create_at';
-    const UPDATED_AT = 'update_at';
+    public $timestamps = false;
 
     protected $fillable = [
         'user_id',
