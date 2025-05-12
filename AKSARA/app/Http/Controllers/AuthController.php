@@ -93,10 +93,10 @@ class AuthController extends Controller
     {
         if ($request->ajax() || $request->wantsJson()) {
             $validator = Validator::make($request->all(), [
-                'nama'     => 'required|string|max:255',
-                'email'    => 'required|email|max:255|unique:users,email',
+                'nama' => 'required|string|max:255',
+                'email' => 'required|email|max:255|unique:users,email',
                 'password' => 'required|string|min:5|max:255',
-                'role'     => 'required|in:admin,mahasiswa,dosen',
+                'role' => 'required|in:admin,mahasiswa,dosen',
             ]);
 
             if ($validator->fails()) {
@@ -108,11 +108,11 @@ class AuthController extends Controller
             }
 
             UserModel::create([
-                'nama'     => $request->nama,
-                'email'    => $request->email,
+                'nama' => $request->nama,
+                'email' => $request->email,
                 'password' => Hash::make($request->password),
-                'role'     => $request->role,
-                'status'   => 'aktif',
+                'role' => $request->role,
+                'status' => 'aktif',
             ]);
 
             return response()->json([

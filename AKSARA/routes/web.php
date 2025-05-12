@@ -19,8 +19,8 @@ use App\Http\Controllers\ProdiController;
 
 Route::get('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/postlogin', [AuthController::class, 'postlogin']);
-// Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-Route::get('logout', [AuthController::class, 'logout'])->middleware('auth');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+// Route::get('logout', [AuthController::class, 'logout'])->middleware('auth');
 
 // Route::get('login', [AuthController::class, 'login'])->name('login');
 // Route::post('login', [AuthController::class, 'postlogin']);
