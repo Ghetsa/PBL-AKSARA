@@ -160,33 +160,17 @@
                     <i class="ti ti-brand-chrome"></i>
                 </li>
                 <li class="pc-item">
-                    <a href="{{ url('/prestasi') }}" class="pc-link {{ ($activeMenu == 'prestasi') ? 'active' : '' }}">
+                    <a href="{{ url('mahasiswa/prestasi/create_ajax') }}" class="pc-link {{ ($activeMenu == 'prestasi') ? 'active' : '' }}">
                         <span class="pc-micon"><i class="ti ti-trophy"></i></span>
                         <span class="pc-mtext">Upload Prestasi</span>
                     </a>
                 </li>
                 <li class="pc-item">
-                    <a href="{{ url('/laporan') }}" class="pc-link {{ ($activeMenu == 'laporan') ? 'active' : '' }}">
+                    <a href="{{ url('mahasiswa/prestasi') }}" class="pc-link {{ ($activeMenu == 'laporan') ? 'active' : '' }}">
                         <span class="pc-micon"><i class="ti ti-report-analytics"></i></span>
                         <span class="pc-mtext">Verifikasi Prestasi</span>
                     </a>
                 </li>
-                <li class="pc-item pc-caption">
-                    <label>Akun</label>
-                    <i class="ti ti-brand-chrome"></i>
-                </li>
-                <li class="pc-item">
-                    <a href="{{ url('/admin') }}" class="pc-link {{ ($activeMenu == 'admin') ? 'active' : '' }}">
-                        <span class="pc-micon"><i class="ti ti-user"></i></span>
-                        <span class="pc-mtext">Profil</span>
-                    </a>
-                </li>
-                <li class="pc-item">
-                    <a href="{{ url('/logout') }}" class="pc-link {{ ($activeMenu == 'logout') ? 'active' : '' }}">
-                        <span class="pc-micon"><i class="ti ti-logout"></i></span>
-                        <span class="pc-mtext">Logout</span>
-                    </a>
-                </li> 
             </ul>
         </div>
     @elseif (Auth::user()->role == 'dosen')
@@ -203,13 +187,13 @@
                     <i class="ti ti-brand-chrome"></i>
                 </li>
                 <li class="pc-item">
-                    <a href="{{ url('/verifikasi') }}" class="pc-link {{ ($activeMenu == 'verifikasi') ? 'active' : '' }}">
+                    <a href="{{ url('/bimbingan') }}" class="pc-link {{ ($activeMenu == 'bimbingan') ? 'active' : '' }}">
                         <span class="pc-micon"><i class="ti ti-file-check"></i></span>
                         <span class="pc-mtext">Mahasiswa Bimbingan</span>
                     </a>
                 </li>
                 <li class="pc-item">
-                    <a href="{{ url('/rekomendasi') }}" class="pc-link {{ ($activeMenu == 'rekomendasi') ? 'active' : '' }}">
+                    <a href="{{ url('/prestasi') }}" class="pc-link {{ ($activeMenu == 'prestasi') ? 'active' : '' }}">
                         <span class="pc-micon"><i class="ti ti-trophy"></i></span>
                         <span class="pc-mtext">Prestasi Mahasiswa</span>
                     </a>
@@ -219,27 +203,11 @@
                     <i class="ti ti-brand-chrome"></i>
                 </li>
                 <li class="pc-item">
-                    <a href="{{ url('/prestasi') }}" class="pc-link {{ ($activeMenu == 'prestasi') ? 'active' : '' }}">
+                    <a href="{{ url('/lomba') }}" class="pc-link {{ ($activeMenu == 'lomba') ? 'active' : '' }}">
                         <span class="pc-micon"><i class="ti ti-award"></i></span>
                         <span class="pc-mtext">Daftar Lomba</span>
                     </a>
                 </li>
-                <li class="pc-item pc-caption">
-                    <label>Akun</label>
-                    <i class="ti ti-brand-chrome"></i>
-                </li>
-                <li class="pc-item">
-                    <a href="{{ url('/admin') }}" class="pc-link {{ ($activeMenu == 'admin') ? 'active' : '' }}">
-                        <span class="pc-micon"><i class="ti ti-user"></i></span>
-                        <span class="pc-mtext">Profil</span>
-                    </a>
-                </li>
-                <li class="pc-item">
-                    <a href="{{ url('/logout') }}" class="pc-link {{ ($activeMenu == 'logout') ? 'active' : '' }}">
-                        <span class="pc-micon"><i class="ti ti-logout"></i></span>
-                        <span class="pc-mtext">Logout</span>
-                    </a>
-                </li> 
             </ul>
         </div>
     @endif 

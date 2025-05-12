@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PeriodeController;
+use App\Http\Controllers\PrestasiController;
 use App\Http\Controllers\ProdiController;
 
 /*
@@ -111,5 +112,28 @@ Route::middleware(['auth'])->group(function () { // artinya semua route di dalam
         // Route::delete('/{id}', [ProdiController::class, 'destroy'])->name('destroy');
         Route::get('/{id}/confirm_ajax', [PeriodeController::class, 'confirm_ajax'])->name('confirm_ajax');
         Route::delete('/{id}/delete-ajax', [PeriodeController::class, 'delete_ajax'])->name('delete_ajax');
+    });
+
+    Route::middleware(['role:mahasiswa'])->prefix('mahasiswa/prestasi')->name('prestasi.mahasiswa.')->group(function () {
+        Route::get('/', [PrestasiController::class, 'indexMahasiswa'])->name('index'); // Halaman utama histori prestasi (full page)
+        Route::get('/list', [PrestasiController::class, 'listMahasiswa'])->name('list'); // Data untuk DataTable mahasiswa
+
+        Route::get('/create-ajax', [PrestasiController::class, 'createFormAjaxMahasiswa'])->name('create_ajax'); // Menampilkan form tambah via AJAX
+        Route::post('/store-ajax', [PrestasiController::class, 'storeAjaxMahasiswa'])->name('store_ajax'); // Menyimpan prestasi via AJAX
+
+        // Jika ada fitur edit/hapus oleh mahasiswa via AJAX nantinya:
+        // Route::get('/{prestasi}/edit-ajax', [PrestasiController::class, 'editFormAjaxMahasiswa'])->name('edit_ajax');
+        // Route::put('/{prestasi}/update-ajax', [PrestasiController::class, 'updateAjaxMahasiswa'])->name('update_ajax');
+        // Route::get('/{prestasi}/confirm-delete-ajax', [PrestasiController::class, 'confirmDeleteAjaxMahasiswa'])->name('confirm_delete_ajax');
+        // Route::delete('/{prestasi}/destroy-ajax', [PrestasiController::class, 'destroyAjaxMahasiswa'])->name('destroy_ajax');
+    });
+
+    // === RUTE UNTUK ADMIN ===
+    Route::middleware(['role:admin'])->prefix('admin/prestasi-verifikasi')->name('prestasi.admin.')->group(function () {
+        Route::get('/', [PrestasiController::class, 'indexAdmin'])->name('index'); // Halaman utama daftar prestasi untuk admin (full page)
+        Route::get('/list', [PrestasiController::class, 'listAdmin'])->name('list'); // Data untuk DataTable admin
+
+        Route::get('/{prestasi}/verify-form-ajax', [PrestasiController::class, 'showVerifyFormAjaxAdmin'])->name('verify_form_ajax'); // Menampilkan detail & form verifikasi via AJAX
+        Route::put('/{prestasi}/process-verification-ajax', [PrestasiController::class, 'processVerificationAjaxAdmin'])->name('process_verification_ajax'); // Memproses verifikasi via AJAX
     });
 });
