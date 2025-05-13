@@ -71,8 +71,6 @@ Route::middleware(['auth'])->group(function () { // artinya semua route di dalam
     })->name('dashboardDSN');
 
     Route::get('/profile', [ProfilController::class, 'index'])->name('profile.index');
-    Route::get('/user/profile_ajax', [ProfilController::class, 'edit_ajax'])->name('profile.edit_ajax');
-    Route::put('/user/profile_update_ajax', [ProfilController::class, 'update_ajax'])->name('profile.update_ajax');
 
     Route::group(['prefix' => 'user', 'as' => 'user.'], function () {
         Route::get('/', [UserController::class, 'index'])->name('index');
@@ -81,6 +79,8 @@ Route::middleware(['auth'])->group(function () { // artinya semua route di dalam
         Route::post('/', [UserController::class, 'store'])->name('store'); // Non-AJAX store
         Route::get('/create_ajax', [UserController::class, 'create_ajax'])->name('create_ajax');
         Route::post('/store_ajax', [UserController::class, 'store_ajax'])->name('store_ajax'); // Jika Anda punya route store_ajax terpisah
+        Route::get('/profile_ajax', [ProfilController::class, 'edit_ajax'])->name('profile.edit_ajax');
+        Route::put('/profile_ajax', [ProfilController::class, 'update_ajax'])->name('profile.update_ajax');
         Route::get('/{id}', [UserController::class, 'show'])->name('show');
         Route::get('/{id}/show_ajax', [UserController::class, 'show_ajax'])->name('show_ajax');
         Route::get('/{id}/edit', [UserController::class, 'edit'])->name('edit');
