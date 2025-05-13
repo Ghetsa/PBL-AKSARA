@@ -27,7 +27,7 @@
                             <button type="submit" class="btn btn-primary btn-sm w-100">Filter</button>
                         </div>
                          <div class="col-md-2">
-                            <a href="{{ route('admin.prestasi.index') }}" class="btn btn-secondary btn-sm w-100">Reset</a>
+                            <a href="{{ route('prestasi.admin.index') }}" class="btn btn-secondary btn-sm w-100">Reset</a>
                         </div>
                     </form>
 
@@ -96,7 +96,7 @@
             processing: true,
             serverSide: true,
             ajax: {
-                url: "{{ route('admin.prestasi.list') }}",
+                url: "{{ route('prestasi.admin.list') }}",
                 data: function (d) { // Mengirim data filter
                     d.search_nama = $('#search_nama_admin').val();
                     d.filter_status = $('#filter_status_admin').val();

@@ -1,5 +1,5 @@
 {{-- resources/views/admin/prestasi/verify_ajax.blade.php --}}
-<form id="formVerifikasiPrestasi" method="POST" action="{{ route('admin.prestasi.process_verification_ajax', $prestasi->prestasi_id) }}">
+<form id="formVerifikasiPrestasi" method="POST" action="{{ route('prestasi.admin.process_verification_ajax', $prestasi->prestasi_id) }}">
     @csrf
     @method('PUT')
     <div class="modal-header">
@@ -21,7 +21,7 @@
                 <th>Bukti</th>
                 <td>
                     @if($prestasi->file_bukti)
-                        <a href="{{ Storage::url($prestasi->file_bukti) }}" target="_blank" class="btn btn-info btn-sm">
+                        <a href="{{ asset(Storage::url($prestasi->file_bukti)) }}" target="_blank" class="btn btn-info btn-sm">
                             <i class="fas fa-file-alt"></i> Lihat Bukti
                         </a>
                     @else

@@ -145,7 +145,7 @@ class PrestasiController extends Controller
                 })
                 ->addColumn('file_bukti_action', function ($row) {
                     if ($row->file_bukti) {
-                        return '<a href="' . Storage::url($row->file_bukti) . '" target="_blank" class="btn btn-info btn-sm"><i class="fas fa-eye"></i> Lihat</a>';
+                        return '<a href="' . asset(Storage::url($row->file_bukti)) . '" target="_blank" class="btn btn-info btn-sm"><i class="fas fa-eye"></i> Lihat</a>';
                     }
                     return '-';
                 })
@@ -251,19 +251,21 @@ class PrestasiController extends Controller
      */
     public function indexAdmin()
     {
-        // View ini akan berisi tabel yang diisi oleh DataTables via AJAX call ke listAdmin()
-        return view('prestasi.admin.index');
+        $breadcrumb = (object) [
+            'title' => 'Data prestasi',
+            'list' => ['Status Verifikasi']
+        ];
+        $activeMenu = 'dashboard';
+        return view('prestasi.admin.index', compact('breadcrumb', 'activeMenu'));
     }
 
-    /**
-     * Menyediakan data prestasi untuk DataTable admin.
-     */
     public function listAdmin(Request $request)
     {
         if ($request->ajax()) {
             $data = PrestasiModel::with('mahasiswa.user', 'mahasiswa.prodi')
                 ->select('prestasi.*') // Pilih semua kolom dari prestasi
-                ->orderByRaw("FIELD(status_verifikasi, 'pending', 'disetujui', 'ditolak'), created_at DESC");
+                ->orderByRaw("FIELD(status_verifikasi, 'pending', 'disetujui', 'ditolak')");
+            // ->orderByRaw("FIELD(status_verifikasi, 'pending', 'disetujui', 'ditolak'), created_at DESC");
 
 
             // Filter
@@ -309,7 +311,7 @@ class PrestasiController extends Controller
                     return '<span class="badge bg-secondary">' . ucfirst($row->status_verifikasi) . '</span>';
                 })
                 ->addColumn('aksi', function ($row) {
-                    $verifyUrl = route('admin.prestasi.verify_form_ajax', $row->prestasi_id);
+                    $verifyUrl = route('prestasi.admin.verify_form_ajax', $row->prestasi_id);
                     return '<button type="button" class="btn btn-info btn-sm" onclick="modalAction(\'' . $verifyUrl . '\')"><i class="fas fa-search-plus"></i> Verifikasi</button>';
                 })
                 ->rawColumns(['status_verifikasi', 'aksi'])
@@ -321,7 +323,7 @@ class PrestasiController extends Controller
     public function showVerifyFormAjaxAdmin(PrestasiModel $prestasi)
     {
         $prestasi->load('mahasiswa.user', 'mahasiswa.prodi');
-        return view('admin.prestasi.verify_ajax', compact('prestasi'));
+        return view('prestasi.admin.verify_ajax', compact('prestasi'));
     }
 
     public function processVerificationAjaxAdmin(Request $request, PrestasiModel $prestasi)
