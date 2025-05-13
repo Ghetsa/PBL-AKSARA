@@ -236,7 +236,43 @@
             <span>{{ Auth::user()->nama }}</span>
           </a>
 
-          <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown">
+            <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown" style="min-width: 200px;"> 
+              <div class="dropdown-header">
+                  <div class="d-flex mb-1 align-items-center"> 
+                      <div class="flex-shrink-0">
+                          <img src="{{ $avatar }}" alt="user-image" class="user-avtar wid-35">
+                      </div>
+                      <div class="flex-grow-1 ms-3"> 
+                          <h6 class="mb-1">{{ Auth::user()->nama }}</h6>
+                          <span>{{ ucfirst($role) ?? 'User' }}</span>
+                      </div>
+                  </div>
+              </div>
+
+              <a href="{{ route('profile.index') }}" class="dropdown-item">
+                  <i class="ti ti-user me-2"></i> 
+                  <span>Lihat Profil</span>
+              </a>
+              <a href="#!" class="dropdown-item">
+                <i class="ti ti-help"></i>
+                <span>Dokumentasi</span>
+              </a>
+              <a href="#!" class="dropdown-item">
+                <i class="ti ti-messages"></i>
+                <span>Feedback</span>
+              </a>
+              <a href="{{ route('logout') }}"
+                  onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+                  class="dropdown-item">
+                  <i class="ti ti-power text-danger me-2"></i> 
+                  <span class="text-danger">Logout</span>
+              </a>
+              <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                  @csrf
+              </form>
+          </div>
+
+          {{-- <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown">
             <div class="dropdown-header">
               <div class="d-flex mb-1">
                 <div class="flex-shrink-0">
@@ -320,7 +356,7 @@
                 </a>
               </div>
             </div>
-          </div>
+          </div> --}}
         </li>
       </ul>
     </div>
