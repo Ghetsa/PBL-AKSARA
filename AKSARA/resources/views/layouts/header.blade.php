@@ -229,7 +229,6 @@
         break;
       }
     @endphp
-
         <li class="dropdown pc-h-item header-user-profile">
           <a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#" role="button"
             aria-haspopup="false" data-bs-auto-close="outside" aria-expanded="false">

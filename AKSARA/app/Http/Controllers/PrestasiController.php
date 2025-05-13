@@ -16,7 +16,7 @@ class PrestasiController extends Controller
     public function index()
     {
         $data = PrestasiModel::all();
-        $breadcrumb = (object)[
+        $breadcrumb = (object) [
             'title' => 'Manajemen Prestasi',
             'list' => ['Dashboard', 'Prestasi']
         ];
@@ -145,7 +145,10 @@ class PrestasiController extends Controller
                 })
                 ->addColumn('file_bukti_action', function ($row) {
                     if ($row->file_bukti) {
-                        return '<a href="' . asset(Storage::url($row->file_bukti)) . '" target="_blank" class="btn btn-info btn-sm"><i class="fas fa-eye"></i> Lihat</a>';
+                        $url = asset('storage/' . $row->file_bukti); // Sesuai struktur URL kamu
+                        return '<a href="' . $url . '" target="_blank" class="btn btn-info btn-sm">
+                    <i class="fas fa-eye"></i> Lihat
+                </a>';
                     }
                     return '-';
                 })
