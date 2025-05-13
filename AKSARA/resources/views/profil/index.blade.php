@@ -218,7 +218,7 @@
                                      @endif
 
                                     <div class="mt-3 text-end">
-                                        <button id="btnEditProfile" class="btn btn-primary">Ubah Profil</button>
+                                        <button id="btnEditProfile" class="btn btn-primary">Perbarui Profil</button>
                                     </div>
                                 </div>
                             </div>
@@ -259,6 +259,135 @@
         });
     </script>
 @endpush
+                                    {{-- @if($user->role == 'dosen' || $user->role == 'mahasiswa')
+                                    <div class="card mt-3">
+                                        <div class="card-header d-flex justify-content-between align-items-center">
+                                            <h5>Keahlian</h5>
+                                            <div>
+                                                <button class="btn btn-sm btn-icon btn-outline-primary me-1" onclick="openProfileModal('keahlian')"><i class="ti ti-plus"></i></button>
+                                                <button class="btn btn-sm btn-icon btn-outline-secondary" onclick="openProfileModal()"><i class="ti ti-pencil"></i></button>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            @forelse($user->keahlian as $k)
+                                            <div class="mb-2">
+                                                <p class="mb-0 fw-bold">{{ $k->keahlian_nama }}</p>
+                                                @if($k->sertifikasi && $k->sertifikasi !== '-')
+                                                    <small class="text-muted d-block">Sertifikasi: {{ $k->sertifikasi }}</small>
+                                                @endif
+                                            </div>
+                                            @empty
+                                                <p class="text-muted">Belum ada keahlian yang ditambahkan.</p>
+                                            @endforelse
+                                        </div>
+                                    </div>
+                                    @endif
+
+                                    @if($user->role == 'dosen' || $user->role == 'mahasiswa')
+                                    <div class="card mt-3">
+                                        <div class="card-header d-flex justify-content-between align-items-center">
+                                            <h5>Pengalaman</h5>
+                                            <div>
+                                                <button class="btn btn-sm btn-icon btn-outline-primary me-1" onclick="openProfileModal('pengalaman')"><i class="ti ti-plus"></i></button>
+                                                <button class="btn btn-sm btn-icon btn-outline-secondary" onclick="openProfileModal()"><i class="ti ti-pencil"></i></button>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            @forelse($user->pengalaman as $p)
+                                            <div class="mb-3 pb-3 border-bottom">
+                                                <h6 class="mb-0">{{ $p->nama_pengalaman }}</h6>
+                                                    @if($p->pengalaman_kategori)
+                                                    <small>({{ $p->pengalaman_kategori }})</small>
+                                                    @endif
+                                            </div>
+                                            @empty
+                                                <p class="text-muted">Belum ada pengalaman yang ditambahkan.</p>
+                                            @endforelse
+                                        </div>
+                                    </div>
+                                    @endif
+
+                                    @if($user->role == 'dosen' || $user->role == 'mahasiswa')
+                                    <div class="card mt-3">
+                                        <div class="card-header d-flex justify-content-between align-items-center">
+                                            <h5>Minat</h5>
+                                            <div>
+                                                <button class="btn btn-sm btn-icon btn-outline-primary me-1" onclick="openProfileModal('minat')"><i class="ti ti-plus"></i></button>
+                                                <button class="btn btn-sm btn-icon btn-outline-secondary" onclick="openProfileModal()"><i class="ti ti-pencil"></i></button>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            @if($user->minat && $user->minat->count() > 0)
+                                                @foreach($user->minat as $m)
+                                                    <span class="badge bg-light text-dark me-1 mb-1 p-2">{{ $m->nama_minat }}</span>
+                                                @endforeach
+                                            @else
+                                                <p class="text-muted">Belum ada minat yang ditambahkan.</p>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    @endif
+
+                                    <div class="mt-3 text-end">
+                                        <button id="btnEditProfile" class="btn btn-primary">Ubah Profil</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    <div class="modal fade" id="updateProfileModal" tabindex="-1" role="dialog" aria-labelledby="updateProfileModalLabel" aria-hidden="true">
+    </div>
+@endsection
+
+@push('js')
+    <script>
+        // Fungsi modalAction yang sudah ada
+        function modalAction(url = '', section = null) {
+            $('#updateProfileModal').html('<div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-body"><p class="text-center">Memuat form...</p></div></div></div>'); // Initial loading state
+            $('#updateProfileModal').load(url, function (responseText, textStatus, req) {
+                if (textStatus === "error") {
+                    console.error("Gagal memuat konten modal: " + req.status + " " + req.statusText);
+                    $('#updateProfileModal').html('<div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-body"><p class="text-danger text-center">Gagal memuat form. Silakan coba lagi.</p></div></div></div>');
+                } else {
+                    // Jika ada section yang dituju, coba aktifkan tab atau scroll ke elemen
+                    if(section && $(this).find('#nav-' + section + '-tab').length) {
+                        var tab = new bootstrap.Tab(document.getElementById('nav-' + section + '-tab'));
+                        tab.show();
+                    } else if (section && $(this).find('#section-' + section).length) {
+                        // Scroll ke section jika bukan tab
+                        var modalBody = $(this).find('.modal-body');
+                        modalBody.scrollTop(0); // Reset scroll
+                        var sectionElement = $(this).find('#section-' + section);
+                        if(sectionElement.length) {
+                            modalBody.animate({
+                                scrollTop: sectionElement.offset().top - modalBody.offset().top + modalBody.scrollTop() - 20 // -20px offset
+                            }, 500);
+                        }
+                    }
+                }
+                $('#updateProfileModal').modal('show');
+            });
+        }
+
+        // Fungsi baru untuk trigger modal
+        function openProfileModal(section = null) {
+            var profileAjaxUrl = "{{ url('user/profile_ajax') }}";
+            modalAction(profileAjaxUrl, section);
+        }
+
+        $(document).ready(function () {
+            // Tombol "Ubah Profil" utama di header card kanan
+            $('#btnEditProfile').click(function () {
+                openProfileModal();
+            });
+        });
+    </script>
+@endpush --}}
+                                    
 
 {{-- @extends('layouts.template')
 

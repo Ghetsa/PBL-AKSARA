@@ -40,12 +40,36 @@ class UserModel extends Authenticatable implements JWTSubject
         return [];
     }
 
-    public function admin() { return $this->hasOne(AdminModel::class, 'user_id', 'user_id'); }
-    public function dosen() { return $this->hasOne(DosenModel::class, 'user_id', 'user_id'); }
-    public function mahasiswa() { return $this->hasOne(MahasiswaModel::class, 'user_id', 'user_id'); }
-    public function keahlian() { return $this->hasMany(KeahlianModel::class, 'user_id', 'user_id'); }
-    public function minat() { return $this->hasMany(MinatModel::class, 'user_id', 'user_id'); }
-    public function pengalaman() { return $this->hasMany(PengalamanModel::class, 'user_id', 'user_id'); }
-    public function notifikasi() { return $this->hasMany(NotifikasiModel::class, 'user_id', 'user_id'); }
-    public function lombaDiinput() { return $this->hasMany(LombaModel::class, 'diinput_oleh', 'user_id'); }
+    public function admin()
+    {
+        return $this->hasOne(AdminModel::class, 'user_id', 'user_id');
+    }
+    public function dosen()
+    {
+        return $this->hasOne(DosenModel::class, 'user_id', 'user_id');
+    }
+    public function mahasiswa()
+    {
+        return $this->hasOne(MahasiswaModel::class, 'user_id', 'user_id');
+    }
+    public function keahlian()
+    {
+        return $this->hasMany(KeahlianModel::class, 'user_id', 'user_id');
+    }
+    public function minat()
+    {
+        return $this->hasMany(MinatModel::class, 'user_id', 'user_id');
+    }
+    public function pengalaman()
+    {
+        return $this->hasMany(PengalamanModel::class, 'user_id', 'user_id');
+    }
+    public function notifikasi()
+    {
+        return $this->hasMany(NotifikasiModel::class, 'user_id', 'user_id');
+    }
+    public function lombaDiinput()
+    {
+        return $this->hasMany(LombaModel::class, 'diinput_oleh', 'user_id');
+    }
 }
