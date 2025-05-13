@@ -69,6 +69,7 @@ Route::middleware(['auth'])->group(function () { // artinya semua route di dalam
 
         return view('dashboard.mahasiswa', compact('breadcrumb', 'activeMenu'));
     })->name('dashboardDSN');
+
     Route::get('/profile', [ProfilController::class, 'index'])->name('profile.index');
     Route::get('/user/profile_ajax', [ProfilController::class, 'edit_ajax'])->name('profile.edit_ajax');
     Route::put('/user/profile_ajax', [ProfilController::class, 'update_ajax'])->name('profile.update_ajax');
