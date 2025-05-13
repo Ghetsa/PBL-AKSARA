@@ -193,7 +193,7 @@ class PrestasiController extends Controller
             'nama_prestasi' => 'required|string|max:255',
             'kategori' => ['required', Rule::in(['akademik', 'non-akademik'])],
             'penyelenggara' => 'required|string|max:255',
-            'tingkat' => ['required', Rule::in(['lokal', 'nasional', 'internasional'])],
+            'tingkat' => ['required', Rule::in(['kota','provinsi', 'nasional', 'internasional'])],
             'tahun' => 'required|integer|digits:4|min:1900|max:' . (date('Y') + 1),
             'file_bukti' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048', // Max 2MB
         ]);

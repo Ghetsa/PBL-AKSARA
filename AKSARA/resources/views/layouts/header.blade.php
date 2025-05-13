@@ -275,7 +275,7 @@
                   <i class="ti ti-edit-circle"></i>
                   <span>Edit Profile</span>
                 </a>
-                <a href="#!" class="dropdown-item">
+                <a href="{{ route('profile.index') }}" class="dropdown-item">
                   <i class="ti ti-user"></i>
                   <span>View Profile</span>
                 </a>

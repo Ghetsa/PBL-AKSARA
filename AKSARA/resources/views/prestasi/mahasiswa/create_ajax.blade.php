@@ -43,7 +43,8 @@
             <div class="col-sm-9">
                 <select class="form-select" id="create_tingkat" name="tingkat" required>
                     <option value="">-- Pilih Tingkat --</option>
-                    <option value="lokal">Lokal/Daerah</option>
+                    <option value="kota">Kota</option>
+                    <option value="provinsi">Provinsi</option>
                     <option value="nasional">Nasional</option>
                     <option value="internasional">Internasional</option>
                 </select>

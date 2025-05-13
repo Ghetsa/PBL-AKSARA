@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PeriodeController;
 use App\Http\Controllers\PrestasiController;
 use App\Http\Controllers\ProdiController;
+use App\Http\Controllers\ProfilController;
 
 /*
 |--------------------------------------------------------------------------
@@ -68,7 +69,10 @@ Route::middleware(['auth'])->group(function () { // artinya semua route di dalam
 
         return view('dashboard.mahasiswa', compact('breadcrumb', 'activeMenu'));
     })->name('dashboardDSN');
-
+    Route::get('/profile', [ProfilController::class, 'index'])->name('profile.index');
+    Route::get('/user/profile_ajax', [ProfilController::class, 'edit_ajax'])->name('profile.edit_ajax');
+    Route::put('/user/profile_update_ajax', [ProfilController::class, 'update_ajax'])->name('profile.update_ajax');
+    
     Route::group(['prefix' => 'user', 'as' => 'user.'], function () {
         Route::get('/', [UserController::class, 'index'])->name('index');
         Route::post('/list', [UserController::class, 'list'])->name('list');
