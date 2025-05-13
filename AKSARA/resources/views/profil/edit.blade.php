@@ -6,8 +6,7 @@
         <div class="modal-content">
             <div class="modal-header bg-primary">
                 <h4 class="modal-title">Ubah Profil</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Tutup">
-                    <span aria-hidden="true">&times;</span>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                 </button>
             </div>
 
@@ -30,7 +29,7 @@
                     <input type="text" class="form-control" value="{{ ucfirst($user->role) }}" disabled>
                 </div>
 
-                @if($user->role === 'dosen')
+                @if ($user->role === 'dosen')
                     <!-- NIP (tidak bisa diedit) -->
                     <div class="form-group">
                         <label>NIP</label>
@@ -58,13 +57,15 @@
                     <!-- Program Studi -->
                     <div class="form-group">
                         <label>Program Studi</label>
-                        <input type="text" class="form-control" value="{{ $user->mahasiswa->prodi->nama ?? '-' }}" disabled>
+                        <input type="text" class="form-control" value="{{ $user->mahasiswa->prodi->nama ?? '-' }}"
+                            disabled>
                     </div>
 
                     <!-- Periode -->
                     <div class="form-group">
                         <label>Periode</label>
-                        <input type="text" class="form-control" value="{{ $user->mahasiswa->periode->tahun_akademik ?? '-' }}" disabled>
+                        <input type="text" class="form-control"
+                            value="{{ $user->mahasiswa->periode->tahun_akademik ?? '-' }}" disabled>
                     </div>
                 @elseif($user->role === 'admin')
                     <!-- NIP Admin (tidak bisa diedit) -->
@@ -77,7 +78,8 @@
                 <!-- Minat -->
                 <div class="form-group">
                     <label>Minat</label>
-                    <input type="text" name="minat" class="form-control" value="{{ $user->minat->first()->minat ?? '' }}">
+                    <input type="text" name="minat" class="form-control"
+                        value="{{ $user->minat->first()->minat ?? '' }}">
                 </div>
 
                 <!-- Pengalaman -->
@@ -87,18 +89,18 @@
                 </div>
 
                 <!-- Prestasi (khusus mahasiswa) -->
-                @if($user->role === 'mahasiswa')
-                <div class="form-group">
-                    <label>Prestasi</label>
-                    <textarea name="prestasi" class="form-control" rows="2">{{ $user->mahasiswa->prestasi->first()->nama_prestasi ?? '' }}</textarea>
-                </div>
+                @if ($user->role === 'mahasiswa')
+                    <div class="form-group">
+                        <label>Prestasi</label>
+                        <textarea name="prestasi" class="form-control" rows="2">{{ $user->mahasiswa->prestasi->first()->nama_prestasi ?? '' }}</textarea>
+                    </div>
                 @endif
 
                 <!-- Keahlian -->
                 <div class="form-group">
                     <label>Keahlian</label>
                     <select name="keahlian_id[]" class="form-control" multiple>
-                        @foreach($keahlianList as $keahlian)
+                        @foreach ($keahlianList as $keahlian)
                             <option value="{{ $keahlian->id }}"
                                 {{ in_array($keahlian->id, $selectedKeahlianIds ?? []) ? 'selected' : '' }}>
                                 {{ $keahlian->keahlian_nama }}
