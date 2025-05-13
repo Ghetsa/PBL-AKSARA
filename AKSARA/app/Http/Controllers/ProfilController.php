@@ -48,27 +48,54 @@ class ProfilController extends Controller
 
         return view('profil.index', compact('user', 'activeMenu', 'breadcrumb'));
     }
+    // public function edit_ajax()
+    // {
+    //     $user = Auth::user();
+    //     $activeMenu = "";
+    //     $breadcrumb = (object) [
+    //         'title' => 'Profil pengguna',
+    //         'list' => ['Dashboard', 'Profil']
+    //     ];
+    //     if ($user->role === 'dosen') {
+    //         $user->load(['dosen', 'keahlian', 'pengalaman', 'minat']);
+    //     }
+
+    //     if ($user->role === 'mahasiswa') {
+    //         $user->load([
+    //             'mahasiswa.prodi',
+    //             'mahasiswa.periode',
+    //             'keahlian',
+    //             'pengalaman',
+    //             'minat',
+    //             'mahasiswa.prestasi'
+    //         ]);
+    //     }
+
+    //     return view('profil.edit', compact('user', 'activeMenu', 'breadcrumb'));
+    // }
     public function edit_ajax()
     {
-        $user = Auth::user();
+        $user = Auth::user()->load([
+            'mahasiswa.prodi',
+            'mahasiswa.periode',
+            'mahasiswa.prestasi',
+            'dosen',
+            'admin',
+            'keahlian',
+            'minat',
+            'pengalaman'
+        ]);
 
-        if ($user->role === 'dosen') {
-            $user->load(['dosen', 'keahlian', 'pengalaman', 'minat']);
-        }
+        $keahlianList = KeahlianModel::all();
+        $pengalamanList = PengalamanModel::all();
+        $minatList = MinatModel::all();
+        $selectedKeahlianIds = $user->keahlian->pluck('keahlian_id')->toArray();
+        $selectedPengalamanIds = $user->pengalaman->pluck('pengalaman_id')->toArray();
+        $selectedMinatIds = $user->minat->pluck('minat_id')->toArray();
 
-        if ($user->role === 'mahasiswa') {
-            $user->load([
-                'mahasiswa.prodi',
-                'mahasiswa.periode',
-                'keahlian',
-                'pengalaman',
-                'minat',
-                'mahasiswa.prestasi'
-            ]);
-        }
-
-        return view('profil._form_edit_ajax', compact('user'));
+        return view('profil.edit', compact('user', 'keahlianList', 'selectedKeahlianIds','selectedMinatIds','selectedPengalamanIds'));
     }
+
 
     public function update_ajax(Request $request)
     {

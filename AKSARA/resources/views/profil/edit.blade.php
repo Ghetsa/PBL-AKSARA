@@ -18,35 +18,81 @@
                     <input type="text" name="nama" class="form-control" value="{{ $user->nama }}" required>
                 </div>
 
-                <!-- Username -->
+                <!-- Email -->
                 <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" name="username" class="form-control" value="{{ $user->username }}" required>
+                    <label>Email</label>
+                    <input type="email" name="email" class="form-control" value="{{ $user->email }}" required>
                 </div>
 
-                <!-- NIM/NIP (tidak bisa diedit) -->
+                <!-- Role Tertampil (tidak bisa diedit) -->
                 <div class="form-group">
-                    <label>{{ $user->role === 'mahasiswa' ? 'NIM' : 'NIP' }}</label>
-                    <input type="text" class="form-control" value="{{ $user->nim ?? $user->nip }}" disabled>
+                    <label>Role</label>
+                    <input type="text" class="form-control" value="{{ ucfirst($user->role) }}" disabled>
                 </div>
+
+                @if($user->role === 'dosen')
+                    <!-- NIP (tidak bisa diedit) -->
+                    <div class="form-group">
+                        <label>NIP</label>
+                        <input type="text" class="form-control" value="{{ $user->dosen->nip }}" disabled>
+                    </div>
+
+                    <!-- Gelar -->
+                    <div class="form-group">
+                        <label>Gelar</label>
+                        <input type="text" name="gelar" class="form-control" value="{{ $user->dosen->gelar }}">
+                    </div>
+
+                    <!-- No HP -->
+                    <div class="form-group">
+                        <label>No. HP</label>
+                        <input type="text" name="no_hp" class="form-control" value="{{ $user->dosen->no_hp }}">
+                    </div>
+                @elseif($user->role === 'mahasiswa')
+                    <!-- NIM (tidak bisa diedit) -->
+                    <div class="form-group">
+                        <label>NIM</label>
+                        <input type="text" class="form-control" value="{{ $user->mahasiswa->nim }}" disabled>
+                    </div>
+
+                    <!-- Program Studi -->
+                    <div class="form-group">
+                        <label>Program Studi</label>
+                        <input type="text" class="form-control" value="{{ $user->mahasiswa->prodi->nama ?? '-' }}" disabled>
+                    </div>
+
+                    <!-- Periode -->
+                    <div class="form-group">
+                        <label>Periode</label>
+                        <input type="text" class="form-control" value="{{ $user->mahasiswa->periode->tahun_akademik ?? '-' }}" disabled>
+                    </div>
+                @elseif($user->role === 'admin')
+                    <!-- NIP Admin (tidak bisa diedit) -->
+                    <div class="form-group">
+                        <label>NIP</label>
+                        <input type="text" class="form-control" value="{{ $user->admin->nip }}" disabled>
+                    </div>
+                @endif
 
                 <!-- Minat -->
                 <div class="form-group">
                     <label>Minat</label>
-                    <input type="text" name="minat" class="form-control" value="{{ $user->minat?->nama }}">
+                    <input type="text" name="minat" class="form-control" value="{{ $user->minat->first()->minat ?? '' }}">
                 </div>
 
                 <!-- Pengalaman -->
                 <div class="form-group">
                     <label>Pengalaman</label>
-                    <textarea name="pengalaman" class="form-control" rows="3">{{ $user->pengalaman?->deskripsi }}</textarea>
+                    <textarea name="pengalaman" class="form-control" rows="2">{{ $user->pengalaman->first()->pengalaman_nama ?? '' }}</textarea>
                 </div>
 
-                <!-- Prestasi -->
+                <!-- Prestasi (khusus mahasiswa) -->
+                @if($user->role === 'mahasiswa')
                 <div class="form-group">
                     <label>Prestasi</label>
-                    <textarea name="prestasi" class="form-control" rows="3">{{ $user->prestasi?->deskripsi }}</textarea>
+                    <textarea name="prestasi" class="form-control" rows="2">{{ $user->mahasiswa->prestasi->first()->nama_prestasi ?? '' }}</textarea>
                 </div>
+                @endif
 
                 <!-- Keahlian -->
                 <div class="form-group">
@@ -55,7 +101,7 @@
                         @foreach($keahlianList as $keahlian)
                             <option value="{{ $keahlian->id }}"
                                 {{ in_array($keahlian->id, $selectedKeahlianIds ?? []) ? 'selected' : '' }}>
-                                {{ $keahlian->nama }}
+                                {{ $keahlian->keahlian_nama }}
                             </option>
                         @endforeach
                     </select>
@@ -78,7 +124,6 @@
 <script>
     $('#formUpdateProfile').submit(function(e) {
         e.preventDefault();
-
         let formData = new FormData(this);
 
         $.ajax({

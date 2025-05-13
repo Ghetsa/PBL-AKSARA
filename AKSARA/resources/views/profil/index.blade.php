@@ -85,7 +85,7 @@
                         <h5 class="mt-3">Minat:</h5>
                         <ul>
                             @forelse($user->minat as $m)
-                                <li>{{ $m->nama_minat }}</li>
+                                <li>{{ $m->minat }}</li>
                             @empty
                                 <li>-</li>
                             @endforelse
@@ -94,7 +94,7 @@
                         <h5 class="mt-3">Pengalaman:</h5>
                         <ul>
                             @forelse($user->pengalaman as $p)
-                                <li>{{ $p->nama_pengalaman }} ({{ $p->tahun }})</li>
+                                <li>{{ $p->pengalaman_nama }} ({{ $p->pengalaman_kategori }})</li>
                             @empty
                                 <li>-</li>
                             @endforelse
