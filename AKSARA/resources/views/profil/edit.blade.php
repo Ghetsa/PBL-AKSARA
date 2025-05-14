@@ -36,23 +36,6 @@
                                 <small class="form-text text-muted">Foto saat ini: <a href="{{ Storage::url($user->profile_photo) }}" target="_blank">lihat foto</a>. Kosongkan jika tidak ingin mengubah.</small>
                             @endif
                         </div>
-
-                        @if ($user->role === 'dosen' && $user->dosen)
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="gelar" class="form-label">Gelar</label>
-                                    <input type="text" name="gelar" id="gelar" class="form-control" value="{{ $user->dosen->gelar ?? '' }}">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="no_hp" class="form-label">No. HP</label>
-                                    <input type="text" name="no_hp" id="no_hp" class="form-control" value="{{ $user->dosen->no_hp ?? '' }}">
-                                </div>
-                            </div>
-                        </div>
-                        @endif
                     </div>
                     <hr class="my-4"> {{-- Pemisah antar bagian --}}
 
@@ -84,19 +67,18 @@
                                         <input type="text" name="keahlian_items[0][sertifikasi]" class="form-control" placeholder="Sertifikasi (Opsional)">
                                     </div>
                                     <div class="col-md-2">
-                                        {{-- Tombol hapus akan ditambahkan oleh JS untuk item pertama jika item > 1 --}}
                                     </div>
                                 </div>
                             @endforelse
                         </div>
                         <button type="button" id="add-keahlian-btn" class="btn btn-sm btn-outline-primary mt-2">Tambah Keahlian</button>
                     </div>
-                    <hr class="my-4"> {{-- Pemisah antar bagian --}}
+                    <hr class="my-4"> 
                     @endif
 
 
                     {{-- Bagian Pengalaman --}}
-                    @if ($user->role === 'dosen' || $user->role === 'mahasiswa')
+                    @if ($user->role === 'mahasiswa')
                     <div id="section-pengalaman" class="mt-4"> {{-- Tambahkan ID untuk scroll targeting --}}
                         <h5><i class="ti ti-briefcase me-2"></i>Pengalaman</h5>
                          <hr class="mt-1 mb-3">
@@ -109,7 +91,7 @@
                                             <input type="text" name="pengalaman_items[{{ $index }}][pengalaman_nama]" class="form-control" value="{{ $pengalaman->pengalaman_nama }}">
                                         </div>
                                          <div class="col-md-6 mb-2">
-                                            <label class="form-label">Kategori (Opsional)</label>
+                                            <label class="form-label">Kategori</label>
                                             <input type="text" name="pengalaman_items[{{ $index }}][pengalaman_kategori]" class="form-control" placeholder="Mis: Pekerjaan, Magang, Proyek" value="{{ $pengalaman->pengalaman_kategori }}">
                                         </div>
                                     </div>
@@ -119,7 +101,16 @@
                                 <div class="pengalaman-item border rounded p-3 mb-3">
                                     <div class="row">
                                          <div class="col-md-6 mb-2"><label class="form-label">Nama Pengalaman</label><input type="text" name="pengalaman_items[0][pengalaman_nama]" class="form-control"></div>
-                                         <div class="col-md-6 mb-2"><label class="form-label">Kategori</label><input type="text" name="pengalaman_items[0][pengalaman_kategori]" placeholder="Mis: Pekerjaan, Magang, Proyek" class="form-control"></div>
+                                         {{-- <div class="col-md-6 mb-2"><label class="form-label">Kategori</label><input type="text" name="pengalaman_items[0][pengalaman_kategori]" placeholder="Mis: Pekerjaan, Magang, Proyek" class="form-control"></div> --}}
+                                         <div class="col-md-6 mb-2">
+                                            <label class="form-label">Kategori</label>
+                                            <select name="pengalaman_items[0][pengalaman_kategori]" class="form-control">
+                                                <option value="">-- Pilih Kategori --</option>
+                                                <option value="Workshop">Workshop</option>
+                                                <option value="Magang">Magang</option>
+                                                <option value="Proyek">Proyek</option>
+                                            </select>
+                                        </div>
                                     </div>
                                     {{-- Tombol hapus tidak ditampilkan untuk item pertama jika hanya satu --}}
                                 </div>
@@ -500,7 +491,7 @@ $(document).ready(function() {
                                          <div class="col-md-6 mb-2"><label class="form-label">Nama Pengalaman</label><input type="text" name="pengalaman_items[0][pengalaman_nama]" class="form-control"></div>
                                          <div class="col-md-6 mb-2"><label class="form-label">Nama Perusahaan/Organisasi</label><input type="text" name="pengalaman_items[0][nama_perusahaan]" class="form-control"></div>
                                          <div class="col-md-6 mb-2"><label class="form-label">Lokasi (Opsional)</label><input type="text" name="pengalaman_items[0][lokasi]" class="form-control"></div>
-                                         <div class="col-md-6 mb-2"><label class="form-label">Kategori (Opsional)</label><input type="text" name="pengalaman_items[0][pengalaman_kategori]" placeholder="Mis: Pekerjaan, Magang, Proyek" class="form-control"></div>
+                                         <div class="col-md-6 mb-2"><label class="form-label">Kategori</label><input type="text" name="pengalaman_items[0][pengalaman_kategori]" placeholder="Mis: Pekerjaan, Magang, Proyek" class="form-control"></div>
                                          <div class="col-md-5 mb-2"><label class="form-label">Tanggal Mulai</label><input type="date" name="pengalaman_items[0][tanggal_mulai]" class="form-control"></div>
                                          <div class="col-md-5 mb-2"><label class="form-label">Tanggal Selesai</label><input type="date" name="pengalaman_items[0][tanggal_selesai]" class="form-control tanggal-selesai-input"></div>
                                          <div class="col-md-2 mb-2 align-self-end"><div class="form-check"><input class="form-check-input masih-bekerja-checkbox" type="checkbox" name="pengalaman_items[0][masih_bekerja]" id="masih_bekerja_0"><label class="form-check-label" for="masih_bekerja_0">Saat ini</label></div></div>
@@ -594,7 +585,7 @@ $(document).ready(function() {
                     <div class="col-md-6 mb-2"><label class="form-label">Nama Pengalaman</label><input type="text" name="pengalaman_items[${pengalamanIndex}][pengalaman_nama]" class="form-control"></div>
                     <div class="col-md-6 mb-2"><label class="form-label">Nama Perusahaan/Organisasi</label><input type="text" name="pengalaman_items[${pengalamanIndex}][nama_perusahaan]" class="form-control"></div>
                     <div class="col-md-6 mb-2"><label class="form-label">Lokasi (Opsional)</label><input type="text" name="pengalaman_items[${pengalamanIndex}][lokasi]" class="form-control"></div>
-                    <div class="col-md-6 mb-2"><label class="form-label">Kategori (Opsional)</label><input type="text" name="pengalaman_items[${pengalamanIndex}][pengalaman_kategori]" placeholder="Mis: Pekerjaan, Magang, Proyek" class="form-control"></div>
+                    <div class="col-md-6 mb-2"><label class="form-label">Kategori</label><input type="text" name="pengalaman_items[${pengalamanIndex}][pengalaman_kategori]" placeholder="Mis: Pekerjaan, Magang, Proyek" class="form-control"></div>
                     <div class="col-md-5 mb-2"><label class="form-label">Tanggal Mulai</label><input type="date" name="pengalaman_items[${pengalamanIndex}][tanggal_mulai]" class="form-control"></div>
                     <div class="col-md-5 mb-2"><label class="form-label">Tanggal Selesai</label><input type="date" name="pengalaman_items[${pengalamanIndex}][tanggal_selesai]" class="form-control tanggal-selesai-input"></div>
                     <div class="col-md-2 mb-2 align-self-end"><div class="form-check"><input class="form-check-input masih-bekerja-checkbox" type="checkbox" name="pengalaman_items[${pengalamanIndex}][masih_bekerja]" id="masih_bekerja_${pengalamanIndex}"><label class="form-check-label" for="masih_bekerja_${pengalamanIndex}">Saat ini</label></div></div>

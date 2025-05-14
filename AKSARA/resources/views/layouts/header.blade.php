@@ -253,9 +253,13 @@
                   <i class="ti ti-user me-2"></i> 
                   <span>Lihat Profil</span>
               </a>
-              <a href="#!" class="dropdown-item">
+              {{-- <a href="#!" class="dropdown-item">
                 <i class="ti ti-help"></i>
                 <span>Dokumentasi</span>
+              </a> --}}
+              <a href="#!" class="dropdown-item">
+                <i class="ti ti-key"></i>
+                <span>Ubah Password</span>
               </a>
               <a href="#!" class="dropdown-item">
                 <i class="ti ti-messages"></i>
