@@ -29,7 +29,6 @@
             <tr>
                 <th>Dosen Pembimbing</th>
                 <td>{{ $prestasi->dosenPembimbing->user->nama ?? ($prestasi->dosenPembimbing->nama ?? '-') }}</td>
-                {{-- Sesuaikan dengan cara Anda mengambil nama dosen --}}
             </tr>
             <tr>
                 <th>Status Verifikasi</th>

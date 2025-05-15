@@ -509,21 +509,26 @@ class PrestasiController extends Controller
 
 
             // Filter
-            if ($request->filled('search_nama')) {
-                $searchTerm = $request->search_nama;
-                $data->where(function ($q) use ($searchTerm) {
-                    $q->where('nama_prestasi', 'like', '%' . $searchTerm . '%')
-                        ->orWhereHas('mahasiswa.user', function ($userQuery) use ($searchTerm) {
-                            $userQuery->where('nama', 'like', '%' . $searchTerm . '%');
-                        })
-                        ->orWhereHas('mahasiswa', function ($mhsQuery) use ($searchTerm) {
-                            $mhsQuery->where('nim', 'like', '%' . $searchTerm . '%');
-                        });
-                });
+            // if ($request->filled('search_nama')) {
+            //     $searchTerm = $request->search_nama;
+            //     $data->where(function ($q) use ($searchTerm) {
+            //         $q->where('nama_prestasi', 'like', '%' . $searchTerm . '%')
+            //             ->orWhereHas('mahasiswa.user', function ($userQuery) use ($searchTerm) {
+            //                 $userQuery->where('nama', 'like', '%' . $searchTerm . '%');
+            //             })
+            //             ->orWhereHas('mahasiswa', function ($mhsQuery) use ($searchTerm) {
+            //                 $mhsQuery->where('nim', 'like', '%' . $searchTerm . '%');
+            //             });
+            //     });
+            // }
+            // Filter data user berdasarkan status
+            if (!empty($request->status_verifikasi)) {
+                $data->where('status_verifikasi', $request->status_verifikasi);
             }
-            if ($request->filled('filter_status') && in_array($request->filter_status, ['pending', 'disetujui', 'ditolak'])) {
-                $data->where('status_verifikasi', $request->filter_status);
-            }
+
+            // if ($request->filled('filter_status') && in_array($request->filter_status, ['pending', 'disetujui', 'ditolak'])) {
+            //     $data->where('status_verifikasi', $request->filter_status);
+            // }
 
 
             return DataTables::of($data)
