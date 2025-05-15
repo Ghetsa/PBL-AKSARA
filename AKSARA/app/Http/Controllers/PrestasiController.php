@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\DosenModel;
 use App\Models\PrestasiModel;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
@@ -11,6 +10,7 @@ use Illuminate\Validation\Rule; // Untuk validasi unique ignore
 use Illuminate\Support\Facades\Log; // Untuk logging
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use App\Models\DosenModel;
 
 class PrestasiController extends Controller
 {
@@ -106,12 +106,16 @@ class PrestasiController extends Controller
 
     public function indexMahasiswa()
     {
+
+        $dosenList = DosenModel::all();
+        // View ini akan berisi tabel yang diisi oleh DataTables via AJAX call ke listMahasiswa()
         $breadcrumb = (object) [
             'title' => 'Histori Prestasi Saya',
             'list' => ['Dashboard', 'Prestasi Saya']
         ];
-        $activeMenu = 'prestasi_mahasiswa'; // Sesuaikan
-        return view('prestasi.mahasiswa.index', compact('breadcrumb', 'activeMenu'));
+
+        $activeMenu = 'dashboard';
+        return view('prestasi.mahasiswa.index', compact('breadcrumb', 'activeMenu', 'dosenList'));
     }
 
     public function listMahasiswa(Request $request)
@@ -139,6 +143,18 @@ class PrestasiController extends Controller
                 ->addColumn('dosen_pembimbing', function ($row) {
                     // Akses nama dosen melalui relasi: prestasi -> dosenPembimbing -> user
                     return $row->dosenPembimbing->user->nama ?? ($row->dosenPembimbing->nama ?? '-');
+                    //                 ->addColumn('dosen', function ($row) {
+                    //                     return $row->dosen ? $row->dosen->user->nama : '-';
+                    //                 })
+                    //                 ->editColumn('status_verifikasi', function ($row) {
+                    //                     if ($row->status_verifikasi == 'pending') {
+                    //                         return '<span class="badge bg-warning text-dark">Pending</span>';
+                    //                     } elseif ($row->status_verifikasi == 'disetujui') {
+                    //                         return '<span class="badge bg-success">Disetujui</span>';
+                    //                     } elseif ($row->status_verifikasi == 'ditolak') {
+                    //                         return '<span class="badge bg-danger">Ditolak</span>';
+                    //                     }
+                    //                     return '<span class="badge bg-secondary">' . ucfirst($row->status_verifikasi) . '</span>';
                 })
                 ->addColumn('status_verifikasi_badge', function ($row) { // Ganti nama kolom dari 'status_verifikasi'
                     $badgeClass = 'bg-secondary';
@@ -179,7 +195,7 @@ class PrestasiController extends Controller
             $q->where('status', 'aktif');
         })->get()->map(function ($dosen) {
             return (object) [
-                'id' => $dosen->dosen_id, // Pastikan primary key DosenModel adalah dosen_id jika itu yang disimpan di prestasi
+                'id' => $dosen->dosen_id,
                 'nama' => $dosen->user->nama ?? 'Nama Dosen Tidak Ada'
             ];
         })->sortBy('nama');
@@ -200,7 +216,7 @@ class PrestasiController extends Controller
             'penyelenggara' => 'required|string|max:255',
             'tingkat' => ['required', Rule::in(['kota', 'provinsi', 'nasional', 'internasional'])],
             'tahun' => 'required|integer|digits:4|min:1900|max:' . (date('Y') + 1),
-            'dosen_id' => 'nullable|integer|exists:dosen,dosen_id', // Validasi dosen_id, pastikan tabel dan kolom benar
+            'dosen_id' => 'nullable|integer|exists:dosen,dosen_id',
             'file_bukti' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048', // Max 2MB
         ]);
 
@@ -218,8 +234,8 @@ class PrestasiController extends Controller
 
         try {
             PrestasiModel::create([
-                'mahasiswa_id' => $mahasiswa_id,
-                'dosen_id' => $request->dosen_id, // Simpan dosen_id
+                'mahasiswa_id' => $user->mahasiswa->mahasiswa_id,
+                'dosen_id' => $request->dosen_id,
                 'nama_prestasi' => $request->nama_prestasi,
                 'kategori' => $request->kategori,
                 'penyelenggara' => $request->penyelenggara,
@@ -493,12 +509,13 @@ class PrestasiController extends Controller
      */
     public function indexAdmin()
     {
+        $dosenList = DosenModel::all();
         $breadcrumb = (object) [
             'title' => 'Data prestasi',
             'list' => ['Status Verifikasi']
         ];
         $activeMenu = 'dashboard';
-        return view('prestasi.admin.index', compact('breadcrumb', 'activeMenu'));
+        return view('prestasi.admin.index', compact('breadcrumb', 'activeMenu', 'dosenList'));
     }
 
     public function listAdmin(Request $request)
@@ -569,6 +586,124 @@ class PrestasiController extends Controller
     }
 
     public function processVerificationAjaxAdmin(Request $request, PrestasiModel $prestasi)
+    {
+        $validator = Validator::make($request->all(), [
+            'status_verifikasi' => ['required', Rule::in(['pending', 'disetujui', 'ditolak'])],
+            'catatan_verifikasi' => 'nullable|string|max:1000',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validasi gagal.',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            $prestasi->status_verifikasi = $request->status_verifikasi;
+            $prestasi->catatan_verifikasi = $request->catatan_verifikasi;
+            // Laravel akan mengisi updated_at jika $timestamps = true di model
+            $prestasi->save();
+
+            // TODO: Kirim Notifikasi ke Mahasiswa
+
+            return response()->json(['status' => true, 'message' => 'Status verifikasi prestasi berhasil diperbarui.']);
+        } catch (\Exception $e) {
+            Log::error('Error verifikasi prestasi (AJAX): ' . $e->getMessage());
+            return response()->json([
+                'status' => false,
+                'message' => 'Gagal memperbarui status verifikasi. Terjadi kesalahan server.'
+            ], 500);
+        }
+    }
+
+    // =========================================================================
+    // == METHOD UNTUK ROLE DOSEN
+    // =========================================================================
+
+    /**
+     * Menampilkan halaman daftar prestasi untuk verifikasi admin.
+     */
+    public function indexDosen()
+    {
+        $dosenList = DosenModel::all();
+        $breadcrumb = (object) [
+            'title' => 'Data prestasi',
+            'list' => ['Status Verifikasi']
+        ];
+        $activeMenu = 'dashboard';
+        return view('prestasi.dosen.index', compact('breadcrumb', 'activeMenu', 'dosenList'));
+    }
+
+    public function listDosen(Request $request)
+    {
+        if ($request->ajax()) {
+            $data = PrestasiModel::with('mahasiswa.user', 'mahasiswa.prodi')
+                ->select('prestasi.*') // Pilih semua kolom dari prestasi
+                ->orderByRaw("FIELD(status_verifikasi, 'pending', 'disetujui', 'ditolak')");
+            // ->orderByRaw("FIELD(status_verifikasi, 'pending', 'disetujui', 'ditolak'), created_at DESC");
+
+
+            // Filter
+            if ($request->filled('search_nama')) {
+                $searchTerm = $request->search_nama;
+                $data->where(function ($q) use ($searchTerm) {
+                    $q->where('nama_prestasi', 'like', '%' . $searchTerm . '%')
+                        ->orWhereHas('mahasiswa.user', function ($userQuery) use ($searchTerm) {
+                            $userQuery->where('nama', 'like', '%' . $searchTerm . '%');
+                        })
+                        ->orWhereHas('mahasiswa', function ($mhsQuery) use ($searchTerm) {
+                            $mhsQuery->where('nim', 'like', '%' . $searchTerm . '%');
+                        });
+                });
+            }
+            if ($request->filled('filter_status') && in_array($request->filter_status, ['pending', 'disetujui', 'ditolak'])) {
+                $data->where('status_verifikasi', $request->filter_status);
+            }
+
+
+            return DataTables::of($data)
+                ->addIndexColumn()
+                ->addColumn('nama_mahasiswa', function ($row) {
+                    return $row->mahasiswa->user->nama ?? 'N/A';
+                })
+                ->addColumn('nim_mahasiswa', function ($row) {
+                    return $row->mahasiswa->nim ?? 'N/A';
+                })
+                ->editColumn('kategori', function ($row) {
+                    return ucfirst($row->kategori);
+                })
+                ->editColumn('tingkat', function ($row) {
+                    return ucfirst($row->tingkat);
+                })
+                ->editColumn('status_verifikasi', function ($row) {
+                    if ($row->status_verifikasi == 'pending') {
+                        return '<span class="badge bg-warning text-dark">Pending</span>';
+                    } elseif ($row->status_verifikasi == 'disetujui') {
+                        return '<span class="badge bg-success">Disetujui</span>';
+                    } elseif ($row->status_verifikasi == 'ditolak') {
+                        return '<span class="badge bg-danger">Ditolak</span>';
+                    }
+                    return '<span class="badge bg-secondary">' . ucfirst($row->status_verifikasi) . '</span>';
+                })
+                ->addColumn('aksi', function ($row) {
+                    $verifyUrl = route('prestasi.dosen.verify_form_ajax', $row->prestasi_id);
+                    return '<button type="button" class="btn btn-info btn-sm" onclick="modalAction(\'' . $verifyUrl . '\')"><i class="fas fa-search-plus"></i> Verifikasi</button>';
+                })
+                ->rawColumns(['status_verifikasi', 'aksi'])
+                ->make(true);
+        }
+        return abort(403);
+    }
+
+    public function showVerifyFormAjaxDosen(PrestasiModel $prestasi)
+    {
+        $prestasi->load('mahasiswa.user', 'mahasiswa.prodi');
+        return view('prestasi.dosen.verify_ajax', compact('prestasi'));
+    }
+
+    public function processVerificationAjaxDosen(Request $request, PrestasiModel $prestasi)
     {
         $validator = Validator::make($request->all(), [
             'status_verifikasi' => ['required', Rule::in(['pending', 'disetujui', 'ditolak'])],

@@ -16,6 +16,7 @@ class PrestasiModel extends Model
 
     protected $fillable = [
         'mahasiswa_id',
+        'dosen_id',
         'nama_prestasi',
         'kategori',
         'penyelenggara',
@@ -29,6 +30,10 @@ class PrestasiModel extends Model
     public function mahasiswa()
     {
         return $this->belongsTo(MahasiswaModel::class, 'mahasiswa_id', 'mahasiswa_id');
+    }
+    public function dosen()
+    {
+        return $this->belongsTo(DosenModel::class, 'dosen_id');
     }
 
     public function feedbackDosen()

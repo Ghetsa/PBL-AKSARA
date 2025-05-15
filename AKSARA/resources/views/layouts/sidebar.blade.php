@@ -177,7 +177,7 @@
                     </a>
                 </li>
                 <li class="pc-item">
-                    <a href="{{ url('/prestasi') }}" class="pc-link {{ ($activeMenu == 'prestasi') ? 'active' : '' }}">
+                    <a href="{{ url('/dosen/prestasi') }}" class="pc-link {{ ($activeMenu == 'prestasi') ? 'active' : '' }}">
                         <span class="pc-micon"><i class="ti ti-trophy"></i></span>
                         <span class="pc-mtext">Prestasi Mahasiswa</span>
                     </a>
@@ -192,6 +192,7 @@
                         <span class="pc-mtext">Daftar Lomba</span>
                     </a>
                 </li>
+
             </ul>
         </div>
     @endif 

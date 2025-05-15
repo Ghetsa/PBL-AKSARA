@@ -157,10 +157,11 @@
                             <thead>
                                 <tr>
                                     <th class="text-center" style="width: 5%;">No.</th>
-                                    <th>Nama Prestasi/Kegiatan</th>
-                                    <th>Kategori</th>
-                                    <th>Tingkat</th>
-                                    <th>Tahun</th>
+                                    <th class="text-center">Nama Prestasi/Kegiatan</th>
+                                    <th class="text-center">Kategori</th>
+                                    <th class="text-center">Tingkat</th>
+                                    <th class="text-center">Tahun</th>
+                                    <th class="text-center">Dosen Pembimbing</th>
                                     <th class="text-center">Status Verifikasi</th>
                                     <th class="text-center">Bukti</th>
                                     <th class="text-center" style="width: 10%;">Aksi</th>
@@ -216,7 +217,8 @@
                 { data: 'nama_prestasi', name: 'nama_prestasi' },
                 { data: 'kategori', name: 'kategori' },
                 { data: 'tingkat', name: 'tingkat' },
-                { data: 'tahun', name: 'tahun' },
+                { data: 'tahun', name: 'tahun', className: 'text-center' },
+                { data: 'dosen', name: 'dosen', className: 'text-center' },
                 { data: 'status_verifikasi', name: 'status_verifikasi', className: 'text-center' },
                 { data: 'file_bukti_action', name: 'file_bukti_action', className: 'text-center', orderable: false, searchable: false },
                 { data: 'aksi', name: 'aksi', className: 'text-center', orderable: false, searchable: false }
