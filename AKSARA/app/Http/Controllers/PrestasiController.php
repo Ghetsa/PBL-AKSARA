@@ -10,6 +10,7 @@ use Illuminate\Validation\Rule; // Untuk validasi unique ignore
 use Illuminate\Support\Facades\Log; // Untuk logging
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use App\Models\DosenModel;
 
 class PrestasiController extends Controller
 {
@@ -176,7 +177,8 @@ class PrestasiController extends Controller
      */
     public function createFormAjaxMahasiswa()
     {
-        return view('prestasi.mahasiswa.create_ajax');
+        $dosenList = DosenModel::all();
+        return view('prestasi.mahasiswa.create_ajax', compact('dosenList'));
     }
 
     /**
@@ -195,6 +197,7 @@ class PrestasiController extends Controller
             'penyelenggara' => 'required|string|max:255',
             'tingkat' => ['required', Rule::in(['kota','provinsi', 'nasional', 'internasional'])],
             'tahun' => 'required|integer|digits:4|min:1900|max:' . (date('Y') + 1),
+            'dosen_id' => 'required|exists:dosen,dosen_id',
             'file_bukti' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048', // Max 2MB
         ]);
 
