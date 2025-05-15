@@ -43,6 +43,12 @@ class PrestasiModel extends Model
         return $this->hasMany(FeedbackDosenModel::class, 'prestasi_id', 'prestasi_id');
     }
 
+    // Dalam PrestasiModel.php
+    public function dosenPembimbing()
+    {
+        return $this->belongsTo(DosenModel::class, 'dosen_id', 'dosen_id'); // Sesuaikan foreign dan owner key jika berbeda
+    }
+
     protected $casts = [
         'kategori' => 'string',
         'tingkat' => 'string',

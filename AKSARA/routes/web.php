@@ -127,6 +127,9 @@ Route::middleware(['auth'])->group(function () { // artinya semua route di dalam
 
         Route::get('/create-ajax', [PrestasiController::class, 'createFormAjaxMahasiswa'])->name('create_ajax'); // Menampilkan form tambah via AJAX
         Route::post('/store-ajax', [PrestasiController::class, 'storeAjaxMahasiswa'])->name('store_ajax'); // Menyimpan prestasi via AJAX
+        Route::get('/edit-ajax/{id}', [PrestasiController::class, 'editAjaxMahasiswa'])->name('edit_ajax'); // Menampilkan form tambah via AJAX
+        Route::post('/update-ajax/{id}', [PrestasiController::class, 'updateAjaxMahasiswa'])->name('update_ajax'); // Menampilkan form tambah via AJAX
+        Route::get('/show-ajax/{id}', [PrestasiController::class, 'showAjaxMahasiswa'])->name('show_ajax'); // Menampilkan form tambah via AJAX
 
         // Jika ada fitur edit/hapus oleh mahasiswa via AJAX nantinya:
         // Route::get('/{prestasi}/edit-ajax', [PrestasiController::class, 'editFormAjaxMahasiswa'])->name('edit_ajax');

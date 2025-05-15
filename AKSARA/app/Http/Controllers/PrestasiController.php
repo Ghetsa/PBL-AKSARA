@@ -100,32 +100,36 @@ class PrestasiController extends Controller
         return redirect()->route('prestasi.index')->with('success', 'Verifikasi berhasil diperbarui');
     }
 
+    // ==========================================================================================
+    // Metode untuk Mahasiswa
+    // ==========================================================================================
+
     public function indexMahasiswa()
     {
+
         $dosenList = DosenModel::all();
         // View ini akan berisi tabel yang diisi oleh DataTables via AJAX call ke listMahasiswa()
         $breadcrumb = (object) [
-            'title' => 'Data prestasi',
-            'list' => ['Status Verifikasi']
+            'title' => 'Histori Prestasi Saya',
+            'list' => ['Dashboard', 'Prestasi Saya']
         ];
+
         $activeMenu = 'dashboard';
         return view('prestasi.mahasiswa.index', compact('breadcrumb', 'activeMenu', 'dosenList'));
     }
 
-    /**
-     * Menyediakan data prestasi untuk DataTable mahasiswa.
-     */
     public function listMahasiswa(Request $request)
     {
         if ($request->ajax()) {
-            $mahasiswa = Auth::user()->mahasiswa;
-            if (!$mahasiswa) {
-                return response()->json(['error' => 'Profil mahasiswa tidak ditemukan.'], 403);
+            $user = Auth::user();
+            if (!$user || !$user->mahasiswa) { // Pastikan user adalah mahasiswa dan memiliki profil mahasiswa
+                return response()->json(['error' => 'Akses ditolak atau profil mahasiswa tidak ditemukan.'], 403);
             }
+            $mahasiswa_id = $user->mahasiswa->mahasiswa_id; // Ambil mahasiswa_id dari user yang login
 
-            $data = PrestasiModel::with('dosen.user') // << Tambahkan eager loading
-                ->where('mahasiswa_id', $mahasiswa->mahasiswa_id)
-                ->select(['prestasi_id', 'nama_prestasi', 'kategori', 'tingkat', 'tahun', 'status_verifikasi', 'file_bukti', 'dosen_id']) // pastikan dosen_id disertakan
+            $data = PrestasiModel::where('mahasiswa_id', $mahasiswa_id)
+                ->with(['dosenPembimbing.user']) // Eager load relasi dosen dan user terkait dosen
+                ->select(['prestasi_id', 'nama_prestasi', 'kategori', 'tingkat', 'tahun', 'status_verifikasi', 'file_bukti', 'catatan_verifikasi', 'dosen_id']) // Ambil catatan & dosen_id
                 ->orderBy('tahun', 'desc');
 
             return DataTables::of($data)
@@ -136,64 +140,178 @@ class PrestasiController extends Controller
                 ->editColumn('tingkat', function ($row) {
                     return ucfirst($row->tingkat);
                 })
-                ->addColumn('dosen', function ($row) {
-                    return $row->dosen ? $row->dosen->user->nama : '-';
+                ->addColumn('dosen_pembimbing', function ($row) {
+                    // Akses nama dosen melalui relasi: prestasi -> dosenPembimbing -> user
+                    return $row->dosenPembimbing->user->nama ?? ($row->dosenPembimbing->nama ?? '-');
+                    //                 ->addColumn('dosen', function ($row) {
+                    //                     return $row->dosen ? $row->dosen->user->nama : '-';
+                    //                 })
+                    //                 ->editColumn('status_verifikasi', function ($row) {
+                    //                     if ($row->status_verifikasi == 'pending') {
+                    //                         return '<span class="badge bg-warning text-dark">Pending</span>';
+                    //                     } elseif ($row->status_verifikasi == 'disetujui') {
+                    //                         return '<span class="badge bg-success">Disetujui</span>';
+                    //                     } elseif ($row->status_verifikasi == 'ditolak') {
+                    //                         return '<span class="badge bg-danger">Ditolak</span>';
+                    //                     }
+                    //                     return '<span class="badge bg-secondary">' . ucfirst($row->status_verifikasi) . '</span>';
                 })
-                ->editColumn('status_verifikasi', function ($row) {
-                    if ($row->status_verifikasi == 'pending') {
-                        return '<span class="badge bg-warning text-dark">Pending</span>';
-                    } elseif ($row->status_verifikasi == 'disetujui') {
-                        return '<span class="badge bg-success">Disetujui</span>';
-                    } elseif ($row->status_verifikasi == 'ditolak') {
-                        return '<span class="badge bg-danger">Ditolak</span>';
+                ->addColumn('status_verifikasi_badge', function ($row) { // Ganti nama kolom dari 'status_verifikasi'
+                    $badgeClass = 'bg-secondary';
+                    $statusText = ucfirst($row->status_verifikasi);
+                    switch ($row->status_verifikasi) {
+                        case 'pending':
+                            $badgeClass = 'bg-warning text-dark';
+                            break;
+                        case 'disetujui':
+                            $badgeClass = 'bg-success';
+                            break;
+                        case 'ditolak':
+                            $badgeClass = 'bg-danger';
+                            break;
                     }
-                    return '<span class="badge bg-secondary">' . ucfirst($row->status_verifikasi) . '</span>';
-                })
-                ->addColumn('file_bukti_action', function ($row) {
-                    if ($row->file_bukti) {
-                        $url = asset('storage/' . $row->file_bukti); // Sesuai struktur URL kamu
-                        return '<a href="' . $url . '" target="_blank" class="btn btn-info btn-sm">
-                    <i class="fas fa-eye"></i> Lihat
-                </a>';
-                    }
-                    return '-';
+                    return '<span class="badge ' . $badgeClass . '">' . $statusText . '</span>';
                 })
                 ->addColumn('aksi', function ($row) {
-                    $btn = '';
-                    // if ($row->status_verifikasi == 'pending') {
-                    //     $editUrl = route('mahasiswa.prestasi.edit_ajax', $row->prestasi_id);
-                    //     $deleteConfirmUrl = route('mahasiswa.prestasi.confirm_delete_ajax', $row->prestasi_id);
-                    //     $btn .= '<button type="button" class="btn btn-warning btn-sm me-1" onclick="modalAction(\'' . $editUrl . '\')">Edit</button>';
-                    //     $btn .= '<button type="button" class="btn btn-danger btn-sm" onclick="deleteConfirmAjax(\'' . $row->prestasi_id . '\', \'Data Prestasi Mahasiswa\')">Hapus</button>';
-                    // } else {
-                    //      $btn = '<button class="btn btn-secondary btn-sm" disabled><i class="fas fa-lock"></i></button>';
-                    // }
-                    // Untuk sekarang, belum ada aksi edit/hapus dari mahasiswa via AJAX
-                    return $btn ?: '-';
+                    $btnDetail = '<button type="button" class="btn btn-xs btn-info btn-sm me-1" onclick="modalAction(\'' . route('prestasi.mahasiswa.show_ajax', $row->prestasi_id) . '\', \'Detail Prestasi\')"><i class="fas fa-eye"></i> Detail</button>';
+                    $btnEdit = '';
+                    $btnDelete = '';
+
+                    if (in_array($row->status_verifikasi, ['pending', 'ditolak'])) {
+                        $btnEdit = '<button type="button" class="btn btn-xs btn-warning btn-sm me-1" onclick="modalAction(\'' . route('prestasi.mahasiswa.edit_ajax', $row->prestasi_id) . '\', \'Edit Prestasi\')"><i class="fas fa-edit"></i> Edit</button>';
+                    }
+
+                    return $btnDetail . $btnEdit . $btnDelete;
                 })
-                ->rawColumns(['status_verifikasi', 'file_bukti_action', 'aksi'])
+                ->rawColumns(['status_verifikasi_badge', 'aksi']) // Tambahkan 'aksi' ke rawColumns
                 ->make(true);
         }
-        return abort(403);
+        return abort(403, "Akses ditolak.");
     }
 
-    /**
-     * Menampilkan form tambah prestasi (untuk dimuat ke modal AJAX).
-     */
     public function createFormAjaxMahasiswa()
     {
-        $dosenList = DosenModel::all();
-        return view('prestasi.mahasiswa.create_ajax', compact('dosenList'));
+        $dosens = DosenModel::with('user')->whereHas('user', function ($q) {
+            $q->where('status', 'aktif');
+        })->get()->map(function ($dosen) {
+            return (object) [
+                'id' => $dosen->dosen_id,
+                'nama' => $dosen->user->nama ?? 'Nama Dosen Tidak Ada'
+            ];
+        })->sortBy('nama');
+        return view('prestasi.mahasiswa.create_ajax', compact('dosens'));
+    }
+
+    public function storeAjaxMahasiswa(Request $request)
+    {
+        $user = Auth::user();
+        if (!$user || !$user->mahasiswa) {
+            return response()->json(['status' => false, 'message' => 'Aksi tidak diizinkan. Profil mahasiswa tidak ditemukan.'], 403);
+        }
+        $mahasiswa_id = $user->mahasiswa->mahasiswa_id;
+
+        $validator = Validator::make($request->all(), [
+            'nama_prestasi' => 'required|string|max:255',
+            'kategori' => ['required', Rule::in(['akademik', 'non-akademik'])],
+            'penyelenggara' => 'required|string|max:255',
+            'tingkat' => ['required', Rule::in(['kota', 'provinsi', 'nasional', 'internasional'])],
+            'tahun' => 'required|integer|digits:4|min:1900|max:' . (date('Y') + 1),
+            'dosen_id' => 'nullable|integer|exists:dosen,dosen_id',
+            'file_bukti' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048', // Max 2MB
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['status' => false, 'message' => 'Validasi gagal.', 'errors' => $validator->errors()], 422);
+        }
+
+        $filePath = null;
+        if ($request->hasFile('file_bukti')) {
+            $file = $request->file('file_bukti');
+            $safeNamaPrestasi = substr(preg_replace('/[^A-Za-z0-9\-]/', '_', $request->nama_prestasi), 0, 50);
+            $fileName = $user->mahasiswa->nim . '_' . $safeNamaPrestasi . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $filePath = $file->storeAs('bukti_prestasi/' . $user->mahasiswa->nim, $fileName, 'public');
+        }
+
+        try {
+            PrestasiModel::create([
+                'mahasiswa_id' => $user->mahasiswa->mahasiswa_id,
+                'dosen_id' => $request->dosen_id,
+                'nama_prestasi' => $request->nama_prestasi,
+                'kategori' => $request->kategori,
+                'penyelenggara' => $request->penyelenggara,
+                'tingkat' => $request->tingkat,
+                'tahun' => $request->tahun,
+                'file_bukti' => $filePath,
+                'status_verifikasi' => 'pending', // Default status
+                'catatan_verifikasi' => null,
+            ]);
+            return response()->json(['status' => true, 'message' => 'Prestasi berhasil ditambahkan dan sedang menunggu verifikasi.']);
+        } catch (\Exception $e) {
+            if ($filePath && Storage::disk('public')->exists($filePath)) {
+                Storage::disk('public')->delete($filePath);
+            }
+            Log::error('Error simpan prestasi (AJAX Mahasiswa): ' . $e->getMessage() . ' Trace: ' . $e->getTraceAsString());
+            return response()->json(['status' => false, 'message' => 'Gagal menyimpan prestasi. Terjadi kesalahan server.'], 500);
+        }
+    }
+
+    public function showAjaxMahasiswa($id)
+    {
+        $user = Auth::user();
+        if (!$user || !$user->mahasiswa) {
+            return response()->json(['message' => 'Akses ditolak atau profil mahasiswa tidak ditemukan.'], 403);
+        }
+
+        $prestasi = PrestasiModel::with(['dosenPembimbing.user', 'mahasiswa.user']) // Eager load relasi
+            ->where('mahasiswa_id', $user->mahasiswa->mahasiswa_id) // Pastikan milik mahasiswa ybs
+            ->findOrFail($id);
+
+        return view('prestasi.mahasiswa.show_ajax', compact('prestasi'));
+    }
+
+    public function editAjaxMahasiswa($id)
+    {
+        $user = Auth::user();
+        if (!$user || !$user->mahasiswa) {
+            return response()->json(['message' => 'Akses ditolak atau profil mahasiswa tidak ditemukan.'], 403);
+        }
+
+        $prestasi = PrestasiModel::where('mahasiswa_id', $user->mahasiswa->mahasiswa_id)
+            ->findOrFail($id);
+
+        // Hanya boleh edit jika status 'pending' atau 'ditolak'
+        if (!in_array($prestasi->status_verifikasi, ['pending', 'ditolak'])) {
+            return response()->json(['message' => 'Prestasi ini tidak dapat diedit karena sudah diverifikasi.'], 403);
+        }
+
+        $dosens = DosenModel::with('user')->whereHas('user', function ($q) {
+            $q->where('status', 'aktif');
+        })->get()->map(function ($dosen) {
+            return (object) [
+                'id' => $dosen->dosen_id,
+                'nama' => $dosen->user->nama ?? 'Nama Dosen Tidak Ada'
+            ];
+        })->sortBy('nama');
+
+        // Kita bisa menggunakan view create_ajax yang sama dengan mengirimkan data $prestasi
+        return view('prestasi.mahasiswa.create_ajax', compact('prestasi', 'dosens'));
     }
 
     /**
-     * Menyimpan prestasi baru yang diinput oleh mahasiswa via AJAX.
+     * Update prestasi yang diinput oleh mahasiswa via AJAX.
      */
-    public function storeAjaxMahasiswa(Request $request)
+    public function updateAjaxMahasiswa(Request $request, $id)
     {
-        $mahasiswa = Auth::user()->mahasiswa;
-        if (!$mahasiswa) {
+        $user = Auth::user();
+        if (!$user || !$user->mahasiswa) {
             return response()->json(['status' => false, 'message' => 'Aksi tidak diizinkan. Profil mahasiswa tidak ditemukan.'], 403);
+        }
+
+        $prestasi = PrestasiModel::where('mahasiswa_id', $user->mahasiswa->mahasiswa_id)->findOrFail($id);
+
+        // Hanya boleh update jika status 'pending' atau 'ditolak'
+        if (!in_array($prestasi->status_verifikasi, ['pending', 'ditolak'])) {
+            return response()->json(['status' => false, 'message' => 'Prestasi ini tidak dapat diupdate.'], 403);
         }
 
         $validator = Validator::make($request->all(), [
@@ -202,55 +320,185 @@ class PrestasiController extends Controller
             'penyelenggara' => 'required|string|max:255',
             'tingkat' => ['required', Rule::in(['kota', 'provinsi', 'nasional', 'internasional'])],
             'tahun' => 'required|integer|digits:4|min:1900|max:' . (date('Y') + 1),
-            'dosen_id' => 'required|exists:dosen,dosen_id',
-            'file_bukti' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048', // Max 2MB
+            'dosen_id' => 'nullable|integer|exists:dosen,dosen_id',
+            'file_bukti' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048', // Opsional saat update
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Validasi gagal.',
-                'errors' => $validator->errors()
-            ], 422);
+            return response()->json(['status' => false, 'message' => 'Validasi gagal.', 'errors' => $validator->errors()], 422);
         }
 
-        $filePath = null;
+        $dataToUpdate = $request->only(['nama_prestasi', 'kategori', 'penyelenggara', 'tingkat', 'tahun', 'dosen_id']);
+
         if ($request->hasFile('file_bukti')) {
+            // Hapus file lama jika ada
+            if ($prestasi->file_bukti && Storage::disk('public')->exists($prestasi->file_bukti)) {
+                Storage::disk('public')->delete($prestasi->file_bukti);
+            }
             $file = $request->file('file_bukti');
-            $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-            $extension = $file->getClientOriginalExtension();
-            // Nama file: nim_namaprestasi_timestamp.extension
             $safeNamaPrestasi = substr(preg_replace('/[^A-Za-z0-9\-]/', '_', $request->nama_prestasi), 0, 50);
-            $fileName = $mahasiswa->nim . '_' . $safeNamaPrestasi . '_' . time() . '.' . $extension;
-            $filePath = $file->storeAs('bukti_prestasi', $fileName, 'public');
+            $fileName = $user->mahasiswa->nim . '_' . $safeNamaPrestasi . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $dataToUpdate['file_bukti'] = $file->storeAs('bukti_prestasi/' . $user->mahasiswa->nim, $fileName, 'public');
         }
+
+        // Jika diedit setelah ditolak, kembalikan status ke pending
+        $dataToUpdate['status_verifikasi'] = 'pending';
+        $dataToUpdate['catatan_verifikasi'] = null; // Hapus catatan lama
 
         try {
-            PrestasiModel::create([
-                'mahasiswa_id' => $mahasiswa->mahasiswa_id,
-                'dosen_id' => $request->dosen_id,
-                'nama_prestasi' => $request->nama_prestasi,
-                'kategori' => $request->kategori,
-                'penyelenggara' => $request->penyelenggara,
-                'tingkat' => $request->tingkat,
-                'tahun' => $request->tahun,
-                'file_bukti' => $filePath,
-                'status_verifikasi' => 'pending',
-                'catatan_verifikasi' => null,
-            ]);
-
-            return response()->json(['status' => true, 'message' => 'Prestasi berhasil ditambahkan dan sedang menunggu verifikasi.']);
+            $prestasi->update($dataToUpdate);
+            return response()->json(['status' => true, 'message' => 'Prestasi berhasil diperbarui dan sedang menunggu verifikasi ulang.']);
         } catch (\Exception $e) {
-            if ($filePath && Storage::disk('public')->exists($filePath)) {
-                Storage::disk('public')->delete($filePath);
-            }
-            Log::error('Error simpan prestasi (AJAX): ' . $e->getMessage() . ' Trace: ' . $e->getTraceAsString());
-            return response()->json([
-                'status' => false,
-                'message' => 'Gagal menyimpan prestasi. Terjadi kesalahan server.'
-            ], 500);
+            Log::error('Error update prestasi (AJAX Mahasiswa): ' . $e->getMessage());
+            return response()->json(['status' => false, 'message' => 'Gagal memperbarui prestasi. Terjadi kesalahan server.'], 500);
         }
     }
+
+    // public function indexMahasiswa()
+    // {
+    //     // View ini akan berisi tabel yang diisi oleh DataTables via AJAX call ke listMahasiswa()
+    //     $breadcrumb = (object) [
+    //         'title' => 'Data prestasi',
+    //         'list' => ['Status Verifikasi']
+    //     ];
+    //     $activeMenu = 'dashboard';
+    //     return view('prestasi.mahasiswa.index', compact('breadcrumb', 'activeMenu'));
+    // }
+
+    // /**
+    //  * Menyediakan data prestasi untuk DataTable mahasiswa.
+    //  */
+    // public function listMahasiswa(Request $request)
+    // {
+    //     if ($request->ajax()) {
+    //         $mahasiswa = Auth::user()->mahasiswa;
+    //         if (!$mahasiswa) {
+    //             return response()->json(['error' => 'Profil mahasiswa tidak ditemukan.'], 403);
+    //         }
+
+    //         $data = PrestasiModel::where('mahasiswa_id', $mahasiswa->mahasiswa_id)
+    //             ->select(['prestasi_id', 'nama_prestasi', 'kategori', 'tingkat', 'tahun', 'status_verifikasi', 'file_bukti'])
+    //             ->orderBy('tahun', 'desc');
+
+    //         return DataTables::of($data)
+    //             ->addIndexColumn()
+    //             ->editColumn('kategori', function ($row) {
+    //                 return ucfirst($row->kategori);
+    //             })
+    //             ->editColumn('tingkat', function ($row) {
+    //                 return ucfirst($row->tingkat);
+    //             })
+    //             ->editColumn('status_verifikasi', function ($row) {
+    //                 if ($row->status_verifikasi == 'pending') {
+    //                     return '<span class="badge bg-warning text-dark">Pending</span>';
+    //                 } elseif ($row->status_verifikasi == 'disetujui') {
+    //                     return '<span class="badge bg-success">Disetujui</span>';
+    //                 } elseif ($row->status_verifikasi == 'ditolak') {
+    //                     return '<span class="badge bg-danger">Ditolak</span>';
+    //                 }
+    //                 return '<span class="badge bg-secondary">' . ucfirst($row->status_verifikasi) . '</span>';
+    //             })
+    //             ->addColumn('file_bukti_action', function ($row) {
+    //                 if ($row->file_bukti) {
+    //                     $url = asset('storage/' . $row->file_bukti); // Sesuai struktur URL kamu
+    //                     return '<a href="' . $url . '" target="_blank" class="btn btn-info btn-sm">
+    //                 <i class="fas fa-eye"></i> Lihat
+    //             </a>';
+    //                 }
+    //                 return '-';
+    //             })
+    //             ->addColumn('aksi', function ($row) {
+    //                 $btn = '';
+    //                 // if ($row->status_verifikasi == 'pending') {
+    //                 //     $editUrl = route('mahasiswa.prestasi.edit_ajax', $row->prestasi_id);
+    //                 //     $deleteConfirmUrl = route('mahasiswa.prestasi.confirm_delete_ajax', $row->prestasi_id);
+    //                 //     $btn .= '<button type="button" class="btn btn-warning btn-sm me-1" onclick="modalAction(\'' . $editUrl . '\')">Edit</button>';
+    //                 //     $btn .= '<button type="button" class="btn btn-danger btn-sm" onclick="deleteConfirmAjax(\'' . $row->prestasi_id . '\', \'Data Prestasi Mahasiswa\')">Hapus</button>';
+    //                 // } else {
+    //                 //      $btn = '<button class="btn btn-secondary btn-sm" disabled><i class="fas fa-lock"></i></button>';
+    //                 // }
+    //                 // Untuk sekarang, belum ada aksi edit/hapus dari mahasiswa via AJAX
+    //                 return $btn ?: '-';
+    //             })
+    //             ->rawColumns(['status_verifikasi', 'file_bukti_action', 'aksi'])
+    //             ->make(true);
+    //     }
+    //     return abort(403);
+    // }
+
+    // /**
+    //  * Menampilkan form tambah prestasi (untuk dimuat ke modal AJAX).
+    //  */
+    // public function createFormAjaxMahasiswa()
+    // {
+    //     return view('prestasi.mahasiswa.create_ajax');
+    // }
+
+    // /**
+    //  * Menyimpan prestasi baru yang diinput oleh mahasiswa via AJAX.
+    //  */
+    // public function storeAjaxMahasiswa(Request $request)
+    // {
+    //     $mahasiswa = Auth::user()->mahasiswa;
+    //     if (!$mahasiswa) {
+    //         return response()->json(['status' => false, 'message' => 'Aksi tidak diizinkan. Profil mahasiswa tidak ditemukan.'], 403);
+    //     }
+
+    //     $validator = Validator::make($request->all(), [
+    //         'nama_prestasi' => 'required|string|max:255',
+    //         'kategori' => ['required', Rule::in(['akademik', 'non-akademik'])],
+    //         'penyelenggara' => 'required|string|max:255',
+    //         'tingkat' => ['required', Rule::in(['kota', 'provinsi', 'nasional', 'internasional'])],
+    //         'tahun' => 'required|integer|digits:4|min:1900|max:' . (date('Y') + 1),
+    //         'file_bukti' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048', // Max 2MB
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         return response()->json([
+    //             'status' => false,
+    //             'message' => 'Validasi gagal.',
+    //             'errors' => $validator->errors()
+    //         ], 422);
+    //     }
+
+    //     $filePath = null;
+    //     if ($request->hasFile('file_bukti')) {
+    //         $file = $request->file('file_bukti');
+    //         $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+    //         $extension = $file->getClientOriginalExtension();
+    //         // Nama file: nim_namaprestasi_timestamp.extension
+    //         $safeNamaPrestasi = substr(preg_replace('/[^A-Za-z0-9\-]/', '_', $request->nama_prestasi), 0, 50);
+    //         $fileName = $mahasiswa->nim . '_' . $safeNamaPrestasi . '_' . time() . '.' . $extension;
+    //         $filePath = $file->storeAs('bukti_prestasi', $fileName, 'public');
+    //     }
+
+    //     try {
+    //         PrestasiModel::create([
+    //             'mahasiswa_id' => $mahasiswa->mahasiswa_id,
+    //             'nama_prestasi' => $request->nama_prestasi,
+    //             'kategori' => $request->kategori,
+    //             'penyelenggara' => $request->penyelenggara,
+    //             'tingkat' => $request->tingkat,
+    //             'tahun' => $request->tahun,
+    //             'file_bukti' => $filePath,
+    //             'status_verifikasi' => 'pending',
+    //             'catatan_verifikasi' => null,
+    //             // Laravel akan mengisi created_at dan updated_at jika $timestamps = true di model
+    //             // Jika $timestamps = false, Anda mungkin perlu menambahkannya manual atau menghapusnya dari fillable jika tidak ada di DB
+    //         ]);
+
+    //         return response()->json(['status' => true, 'message' => 'Prestasi berhasil ditambahkan dan sedang menunggu verifikasi.']);
+    //     } catch (\Exception $e) {
+    //         if ($filePath && Storage::disk('public')->exists($filePath)) {
+    //             Storage::disk('public')->delete($filePath);
+    //         }
+    //         Log::error('Error simpan prestasi (AJAX): ' . $e->getMessage() . ' Trace: ' . $e->getTraceAsString());
+    //         return response()->json([
+    //             'status' => false,
+    //             'message' => 'Gagal menyimpan prestasi. Terjadi kesalahan server.'
+    //         ], 500);
+    //     }
+    // }
 
     // =========================================================================
     // == METHOD UNTUK ROLE ADMIN
