@@ -12,7 +12,7 @@ class PrestasiModel extends Model
     protected $table = 'prestasi';
     protected $primaryKey = 'prestasi_id';
 
-    public $timestamps = false;
+    public $timestamps = true;
 
     protected $fillable = [
         'mahasiswa_id',
@@ -25,6 +25,8 @@ class PrestasiModel extends Model
         'file_bukti',
         'status_verifikasi',
         'catatan_verifikasi',
+        'created_at',
+        'updated_at'
     ];
 
     public function mahasiswa()
