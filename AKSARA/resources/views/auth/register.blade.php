@@ -3,7 +3,7 @@
 <!-- [Head] start -->
 
 <head>
-  <title>Sign up | Mantis Bootstrap 5 Admin Template</title>
+  <title>Register | AKSARA</title>
   <!-- [Meta] -->
   <meta charset="utf-8">
   <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -49,7 +49,7 @@
     <div class="auth-wrapper v3">
       <div class="auth-form">
         <div class="auth-header">
-          <a href="#"><img src="mantis/dist/assets/images/logo-dark.svg" alt="img"></a>
+          <a href="#"><img src="{{ asset('logo/logo.svg') }}" alt="img"></a>
         </div>
         <div class="card my-5">
           <div class="card-body">

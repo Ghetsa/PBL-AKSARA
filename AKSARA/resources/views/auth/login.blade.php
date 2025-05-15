@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Login | Mantis Bootstrap 5 Admin Template</title>
+  <title>Login | AKSARA</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -27,7 +27,8 @@
     <div class="auth-wrapper v3">
       <div class="auth-form">
         <div class="auth-header">
-          <a href="#"><img src="{{ asset('mantis/dist/assets/images/logo-dark.svg') }}" alt="logo"></a>
+          <a href="#"><img src="{{ asset('logo/logo.svg') }}" alt="logo"></a>
+          {{-- <a href="#"><img src="{{ asset('mantis/dist/assets/images/logo-dark.svg') }}" alt="logo"></a> --}}
         </div>
         <div class="card my-5">
           <div class="card-body">

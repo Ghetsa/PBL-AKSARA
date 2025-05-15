@@ -1,5 +1,3 @@
-{{-- resources/views/mahasiswa/prestasi/create_ajax.blade.php --}}
-{{-- Jika ini juga digunakan untuk edit, Anda perlu variabel $prestasi --}}
 @php
     $isEditMode = isset($prestasi);
 @endphp
@@ -80,7 +78,6 @@
                     <option value="">-- Pilih Dosen --</option>
                     @if(isset($dosens) && $dosens->count() > 0)
                         @foreach($dosens as $dosen)
-                            {{-- Asumsi $dosen memiliki ->id dan relasi ->user->nama atau ->nama_dosen --}}
                             <option value="{{ $dosen->id ?? $dosen->dosen_id }}"
                                     {{ old('dosen_id', $prestasi->dosen_id ?? '') == ($dosen->id ?? $dosen->dosen_id) ? 'selected' : '' }}>
                                 {{ $dosen->user->nama ?? ($dosen->nama ?? 'Nama Dosen Tidak Tersedia') }}
@@ -92,9 +89,8 @@
             </div>
         </div>
 
-        {{-- Field File Bukti --}}
         <div class="form-group row mb-3">
-            <label for="file_bukti" class="col-sm-3 col-form-label">Unggah Bukti {{ $isEditMode ? '' : '(Wajib)' }}</label>
+            <label for="file_bukti" class="col-sm-3 col-form-label">Unggah File Bukti Prestasi {{ $isEditMode ? '' : '(Wajib)' }}</label>
             <div class="col-sm-9">
                 <input type="file" class="form-control" id="file_bukti" name="file_bukti" accept="pdf, jpg, jpeg, png" {{ !$isEditMode ? 'required' : '' }}>
                 <small class="form-text text-muted">Format: PDF, JPG, JPEG, PNG. Max: 2MB.</small>
@@ -123,15 +119,6 @@
 
 <script>
 $(document).ready(function() {
-    // Inisialisasi Select2 untuk Dosen Pembimbing jika Anda ingin fitur search
-    // $('#dosen_id').select2({
-    //     dropdownParent: $('#myModal'), // Penting jika modal Bootstrap
-    //     theme: 'bootstrap-5',
-    //     placeholder: '-- Tidak Ada / Pilih Dosen --',
-    //     allowClear: true
-    // });
-
-
     // Validasi form (jQuery Validation)
     const formPrestasi = $('#{{ $isEditMode ? "formEditPrestasi" : "formTambahPrestasi" }}');
     formPrestasi.validate({

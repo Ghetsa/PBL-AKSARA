@@ -13,7 +13,7 @@
     <meta name="author" content="CodedThemes">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <link rel="icon" href="{{ asset('mantis/dist/assets/images/favicon.svg') }}" type="image/x-icon">
+    <link rel="icon" href="{{ asset('logo/aksara-logo.svg') }}" type="image/x-icon">
     {{-- <link rel="stylesheet" href="[https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap](https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap)" id="main-font-link"> --}}
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" id="main-font-link">
     <link rel="stylesheet" href="{{ asset('mantis/dist/assets/fonts/tabler-icons.min.css') }}">
@@ -27,6 +27,10 @@
     <link rel="stylesheet" href="{{ asset('mantis/dist/assets/css/plugins/responsive.bootstrap5.min.css') }}">
     <link rel="stylesheet" href="{{ asset('mantis/dist/assets/css/plugins/buttons.bootstrap5.min.css') }}">
 
+    <script>
+        // Variabel global untuk base path aset dari direktori public Laravel
+        const BASE_ASSET_URL = "{{ rtrim(asset(''), '/') }}"; // Ini akan menjadi http://localhost/PBL-AKSARA/AKSARA/public
+    </script>
     <!-- SweetAlert2 CDN -->
     {{-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> --}}
     {{-- <link rel="stylesheet" href="{{ asset('mantis/dist/assets/css/plugins/themes/borderless.css') }}">
@@ -125,13 +129,13 @@
             }
         });
     </script>
-    @stack('js')
 
     <script>layout_change('light');</script>
     <script>change_box_container('false');</script>
     <script>layout_rtl_change('false');</script>
     <script>preset_change("preset-1");</script>
     <script>font_change("Public-Sans");</script>
+    @stack('js')
     @yield('page-js')
 </body>
 </html>

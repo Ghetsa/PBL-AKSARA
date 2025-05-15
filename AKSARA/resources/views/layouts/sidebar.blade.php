@@ -1,8 +1,8 @@
 <nav class="pc-sidebar">
   <div class="navbar-wrapper">
-      <div class="m-header">
+      <div style="height: 60px; display: flex; align-items: center; padding: 16px 24px;">
           <a href="{{ url('/') }}" class="b-brand text-primary">
-              <img src="{{ asset('mantis/dist/assets/images/logo-dark.svg') }}" class="img-fluid logo-lg" alt="logo">
+              <img src="{{ asset('logo/logo.svg') }}" class="img-fluid logo-lg" alt="logo">
           </a>
       </div>
       @if (Auth::user()->role == 'admin')
