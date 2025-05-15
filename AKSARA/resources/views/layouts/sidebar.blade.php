@@ -144,17 +144,17 @@
                     <i class="ti ti-brand-chrome"></i>
                 </li>
                 <li class="pc-item">
-                    <a href="{{ url('mahasiswa/prestasi/create_ajax') }}" class="pc-link {{ ($activeMenu == 'prestasi') ? 'active' : '' }}">
+                    <a href="{{ url('mahasiswa/prestasi') }}" class="pc-link {{ ($activeMenu == 'prestasi') ? 'active' : '' }}">
                         <span class="pc-micon"><i class="ti ti-trophy"></i></span>
                         <span class="pc-mtext">Upload Prestasi</span>
                     </a>
                 </li>
-                <li class="pc-item">
-                    <a href="{{ url('mahasiswa/prestasi') }}" class="pc-link {{ ($activeMenu == 'laporan') ? 'active' : '' }}">
+                {{-- <li class="pc-item">
+                    <a href="{{ url('mahasiswa/prestasi/create_ajax') }}" class="pc-link {{ ($activeMenu == 'laporan') ? 'active' : '' }}">
                         <span class="pc-micon"><i class="ti ti-report-analytics"></i></span>
                         <span class="pc-mtext">Verifikasi Prestasi</span>
                     </a>
-                </li>
+                </li> --}}
             </ul>
         </div>
     @elseif (Auth::user()->role == 'dosen')

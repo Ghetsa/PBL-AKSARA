@@ -1,5 +1,4 @@
-{{-- Menggunakan struktur modal yang sama seperti MANTIS --}}
-<div class="modal-dialog modal-xl"> {{-- modal-xl untuk lebih banyak ruang --}}
+<div class="modal-dialog modal-xl"> 
     <div class="modal-content">
         <form id="formUpdateProfile" method="POST" action="{{ route('profile.update_ajax') }}" enctype="multipart/form-data">
             @csrf
@@ -11,7 +10,6 @@
             </div>
             <div class="modal-body" style="max-height: 70vh; overflow-y: auto;"> 
 
-                    {{-- Bagian Info Dasar --}}
                     <div id="section-dasar">
                         <h5><i class="ti ti-id me-2"></i>Info Dasar</h5>
                         <hr class="mt-1 mb-3">
@@ -37,12 +35,11 @@
                             @endif
                         </div>
                     </div>
-                    <hr class="my-4"> {{-- Pemisah antar bagian --}}
+                    <hr class="my-4"> 
 
 
-                    {{-- Bagian Keahlian --}}
                     @if ($user->role === 'dosen' || $user->role === 'mahasiswa')
-                    <div id="section-keahlian" class="mt-4"> {{-- Tambahkan ID untuk scroll targeting --}}
+                    <div id="section-keahlian" class="mt-4"> 
                         <h5><i class="ti ti-star me-2"></i>Keahlian</h5>
                         <hr class="mt-1 mb-3">
                         <div id="keahlian-fields-container">
@@ -68,6 +65,18 @@
                                     </div>
                                     <div class="col-md-2">
                                     </div>
+                                    <!-- Keahlian -->
+                                    <div class="form-group">
+                                        <label>Keahlian</label>
+                                        <select name="keahlian_id[]" class="form-control" multiple>
+                                            @foreach ($keahlianList as $keahlian)
+                                                <option value="{{ $keahlian->id }}"
+                                                    {{ in_array($keahlian->id, $selectedKeahlianIds ?? []) ? 'selected' : '' }}>
+                                                    {{ $keahlian->keahlian_nama }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
                                 </div>
                             @endforelse
                         </div>
@@ -77,9 +86,8 @@
                     @endif
 
 
-                    {{-- Bagian Pengalaman --}}
                     @if ($user->role === 'mahasiswa')
-                    <div id="section-pengalaman" class="mt-4"> {{-- Tambahkan ID untuk scroll targeting --}}
+                    <div id="section-pengalaman" class="mt-4"> 
                         <h5><i class="ti ti-briefcase me-2"></i>Pengalaman</h5>
                          <hr class="mt-1 mb-3">
                         <div id="pengalaman-fields-container">
@@ -101,7 +109,6 @@
                                 <div class="pengalaman-item border rounded p-3 mb-3">
                                     <div class="row">
                                          <div class="col-md-6 mb-2"><label class="form-label">Nama Pengalaman</label><input type="text" name="pengalaman_items[0][pengalaman_nama]" class="form-control"></div>
-                                         {{-- <div class="col-md-6 mb-2"><label class="form-label">Kategori</label><input type="text" name="pengalaman_items[0][pengalaman_kategori]" placeholder="Mis: Pekerjaan, Magang, Proyek" class="form-control"></div> --}}
                                          <div class="col-md-6 mb-2">
                                             <label class="form-label">Kategori</label>
                                             <select name="pengalaman_items[0][pengalaman_kategori]" class="form-control">
@@ -112,19 +119,18 @@
                                             </select>
                                         </div>
                                     </div>
-                                    {{-- Tombol hapus tidak ditampilkan untuk item pertama jika hanya satu --}}
                                 </div>
                             @endforelse
                         </div>
                         <button type="button" id="add-pengalaman-btn" class="btn btn-sm btn-outline-primary mt-2">Tambah Pengalaman</button>
                     </div>
-                    <hr class="my-4"> {{-- Pemisah antar bagian --}}
+                    <hr class="my-4">
                     @endif
 
 
                     {{-- Bagian Minat --}}
                     @if ($user->role === 'dosen' || $user->role === 'mahasiswa')
-                    <div id="section-minat" class="mt-4"> {{-- Tambahkan ID untuk scroll targeting --}}
+                    <div id="section-minat" class="mt-4"> 
                         <h5><i class="ti ti-heart me-2"></i>Minat</h5>
                         <hr class="mt-1 mb-3">
                         <div id="minat-fields-container">
@@ -350,7 +356,7 @@ $(document).ready(function() {
         });
     });
 });
-</script>
+</script> 
 
 {{-- <div class="modal-dialog modal-xl"> 
     <div class="modal-content">
