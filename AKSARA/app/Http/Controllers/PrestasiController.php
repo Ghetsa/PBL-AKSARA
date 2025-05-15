@@ -102,13 +102,14 @@ class PrestasiController extends Controller
 
     public function indexMahasiswa()
     {
+        $dosenList = DosenModel::all();
         // View ini akan berisi tabel yang diisi oleh DataTables via AJAX call ke listMahasiswa()
         $breadcrumb = (object) [
             'title' => 'Data prestasi',
             'list' => ['Status Verifikasi']
         ];
         $activeMenu = 'dashboard';
-        return view('prestasi.mahasiswa.index', compact('breadcrumb', 'activeMenu'));
+        return view('prestasi.mahasiswa.index', compact('breadcrumb', 'activeMenu', 'dosenList'));
     }
 
     /**
@@ -122,8 +123,9 @@ class PrestasiController extends Controller
                 return response()->json(['error' => 'Profil mahasiswa tidak ditemukan.'], 403);
             }
 
-            $data = PrestasiModel::where('mahasiswa_id', $mahasiswa->mahasiswa_id)
-                ->select(['prestasi_id', 'nama_prestasi', 'kategori', 'tingkat', 'tahun', 'status_verifikasi', 'file_bukti'])
+            $data = PrestasiModel::with('dosen.user') // << Tambahkan eager loading
+                ->where('mahasiswa_id', $mahasiswa->mahasiswa_id)
+                ->select(['prestasi_id', 'nama_prestasi', 'kategori', 'tingkat', 'tahun', 'status_verifikasi', 'file_bukti', 'dosen_id']) // pastikan dosen_id disertakan
                 ->orderBy('tahun', 'desc');
 
             return DataTables::of($data)
@@ -133,6 +135,9 @@ class PrestasiController extends Controller
                 })
                 ->editColumn('tingkat', function ($row) {
                     return ucfirst($row->tingkat);
+                })
+                ->addColumn('dosen', function ($row) {
+                    return $row->dosen ? $row->dosen->user->nama : '-';
                 })
                 ->editColumn('status_verifikasi', function ($row) {
                     if ($row->status_verifikasi == 'pending') {
@@ -195,7 +200,7 @@ class PrestasiController extends Controller
             'nama_prestasi' => 'required|string|max:255',
             'kategori' => ['required', Rule::in(['akademik', 'non-akademik'])],
             'penyelenggara' => 'required|string|max:255',
-            'tingkat' => ['required', Rule::in(['kota','provinsi', 'nasional', 'internasional'])],
+            'tingkat' => ['required', Rule::in(['kota', 'provinsi', 'nasional', 'internasional'])],
             'tahun' => 'required|integer|digits:4|min:1900|max:' . (date('Y') + 1),
             'dosen_id' => 'required|exists:dosen,dosen_id',
             'file_bukti' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048', // Max 2MB
@@ -223,6 +228,7 @@ class PrestasiController extends Controller
         try {
             PrestasiModel::create([
                 'mahasiswa_id' => $mahasiswa->mahasiswa_id,
+                'dosen_id' => $request->dosen_id,
                 'nama_prestasi' => $request->nama_prestasi,
                 'kategori' => $request->kategori,
                 'penyelenggara' => $request->penyelenggara,
@@ -231,8 +237,6 @@ class PrestasiController extends Controller
                 'file_bukti' => $filePath,
                 'status_verifikasi' => 'pending',
                 'catatan_verifikasi' => null,
-                // Laravel akan mengisi created_at dan updated_at jika $timestamps = true di model
-                // Jika $timestamps = false, Anda mungkin perlu menambahkannya manual atau menghapusnya dari fillable jika tidak ada di DB
             ]);
 
             return response()->json(['status' => true, 'message' => 'Prestasi berhasil ditambahkan dan sedang menunggu verifikasi.']);
@@ -246,6 +250,7 @@ class PrestasiController extends Controller
                 'message' => 'Gagal menyimpan prestasi. Terjadi kesalahan server.'
             ], 500);
         }
+
     }
 
     // =========================================================================
