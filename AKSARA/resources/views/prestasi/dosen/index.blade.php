@@ -32,7 +32,7 @@
                                 <button type="submit" class="btn btn-primary btn-sm w-100">Filter</button>
                             </div>
                             <div class="col-md-2">
-                                <a href="{{ route('admin.prestasi.index') }}"
+                                <a href="{{ route('prestasi.dosen.index') }}"
                                     class="btn btn-secondary btn-sm w-100">Reset</a>
                             </div>
                         </form>
@@ -65,7 +65,7 @@
     </div>
 
     {{-- Modal Umum untuk form AJAX (pastikan ID ini unik atau gunakan yang sudah ada di layout) --}}
-    <div class="modal fade" id="myModalAdmin" tabindex="-1" role="dialog" aria-labelledby="myModalAdminLabel"
+    <div class="modal fade" id="myModalDosen" tabindex="-1" role="dialog" aria-labelledby="myModalDosenLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
@@ -78,9 +78,9 @@
 @push('js')
     {{-- Dependensi JS yang diperlukan --}}
     <script>
-        var dataDaftarPrestasiAdmin;
+        var dataDaftarPrestasiDosen;
 
-        function modalAction(url, modalId = 'myModalAdmin') { // Default ke myModalAdmin
+        function modalAction(url, modalId = 'myModalDosen') { // Default ke myModalDosen
             const targetModalContent = $(`#${modalId} .modal-content`);
             targetModalContent.html(''); // Kosongkan dulu
             $.ajax({
@@ -108,7 +108,7 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: "{{ route('dosen.prestasi.list') }}",
+                    url: "{{ route('prestasi.dosen.list') }}",
                     data: function(d) { // Mengirim data filter
                         d.search_nama = $('#search_nama_dosen').val();
                         d.filter_status = $('#filter_status_dosen').val();
