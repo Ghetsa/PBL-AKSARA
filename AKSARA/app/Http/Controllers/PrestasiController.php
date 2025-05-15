@@ -677,6 +677,9 @@ class PrestasiController extends Controller
                 ->editColumn('tingkat', function ($row) {
                     return ucfirst($row->tingkat);
                 })
+                ->addColumn('dosen', function ($row) {
+                    return $row->dosen ? $row->dosen->user->nama : '-';
+                })
                 ->editColumn('status_verifikasi', function ($row) {
                     if ($row->status_verifikasi == 'pending') {
                         return '<span class="badge bg-warning text-dark">Pending</span>';

@@ -49,6 +49,7 @@
                                         <th>Kategori</th>
                                         <th>Tingkat</th>
                                         <th>Tahun</th>
+                                        <th>Dosen Pembimbing</th>
                                         <th class="text-center">Status</th>
                                         <th class="text-center">Aksi</th>
                                     </tr>
@@ -144,6 +145,10 @@
                     {
                         data: 'tahun',
                         name: 'tahun'
+                    },
+                    {
+                        data: 'dosen',
+                        name: 'dosen'
                     },
                     {
                         data: 'status_verifikasi',
