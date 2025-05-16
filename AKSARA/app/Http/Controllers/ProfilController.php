@@ -9,8 +9,11 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\MinatModel;
 use App\Models\KeahlianModel;
 use App\Models\PengalamanModel;
-use App\Models\PrestasiModel;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule; // Untuk validasi unique ignore
 
 class ProfilController extends Controller
 {
@@ -170,47 +173,168 @@ class ProfilController extends Controller
     //     }
     // }
 
+    // public function edit_ajax()
+    // {
+    //     $user = Auth::user()->load([
+    //         'mahasiswa.prodi',
+    //         'mahasiswa.periode',
+    //         'mahasiswa.prestasi',
+    //         'dosen',
+    //         'admin',
+    //         'keahlian',
+    //         'minat',
+    //         'pengalaman'
+    //     ]);
+
+    //     // Anda tidak perlu mengambil semua list jika inputnya berupa text dinamis
+    //     // $keahlianList = KeahlianModel::all();
+    //     // $pengalamanList = PengalamanModel::all(); // Ini mungkin tidak relevan untuk form edit dinamis
+    //     // $minatList = MinatModel::all();
+
+    //     // Yang Anda perlukan adalah data yang sudah dimiliki user
+    //     $selectedKeahlian = $user->keahlian; // Collection dari KeahlianModel terkait user
+    //     $selectedMinat = $user->minat;         // Collection dari MinatModel
+    //     $selectedPengalaman = $user->pengalaman; // Collection dari PengalamanModel
+
+    //     // Jika mahasiswa, ambil juga prestasi
+    //     $selectedPrestasi = collect(); // default empty collection
+    //     if ($user->role === 'mahasiswa' && $user->mahasiswa) {
+    //         $selectedPrestasi = $user->mahasiswa->prestasi;
+    //     }
+
+
+    //     return view('profil.edit', compact(
+    //         'user',
+    //         'selectedKeahlian',
+    //         'selectedMinat',
+    //         'selectedPengalaman',
+    //         'selectedPrestasi'
+    //         // Anda tidak perlu mengirim $keahlianList, $minatList, $pengalamanList
+    //         // kecuali jika Anda ingin dropdown pre-defined, tapi UI LinkedIn lebih ke arah input teks dinamis.
+    //     ));
+    // }
+
+
+    // public function update_ajax(Request $request)
+    // {
+    //     $user = Auth::user();
+    //     DB::beginTransaction();
+
+    //     try {
+    //         // Validasi Data Dasar User
+    //         $validator = Validator::make($request->only(['nama', 'email', 'profile_photo']), [
+    //             'nama' => 'required|string|max:255',
+    //             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+    //             'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // tambahkan gif jika perlu
+    //         ]);
+
+    //         if ($validator->fails()) {
+    //             return response()->json(['message' => 'Validasi gagal.', 'errors' => $validator->errors()], 422);
+    //         }
+
+    //         $userData = ['nama' => $request->nama, 'email' => $request->email];
+
+    //         if ($request->hasFile('profile_photo')) {
+    //             if ($user->profile_photo && Storage::disk('public')->exists($user->profile_photo)) {
+    //                 Storage::disk('public')->delete($user->profile_photo);
+    //             }
+    //             $path = $request->file('profile_photo')->store('profile_photos', 'public');
+    //             $userData['profile_photo'] = $path;
+    //         }
+    //         $user->update($userData);
+
+    //         // Update Detail Role-Specific (NIP, Gelar, No HP, dll.)
+    //         if ($user->role === 'dosen' && $user->dosen) {
+    //             $user->dosen->update($request->only(['gelar', 'no_hp'])); // Pastikan field ini ada di request dan fillable DosenModel
+    //         }
+    //         // Untuk mahasiswa, NIP, Prodi, Periode biasanya tidak diubah dari profil, tapi dari data akademik.
+
+    //         // --- Handle Keahlian ---
+    //         $user->keahlian()->delete(); // Hapus yang lama
+    //         if ($request->has('keahlian_items')) {
+    //             foreach ($request->keahlian_items as $item) {
+    //                 if (!empty($item['nama'])) { // Hanya simpan jika nama keahlian diisi
+    //                     $user->keahlian()->create([
+    //                         'keahlian_nama' => $item['nama'],
+    //                         'sertifikasi' => $item['sertifikasi'] ?? null, // Ambil sertifikasi jika ada
+    //                     ]);
+    //                 }
+    //             }
+    //         }
+
+    //         // --- Handle Minat ---
+    //         $user->minat()->delete(); // Hapus yang lama
+    //         if ($request->has('minat_items')) {
+    //             foreach ($request->minat_items as $namaMinat) {
+    //                 if (!empty($namaMinat)) { // Hanya simpan jika nama minat diisi
+    //                     $user->minat()->create(['nama_minat' => $namaMinat]); // Sesuaikan nama kolom di model
+    //                 }
+    //             }
+    //         }
+
+    //         // --- Handle Pengalaman ---
+    //         $user->pengalaman()->delete(); // Hapus yang lama
+    //         if ($request->has('pengalaman_items')) {
+    //             foreach ($request->pengalaman_items as $item) {
+    //                 // Validasi minimal untuk setiap item pengalaman
+    //                 if (!empty($item['pengalaman_nama'])) {
+    //                     $user->pengalaman()->create([
+    //                         'pengalaman_nama' => $item['pengalaman_nama'],
+    //                         'pengalaman_kategori' => $item['pengalaman_kategori'] ?? null,
+    //                     ]);
+    //                 }
+    //             }
+    //         }
+
+    //         DB::commit();
+    //         return response()->json(['success' => true, 'message' => 'Profil berhasil diperbarui.']);
+    //     } catch (\Exception $e) {
+    //         DB::rollBack();
+    //         // Log error $e->getMessage()
+    //         return response()->json(['success' => false, 'message' => 'Gagal memperbarui profil. Terjadi kesalahan server.', 'error' => $e->getMessage()], 500);
+    //     }
+    // }
+
     public function edit_ajax()
     {
         $user = Auth::user()->load([
-            'mahasiswa.prodi',
+            'mahasiswa.prodi', // Eager load untuk data yang mungkin ditampilkan di form
             'mahasiswa.periode',
-            'mahasiswa.prestasi',
+            // 'mahasiswa.prestasi', // Prestasi mungkin diedit di halaman terpisah
             'dosen',
             'admin',
-            'keahlian',
-            'minat',
+            'keahlian', // Untuk mendapatkan keahlian yang sudah dipilih user
+            'minat',    // Untuk mendapatkan minat yang sudah dipilih user
             'pengalaman'
         ]);
 
-        // Anda tidak perlu mengambil semua list jika inputnya berupa text dinamis
-        // $keahlianList = KeahlianModel::all();
-        // $pengalamanList = PengalamanModel::all(); // Ini mungkin tidak relevan untuk form edit dinamis
-        // $minatList = MinatModel::all();
+        // Ambil daftar opsi dari ENUM atau konstanta model
+        $allKeahlianOptions = KeahlianModel::PILIHAN_KEAHLIAN; // Menggunakan konstanta dari model
+        $allMinatOptions = MinatModel::PILIHAN_MINAT;         // Menggunakan konstanta dari model
 
-        // Yang Anda perlukan adalah data yang sudah dimiliki user
-        $selectedKeahlian = $user->keahlian; // Collection dari KeahlianModel terkait user
-        $selectedMinat = $user->minat;         // Collection dari MinatModel
-        $selectedPengalaman = $user->pengalaman; // Collection dari PengalamanModel
+        // Data yang sudah dimiliki user untuk pre-fill checkboxes dan info sertifikat
+        $selectedKeahlian = $user->keahlian->mapWithKeys(function ($item) {
+            return [$item->keahlian_nama => $item->sertifikasi]; // keahlian_nama => path_sertifikat
+        });
+        $selectedMinat = $user->minat->pluck('nama_minat')->toArray(); // Asumsi kolomnya 'nama_minat'
+        // Jika kolomnya 'minat', gunakan: $user->minat->pluck('minat')->toArray();
 
-        // Jika mahasiswa, ambil juga prestasi
-        $selectedPrestasi = collect(); // default empty collection
-        if ($user->role === 'mahasiswa' && $user->mahasiswa) {
-            $selectedPrestasi = $user->mahasiswa->prestasi;
-        }
+
+        // Pengalaman tetap seperti sebelumnya (dynamic input)
+        $selectedPengalaman = $user->pengalaman;
+        $selectedPrestasi = ($user->role === 'mahasiswa' && $user->mahasiswa) ? $user->mahasiswa->prestasi : collect();
 
 
         return view('profil.edit', compact(
             'user',
+            'allKeahlianOptions',
+            'allMinatOptions',
             'selectedKeahlian',
             'selectedMinat',
             'selectedPengalaman',
             'selectedPrestasi'
-            // Anda tidak perlu mengirim $keahlianList, $minatList, $pengalamanList
-            // kecuali jika Anda ingin dropdown pre-defined, tapi UI LinkedIn lebih ke arah input teks dinamis.
         ));
     }
-
 
     public function update_ajax(Request $request)
     {
@@ -218,68 +342,110 @@ class ProfilController extends Controller
         DB::beginTransaction();
 
         try {
-            // Validasi Data Dasar User
-            $validator = Validator::make($request->only(['nama', 'email', 'profile_photo']), [
+            $validator = Validator::make($request->all(), [
                 'nama' => 'required|string|max:255',
                 'email' => 'required|email|max:255|unique:users,email,' . $user->id,
-                'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // tambahkan gif jika perlu
+                'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                // Validasi untuk dosen jika ada field khusus
+                'gelar' => $user->role === 'dosen' ? 'nullable|string|max:100' : '',
+                'no_hp' => $user->role === 'dosen' ? 'nullable|string|max:20' : '',
+                // Keahlian dan Minat akan divalidasi sebagai array
+                'keahlian_pilihan' => 'nullable|array',
+                'keahlian_pilihan.*' => ['string', Rule::in(KeahlianModel::PILIHAN_KEAHLIAN)], // Validasi terhadap ENUM/pilihan
+                'minat_pilihan' => 'nullable|array',
+                'minat_pilihan.*' => ['string', Rule::in(MinatModel::PILIHAN_MINAT)], // Validasi terhadap ENUM/pilihan
+                // Validasi untuk file sertifikasi (array of files)
+                // Nama file input di view: sertifikasi_file[Nama Keahlian]
+                'sertifikasi_file' => 'nullable|array',
+                'sertifikasi_file.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048', // Max 2MB per file
+                // Validasi pengalaman (jika masih menggunakan item dinamis)
+                'pengalaman_items' => 'nullable|array',
+                'pengalaman_items.*.pengalaman_nama' => 'required_with:pengalaman_items.*.pengalaman_kategori|string|max:255',
+                'pengalaman_items.*.pengalaman_kategori' => 'nullable|string|max:255',
             ]);
 
             if ($validator->fails()) {
-                return response()->json(['message' => 'Validasi gagal.', 'errors' => $validator->errors()], 422);
+                return response()->json(['success' => false, 'message' => 'Validasi gagal.', 'errors' => $validator->errors()], 422);
             }
 
             $userData = ['nama' => $request->nama, 'email' => $request->email];
-
             if ($request->hasFile('profile_photo')) {
                 if ($user->profile_photo && Storage::disk('public')->exists($user->profile_photo)) {
                     Storage::disk('public')->delete($user->profile_photo);
                 }
-                $path = $request->file('profile_photo')->store('profile_photos', 'public');
+                $path = $request->file('profile_photo')->store('profile_photos/' . $user->id, 'public');
                 $userData['profile_photo'] = $path;
             }
             $user->update($userData);
 
-            // Update Detail Role-Specific (NIP, Gelar, No HP, dll.)
             if ($user->role === 'dosen' && $user->dosen) {
-                $user->dosen->update($request->only(['gelar', 'no_hp'])); // Pastikan field ini ada di request dan fillable DosenModel
+                $user->dosen->update($request->only(['gelar', 'no_hp']));
             }
-            // Untuk mahasiswa, NIP, Prodi, Periode biasanya tidak diubah dari profil, tapi dari data akademik.
 
-            // --- Handle Keahlian ---
-            $user->keahlian()->delete(); // Hapus yang lama
-            if ($request->has('keahlian_items')) {
-                foreach ($request->keahlian_items as $item) {
-                    if (!empty($item['nama'])) { // Hanya simpan jika nama keahlian diisi
-                        $user->keahlian()->create([
-                            'keahlian_nama' => $item['nama'],
-                            'sertifikasi' => $item['sertifikasi'] ?? null, // Ambil sertifikasi jika ada
-                        ]);
+            // --- Handle Keahlian dengan file sertifikasi ---
+            $currentKeahlian = $user->keahlian->keyBy('keahlian_nama');
+            $newKeahlianData = [];
+            $selectedKeahlianNames = $request->input('keahlian_pilihan', []);
+
+            foreach ($selectedKeahlianNames as $keahlianNama) {
+                $existingKeahlian = $currentKeahlian->get($keahlianNama);
+                $sertifikasiPath = $existingKeahlian->sertifikasi ?? null; // Path sertifikat lama
+
+                // Cek apakah ada file baru yang diunggah untuk keahlian ini
+                // Nama input file: sertifikasi_file[Nama Keahlian Dengan Spasi Diganti Underscore]
+                $fileInputName = 'sertifikasi_file.' . Str::slug($keahlianNama, '_');
+
+                if ($request->hasFile($fileInputName)) {
+                    $file = $request->file($fileInputName);
+                    // Hapus file sertifikat lama jika ada dan file baru diunggah
+                    if ($sertifikasiPath && Storage::disk('public')->exists($sertifikasiPath)) {
+                        Storage::disk('public')->delete($sertifikasiPath);
                     }
+                    // Simpan file baru
+                    $sertifikasiPath = $file->store('sertifikasi_keahlian/' . $user->id, 'public');
                 }
+
+                $newKeahlianData[] = [
+                    'user_id' => $user->user_id,
+                    'keahlian_nama' => $keahlianNama,
+                    'sertifikasi' => $sertifikasiPath,
+                    // 'created_at' dan 'updated_at' akan diisi otomatis jika $timestamps = true
+                ];
+            }
+            // Hapus semua keahlian lama, lalu buat yang baru
+            $user->keahlian()->delete();
+            if (!empty($newKeahlianData)) {
+                KeahlianModel::insert($newKeahlianData); // Bulk insert
             }
 
-            // --- Handle Minat ---
+
+            // --- Handle Minat (checkboxes) ---
             $user->minat()->delete(); // Hapus yang lama
-            if ($request->has('minat_items')) {
-                foreach ($request->minat_items as $namaMinat) {
-                    if (!empty($namaMinat)) { // Hanya simpan jika nama minat diisi
-                        $user->minat()->create(['nama_minat' => $namaMinat]); // Sesuaikan nama kolom di model
-                    }
+            $selectedMinatPilihan = $request->input('minat_pilihan', []);
+            if (!empty($selectedMinatPilihan)) {
+                $minatToInsert = [];
+                foreach ($selectedMinatPilihan as $minatNama) {
+                    $minatToInsert[] = ['user_id' => $user->user_id, 'nama_minat' => $minatNama]; // Ganti 'minat' dengan 'nama_minat'
                 }
+                MinatModel::insert($minatToInsert);
             }
 
-            // --- Handle Pengalaman ---
-            $user->pengalaman()->delete(); // Hapus yang lama
+
+            // --- Handle Pengalaman (jika masih menggunakan metode lama) ---
+            $user->pengalaman()->delete();
             if ($request->has('pengalaman_items')) {
+                $pengalamanToInsert = [];
                 foreach ($request->pengalaman_items as $item) {
-                    // Validasi minimal untuk setiap item pengalaman
                     if (!empty($item['pengalaman_nama'])) {
-                        $user->pengalaman()->create([
+                        $pengalamanToInsert[] = [
+                            'user_id' => $user->user_id,
                             'pengalaman_nama' => $item['pengalaman_nama'],
                             'pengalaman_kategori' => $item['pengalaman_kategori'] ?? null,
-                        ]);
+                        ];
                     }
+                }
+                if (!empty($pengalamanToInsert)) {
+                    PengalamanModel::insert($pengalamanToInsert);
                 }
             }
 
@@ -287,7 +453,7 @@ class ProfilController extends Controller
             return response()->json(['success' => true, 'message' => 'Profil berhasil diperbarui.']);
         } catch (\Exception $e) {
             DB::rollBack();
-            // Log error $e->getMessage()
+            Log::error('Error update profil AJAX: ' . $e->getMessage() . ' Stack: ' . $e->getTraceAsString());
             return response()->json(['success' => false, 'message' => 'Gagal memperbarui profil. Terjadi kesalahan server.', 'error' => $e->getMessage()], 500);
         }
     }

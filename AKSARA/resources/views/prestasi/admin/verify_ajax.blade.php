@@ -33,14 +33,12 @@
                 </td>
             </tr>
             <tr><th>Tgl Pengajuan</th><td>{{ $prestasi->created_at ? $prestasi->created_at->format('d M Y H:i') : '-' }}</td></tr>
-             @if($prestasi->dosenPembimbing) {{-- Tampilkan jika ada dosen pembimbing --}}
+             @if($prestasi->dosenPembimbing) 
             <tr><th>Dosen Pembimbing</th><td>{{ $prestasi->dosenPembimbing->user->nama ?? ($prestasi->dosenPembimbing->nama ?? 'N/A') }}</td></tr>
             @endif
         </table>
         <hr>
         <h6>Form Verifikasi:</h6>
-        {{-- Hapus Dropdown Status Verifikasi yang lama --}}
-        {{-- <div class="form-group row mb-3"> ... </div> --}}
 
         <div class="form-group row mb-3">
             <label for="verify_catatan_verifikasi" class="col-sm-3 col-form-label">Catatan Verifikasi</label>
@@ -51,7 +49,6 @@
             </div>
         </div>
 
-        {{-- Tombol Aksi Verifikasi Baru --}}
         <div class="form-group row mt-4">
             <label class="col-sm-3 col-form-label">Aksi</label>
             <div class="col-sm-9">
@@ -71,9 +68,6 @@
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-        {{-- Tombol Simpan Verifikasi utama bisa dihilangkan atau dipertahankan sebagai fallback --}}
-        {{-- <button type="submit" class="btn btn-primary">Simpan Status</button> --}}
-        <small class="text-muted me-auto">Pilih tindakan di atas untuk menyimpan.</small>
     </div>
 </form>
 

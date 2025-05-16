@@ -30,4 +30,18 @@ class KeahlianModel extends Model
     {
         return $this->hasMany(DosenModel::class, 'keahlian_id', 'keahlian_id');
     }
+
+    public const PILIHAN_KEAHLIAN = [
+        'Web Development',
+        'Mobile Development',
+        'Data Science',
+        'Machine Learning',
+        'Cyber Security',
+        'Cloud Computing',
+        'DevOps',
+        'UI/UX Design',
+        'Database Administration',
+        'Network Engineering'
+        // Tambahkan opsi lain jika ada
+    ];
 }

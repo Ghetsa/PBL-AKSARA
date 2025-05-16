@@ -25,4 +25,18 @@ class MinatModel extends Model
     protected $casts = [
         'minat' => 'string',
     ];
+
+    public const PILIHAN_MINAT = [
+        'Web Development',
+        'Mobile Development',
+        'Data Science',
+        'Machine Learning',
+        'Cyber Security',
+        'Cloud Computing',
+        'DevOps',
+        'UI/UX Design',
+        'Database Administration',
+        'Network Engineering'
+        // Tambahkan opsi lain jika ada
+    ];
 }

@@ -35,7 +35,7 @@
                                     <th class="text-center">No.</th>
                                     <th>Nama Mahasiswa</th>
                                     <th>NIM</th>
-                                    <th>Nama Prestasi</th>
+                                    <th>Prestasi</th>
                                     <th>Kategori</th>
                                     <th>Tingkat</th>
                                     <th>Tahun</th>
