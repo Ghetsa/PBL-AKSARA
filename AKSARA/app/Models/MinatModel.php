@@ -16,7 +16,7 @@ class MinatModel extends Model
         'minat_nama',
     ];
 
-    public function users()
+    public function user()
     {
         return $this->belongsToMany(UserModel::class, 'minat_user', 'minat_id', 'user_id')
             ->withTimestamps();

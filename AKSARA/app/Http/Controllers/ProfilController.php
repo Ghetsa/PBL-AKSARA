@@ -20,7 +20,7 @@ class ProfilController extends Controller
     public function index()
     {
         $activeMenu = "";
-        $breadcrumb = (object)[
+        $breadcrumb = (object) [
             'title' => 'Profil pengguna',
             'list' => ['Dashboard', 'Profil']
         ];
@@ -91,94 +91,141 @@ class ProfilController extends Controller
         DB::beginTransaction();
 
         try {
-            $validator = Validator::make($request->all(), [
+            // Validasi
+            $rules = [
                 'nama' => 'required|string|max:255',
-                'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+                'email' => 'required|email|max:255|unique:users,email,' . $user->user_id . ',user_id',
                 'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-                'gelar' => $user->role === 'dosen' ? 'nullable|string|max:100' : '',
-                'no_hp' => $user->role === 'dosen' ? 'nullable|string|max:20' : '',
-                'keahlian_pilihan' => 'nullable|array',
-                'keahlian_pilihan.*' => ['string', Rule::in(KeahlianModel::PILIHAN_KEAHLIAN)],
+
+                // keahlian sebagai array keahlian_id
+                'keahlian_id' => 'nullable|array',
+                'keahlian_id.*' => ['integer', Rule::exists('m_keahlian', 'keahlian_id')],
+
+                // sertifikasi keahlian optional, array dengan key keahlian_nama
+                'keahlian_items' => 'nullable|array',
+                'keahlian_items.*.nama' => 'required_with:keahlian_items|string|max:255',
+                'keahlian_items.*.sertifikasi' => 'nullable|string|max:255',
+
                 'minat_pilihan' => 'nullable|array',
                 'minat_pilihan.*' => ['string', Rule::in(MinatModel::PILIHAN_MINAT)],
+
                 'sertifikasi_file' => 'nullable|array',
                 'sertifikasi_file.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
-                'pengalaman_items' => 'nullable|array',
-                'pengalaman_items.*.pengalaman_nama' => 'required_with:pengalaman_items.*.pengalaman_kategori|string|max:255',
-                'pengalaman_items.*.pengalaman_kategori' => 'nullable|string|max:255',
-            ]);
 
-            if ($validator->fails()) {
-                return response()->json(['success' => false, 'message' => 'Validasi gagal.', 'errors' => $validator->errors()], 422);
+                'pengalaman_items' => 'nullable|array',
+                'pengalaman_items.*.pengalaman_nama' => 'nullable|string|max:255',
+                'pengalaman_items.*.pengalaman_kategori' => 'nullable|string|max:255',
+            ];
+
+            if ($user->role === 'dosen') {
+                $rules['gelar'] = 'nullable|string|max:100';
+                $rules['no_hp'] = 'nullable|string|max:20';
             }
 
-            $userData = ['nama' => $request->nama, 'email' => $request->email];
+            $validator = Validator::make($request->all(), $rules);
 
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validasi gagal.',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            // Update data dasar user
+            $userData = [
+                'nama' => $request->nama,
+                'email' => $request->email,
+            ];
+
+            // Update foto profil
             if ($request->hasFile('foto')) {
                 if ($user->foto && Storage::disk('public')->exists($user->foto)) {
                     Storage::disk('public')->delete($user->foto);
                 }
                 $file = $request->file('foto');
                 $filename = 'foto_' . time() . '.' . $file->getClientOriginalExtension();
-                $path = $file->storeAs('profile_photos/' . $user->id, $filename, 'public');
+                $path = $file->storeAs('profile_photos/' . $user->user_id, $filename, 'public');
                 $userData['foto'] = $path;
             }
 
             $user->update($userData);
 
+            // Update dosen data jika role = dosen
             if ($user->role === 'dosen' && $user->dosen) {
                 $user->dosen->update($request->only(['gelar', 'no_hp']));
             }
 
-            // --- Handle Keahlian (pivot with sertifikasi) ---
-            $selectedKeahlian = $request->input('keahlian_pilihan', []);
+            // --- Handle Keahlian ---
+            $selectedKeahlianIds = $request->input('keahlian_id', []);
             $keahlianSyncData = [];
 
-            foreach ($selectedKeahlian as $keahlianNama) {
-                $fileInputName = 'sertifikasi_file.' . Str::slug($keahlianNama, '_');
+            foreach ($selectedKeahlianIds as $keahlianId) {
+                $keahlian = KeahlianModel::find($keahlianId);
+                if (!$keahlian)
+                    continue;
+
+                // Cek file sertifikasi yang terkait keahlian ini (berdasarkan keahlian_nama)
+                $keahlianSlug = Str::slug($keahlian->keahlian_nama, '_');
                 $sertifikasiPath = null;
 
-                if ($request->hasFile($fileInputName)) {
-                    $file = $request->file($fileInputName);
-                    $sertifikasiPath = $file->store('sertifikasi_keahlian/' . $user->id, 'public');
+                if ($request->hasFile('sertifikasi_file') && isset($request->file('sertifikasi_file')[$keahlianSlug])) {
+                    $file = $request->file('sertifikasi_file')[$keahlianSlug];
+                    if ($file->isValid()) {
+                        $sertifikasiPath = $file->store("sertifikasi_keahlian/{$user->user_id}", 'public');
+                    }
                 } else {
-                    $pivot = $user->keahlian->firstWhere('keahlian_nama', $keahlianNama)?->pivot;
+                    // Jika tidak upload file baru, ambil dari pivot lama (jika ada)
+                    $pivot = $user->keahlian->firstWhere('keahlian_id', $keahlianId)?->pivot;
                     $sertifikasiPath = $pivot?->sertifikasi;
                 }
 
-                $keahlianSyncData[$keahlianNama] = ['sertifikasi' => $sertifikasiPath];
+                $keahlianSyncData[$keahlianId] = ['sertifikasi' => $sertifikasiPath];
             }
 
             $user->keahlian()->sync($keahlianSyncData);
 
-            // --- Handle Minat (pivot) ---
+            // --- Handle Minat ---
             $selectedMinat = $request->input('minat_pilihan', []);
             $user->minat()->sync($selectedMinat);
 
             // --- Handle Pengalaman ---
             $user->pengalaman()->delete();
-            if ($request->has('pengalaman_items')) {
-                $pengalamanToInsert = [];
-                foreach ($request->pengalaman_items as $item) {
-                    if (!empty($item['pengalaman_nama'])) {
-                        $pengalamanToInsert[] = [
-                            'user_id' => $user->user_id,
-                            'pengalaman_nama' => $item['pengalaman_nama'],
-                            'pengalaman_kategori' => $item['pengalaman_kategori'] ?? null,
-                        ];
-                    }
-                }
-                if (!empty($pengalamanToInsert)) {
-                    PengalamanModel::insert($pengalamanToInsert);
+
+            $pengalamanItems = $request->input('pengalaman_items', []);
+            $pengalamanToInsert = [];
+
+            foreach ($pengalamanItems as $item) {
+                if (!empty($item['pengalaman_nama'])) {
+                    $pengalamanToInsert[] = [
+                        'user_id' => $user->user_id,
+                        'pengalaman_nama' => $item['pengalaman_nama'],
+                        'pengalaman_kategori' => $item['pengalaman_kategori'] ?? null,
+                    ];
                 }
             }
 
+            if (!empty($pengalamanToInsert)) {
+                PengalamanModel::insert($pengalamanToInsert);
+            }
+
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'Profil berhasil diperbarui.']);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Profil berhasil diperbarui.'
+            ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error update profil AJAX: ' . $e->getMessage() . ' Stack: ' . $e->getTraceAsString());
-            return response()->json(['success' => false, 'message' => 'Gagal memperbarui profil. Terjadi kesalahan server.', 'error' => $e->getMessage()], 500);
+            Log::error('Error update profil AJAX: ' . $e->getMessage(), [
+                'stack' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan server.',
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 }
