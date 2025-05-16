@@ -137,7 +137,7 @@
                 {{-- Tombol Masuk dan Daftar dipindahkan ke Navbar --}}
             </div>
             <div class="col-md-6 illustration-container">
-                <img src="{{ asset('mantis/dist/assets/images/slider/img-slide-1.jpg') }}" alt="Ilustrasi Prestasi" class="img-fluid" style="max-height: 400px;">
+                <img src="{{ asset('mantis/dist/assets/images/slider/gedung.jpg') }}" alt="Ilustrasi Prestasi" class="img-fluid" style="max-height: 400px; width: 1000px;">
             </div>
         </div>
 
