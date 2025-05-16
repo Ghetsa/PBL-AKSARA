@@ -25,8 +25,6 @@ class PrestasiModel extends Model
         'file_bukti',
         'status_verifikasi',
         'catatan_verifikasi',
-        'created_at',
-        'updated_at'
     ];
 
     public function mahasiswa()

@@ -625,11 +625,19 @@ class PrestasiController extends Controller
     public function listDosen(Request $request)
     {
         if ($request->ajax()) {
+
+            $userId = Auth::id();
+
+            $dosen = \App\Models\DosenModel::where('user_id', $userId)->first();
+                if (!$dosen) return abort(403);
+
             $data = PrestasiModel::with('mahasiswa.user', 'mahasiswa.prodi')
+                ->where('dosen_id', $dosen->dosen_id)
                 ->select('prestasi.*') // Pilih semua kolom dari prestasi
                 ->orderByRaw("FIELD(status_verifikasi, 'pending', 'disetujui', 'ditolak')");
             // ->orderByRaw("FIELD(status_verifikasi, 'pending', 'disetujui', 'ditolak'), created_at DESC");
 
+            
 
             // Filter
             if ($request->filled('search_nama')) {
