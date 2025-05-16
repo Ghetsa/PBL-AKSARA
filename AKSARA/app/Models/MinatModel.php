@@ -19,19 +19,29 @@ class MinatModel extends Model
     public function users()
     {
         return $this->belongsToMany(UserModel::class, 'minat_user', 'minat_id', 'user_id')
-                    ->withTimestamps();
+            ->withTimestamps();
     }
 
     public const PILIHAN_MINAT = [
-        'Web Development',
-        'Mobile Development',
-        'Data Science',
+        'Pemrograman',
+        'Desain Grafis',
+        'Manajemen Proyek',
+        'Analisis Data',
+        'Jaringan Komputer',
+        'Kecerdasan Buatan',
+        'Keamanan Siber',
         'Machine Learning',
-        'Cyber Security',
+        'UI/UX',
         'Cloud Computing',
-        'DevOps',
-        'UI/UX Design',
-        'Database Administration',
-        'Network Engineering'
+        'Fotografi',
+        'Desain Grafis',
+        'Musik',
+        'Sepak Bola / Futsal',
+        'E-Sports',
+        'Bulu Tangkis',
+        'Kategori Kewirausahaan',
+        'Startup Teknologi',
+        'Business Plan',
+        'Digital Marketing',
     ];
 }

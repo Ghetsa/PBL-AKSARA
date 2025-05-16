@@ -21,7 +21,17 @@ class KeahlianModel extends Model
         'Keamanan Siber',
         'Machine Learning',
         'UI/UX',
-        'Cloud Computing'
+        'Cloud Computing',
+        'Fotografi',
+        'Desain Grafis',
+        'Musik',
+        'Sepak Bola / Futsal',
+        'E-Sports',
+        'Bulu Tangkis',
+        'Kategori Kewirausahaan',
+        'Startup Teknologi',
+        'Business Plan',
+        'Digital Marketing',
     ];
 
     // Relasi many-to-many dengan User (melalui pivot keahlian_user)
