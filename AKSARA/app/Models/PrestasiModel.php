@@ -11,8 +11,8 @@ class PrestasiModel extends Model
 
     protected $table = 'prestasi';
     protected $primaryKey = 'prestasi_id';
+    public $timestamps = false;
 
-    public $timestamps = true;
 
     protected $fillable = [
         'mahasiswa_id',
