@@ -132,10 +132,10 @@ Route::middleware(['auth'])->group(function () { // artinya semua route di dalam
         Route::get('/show-ajax/{id}', [PrestasiController::class, 'showAjaxMahasiswa'])->name('show_ajax'); // Menampilkan form tambah via AJAX
 
         // Jika ada fitur edit/hapus oleh mahasiswa via AJAX nantinya:
-        // Route::get('/{prestasi}/edit-ajax', [PrestasiController::class, 'editFormAjaxMahasiswa'])->name('edit_ajax');
-        // Route::put('/{prestasi}/update-ajax', [PrestasiController::class, 'updateAjaxMahasiswa'])->name('update_ajax');
-        // Route::get('/{prestasi}/confirm-delete-ajax', [PrestasiController::class, 'confirmDeleteAjaxMahasiswa'])->name('confirm_delete_ajax');
-        // Route::delete('/{prestasi}/destroy-ajax', [PrestasiController::class, 'destroyAjaxMahasiswa'])->name('destroy_ajax');
+        Route::get('/profil/edit-ajax', [ProfilController::class, 'edit_ajax'])->name('profil.edit_ajax');
+        Route::put('/profil/update-ajax', [ProfilController::class, 'update_ajax'])->name('profil.update_ajax');
+        Route::get('/{prestasi}/confirm-delete-ajax', [PrestasiController::class, 'confirmDeleteAjaxMahasiswa'])->name('confirm_delete_ajax');
+        Route::delete('/{prestasi}/destroy-ajax', [PrestasiController::class, 'destroyAjaxMahasiswa'])->name('destroy_ajax');
     });
 
     // === RUTE UNTUK ADMIN ===
@@ -155,7 +155,7 @@ Route::middleware(['auth'])->group(function () { // artinya semua route di dalam
 
         Route::get('/create-ajax', [PrestasiController::class, 'createFormAjaxDosen'])->name('create_ajax'); // Menampilkan form tambah via AJAX
         Route::post('/store-ajax', [PrestasiController::class, 'storeAjaxDosen'])->name('store_ajax'); // Menyimpan prestasi via AJAX
-        
+
         Route::get('/{prestasi}/verify-form-ajax', [PrestasiController::class, 'showVerifyFormAjaxAdmin'])->name('verify_form_ajax'); // Menampilkan detail & form verifikasi via AJAX
         Route::put('/{prestasi}/process-verification-ajax', [PrestasiController::class, 'processVerificationAjaxAdmin'])->name('process_verification_ajax'); // Memproses verifikasi via AJAX
 

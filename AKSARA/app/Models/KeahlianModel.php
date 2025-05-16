@@ -2,46 +2,34 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class KeahlianModel extends Model
 {
-    use HasFactory;
-
     protected $table = 'keahlian';
     protected $primaryKey = 'keahlian_id';
+    public $timestamps = true;
 
-    const CREATED_AT = 'create_at';
-    const UPDATED_AT = 'update_at';
-
-    protected $fillable = [
-        'user_id',
-        'keahlian_nama',
-        'sertifikasi',
-    ];
-
-    public function user()
-    {
-        return $this->belongsTo(UserModel::class, 'user_id', 'user_id');
-    }
-
-    public function dosen()
-    {
-        return $this->hasMany(DosenModel::class, 'keahlian_id', 'keahlian_id');
-    }
-
-    public const PILIHAN_KEAHLIAN = [
-        'Web Development',
-        'Mobile Development',
-        'Data Science',
+    // Daftar pilihan keahlian yang tersedia (statis)
+    const PILIHAN_KEAHLIAN = [
+        'Pemrograman',
+        'Desain Grafis',
+        'Manajemen Proyek',
+        'Analisis Data',
+        'Jaringan Komputer',
+        'Kecerdasan Buatan',
+        'Keamanan Siber',
         'Machine Learning',
-        'Cyber Security',
-        'Cloud Computing',
-        'DevOps',
-        'UI/UX Design',
-        'Database Administration',
-        'Network Engineering'
-        // Tambahkan opsi lain jika ada
+        'UI/UX',
+        'Cloud Computing'
     ];
+
+    // Relasi many-to-many dengan User (melalui pivot keahlian_user)
+    public function users()
+    {
+        return $this->belongsToMany(UserModel::class, 'keahlian_user', 'keahlian_id', 'user_id')
+            ->withPivot('sertifikasi')
+            ->withTimestamps();
+    }
+
 }

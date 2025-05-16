@@ -13,18 +13,14 @@ class MinatModel extends Model
     protected $primaryKey = 'minat_id';
 
     protected $fillable = [
-        'user_id',
-        'minat',
+        'minat_nama',
     ];
 
-    public function user()
+    public function users()
     {
-        return $this->belongsTo(UserModel::class, 'user_id', 'user_id');
+        return $this->belongsToMany(UserModel::class, 'minat_user', 'minat_id', 'user_id')
+                    ->withTimestamps();
     }
-
-    protected $casts = [
-        'minat' => 'string',
-    ];
 
     public const PILIHAN_MINAT = [
         'Web Development',
@@ -37,6 +33,5 @@ class MinatModel extends Model
         'UI/UX Design',
         'Database Administration',
         'Network Engineering'
-        // Tambahkan opsi lain jika ada
     ];
 }
