@@ -628,8 +628,9 @@ class PrestasiController extends Controller
 
             $userId = Auth::id();
 
-            $dosen = \App\Models\DosenModel::where('user_id', $userId)->first();
-                if (!$dosen) return abort(403);
+            $dosen = DosenModel::where('user_id', $userId)->first();
+            if (!$dosen)
+                return abort(403);
 
             $data = PrestasiModel::with('mahasiswa.user', 'mahasiswa.prodi')
                 ->where('dosen_id', $dosen->dosen_id)
@@ -637,7 +638,7 @@ class PrestasiController extends Controller
                 ->orderByRaw("FIELD(status_verifikasi, 'pending', 'disetujui', 'ditolak')");
             // ->orderByRaw("FIELD(status_verifikasi, 'pending', 'disetujui', 'ditolak'), created_at DESC");
 
-            
+
 
             // Filter
             if ($request->filled('search_nama')) {
@@ -700,7 +701,7 @@ class PrestasiController extends Controller
         return view('prestasi.dosen.verify_ajax', compact('prestasi'));
     }
 
-    public function processVerificationAjaxDosen(Request $request, PrestasiModel $prestasi)
+    public function processVerificationAjaxDosen(Request $request, $prestasi_id)
     {
         $validator = Validator::make($request->all(), [
             'status_verifikasi' => ['required', Rule::in(['pending', 'disetujui', 'ditolak'])],
@@ -716,12 +717,10 @@ class PrestasiController extends Controller
         }
 
         try {
+            $prestasi = PrestasiModel::findOrFail($prestasi_id); // Ambil manual
             $prestasi->status_verifikasi = $request->status_verifikasi;
             $prestasi->catatan_verifikasi = $request->catatan_verifikasi;
-            // Laravel akan mengisi updated_at jika $timestamps = true di model
             $prestasi->save();
-
-            // TODO: Kirim Notifikasi ke Mahasiswa
 
             return response()->json(['status' => true, 'message' => 'Status verifikasi prestasi berhasil diperbarui.']);
         } catch (\Exception $e) {
@@ -732,4 +731,5 @@ class PrestasiController extends Controller
             ], 500);
         }
     }
+
 }

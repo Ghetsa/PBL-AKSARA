@@ -156,8 +156,8 @@ Route::middleware(['auth'])->group(function () { // artinya semua route di dalam
         Route::get('/create-ajax', [PrestasiController::class, 'createFormAjaxDosen'])->name('create_ajax'); // Menampilkan form tambah via AJAX
         Route::post('/store-ajax', [PrestasiController::class, 'storeAjaxDosen'])->name('store_ajax'); // Menyimpan prestasi via AJAX
 
-        Route::get('/{prestasi}/verify-form-ajax', [PrestasiController::class, 'showVerifyFormAjaxAdmin'])->name('verify_form_ajax'); // Menampilkan detail & form verifikasi via AJAX
-        Route::put('/{prestasi}/process-verification-ajax', [PrestasiController::class, 'processVerificationAjaxAdmin'])->name('process_verification_ajax'); // Memproses verifikasi via AJAX
+        Route::get('/{prestasi}/verify-form-ajax', [PrestasiController::class, 'showVerifyFormAjaxDosen'])->name('verify_form_ajax'); // Menampilkan detail & form verifikasi via AJAX
+        Route::put('/{prestasi}/process-verification-ajax', [PrestasiController::class, 'processVerificationAjaxDosen'])->name('process_verification_ajax');
 
         // Jika ada fitur edit/hapus oleh mahasiswa via AJAX nantinya:
         // Route::get('/{prestasi}/edit-ajax', [PrestasiController::class, 'editFormAjaxMahasiswa'])->name('edit_ajax');
