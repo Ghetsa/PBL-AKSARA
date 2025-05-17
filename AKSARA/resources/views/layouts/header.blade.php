@@ -213,7 +213,10 @@
           </div>
         </li>
         @php
-      $role = Auth::user()->role;
+      $user = Auth::user();
+      $role = $user->role;
+      $avatar = '';
+
       if ($user->foto && Storage::disk('public')->exists($user->foto)) {
         $avatar = asset('storage/' . $user->foto);
       } else {
@@ -234,11 +237,12 @@
         }
       }
     @endphp
+
         <li class="dropdown pc-h-item header-user-profile">
           <a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#" role="button"
             aria-haspopup="false" data-bs-auto-close="outside" aria-expanded="false">
             <img src="{{ $avatar }}" alt="user-image" class="user-avtar rounded-circle img-fluid"
-                    style="width: 30px; height: 30px; object-fit: cover;"> {{-- GANTI DI SINI --}}
+              style="width: 30px; height: 30px; object-fit: cover;"> {{-- GANTI DI SINI --}}
             <span>{{ Auth::user()->nama }}</span>
           </a>
 

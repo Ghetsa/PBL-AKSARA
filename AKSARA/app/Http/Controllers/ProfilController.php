@@ -185,7 +185,6 @@ class ProfilController extends Controller
         // --- Handle minat ---
         $selectedMinatIds = $request->input('minat_id', []);
         $user->minat()->sync($selectedMinatIds);
-
             // --- Handle Pengalaman ---
             $user->pengalaman()->delete();
 
