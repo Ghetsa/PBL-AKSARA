@@ -99,7 +99,7 @@ class ProfilController extends Controller
 
                 // keahlian sebagai array keahlian_id
                 'keahlian_id' => 'nullable|array',
-                'keahlian_id.*' => ['integer', Rule::exists('m_keahlian', 'keahlian_id')],
+                'keahlian_id.*' => ['integer', Rule::exists('keahlian', 'keahlian_id')],
 
                 // sertifikasi keahlian optional, array dengan key keahlian_nama
                 'keahlian_items' => 'nullable|array',
@@ -156,38 +156,35 @@ class ProfilController extends Controller
                 $user->dosen->update($request->only(['gelar', 'no_hp']));
             }
 
-            // --- Handle Keahlian ---
-            $selectedKeahlianIds = $request->input('keahlian_id', []);
-            $keahlianSyncData = [];
+            // --- Handle keahlian ---
+        $selectedKeahlianIds = $request->input('keahlian_id', []);
+        $keahlianSyncData = [];
 
-            foreach ($selectedKeahlianIds as $keahlianId) {
-                $keahlian = KeahlianModel::find($keahlianId);
-                if (!$keahlian)
-                    continue;
+        foreach ($selectedKeahlianIds as $keahlianId) {
+            $keahlian = \App\Models\KeahlianModel::find($keahlianId);
+            if (!$keahlian) continue;
 
-                // Cek file sertifikasi yang terkait keahlian ini (berdasarkan keahlian_nama)
-                $keahlianSlug = Str::slug($keahlian->keahlian_nama, '_');
-                $sertifikasiPath = null;
+            $keahlianSlug = Str::slug($keahlian->keahlian_nama, '_');
+            $sertifikasiPath = null;
 
-                if ($request->hasFile('sertifikasi_file') && isset($request->file('sertifikasi_file')[$keahlianSlug])) {
-                    $file = $request->file('sertifikasi_file')[$keahlianSlug];
-                    if ($file->isValid()) {
-                        $sertifikasiPath = $file->store("sertifikasi_keahlian/{$user->user_id}", 'public');
-                    }
-                } else {
-                    // Jika tidak upload file baru, ambil dari pivot lama (jika ada)
-                    $pivot = $user->keahlian->firstWhere('keahlian_id', $keahlianId)?->pivot;
-                    $sertifikasiPath = $pivot?->sertifikasi;
+            if ($request->hasFile('sertifikasi_file') && isset($request->file('sertifikasi_file')[$keahlianSlug])) {
+                $file = $request->file('sertifikasi_file')[$keahlianSlug];
+                if ($file->isValid()) {
+                    $sertifikasiPath = $file->store("sertifikasi_keahlian/{$user->user_id}", 'public');
                 }
-
-                $keahlianSyncData[$keahlianId] = ['sertifikasi' => $sertifikasiPath];
+            } else {
+                $pivot = $user->keahlian->firstWhere('keahlian_id', $keahlianId)?->pivot;
+                $sertifikasiPath = $pivot?->sertifikasi;
             }
 
-            $user->keahlian()->sync($keahlianSyncData);
+            $keahlianSyncData[$keahlianId] = ['sertifikasi' => $sertifikasiPath];
+        }
 
-            // --- Handle Minat ---
-            $selectedMinat = $request->input('minat_pilihan', []);
-            $user->minat()->sync($selectedMinat);
+        $user->keahlian()->sync($keahlianSyncData);
+
+        // --- Handle minat ---
+        $selectedMinatIds = $request->input('minat_id', []);
+        $user->minat()->sync($selectedMinatIds);
 
             // --- Handle Pengalaman ---
             $user->pengalaman()->delete();
