@@ -22,26 +22,26 @@ class MinatModel extends Model
             ->withTimestamps();
     }
 
-    public const PILIHAN_MINAT = [
-        'Pemrograman',
-        'Desain Grafis',
-        'Manajemen Proyek',
-        'Analisis Data',
-        'Jaringan Komputer',
-        'Kecerdasan Buatan',
-        'Keamanan Siber',
-        'Machine Learning',
-        'UI/UX',
-        'Cloud Computing',
-        'Fotografi',
-        'Desain Grafis',
-        'Musik',
-        'Sepak Bola / Futsal',
-        'E-Sports',
-        'Bulu Tangkis',
-        'Kategori Kewirausahaan',
-        'Startup Teknologi',
-        'Business Plan',
-        'Digital Marketing',
-    ];
+    // public const PILIHAN_MINAT = [
+    //     'Pemrograman',
+    //     'Desain Grafis',
+    //     'Manajemen Proyek',
+    //     'Analisis Data',
+    //     'Jaringan Komputer',
+    //     'Kecerdasan Buatan',
+    //     'Keamanan Siber',
+    //     'Machine Learning',
+    //     'UI/UX',
+    //     'Cloud Computing',
+    //     'Fotografi',
+    //     'Desain Grafis',
+    //     'Musik',
+    //     'Sepak Bola / Futsal',
+    //     'E-Sports',
+    //     'Bulu Tangkis',
+    //     'Kategori Kewirausahaan',
+    //     'Startup Teknologi',
+    //     'Business Plan',
+    //     'Digital Marketing',
+    // ];
 }

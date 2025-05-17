@@ -1,8 +1,7 @@
 {{-- profil/edit.blade.php --}}
 <div class="modal-dialog modal-xl">
     <div class="modal-content">
-        <form id="formUpdateProfile" method="POST" action="{{ route('profile.update_ajax') }}"
-            enctype="multipart/form-data">
+        <form id="formUpdateProfile" method="POST" action="{{ route('profile.update_ajax') }}" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
@@ -10,7 +9,7 @@
                 <h5 class="modal-title">Perbarui Profil</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+            <div class="modal-body" style="max-height: 75vh; overflow-y: auto;">
 
                 {{-- Bagian Info Dasar --}}
                 <div id="section-dasar">
@@ -19,396 +18,116 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group mb-3">
-                                <label for="nama" class="form-label">Nama Lengkap <span
-                                        class="text-danger">*</span></label>
-                                <input type="text" name="nama" id="nama" class="form-control"
-                                    value="{{ old('nama', $user->nama) }}" required>
+                                <label for="edit_nama" class="form-label">Nama Lengkap <span class="text-danger">*</span></label>
+                                <input type="text" name="nama" id="edit_nama" class="form-control" value="{{ old('nama', $user->nama) }}" required>
                                 <span class="invalid-feedback error-nama"></span>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group mb-3">
-                                <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
-                                <input type="email" name="email" id="email" class="form-control"
-                                    value="{{ old('email', $user->email) }}" required>
-                                <span class="invalid-feedback error-email"></span>
+                                <label for="edit_email" class="form-label">Email <span class="text-danger">*</span></label>
+                                <input type="email" name="email" id="edit_email" class="form-control" value="{{ old('email', $user->email) }}" required>
+                                 <span class="invalid-feedback error-email"></span>
                             </div>
                         </div>
                     </div>
                     <div class="form-group mb-3">
-                        <label for="foto" class="form-label">Foto Profil</label>
-                        <input type="file" name="foto" id="foto" class="form-control">
-                        @if($user->foto)
-                            <small class="form-text text-muted">Foto saat ini:
-                                <a href="{{ Storage::url($user->foto) }}" target="_blank">lihat foto</a>.
-                                Kosongkan jika tidak ingin mengubah.
+                        <label for="edit_foto" class="form-label">Foto Profil</label>
+                        <input type="file" name="foto" id="edit_foto" class="form-control">
+                        @if($user->foto && Storage::disk('public')->exists($user->foto))
+                            <small class="form-text text-muted mt-1">
+                                Foto saat ini: <a href="{{ Storage::url($user->foto) }}" target="_blank">lihat foto</a>.
+                                <br>Kosongkan jika tidak ingin mengubah.
                             </small>
+                        @elseif($user->foto)
+                             <small class="form-text text-danger mt-1">File foto profil sebelumnya tidak ditemukan.</small>
                         @endif
                         <span class="invalid-feedback error-foto"></span>
                     </div>
-                    {{-- Tambahkan field lain untuk Dosen jika perlu diedit di sini --}}
-                    @if ($user->role === 'dosen' && $user->dosen)
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="gelar" class="form-label">Gelar</label>
-                                    <input type="text" name="gelar" id="gelar" class="form-control"
-                                        value="{{ old('gelar', $user->dosen->gelar ?? '') }}">
-                                    <span class="invalid-feedback error-gelar"></span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="no_hp" class="form-label">No. HP</label>
-                                    <input type="text" name="no_hp" id="no_hp" class="form-control"
-                                        value="{{ old('no_hp', $user->dosen->no_hp ?? '') }}">
-                                    <span class="invalid-feedback error-no_hp"></span>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
                 </div>
                 <hr class="my-4">
 
                 {{-- Bagian Keahlian --}}
                 @if ($user->role === 'dosen' || $user->role === 'mahasiswa')
-    <div id="section-keahlian" class="mt-4">
-        <h5><i class="ti ti-star me-2"></i>Keahlian</h5>
-        <p class="text-muted">Pilih keahlian yang Anda kuasai dan unggah file sertifikasi jika ada.</p>
-        <hr class="mt-1 mb-3">
-        <div class="row">
-            @foreach ($allKeahlianOptions as $keahlianOption)
-                @php
-                    $keahlianRecord = \App\Models\KeahlianModel::where('keahlian_nama', $keahlianOption)->first();
-                    $keahlianId = $keahlianRecord ? $keahlianRecord->keahlian_id : null;
-                    $isChecked = $user->keahlian->contains('keahlian_id', $keahlianId);
-                    $keahlianSlug = \Illuminate\Support\Str::slug($keahlianOption, '_');
-                    $sertifikasiPath = $isChecked
-                        ? $user->keahlian->firstWhere('keahlian_id', $keahlianId)->pivot->sertifikasi
-                        : null;
-                @endphp
-
-                @if($keahlianId)
-                    <div class="col-md-6 mb-3">
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="checkbox" name="keahlian_id[]"
-                                value="{{ $keahlianId }}" id="keahlian_{{ $keahlianSlug }}" {{ $isChecked ? 'checked' : '' }}>
-                            <label class="form-check-label" for="keahlian_{{ $keahlianSlug }}">
-                                {{ $keahlianOption }}
-                            </label>
-                        </div>
-                        <div class="ms-4">
-                            <label for="sertifikasi_file_{{ $keahlianSlug }}" class="form-label visually-hidden sr-only">
-                                Sertifikat untuk {{ $keahlianOption }}
-                            </label>
-                            <input type="file" class="form-control form-control-sm"
-                                name="sertifikasi_file[{{ $keahlianSlug }}]"
-                                id="sertifikasi_file_{{ $keahlianSlug }}">
-                            @if ($sertifikasiPath && Storage::disk('public')->exists($sertifikasiPath))
-                                <small class="form-text text-muted d-block mt-1">
-                                    Sertifikat ada: <a href="{{ Storage::url($sertifikasiPath) }}" target="_blank">Lihat</a>
-                                </small>
-                            @endif
-                            <span class="invalid-feedback error-sertifikasi_file.{{ $keahlianOption }}"></span>
-                        </div>
-                    </div>
-                @endif
-            @endforeach
-        </div>
-    </div>
-    <hr class="my-4">
-@endif
-
-{{-- Bagian Minat --}}
-@if ($user->role === 'dosen' || $user->role === 'mahasiswa')
-    <div id="section-minat" class="mt-4">
-        <h5><i class="ti ti-heart me-2"></i>Minat</h5>
-        <p class="text-muted">Pilih bidang yang Anda minati.</p>
-        <hr class="mt-1 mb-3">
-        <div class="row">
-            @foreach ($allMinatOptions as $minatOption)
-                @php
-                    $minatRecord = \App\Models\MinatModel::where('minat_nama', $minatOption)->first();
-                    $minatId = $minatRecord ? $minatRecord->minat_id : null;
-                    $isChecked = $user->minat->contains('minat_id', $minatId);
-                    $minatSlug = \Illuminate\Support\Str::slug($minatOption, '_');
-                @endphp
-
-                @if($minatId)
-                    <div class="col-md-6 mb-2">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="minat_id[]"
-                                value="{{ $minatId }}" id="minat_{{ $minatSlug }}" {{ $isChecked ? 'checked' : '' }}>
-                            <label class="form-check-label" for="minat_{{ $minatSlug }}">
-                                {{ $minatOption }}
-                            </label>
-                        </div>
-                    </div>
-                @endif
-            @endforeach
-        </div>
-    </div>
-    <hr class="my-4">
-@endif
-
-                @if ($user->role === 'mahasiswa')
-                        <div id="section-pengalaman" class="mt-4">
-                            <h5><i class="ti ti-briefcase me-2"></i>Pengalaman</h5>
-                            <hr class="mt-1 mb-3">
-                            <div id="pengalaman-fields-container">
-                                @forelse ($selectedPengalaman as $index => $pengalaman)
-                                        <div class="pengalaman-item border rounded p-3 mb-3">
-                                            <div class="d-flex justify-content-end">
-                                                <button type="button" class="btn btn-sm btn-danger remove-item-btn mb-2">Hapus
-                                                    Pengalaman Ini</button>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-6 mb-2">
-                                                    <label class="form-label">Nama Pengalaman/Posisi</label>
-                                                    <input type="text" name="pengalaman_items[{{ $index }}][pengalaman_nama]"
-                                                        class="form-control" value="{{ $pengalaman->pengalaman_nama }}">
-                                                </div>
-                                                <div class="col-md-6 mb-2">
-                                                    <label class="form-label">Kategori</label>
-                                                    <select name="pengalaman_items[0][pengalaman_kategori]" class="form-control">
-                                                        <option value="">-- Pilih Kategori --</option>
-                                                        <option value="Workshop">Workshop</option>
-                                                        <option value="Magang">Magang</option>
-                                                        <option value="Proyek">Proyek</option>
-                                                    </select>
-                                                </div>
-                                            </div>
+                <div id="section-keahlian" class="mt-3">
+                    <h5><i class="ti ti-star me-2"></i>Keahlian</h5>
+                    <p class="text-muted small">Pilih keahlian Anda. Unggah file sertifikasi (PDF, JPG, PNG maks 2MB) untuk diverifikasi. Mengunggah file baru akan mengirim ulang untuk verifikasi.</p>
+                    <hr class="mt-1 mb-3">
+                    <div class="row">
+                        @foreach ($allKeahlianOptions as $keahlian)
+                            @php
+                                $userKeahlianInfo = $userKeahlian->get($keahlian->keahlian_id); // Menggunakan keahlian_id sebagai key
+                                $isChecked = $userKeahlianInfo !== null;
+                                $sertifikasiPath = $isChecked ? $userKeahlianInfo['sertifikasi'] : null;
+                                $sertifikasiUrl = $isChecked ? $userKeahlianInfo['sertifikasi_url'] : null;
+                                $statusVerifikasi = $isChecked ? $userKeahlianInfo['status_verifikasi'] : null;
+                                $catatanVerifikasi = $isChecked ? $userKeahlianInfo['catatan_verifikasi'] : null;
+                                $inputIdSlug = Str::slug($keahlian->keahlian_nama); // Untuk ID HTML unik
+                            @endphp
+                            <div class="col-md-6 mb-3">
+                                <div class="card">
+                                    <div class="card-body p-3">
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" name="keahlian_id[]" value="{{ $keahlian->keahlian_id }}" id="keahlian_{{ $inputIdSlug }}" {{ $isChecked ? 'checked' : '' }}>
+                                            <label class="form-check-label fw-bold" for="keahlian_{{ $inputIdSlug }}">
+                                                {{ $keahlian->keahlian_nama }}
+                                            </label>
                                         </div>
-                                    </div>
-                                @empty
-                                <div class="pengalaman-item border rounded p-3 mb-3">
-                                    <div class="row">
-                                        <div class="col-md-6 mb-2"><label class="form-label">Nama Pengalaman</label><input
-                                                type="text" name="pengalaman_items[0][pengalaman_nama]" class="form-control"></div>
-                                        <div class="col-md-6 mb-2">
-                                            <label class="form-label">Kategori</label>
-                                            <select name="pengalaman_items[0][pengalaman_kategori]" class="form-control">
-                                                <option value="">-- Pilih Kategori --</option>
-                                                <option value="Workshop">Workshop</option>
-                                                <option value="Magang">Magang</option>
-                                                <option value="Proyek">Proyek</option>
-                                            </select>
+                                        <div class="ms-1">
+                                            <label for="sertifikasi_file_{{ $keahlian->keahlian_id }}" class="form-label small mb-1 @if(!$isChecked) d-none @endif keahlian-file-input-label">File Sertifikasi:</label>
+                                            <input type="file" class="form-control form-control-sm @if(!$isChecked) d-none @endif keahlian-file-input" name="sertifikasi_file[{{ $keahlian->keahlian_id }}]" id="sertifikasi_file_{{ $keahlian->keahlian_id }}" accept=".pdf,.jpg,.jpeg,.png">
+                                            <span class="invalid-feedback error-sertifikasi_file.{{ $keahlian->keahlian_id }}"></span>
+
+                                            @if ($sertifikasiPath)
+                                                <small class="form-text text-muted d-block mt-1">
+                                                    File saat ini: <a href="{{ $sertifikasiUrl }}" target="_blank">Lihat</a>
+                                                    <br>Status:
+                                                    @if($statusVerifikasi == 'disetujui') <span class="badge bg-success">Disetujui</span>
+                                                    @elseif($statusVerifikasi == 'ditolak') <span class="badge bg-danger">Ditolak</span>
+                                                        @if($catatanVerifikasi) <em class="d-block text-danger small fst-italic">Catatan: {{ $catatanVerifikasi }}</em> @endif
+                                                    @else <span class="badge bg-warning text-dark">Pending</span>
+                                                    @endif
+                                                </small>
+                                            @elseif($isChecked)
+                                                <small class="form-text text-muted d-block mt-1">Unggah sertifikat jika ada.</small>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
-                            @endforelse
-                        </div>
-                        <button type="button" id="add-pengalaman-btn" class="btn btn-sm btn-outline-primary mt-2">Tambah
-                            Pengalaman</button>
+                            </div>
+                        @endforeach
                     </div>
-                    <hr class="my-4">
+                </div>
+                <hr class="my-4">
                 @endif
 
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
-    </div>
-    </form>
-</div>
-</div>
-
-<script>
-    $(document).ready(function () {
-        // Hapus script lama untuk tambah/hapus dinamis keahlian dan minat jika sudah tidak relevan
-        // $('#add-keahlian-btn').off('click'); // Hapus listener lama jika ada
-        // $('#add-minat-btn').off('click');
-
-        // --- Handle Pengalaman (jika masih menggunakan dynamic input) ---
-        let pengalamanNextIndex = {{ $selectedPengalaman->count() > 0 ? $selectedPengalaman->count() : 1 }};
-        if (pengalamanNextIndex === 1 && "{{$selectedPengalaman->count()}}" === "0") {
-            $('#pengalaman-fields-container .pengalaman-item:first-child input').val('');
-            $('#pengalaman-fields-container .pengalaman-item:first-child .remove-item-btn').hide();
-        } else {
-            $('#pengalaman-fields-container .pengalaman-item .remove-item-btn').show();
-        }
-
-
-        $('#add-pengalaman-btn').click(function () {
-            const newIndex = $('#pengalaman-fields-container .pengalaman-item').length;
-            const newItemHtml = `
-            <div class="pengalaman-item border rounded p-3 mb-3">
-                <div class="d-flex justify-content-end">
-                    <button type="button" class="btn btn-sm btn-danger remove-item-btn mb-2">Hapus Pengalaman Ini</button>
-                </div>
-                <div class="row">
-                    <div class="col-md-6 mb-2">
-                        <label class="form-label">Nama Pengalaman/Posisi</label>
-                        <input type="text" name="pengalaman_items[${newIndex}][pengalaman_nama]" class="form-control">
-                    </div>
-                    <div class="col-md-6 mb-2">
-                        <label class="form-label">Kategori</label>
-                        <input type="text" name="pengalaman_items[${newIndex}][pengalaman_kategori]" class="form-control" placeholder="Mis: Pekerjaan, Magang, Proyek, Organisasi">
-                    </div>
-                </div>
-            </div>`;
-            $('#pengalaman-fields-container').append(newItemHtml);
-            $('#pengalaman-fields-container .pengalaman-item .remove-item-btn').show(); // Pastikan tombol hapus selalu terlihat untuk item baru
-        });
-
-        $('body').on('click', '#pengalaman-fields-container .remove-item-btn', function () {
-            $(this).closest('.pengalaman-item').remove();
-            if ($('#pengalaman-fields-container .pengalaman-item').length === 0) {
-                $('#add-pengalaman-btn').click(); // Tambah lagi jika semua dihapus
-            }
-            if ($('#pengalaman-fields-container .pengalaman-item').length === 1) {
-                $('#pengalaman-fields-container .pengalaman-item:first-child .remove-item-btn').hide();
-            }
-        });
-
-
-        // Handle form submission
-        $('#formUpdateProfile').on('submit', function (e) {
-            e.preventDefault();
-            const form = this;
-            const fd = new FormData(form);
-            fd.append('_method', 'PUT');
-
-            const btn = $(form).find('button[type="submit"]');
-            const orig = btn.html();
-            btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Menyimpan…');
-
-            $.ajax({
-                url: $(form).attr('action'),
-                type: 'POST',
-                data: fd,
-                processData: false,
-                contentType: false,
-                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
-                success(resp) {
-                    if (resp.success) {
-                        toastr.success(resp.message);
-                        $('#updateProfileModal').modal('hide');
-                        setTimeout(() => location.reload(), 800);
-                    } else {
-                        toastr.error(resp.message);
-                    }
-                },
-                error(xhr) {
-                    if (xhr.status === 422) {
-                        const errs = xhr.responseJSON.errors;
-                        for (let field in errs) {
-                            const msg = errs[field][0];
-                            const inp = $('[name="' + field + '"]');
-                            inp.addClass('is-invalid');
-                            inp.closest('.mb-3').find('.invalid-feedback').text(msg);
-                        }
-                    } else {
-                        toastr.error('Server error: ' + xhr.status);
-                    }
-                },
-                complete() {
-                    btn.prop('disabled', false).html(orig);
-                }
-            });
-        });
-</script>
-
-{{-- <div class="modal-dialog modal-xl">
-    <div class="modal-content">
-        <form id="formUpdateProfile" method="POST" action="{{ route('profile.update_ajax') }}"
-            enctype="multipart/form-data">
-            @csrf
-            @method('PUT')
-
-            <div class="modal-header">
-                <h5 class="modal-title">Perbarui Profil</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
-
-                <div id="section-dasar">
-                    <h5><i class="ti ti-id me-2"></i>Info Dasar</h5>
+                {{-- Bagian Minat --}}
+                @if ($user->role === 'dosen' || $user->role === 'mahasiswa')
+                <div id="section-minat" class="mt-3">
+                    <h5><i class="ti ti-heart me-2"></i>Minat</h5>
+                    <p class="text-muted small">Pilih bidang yang Anda minati.</p>
                     <hr class="mt-1 mb-3">
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group mb-3">
-                                <label for="nama" class="form-label">Nama Lengkap</label>
-                                <input type="text" name="nama" id="nama" class="form-control" value="{{ $user->nama }}"
-                                    required>
+                        @foreach ($allMinatOptions as $minat)
+                            @php
+                                $inputIdSlug = Str::slug($minat->minat_nama);
+                            @endphp
+                        <div class="col-md-6 col-lg-4 mb-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="minat_id[]" value="{{ $minat->minat_id }}" id="minat_{{ $inputIdSlug }}" {{ in_array($minat->minat_id, $userMinatIds) ? 'checked' : '' }}>
+                                <label class="form-check-label" for="minat_{{ $inputIdSlug }}">
+                                    {{ $minat->minat_nama }}
+                                </label>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group mb-3">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="email" name="email" id="email" class="form-control"
-                                    value="{{ $user->email }}" required>
-                            </div>
-                        </div>
+                        @endforeach
                     </div>
-                    <div class="form-group mb-3">
-                        <label for="foto" class="form-label">Foto Profil</label>
-                        <input type="file" name="foto" id="foto" class="form-control">
-                        @if($user->foto)
-                        <small class="form-text text-muted">Foto saat ini: <a href="{{ Storage::url($user->foto) }}"
-                                target="_blank">lihat foto</a>. Kosongkan jika tidak ingin mengubah.</small>
-                        @endif
-                    </div>
-                </div>
-                <hr class="my-4">
-
-
-                @if ($user->role === 'dosen' || $user->role === 'mahasiswa')
-                <div id="section-keahlian" class="mt-4">
-                    <h5><i class="ti ti-star me-2"></i>Keahlian</h5>
-                    <hr class="mt-1 mb-3">
-                    <div id="keahlian-fields-container">
-                        @forelse ($selectedKeahlian as $index => $keahlian)
-                        <div class="row keahlian-item mb-2 align-items-center">
-                            <div class="col-md-5">
-                                <input type="text" name="keahlian_items[{{ $index }}][nama]" class="form-control"
-                                    placeholder="Nama Keahlian (mis: Pemrograman Python)"
-                                    value="{{ $keahlian->keahlian_nama }}">
-                            </div>
-                            <div class="col-md-5">
-                                <input type="text" name="keahlian_items[{{ $index }}][sertifikasi]" class="form-control"
-                                    placeholder="Sertifikasi (Opsional)" value="{{ $keahlian->sertifikasi }}">
-                            </div>
-                            <div class="col-md-2">
-                                <button type="button" class="btn btn-sm btn-danger remove-item-btn">Hapus</button>
-                            </div>
-                        </div>
-                        @empty
-                        <div class="row keahlian-item mb-2 align-items-center">
-                            <div class="col-md-5">
-                                <input type="text" name="keahlian_items[0][nama]" class="form-control"
-                                    placeholder="Nama Keahlian (mis: Pemrograman Python)">
-                            </div>
-                            <div class="col-md-5">
-                                <input type="text" name="keahlian_items[0][sertifikasi]" class="form-control"
-                                    placeholder="Sertifikasi (Opsional)">
-                            </div>
-                            <div class="col-md-2"></div>
-                        </div>
-                        @endforelse
-
-                        <!-- Pilihan Keahlian -->
-                        <div class="form-group mt-3">
-                            <label>Keahlian</label>
-                            <select name="keahlian_id[]" class="form-control" multiple>
-                                @foreach ($keahlianList as $keahlian)
-                                <option value="{{ $keahlian->keahlian_id }}" {{ in_array($keahlian->keahlian_id,
-                                    $selectedKeahlianIds ?? []) ? 'selected' : '' }}>
-                                    {{ $keahlian->keahlian_nama }}
-                                </option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <button type="button" id="add-keahlian-btn" class="btn btn-sm btn-outline-primary mt-2">Tambah
-                        Keahlian</button>
                 </div>
                 <hr class="my-4">
                 @endif
 
-
                 @if ($user->role === 'mahasiswa')
-                <div id="section-pengalaman" class="mt-4">
+                <div id="section-pengalaman" class="mt-3">
                     <h5><i class="ti ti-briefcase me-2"></i>Pengalaman</h5>
                     <hr class="mt-1 mb-3">
                     <div id="pengalaman-fields-container">
@@ -455,37 +174,6 @@
                 <hr class="my-4">
                 @endif
 
-
-                @if ($user->role === 'dosen' || $user->role === 'mahasiswa')
-                <div id="section-minat" class="mt-4">
-                    <h5><i class="ti ti-heart me-2"></i>Minat</h5>
-                    <hr class="mt-1 mb-3">
-                    <div id="minat-fields-container">
-                        @forelse ($selectedMinat as $index => $minat)
-                        <div class="row minat-item mb-2 align-items-center">
-                            <div class="col-md-10">
-                                <input type="text" name="minat_items[]" class="form-control" placeholder="Nama Minat"
-                                    value="{{ $minat->nama_minat }}">
-                            </div>
-                            <div class="col-md-2">
-                                <button type="button" class="btn btn-sm btn-danger remove-item-btn">Hapus</button>
-                            </div>
-                        </div>
-                        @empty
-                        <div class="row minat-item mb-2 align-items-center">
-                            <div class="col-md-10">
-                                <input type="text" name="minat_items[]" class="form-control" placeholder="Nama Minat">
-                            </div>
-                            <div class="col-md-2"></div>
-                        </div>
-                        @endforelse
-                    </div>
-                    <button type="button" id="add-minat-btn" class="btn btn-sm btn-outline-primary mt-2">Tambah
-                        Minat</button>
-                </div>
-                <hr class="my-4">
-                @endif
-
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
@@ -496,191 +184,168 @@
 </div>
 
 <script>
-        $(document).ready(function () {
-            // ... (JavaScript Anda untuk add/remove item tetap sama) ...
-            // --- Keahlian ---
-            let keahlianIndex = {{ $selectedKeahlian-> count() > 0 ? $selectedKeahlian -> count() : 1
-        }};
-    if (keahlianIndex === 1 && "{{$selectedKeahlian->count()}}" === "0") { // Jika tidak ada data, dan index masih 1, kita bersihkan field awal
-        $('#keahlian-fields-container .keahlian-item:first-child input').val('');
-    }
-    $('#add-keahlian-btn').click(function () {
-        let newIndex = $('#keahlian-fields-container .keahlian-item').length; // Dapatkan index baru berdasarkan jumlah item yang ada
-        $('#keahlian-fields-container').append(`
-            <div class="row keahlian-item mb-2 align-items-center">
-                <div class="col-md-5">
-                    <input type="text" name="keahlian_items[${newIndex}][nama]" class="form-control" placeholder="Nama Keahlian">
-                </div>
-                <div class="col-md-5">
-                    <input type="text" name="keahlian_items[${newIndex}][sertifikasi]" class="form-control" placeholder="Sertifikasi (Opsional)">
-                </div>
-                <div class="col-md-2">
-                    <button type="button" class="btn btn-sm btn-danger remove-item-btn">Hapus</button>
-                </div>
-            </div>
-        `);
-        // keahlianIndex++; // Tidak perlu increment global lagi jika index diambil dari length
-        updateRemoveButtons('#keahlian-fields-container .keahlian-item', '#add-keahlian-btn');
-    });
+$(document).ready(function() {
+    // Toggle visibility of file input based on checkbox state
+      $('input[name="keahlian_id[]"]').each(function() {
+        var $checkbox = $(this);
+        var keahlianId = $checkbox.val(); // Ini adalah keahlian_id dari value checkbox
+        
+        // Target kontainer spesifik untuk input file dan labelnya
+        var $fileInputSection = $('#sertifikasi_file_' + keahlianId).closest('.ms-1');
+        var $fileInputLabel = $fileInputSection.find('.keahlian-file-input-label');
+        var $fileInput = $fileInputSection.find('.keahlian-file-input');
 
-    // --- Minat ---
-    if ("{{$selectedMinat->count()}}" === "0") {
-        $('#minat-fields-container .minat-item:first-child input').val('');
-    }
-    $('#add-minat-btn').click(function () {
-        let newIndex = $('#minat-fields-container .minat-item').length;
-        $('#minat-fields-container').append(`
-            <div class="row minat-item mb-2 align-items-center">
-                <div class="col-md-10">
-                    <input type="text" name="minat_items[]" class="form-control" placeholder="Nama Minat">
-                </div>
-                <div class="col-md-2">
-                    <button type="button" class="btn btn-sm btn-danger remove-item-btn">Hapus</button>
-                </div>
-            </div>
-        `);
-        updateRemoveButtons('#minat-fields-container .minat-item', '#add-minat-btn');
-    });
-
-    // --- Pengalaman ---
-    let pengalamanIndex = {{ $selectedPengalaman-> count() > 0 ? $selectedPengalaman -> count() : 0 }}; // Mulai dari 0 jika kosong
-    if (pengalamanIndex === 0) {
-        // Jika tidak ada pengalaman, kita bisa membersihkan field default atau membiarkannya untuk input baru
-        $('#pengalaman-fields-container .pengalaman-item:first-child input, #pengalaman-fields-container .pengalaman-item:first-child textarea').val('');
-        $('#pengalaman-fields-container .pengalaman-item:first-child .masih-bekerja-checkbox').prop('checked', false).trigger('change');
-        $('#pengalaman-fields-container .pengalaman-item:first-child .remove-item-btn').hide(); // Sembunyikan tombol hapus jika hanya 1 (template)
-    }
-
-    $('#add-pengalaman-btn').click(function () {
-        pengalamanIndex = $('#pengalaman-fields-container .pengalaman-item').length;
-        const newItemHtml = `
-            <div class="pengalaman-item border rounded p-3 mb-3">
-                <div class="d-flex justify-content-end"> <button type="button" class="btn btn-sm btn-danger remove-item-btn mb-2">Hapus Pengalaman Ini</button> </div>
-                <div class="row">
-                    <div class="col-md-6 mb-2"><label class="form-label">Nama Pengalaman</label><input type="text" name="pengalaman_items[${pengalamanIndex}][pengalaman_nama]" class="form-control"></div>
-                    <div class="col-md-6 mb-2"><label class="form-label">Kategori</label><input type="text" name="pengalaman_items[${pengalamanIndex}][pengalaman_kategori]" placeholder="Mis: Pekerjaan, Magang, Proyek" class="form-control"></div>
-                </div>
-            </div>`;
-        $('#pengalaman-fields-container').append(newItemHtml);
-        // pengalamanIndex++; // Tidak perlu jika index diambil dari length
-        // Untuk pengalaman, tombol remove selalu ada per item block, jadi tidak perlu updateRemoveButtons secara khusus untuk menyembunyikan.
-    });
-
-    // Fungsi umum untuk menghapus item
-    $('body').on('click', '.remove-item-btn', function () {
-        $(this).closest('.keahlian-item, .minat-item, .pengalaman-item, .prestasi-item').remove();
-        // Panggil updateRemoveButtons jika diperlukan untuk item yang hanya punya 1 tombol hapus jika > 1
-        updateRemoveButtons('#keahlian-fields-container .keahlian-item', '#add-keahlian-btn');
-        updateRemoveButtons('#minat-fields-container .minat-item', '#add-minat-btn');
-        // Untuk pengalaman dan prestasi, tombol hapus ada di setiap item block, jadi tidak perlu logic khusus updateRemoveButtons
-        // Namun, jika semua item dihapus, template kosong awal mungkin perlu ditambahkan kembali
-        if ($('#pengalaman-fields-container .pengalaman-item').length === 0) {
-            $('#add-pengalaman-btn').click(); // Tambahkan satu template kosong
-            $('#pengalaman-fields-container .pengalaman-item:first-child .remove-item-btn').hide();
-        }
-        if ($('#prestasi-fields-container .prestasi-item').length === 0 && "{{$user->role}}" === "mahasiswa") {
-            $('#add-prestasi-btn').click(); // Tambahkan satu template kosong
-            $('#prestasi-fields-container .prestasi-item:first-child .remove-item-btn').hide();
-        }
-
-    });
-
-    // Fungsi untuk disable/enable tanggal selesai
-    $('body').on('change', '.masih-bekerja-checkbox', function () {
-        const $tanggalSelesaiInput = $(this).closest('.row').find('.tanggal-selesai-input');
-        if ($(this).is(':checked')) {
-            $tanggalSelesaiInput.prop('disabled', true).val('');
+        // Initial state handling
+        if ($checkbox.is(':checked')) {
+            $fileInputSection.show(); // Tampilkan kontainer
+            $fileInputLabel.removeClass('d-none'); // Hapus d-none dari label
+            $fileInput.removeClass('d-none');     // Hapus d-none dari input file
         } else {
-            $tanggalSelesaiInput.prop('disabled', false);
+            $fileInputSection.hide(); 
+            // Class d-none pada label dan input sudah diatur oleh Blade, jadi tidak perlu di-add lagi di sini
         }
+
+        $checkbox.on('change', function() {
+            if ($(this).is(':checked')) {
+                $fileInputLabel.removeClass('d-none'); 
+                $fileInput.removeClass('d-none');   
+                $fileInputSection.slideDown();
+            } else {
+                $fileInputSection.slideUp(function() {
+                    // $fileInputLabel.addClass('d-none');
+                    // $fileInput.addClass('d-none');
+                });
+                $('#sertifikasi_file_' + keahlianId).val(''); // Kosongkan input file jika tidak jadi dipilih
+            }
+        });
     });
-    // Inisialisasi untuk item yang sudah ada
-    $('.masih-bekerja-checkbox').each(function () {
-        $(this).trigger('change');
+
+    function updatePengalamanRemoveButtons() {
+        const itemCount = $('#pengalaman-fields-container .pengalaman-item').length;
+        if (itemCount <= 1 && !(itemCount === 1 && $('#pengalaman-fields-container .pengalaman-item:first-child input[name$="[pengalaman_nama]"]').val() === '')) {
+            if (!(itemCount === 1 && $('#pengalaman-fields-container .pengalaman-item:first-child input[name$="[pengalaman_nama]"]').val() === '')) {
+                 $('#pengalaman-fields-container .pengalaman-item:first-child .remove-item-btn').hide();
+            } else if (itemCount === 1) { // Jika hanya 1 item dan itu template kosong
+                 $('#pengalaman-fields-container .pengalaman-item:first-child .remove-item-btn').hide();
+            }
+        } else if (itemCount > 1) {
+            $('#pengalaman-fields-container .pengalaman-item .remove-item-btn').show();
+        }
+         if (itemCount === 0) {
+            $('#add-pengalaman-btn').click();
+        }
+    }
+
+    if ($('#add-pengalaman-btn').length > 0) { // Pastikan tombol ada sebelum menambahkan listener
+        $('#add-pengalaman-btn').click(function() {
+            const newIndex = Date.now(); // Timestamp untuk index unik sementara
+            const newItemHtml = `
+                <div class="pengalaman-item border rounded p-3 mb-3">
+                    <div class="d-flex justify-content-end">
+                        <button type="button" class="btn btn-sm btn-outline-danger remove-item-btn mb-2"><i class="ti ti-trash"></i></button>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label">Nama Pengalaman/Posisi <span class="text-danger">*</span></label>
+                            <input type="text" name="pengalaman_items[${newIndex}][pengalaman_nama]" class="form-control">
+                            <span class="invalid-feedback error-pengalaman_items_${newIndex}_pengalaman_nama"></span>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label">Kategori</label>
+                            <select name="pengalaman_items[${newIndex}][pengalaman_kategori]" class="form-control">
+                                <option value="">-- Pilih Kategori --</option>
+                                <option value="Workshop">Workshop</option>
+                                <option value="Magang">Magang</option>
+                                <option value="Proyek">Proyek</option>
+                                <option value="Organisasi">Organisasi</option>
+                                <option value="Pekerjaan">Pekerjaan</option>
+                            </select>
+                            <span class="invalid-feedback error-pengalaman_items_${newIndex}_pengalaman_kategori"></span>
+                        </div>
+                    </div>
+                </div>`;
+            $('#pengalaman-fields-container').append(newItemHtml);
+            updatePengalamanRemoveButtons();
+        });
+    }
+
+
+    $('body').on('click', '#pengalaman-fields-container .remove-item-btn', function() {
+        $(this).closest('.pengalaman-item').remove();
+        updatePengalamanRemoveButtons();
     });
+    updatePengalamanRemoveButtons();
 
-
-    // Fungsi untuk memastikan tombol hapus hanya muncul jika ada lebih dari 1 item (untuk Keahlian & Minat)
-    // atau untuk menyembunyikan tombol hapus pada item template jika hanya itu yang ada.
-    function updateRemoveButtons(itemSelector, addButtonSelector) {
-        const $items = $(itemSelector);
-        if ($items.length <= 1) {
-            // Jika hanya satu item (bisa jadi template awal yang kosong atau satu data), sembunyikan tombol hapusnya.
-            $items.first().find('.remove-item-btn').hide();
-        } else {
-            $items.find('.remove-item-btn').show();
-        }
-        // Jika tidak ada item sama sekali, dan itu adalah kontainer keahlian/minat, tambahkan template awal
-        if ($items.length === 0) {
-            if (addButtonSelector) $(addButtonSelector).click();
-        }
-    }
-
-    // Panggil updateRemoveButtons saat modal pertama kali dimuat untuk state awal
-    updateRemoveButtons('#keahlian-fields-container .keahlian-item', '#add-keahlian-btn');
-    updateRemoveButtons('#minat-fields-container .minat-item', '#add-minat-btn');
-    // Untuk pengalaman dan prestasi, jika tidak ada data, pastikan template awal tidak memiliki tombol hapus
-    if ($('#pengalaman-fields-container .pengalaman-item').length <= 1 && "{{$selectedPengalaman->count()}}" === "0") {
-        $('#pengalaman-fields-container .pengalaman-item:first-child .remove-item-btn').hide();
-    }
-    if ("{{$user->role}}" === "mahasiswa" && $('#prestasi-fields-container .prestasi-item').length <= 1 && "{{$selectedPrestasi->count()}}" === "0") {
-        $('#prestasi-fields-container .prestasi-item:first-child .remove-item-btn').hide();
-    }
-
-
-    // Handle form submission (tetap sama)
-    $('#formUpdateProfile').submit(function (e) {
+    // Handle form submission
+    $('#formUpdateProfile').on('submit', function(e) {
         e.preventDefault();
         let formData = new FormData(this);
-        // Tambahkan _method karena FormData tidak secara native mengirim PUT/PATCH
-        formData.append('_method', 'PUT');
+        // _method PUT sudah ada di form
 
         const submitButton = $(this).find('button[type="submit"]');
         const originalButtonText = submitButton.html();
         submitButton.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Menyimpan...');
-
+        $('.invalid-feedback').text('');
+        $('.form-control, .form-select, .form-check-input').removeClass('is-invalid');
 
         $.ajax({
             url: $(this).attr('action'),
-            method: "POST", // Selalu POST untuk FormData dengan _method
+            method: "POST",
             data: formData,
             processData: false,
             contentType: false,
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            success: function (response) {
-                if (response.success) {
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            success: function(response) {
+                if(response.success){
                     toastr.success(response.message || 'Profil berhasil diperbarui!');
                     $('#updateProfileModal').modal('hide');
                     setTimeout(() => { location.reload(); }, 1500);
                 } else {
-                    toastr.error(response.message || 'Terjadi kesalahan.');
-                    if (response.errors) {
-                        let errorMsg = '<strong>Kesalahan Validasi:</strong><br>';
-                        $.each(response.errors, function (key, value) {
-                            errorMsg += `&bull; ${value.join('<br>&bull; ')}<br>`;
+                    toastr.error(response.message || 'Terjadi kesalahan. Periksa kembali isian Anda.');
+                    if(response.errors){
+                        $.each(response.errors, function(key, value){
+                            let sanitizedKey = key.replace(/\./g, '_').replace(/\[/g, '_').replace(/\]/g, '');
+                            let errorSpan = $('.error-' + sanitizedKey);
+                            let inputElement = $('[name="'+key+'"]').length ? $('[name="'+key+'"]') : $(`[name^="${key.split('.')[0]}"][name*="[${key.split('.')[1]}]"]`); // Handle array inputs
+
+                            if(inputElement.length) {
+                                inputElement.addClass('is-invalid');
+                                if (errorSpan.length) {
+                                    errorSpan.text(value[0]).show();
+                                } else {
+                                     inputElement.closest('.form-group, .mb-2, .mb-3, .ms-1').find('.invalid-feedback').first().text(value[0]).show();
+                                     if(!inputElement.closest('.form-group, .mb-2, .mb-3, .ms-1').find('.invalid-feedback').first().length){
+                                         inputElement.after('<span class="invalid-feedback d-block error-'+sanitizedKey+'">' + value[0] + '</span>');
+                                     }
+                                }
+                            } else {
+                                console.warn('Input element for error key not found:', key);
+                                 $('#formUpdateProfile').find('.modal-body').prepend('<div class="alert alert-danger alert-dismissible fade show" role="alert">Error pada field ' + key + ': ' + value[0] + '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>');
+                            }
                         });
-                        // Tampilkan pesan error yang lebih detail
-                        toastr.error(errorMsg, 'Validasi Gagal', { timeOut: 7000, extendedTimeOut: 3000, escapeHtml: false });
-                        console.warn("Validation errors:", response.errors);
                     }
                 }
             },
-            error: function (jqXHR, textStatus, errorThrown) {
-                let errorMessage = 'Gagal memperbarui profil. Coba lagi nanti.';
+            error: function(jqXHR, textStatus, errorThrown) {
+                 let errorMessage = 'Gagal memperbarui profil.';
                 if (jqXHR.responseJSON) {
                     errorMessage = jqXHR.responseJSON.message || errorMessage;
-                    if (jqXHR.responseJSON.errors) {
-                        $.each(jqXHR.responseJSON.errors, function (key, value) {
-                            errorMessage += '<br>&bull; ' + value.join('<br>&bull; ');
+                    if(jqXHR.responseJSON.errors){
+                        let errorDetails = '<br><ul>';
+                         $.each(jqXHR.responseJSON.errors, function(key, value){
+                            errorDetails += `<li>${value.join(', ')}</li>`;
                         });
+                        errorDetails += '</ul>';
+                        errorMessage += errorDetails;
                     }
+                } else if (jqXHR.status === 0) {
+                    errorMessage = 'Tidak dapat terhubung ke server. Periksa koneksi internet Anda.';
+                } else {
+                    errorMessage = `Error ${jqXHR.status}: ${jqXHR.statusText || 'Kesalahan Tidak Diketahui'}`;
                 }
-                toastr.error(errorMessage, 'Error ' + jqXHR.status, { timeOut: 7000, extendedTimeOut: 3000, escapeHtml: false });
-                console.error("AJAX Error:", textStatus, errorThrown, jqXHR.responseText);
+                toastr.error(errorMessage, 'Error', {timeOut: 10000, extendedTimeOut: 3000, escapeHtml: false, positionClass: 'toast-top-full-width'});
             },
-            complete: function () {
+            complete: function(){
                 submitButton.prop('disabled', false).html(originalButtonText);
             }
         });
