@@ -53,21 +53,33 @@ class UserModel extends Authenticatable implements JWTSubject
     {
         return $this->hasOne(MahasiswaModel::class, 'user_id', 'user_id');
     }
-    // Dalam UserModel
+    // public function keahlian()
+    // {
+    //     return $this->belongsToMany(KeahlianModel::class, 'keahlian_user', 'user_id', 'keahlian_id')
+    //         ->withPivot('sertifikasi')
+    //         ->withTimestamps();
+    // }
+
+    // public function minat()
+    // {
+    //     return $this->belongsToMany(MinatModel::class, 'minat_user', 'user_id', 'minat_id')
+    //         ->withTimestamps();
+    // }
+
+    // Relasi untuk Keahlian (Many-to-Many)
     public function keahlian()
     {
         return $this->belongsToMany(KeahlianModel::class, 'keahlian_user', 'user_id', 'keahlian_id')
-            ->withPivot('sertifikasi')
+            ->withPivot('keahlian_user_id', 'sertifikasi', 'status_verifikasi', 'catatan_verifikasi')
             ->withTimestamps();
     }
 
+    // Relasi untuk Minat (Many-to-Many)
     public function minat()
     {
         return $this->belongsToMany(MinatModel::class, 'minat_user', 'user_id', 'minat_id')
             ->withTimestamps();
     }
-
-
 
     public function pengalaman()
     {
