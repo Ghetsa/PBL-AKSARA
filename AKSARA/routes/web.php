@@ -141,15 +141,22 @@ Route::middleware(['auth'])->group(function () { // artinya semua route di dalam
 
 
     });
-    Route::middleware(['role:mahasiswa'])->prefix('mahasiswa/keahlianuser')->name('mahasiswa.')->group(function () {
-        // KEAHLIAN MAHASISWA
-        Route::get('/', [KeahlianUserController::class, 'index'])->name('keahlianuser.index');
-        Route::get('/list', [KeahlianUserController::class, 'listData'])->name('keahlianuser.list');
-        Route::get('/create', [KeahlianUserController::class, 'create'])->name('keahlianuser.create');
-        Route::post('/', [KeahlianUserController::class, 'store'])->name('keahlianuser.store');
-        Route::get('/{id}/edit', [KeahlianUserController::class, 'edit'])->name('keahlianuser.edit');
-        Route::put('/{id}', [KeahlianUserController::class, 'update'])->name('keahlianuser.update');
+    Route::middleware(['role:mahasiswa'])->prefix('mahasiswa')->name('mahasiswa.')->group(function () {
+    Route::prefix('keahlianuser')->name('keahlianuser.')->group(function () {
+        Route::get('/', [KeahlianUserController::class, 'index'])->name('index');
+        Route::get('/list', [KeahlianUserController::class, 'listData'])->name('list');
+        Route::get('/create', [KeahlianUserController::class, 'create'])->name('create');
+        Route::post('/', [KeahlianUserController::class, 'store'])->name('store');
+        // Route::get('/{id}/edit', [KeahlianUserController::class, 'edit'])->name('edit');
+        // Route::put('/{id}', [KeahlianUserController::class, 'update'])->name('update');
+
+        // Jika pakai modal ajax
+        Route::get('/{id}/show_ajax', [KeahlianUserController::class, 'showAjax'])->name('show_ajax');
+        // Route::get('/{id}/edit_ajax', [KeahlianUserController::class, 'editAjax'])->name('edit_ajax');
+        // Route::put('/{id}/update_ajax', [KeahlianUserController::class, 'updateAjax'])->name('update_ajax');
     });
+});
+
 
 
 

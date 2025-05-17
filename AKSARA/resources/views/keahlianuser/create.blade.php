@@ -1,16 +1,16 @@
-@extends('layouts.app')
+@extends('layouts.template')
 
 @section('content')
 <h4>Tambah Keahlian</h4>
 
-<form action="{{ route('keahlianuser.store') }}" method="POST">
+<form action="{{ route('mahasiswa.keahlianuser.store') }}" method="POST">
     @csrf
     <div class="mb-3">
         <label>Keahlian</label>
         <select name="keahlian_id" class="form-control" required>
             <option value="">-- Pilih Keahlian --</option>
             @foreach ($keahlians as $k)
-                <option value="{{ $k->keahlian_id }}">{{ $k->nama ?? $k->nama_keahlian ?? 'Unknown' }}</option>
+                <option value="{{ $k->keahlian_id }}">{{ $k->keahlian_nama ?? 'Unknown' }}</option>
             @endforeach
         </select>
     </div>
