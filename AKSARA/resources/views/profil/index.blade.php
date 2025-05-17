@@ -162,7 +162,7 @@
                                                 <div class="card-body">
                                                     @foreach($user->minat as $m)
                                                         <span
-                                                            class="badge bg-light text-dark me-1 mb-1 p-2 fs-6">{{ $m->nama_minat ?? $m->minat }}</span>
+                                                            class="badge bg-light text-dark me-1 mb-1 p-2 fs-6">{{ $m->minat_nama ?? $m->minat }}</span>
                                                     @endforeach
                                                 </div>
                                             @else

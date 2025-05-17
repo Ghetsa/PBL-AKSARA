@@ -11,28 +11,11 @@ class KeahlianModel extends Model
     public $timestamps = true;
 
     // Daftar pilihan keahlian yang tersedia (statis)
-    const PILIHAN_KEAHLIAN = [
-        'Pemrograman',
-        'Desain Grafis',
-        'Manajemen Proyek',
-        'Analisis Data',
-        'Jaringan Komputer',
-        'Kecerdasan Buatan',
-        'Keamanan Siber',
-        'Machine Learning',
-        'UI/UX',
-        'Cloud Computing',
-        'Fotografi',
-        'Desain Grafis',
-        'Musik',
-        'Sepak Bola / Futsal',
-        'E-Sports',
-        'Bulu Tangkis',
-        'Kategori Kewirausahaan',
-        'Startup Teknologi',
-        'Business Plan',
-        'Digital Marketing',
-    ];
+    public static function getPilihanKeahlian()
+    {
+        return self::orderBy('keahlian_nama')->pluck('keahlian_nama')->toArray();
+    }
+
 
     // Relasi many-to-many dengan User (melalui pivot keahlian_user)
     public function users()
