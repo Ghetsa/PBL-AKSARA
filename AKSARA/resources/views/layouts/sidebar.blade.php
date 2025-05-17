@@ -149,6 +149,16 @@
                         <span class="pc-mtext">Upload Prestasi</span>
                     </a>
                 </li>
+                <li class="pc-item pc-caption">
+                    <label>Keahlian</label>
+                    <i class="ti ti-brand-chrome"></i>
+                </li>
+                <li class="pc-item">
+                    <a href="{{ url('mahasiswa/keahlianuser') }}" class="pc-link {{ ($activeMenu == 'keahlian') ? 'active' : '' }}">
+                        <span class="pc-micon"><i class="ti ti-trophy"></i></span>
+                        <span class="pc-mtext">Upload Keahlian</span>
+                    </a>
+                </li>
                 {{-- <li class="pc-item">
                     <a href="{{ url('mahasiswa/prestasi/create_ajax') }}" class="pc-link {{ ($activeMenu == 'laporan') ? 'active' : '' }}">
                         <span class="pc-micon"><i class="ti ti-report-analytics"></i></span>

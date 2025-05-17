@@ -137,7 +137,21 @@ Route::middleware(['auth'])->group(function () { // artinya semua route di dalam
         Route::put('/profil/update-ajax', [ProfilController::class, 'update_ajax'])->name('profil.update_ajax');
         Route::get('/{prestasi}/confirm-delete-ajax', [PrestasiController::class, 'confirmDeleteAjaxMahasiswa'])->name('confirm_delete_ajax');
         Route::delete('/{prestasi}/destroy-ajax', [PrestasiController::class, 'destroyAjaxMahasiswa'])->name('destroy_ajax');
+
+
+
     });
+    Route::middleware(['role:mahasiswa'])->prefix('mahasiswa/keahlianuser')->name('prestasi.mahasiswa.')->group(function () {
+        // KEAHLIAN MAHASISWA
+        Route::get('/', [KeahlianUserController::class, 'index'])->name('keahlianuser.index');
+        Route::get('/list', [KeahlianUserController::class, 'listData'])->name('keahlianuser.list');
+        Route::get('/create', [KeahlianUserController::class, 'create'])->name('keahlianuser.create');
+        Route::post('/', [KeahlianUserController::class, 'store'])->name('keahlianuser.store');
+        Route::get('/{id}/edit', [KeahlianUserController::class, 'edit'])->name('keahlianuser.edit');
+        Route::put('/{id}', [KeahlianUserController::class, 'update'])->name('keahlianuser.update');
+    });
+
+
 
     // === RUTE UNTUK ADMIN ===
     Route::middleware(['role:admin'])->prefix('admin/prestasi-verifikasi')->name('prestasi.admin.')->group(function () {
@@ -167,16 +181,7 @@ Route::middleware(['auth'])->group(function () { // artinya semua route di dalam
         // Route::delete('/{prestasi}/destroy-ajax', [PrestasiController::class, 'destroyAjaxMahasiswa'])->name('destroy_ajax');
     });
 
-    Route::middleware('auth')->group(function () {
-        Route::get('/keahlianuser', [KeahlianUserController::class, 'index'])->name('keahlianuser.index');
-        Route::get('/keahlianuser/list', [KeahlianUserController::class, 'listData'])->name('keahlianuser.list');
-
-        Route::get('/keahlianuser/create', [KeahlianUserController::class, 'create'])->name('keahlianuser.create');
-        Route::post('/keahlianuser', [KeahlianUserController::class, 'store'])->name('keahlianuser.store');
-
-        Route::get('/keahlianuser/{id}/edit', [KeahlianUserController::class, 'edit'])->name('keahlianuser.edit');
-        Route::put('/keahlianuser/{id}', [KeahlianUserController::class, 'update'])->name('keahlianuser.update');
-
+    Route::middleware(['role:admin'])->group(function () {
         Route::get('/keahlianuser/{id}/verify', [KeahlianUserController::class, 'verifyForm'])->name('keahlianuser.verify_form');
         Route::post('/keahlianuser/{id}/verify', [KeahlianUserController::class, 'processVerify'])->name('keahlianuser.process_verify');
     });

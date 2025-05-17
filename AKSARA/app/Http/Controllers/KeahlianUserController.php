@@ -20,8 +20,8 @@ class KeahlianUserController extends Controller
             'title' => 'Manajemen Keahlian User',
             'list' => ['Dashboard', 'Keahlian User']
         ];
-
-        return view('keahlianuser.index', compact('breadcrumb'));
+        $activeMenu = 'keahlian';
+        return view('keahlianuser.index', compact('breadcrumb', 'activeMenu'));
     }
 
     // Data untuk datatables ajax (admin)
@@ -33,13 +33,13 @@ class KeahlianUserController extends Controller
 
             return DataTables::of($data)
                 ->addIndexColumn()
-                ->addColumn('nama_user', fn($row) => $row->user->name ?? '-')
+                ->addColumn('nama_user', fn($row) => $row->user->nama ?? '-')
                 ->addColumn('keahlian', fn($row) => $row->keahlian->nama ?? '-')
                 ->editColumn('sertifikasi', fn($row) => $row->sertifikasi ?? '-')
                 ->editColumn('status_verifikasi', fn($row) => $row->status_verifikasi ?? 'pending')
                 ->addColumn('aksi', function ($row) {
-                    $btn = '<a href="'.route('keahlianuser.edit', $row->keahlian_user_id).'" class="btn btn-warning btn-sm me-1">Edit</a>';
-                    $btn .= '<a href="'.route('keahlianuser.verify_form', $row->keahlian_user_id).'" class="btn btn-info btn-sm">Verifikasi</a>';
+                    $btn = '<a href="' . route('keahlianuser.edit', $row->keahlian_user_id) . '" class="btn btn-warning btn-sm me-1">Edit</a>';
+                    $btn .= '<a href="' . route('keahlianuser.verify_form', $row->keahlian_user_id) . '" class="btn btn-info btn-sm">Verifikasi</a>';
                     return $btn;
                 })
                 ->rawColumns(['aksi'])
