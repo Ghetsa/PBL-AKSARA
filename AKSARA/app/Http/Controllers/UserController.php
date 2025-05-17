@@ -327,10 +327,11 @@ class UserController extends Controller
         }
 
         $roles = ['admin', 'dosen', 'mahasiswa'];
+        $keahlian = KeahlianModel::all();
         $prodi = ProdiModel::select('prodi_id', 'kode', 'nama')->get();
         $periode = PeriodeModel::select('periode_id', 'semester', 'tahun_akademik')->get();
 
-        return view('user.edit_ajax', compact('user', 'roles', 'prodi', 'periode'));
+        return view('user.edit_ajax', compact('user', 'roles', 'prodi', 'periode', 'keahlian'));
     }
 
     public function update_ajax(Request $request, $user_id)
@@ -343,11 +344,6 @@ class UserController extends Controller
         if (!$user) {
             return response()->json(['status' => false, 'message' => 'User tidak ditemukan.'], 404);
         }
-
-        $adminId = $user->admin->admin_id ?? null;
-        $dosenId = $user->dosen->dosen_id ?? null;
-        $mahasiswaId = $user->mahasiswa->mahasiswa_id ?? null;
-
 
         $baseRules = [
             'nama' => 'required|string|max:255',
@@ -363,24 +359,22 @@ class UserController extends Controller
 
         // Aturan validasi tambahan berdasarkan role
         $roleRules = [];
-        
 
-            if ($request->role === 'admin') {
-        $roleRules = [
-            'nip' => ['required', 'string', 'max:50', Rule::unique('admin', 'nip')->ignore($adminId, 'admin_id')],
+        if ($request->role === 'admin') {
+            $roleRules = [
+                'nip' => ['required', 'string', 'max:50', Rule::unique('admin', 'nip')->ignore($user->admin->admin_id ?? null, 'admin_id')],
             ];
         } elseif ($request->role === 'dosen') {
             $roleRules = [
-                'nip' => ['required', 'string', 'max:50', Rule::unique('dosen', 'nip')->ignore($dosenId, 'dosen_id')],
+                'nip' => ['required', 'string', 'max:50', Rule::unique('dosen', 'nip')->ignore($user->dosen->dosen_id ?? null, 'dosen_id')],
             ];
         } elseif ($request->role === 'mahasiswa') {
             $roleRules = [
-                'nim' => ['required', 'string', 'max:50', Rule::unique('mahasiswa', 'nim')->ignore($mahasiswaId, 'mahasiswa_id')],
+                'nim' => ['required', 'string', 'max:50', Rule::unique('mahasiswa', 'nim')->ignore($user->mahasiswa->mahasiswa_id ?? null, 'mahasiswa_id')],
                 'prodi_id' => 'required|exists:program_studi,prodi_id',
                 'periode_id' => 'required|exists:periode,periode_id'
             ];
         }
-
 
 
         $validator = Validator::make($request->all(), array_merge($baseRules, $roleRules));
@@ -405,17 +399,6 @@ class UserController extends Controller
                 $userData['password'] = Hash::make($request->password);
             }
             $user->update($userData);
-            if ($request->role == 'admin') {
-                AdminModel::updateOrCreate(
-                    ['user_id' => $user->user_id],
-                    ['nip' => $request->nip]
-                );
-
-                if ($user->dosen)
-                    $user->dosen->delete();
-                if ($user->mahasiswa)
-                    $user->mahasiswa->delete();
-                }
 
             if ($request->role == 'dosen') {
                 DosenModel::updateOrCreate(

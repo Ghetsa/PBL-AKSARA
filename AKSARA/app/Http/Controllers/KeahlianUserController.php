@@ -54,18 +54,19 @@ class KeahlianUserController extends Controller
 }
 
     // Form tambah (user)
-    public function create()
+ public function create()
 {
     $keahlians = KeahlianModel::all();
 
-    $breadcrumb = (object) [
-        'title' => 'Tambah Keahlian',
-        'list' => ['Dashboard', 'Keahlian Saya', 'Tambah']
-    ];
-    $activeMenu = 'keahlian';
+    // Jika request AJAX, kirim partial/modal saja
+    if (request()->ajax()) {
+        return view('keahlianuser.modal_create', compact('keahlians'));
+    }
 
-    return view('keahlianuser.create', compact('keahlians', 'breadcrumb', 'activeMenu'));
+    // Kalau bukan AJAX, fallback (opsional)
+    return abort(404);
 }
+
 
 public function store(Request $request)
 {
