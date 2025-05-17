@@ -141,7 +141,7 @@ Route::middleware(['auth'])->group(function () { // artinya semua route di dalam
 
 
     });
-    Route::middleware(['role:mahasiswa'])->prefix('mahasiswa/keahlianuser')->name('prestasi.mahasiswa.')->group(function () {
+    Route::middleware(['role:mahasiswa'])->prefix('mahasiswa/keahlianuser')->name('mahasiswa.')->group(function () {
         // KEAHLIAN MAHASISWA
         Route::get('/', [KeahlianUserController::class, 'index'])->name('keahlianuser.index');
         Route::get('/list', [KeahlianUserController::class, 'listData'])->name('keahlianuser.list');
@@ -182,7 +182,9 @@ Route::middleware(['auth'])->group(function () { // artinya semua route di dalam
     });
 
     Route::middleware(['role:admin'])->group(function () {
-        Route::get('/keahlianuser/{id}/verify', [KeahlianUserController::class, 'verifyForm'])->name('keahlianuser.verify_form');
+        Route::get('/', [KeahlianUserController::class, 'index'])->name('keahlianuser.index');
+        Route::get('/list', [KeahlianUserController::class, 'listData'])->name('keahlianuser.list');
+        Route::get('/create', [KeahlianUserController::class, 'create'])->name('keahlianuser.create');Route::get('/keahlianuser/{id}/verify', [KeahlianUserController::class, 'verifyForm'])->name('keahlianuser.verify_form');
         Route::post('/keahlianuser/{id}/verify', [KeahlianUserController::class, 'processVerify'])->name('keahlianuser.process_verify');
     });
 
