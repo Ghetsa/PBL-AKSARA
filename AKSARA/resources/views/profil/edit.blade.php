@@ -72,76 +72,84 @@
 
                 {{-- Bagian Keahlian --}}
                 @if ($user->role === 'dosen' || $user->role === 'mahasiswa')
-                    <div id="section-keahlian" class="mt-4">
-                        <h5><i class="ti ti-star me-2"></i>Keahlian</h5>
-                        <p class="text-muted">Pilih keahlian yang Anda kuasai dan unggah file sertifikasi jika ada.</p>
-                        <hr class="mt-1 mb-3">
-                        <div class="row">
-                            @foreach ($allKeahlianOptions as $keahlianOption)
-                                @php
-                                    $keahlianSlug = Str::slug($keahlianOption, '_');
-                                    $isChecked = $selectedKeahlian->has($keahlianOption);
-                                    $sertifikasiPath = $isChecked ? $selectedKeahlian[$keahlianOption] : null;
-                                @endphp
-                                <div class="col-md-6 mb-3">
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" name="keahlian_pilihan[]"
-                                            value="{{ $keahlianOption }}" id="keahlian_{{ $keahlianSlug }}" {{ $isChecked ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="keahlian_{{ $keahlianSlug }}">
-                                            {{ $keahlianOption }}
-                                        </label>
-                                    </div>
-                                    <div class="ms-4"> {{-- Indentasi untuk input file --}}
-                                        <label for="sertifikasi_file_{{ $keahlianSlug }}"
-                                            class="form-labelvisually-hidden sr-only ">Sertifikat untuk
-                                            {{ $keahlianOption }}</label>
-                                        <input type="file" class="form-control form-control-sm"
-                                            name="sertifikasi_file[{{ $keahlianOption }}]"
-                                            id="sertifikasi_file_{{ $keahlianSlug }}">
-                                        @if ($sertifikasiPath && Storage::disk('public')->exists($sertifikasiPath))
-                                            <small class="form-text text-muted d-block mt-1">
-                                                Sertifikat ada: <a href="{{ Storage::url($sertifikasiPath) }}"
-                                                    target="_blank">Lihat</a>
-                                            </small>
-                                        @elseif($isChecked && $sertifikasiPath)
-                                            <small class="form-text text-danger d-block mt-1">
-                                                Sertifikat tidak ditemukan (Path: {{ $sertifikasiPath }})
-                                            </small>
-                                        @endif
-                                        <span class="invalid-feedback error-sertifikasi_file.{{ $keahlianOption }}"></span>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                    <hr class="my-4">
-                @endif
+    <div id="section-keahlian" class="mt-4">
+        <h5><i class="ti ti-star me-2"></i>Keahlian</h5>
+        <p class="text-muted">Pilih keahlian yang Anda kuasai dan unggah file sertifikasi jika ada.</p>
+        <hr class="mt-1 mb-3">
+        <div class="row">
+            @foreach ($allKeahlianOptions as $keahlianOption)
+                @php
+                    $keahlianRecord = \App\Models\KeahlianModel::where('keahlian_nama', $keahlianOption)->first();
+                    $keahlianId = $keahlianRecord ? $keahlianRecord->keahlian_id : null;
+                    $isChecked = $user->keahlian->contains('keahlian_id', $keahlianId);
+                    $keahlianSlug = \Illuminate\Support\Str::slug($keahlianOption, '_');
+                    $sertifikasiPath = $isChecked
+                        ? $user->keahlian->firstWhere('keahlian_id', $keahlianId)->pivot->sertifikasi
+                        : null;
+                @endphp
 
-                {{-- Bagian Minat --}}
-                @if ($user->role === 'dosen' || $user->role === 'mahasiswa')
-                    <div id="section-minat" class="mt-4">
-                        <h5><i class="ti ti-heart me-2"></i>Minat</h5>
-                        <p class="text-muted">Pilih bidang yang Anda minati.</p>
-                        <hr class="mt-1 mb-3">
-                        <div class="row">
-                            @foreach ($allMinatOptions as $minatOption)
-                                @php
-                                    $minatSlug = Str::slug($minatOption, '_');
-                                @endphp
-                                <div class="col-md-6 mb-2">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="minat_pilihan[]"
-                                            value="{{ $minatOption }}" id="minat_{{ $minatSlug }}" {{ in_array($minatOption, $selectedMinat) ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="minat_{{ $minatSlug }}">
-                                            {{ $minatOption }}
-                                        </label>
-                                    </div>
-                                </div>
-                            @endforeach
+                @if($keahlianId)
+                    <div class="col-md-6 mb-3">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="keahlian_id[]"
+                                value="{{ $keahlianId }}" id="keahlian_{{ $keahlianSlug }}" {{ $isChecked ? 'checked' : '' }}>
+                            <label class="form-check-label" for="keahlian_{{ $keahlianSlug }}">
+                                {{ $keahlianOption }}
+                            </label>
+                        </div>
+                        <div class="ms-4">
+                            <label for="sertifikasi_file_{{ $keahlianSlug }}" class="form-label visually-hidden sr-only">
+                                Sertifikat untuk {{ $keahlianOption }}
+                            </label>
+                            <input type="file" class="form-control form-control-sm"
+                                name="sertifikasi_file[{{ $keahlianSlug }}]"
+                                id="sertifikasi_file_{{ $keahlianSlug }}">
+                            @if ($sertifikasiPath && Storage::disk('public')->exists($sertifikasiPath))
+                                <small class="form-text text-muted d-block mt-1">
+                                    Sertifikat ada: <a href="{{ Storage::url($sertifikasiPath) }}" target="_blank">Lihat</a>
+                                </small>
+                            @endif
+                            <span class="invalid-feedback error-sertifikasi_file.{{ $keahlianOption }}"></span>
                         </div>
                     </div>
-                    <hr class="my-4">
                 @endif
+            @endforeach
+        </div>
+    </div>
+    <hr class="my-4">
+@endif
+
+{{-- Bagian Minat --}}
+@if ($user->role === 'dosen' || $user->role === 'mahasiswa')
+    <div id="section-minat" class="mt-4">
+        <h5><i class="ti ti-heart me-2"></i>Minat</h5>
+        <p class="text-muted">Pilih bidang yang Anda minati.</p>
+        <hr class="mt-1 mb-3">
+        <div class="row">
+            @foreach ($allMinatOptions as $minatOption)
+                @php
+                    $minatRecord = \App\Models\MinatModel::where('minat_nama', $minatOption)->first();
+                    $minatId = $minatRecord ? $minatRecord->minat_id : null;
+                    $isChecked = $user->minat->contains('minat_id', $minatId);
+                    $minatSlug = \Illuminate\Support\Str::slug($minatOption, '_');
+                @endphp
+
+                @if($minatId)
+                    <div class="col-md-6 mb-2">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="minat_id[]"
+                                value="{{ $minatId }}" id="minat_{{ $minatSlug }}" {{ $isChecked ? 'checked' : '' }}>
+                            <label class="form-check-label" for="minat_{{ $minatSlug }}">
+                                {{ $minatOption }}
+                            </label>
+                        </div>
+                    </div>
+                @endif
+            @endforeach
+        </div>
+    </div>
+    <hr class="my-4">
+@endif
 
                 @if ($user->role === 'mahasiswa')
                         <div id="section-pengalaman" class="mt-4">
