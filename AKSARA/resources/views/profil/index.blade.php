@@ -18,12 +18,10 @@
                                     <div class="card">
                                         <div class="card-body position-relative">
                                             @php
-                                                $avatar = '';
-
                                                 if ($user->foto && Storage::disk('public')->exists($user->foto)) {
-                                                    $avatar = Storage::url($user->foto);
+                                                    $avatar = asset('storage/' . $user->foto);
                                                 } else {
-                                                    // Avatar default
+                                                    // Avatar default berdasarkan role
                                                     switch ($user->role) {
                                                         case 'mahasiswa':
                                                             $avatar = asset('mantis/dist/assets/images/user/1.jpg');
@@ -43,7 +41,8 @@
                                             <div class="text-center mt-3">
                                                 <div class="chat-avtar d-inline-flex mx-auto">
                                                     <img src="{{ $avatar }}" alt="Foto Profil"
-                                                        class="rounded-circle img-fluid">
+                                                        class="rounded-circle img-fluid"
+                                                        style="width: 130px; height: 130px; object-fit: cover;">
                                                 </div>
                                                 <h4 class="mb-0 mt-2">{{ $user->nama }}</h4>
                                                 <p class="text-muted text-md">{{ ucfirst($user->role) }}</p>
