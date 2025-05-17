@@ -74,57 +74,84 @@ public function store(Request $request)
 
     $validated = $request->validate([
         'keahlian_id' => 'required|exists:keahlian,keahlian_id',
-        'sertifikasi' => 'nullable|string|max:255',
+        'sertifikasi' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048', // max 2MB
     ]);
 
-    $validated['user_id'] = $userId;
-    $validated['status_verifikasi'] = 'pending';
+    $data = [
+        'keahlian_id' => $validated['keahlian_id'],
+        'user_id' => $userId,
+        'status_verifikasi' => 'pending',
+    ];
 
-    KeahlianUserModel::create($validated);
+    // Kalau ada file sertifikasi, simpan dulu filenya
+    if ($request->hasFile('sertifikasi')) {
+        $file = $request->file('sertifikasi');
+        $path = $file->store('sertifikasi', 'public'); // simpan di storage/app/public/sertifikasi
+        $data['sertifikasi'] = $path; // simpan path file ke kolom sertifikasi di DB
+    }
+
+    KeahlianUserModel::create($data);
     
     return redirect()->route('mahasiswa.keahlianuser.index')
                      ->with('success', 'Keahlian berhasil ditambahkan dan menunggu verifikasi.');
-
 }
+
+
 
     // Form edit user
     public function edit($id)
-    {
-        $data = KeahlianUserModel::findOrFail($id);
-        $keahlians = KeahlianModel::all();
+{
+    $data = KeahlianUserModel::findOrFail($id);
+    $keahlians = KeahlianModel::all();
 
-        // Pastikan user yang edit adalah pemilik, kecuali admin
-        if (Auth::user()->role != 'admin' && $data->user_id != Auth::id()) {
-            abort(403);
-        }
-
-        return view('keahlianuser.edit', compact('data', 'keahlians'));
+    // Pastikan user yang edit adalah pemilik, kecuali admin
+    if (Auth::user()->role != 'admin' && $data->user_id != Auth::id()) {
+        abort(403);
     }
 
-    // Update user
-    public function update(Request $request, $id)
-    {
-        $data = KeahlianUserModel::findOrFail($id);
+    return view('keahlianuser.edit', compact('data', 'keahlians'));
+}
 
-        if (Auth::user()->role != 'admin' && $data->user_id != Auth::id()) {
-            abort(403);
-        }
+// Update user
+public function update(Request $request, $id)
+{
+    $data = KeahlianUserModel::findOrFail($id);
 
-        $validated = $request->validate([
-            'keahlian_id' => 'required|exists:keahlian,keahlian_id',
-            'sertifikasi' => 'nullable|string|max:255',
-        ]);
-
-        $data->update($validated);
-
-        // Saat user update, status verifikasi jadi pending lagi
-        if (Auth::user()->role != 'admin') {
-            $data->status_verifikasi = 'pending';
-            $data->save();
-        }
-
-        return redirect()->route('keahlianuser.index')->with('success', 'Keahlian berhasil diperbarui.');
+    if (Auth::user()->role != 'admin' && $data->user_id != Auth::id()) {
+        abort(403);
     }
+
+    // Validasi termasuk file upload untuk sertifikasi
+    $validated = $request->validate([
+        'keahlian_id' => 'required|exists:keahlian,keahlian_id',
+        'sertifikasi' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048', // max 2MB, sama seperti store
+    ]);
+
+    // Update field keahlian_id dulu
+    $data->keahlian_id = $validated['keahlian_id'];
+
+    // Handle upload file sertifikasi jika ada
+    if ($request->hasFile('sertifikasi')) {
+        // Hapus file lama jika ada (opsional, tapi recommended)
+        if ($filePath && Storage::disk('public')->exists($filePath)) {
+                Storage::disk('public')->delete($filePath);
+            }
+        $file = $request->file('sertifikasi');
+        $path = $file->store('sertifikasi', 'public');
+        $data->sertifikasi = $path;
+    }
+
+    // Simpan update
+    $data->save();
+
+    // Saat user update, status verifikasi jadi pending lagi kecuali admin
+    if (Auth::user()->role != 'admin') {
+        $data->status_verifikasi = 'pending';
+        $data->save();
+    }
+
+    return redirect()->route('mahasiswa.keahlianuser.index')->with('success', 'Keahlian berhasil diperbarui.');
+}
 
     // Form verifikasi admin
     public function verifyForm($id)
