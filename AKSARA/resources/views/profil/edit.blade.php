@@ -1,8 +1,7 @@
 {{-- profil/edit.blade.php --}}
 <div class="modal-dialog modal-xl">
     <div class="modal-content">
-        <form id="formUpdateProfile" method="POST" action="{{ route('profile.update_ajax') }}"
-            enctype="multipart/form-data">
+        <form id="formUpdateProfile" method="POST" action="{{ route('profile.update_ajax') }}" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
@@ -10,7 +9,7 @@
                 <h5 class="modal-title">Perbarui Profil</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+            <div class="modal-body" style="max-height: 75vh; overflow-y: auto;">
 
                 {{-- Bagian Info Dasar --}}
                 <div id="section-dasar">
@@ -19,30 +18,29 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group mb-3">
-                                <label for="nama" class="form-label">Nama Lengkap <span
-                                        class="text-danger">*</span></label>
-                                <input type="text" name="nama" id="nama" class="form-control"
-                                    value="{{ old('nama', $user->nama) }}" required>
+                                <label for="edit_nama" class="form-label">Nama Lengkap <span class="text-danger">*</span></label>
+                                <input type="text" name="nama" id="edit_nama" class="form-control" value="{{ old('nama', $user->nama) }}" required>
                                 <span class="invalid-feedback error-nama"></span>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group mb-3">
-                                <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
-                                <input type="email" name="email" id="email" class="form-control"
-                                    value="{{ old('email', $user->email) }}" required>
-                                <span class="invalid-feedback error-email"></span>
+                                <label for="edit_email" class="form-label">Email <span class="text-danger">*</span></label>
+                                <input type="email" name="email" id="edit_email" class="form-control" value="{{ old('email', $user->email) }}" required>
+                                 <span class="invalid-feedback error-email"></span>
                             </div>
                         </div>
                     </div>
                     <div class="form-group mb-3">
-                        <label for="foto" class="form-label">Foto Profil</label>
-                        <input type="file" name="foto" id="foto" class="form-control">
-                        @if($user->foto)
-                            <small class="form-text text-muted">Foto saat ini:
-                                <a href="{{ Storage::url($user->foto) }}" target="_blank">lihat foto</a>.
-                                Kosongkan jika tidak ingin mengubah.
+                        <label for="edit_foto" class="form-label">Foto Profil</label>
+                        <input type="file" name="foto" id="edit_foto" class="form-control">
+                        @if($user->foto && Storage::disk('public')->exists($user->foto))
+                            <small class="form-text text-muted mt-1">
+                                Foto saat ini: <a href="{{ Storage::url($user->foto) }}" target="_blank">lihat foto</a>.
+                                <br>Kosongkan jika tidak ingin mengubah.
                             </small>
+                        @elseif($user->foto)
+                             <small class="form-text text-danger mt-1">File foto profil sebelumnya tidak ditemukan.</small>
                         @endif
                         <span class="invalid-feedback error-foto"></span>
                     </div>
@@ -152,6 +150,13 @@
                     <hr class="my-4">
                 @endif
 
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+            </div>
+        </form>
+    </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>

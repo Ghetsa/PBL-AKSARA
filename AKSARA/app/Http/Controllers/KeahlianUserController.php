@@ -21,57 +21,71 @@ class KeahlianUserController extends Controller
             'list' => ['Dashboard', 'Keahlian User']
         ];
         $activeMenu = 'keahlian';
+
+
         return view('keahlianuser.index', compact('breadcrumb', 'activeMenu'));
+
+        
     }
 
     // Data untuk datatables ajax (admin)
     public function listData(Request $request)
-    {
-        if ($request->ajax()) {
-            $data = KeahlianUserModel::with('user', 'keahlian')
-                ->orderBy('created_at', 'desc');
+{
+    if ($request->ajax()) {
+        $data = KeahlianUserModel::with(['user', 'keahlian']) // relasi model
+            ->where('user_id', Auth::id()) // tampilkan hanya data milik user login
+            ->orderBy('created_at', 'desc');
 
-            return DataTables::of($data)
-                ->addIndexColumn()
-                ->addColumn('nama_user', fn($row) => $row->user->nama ?? '-')
-                ->addColumn('keahlian', fn($row) => $row->keahlian->nama ?? '-')
-                ->editColumn('sertifikasi', fn($row) => $row->sertifikasi ?? '-')
-                ->editColumn('status_verifikasi', fn($row) => $row->status_verifikasi ?? 'pending')
-                ->addColumn('aksi', function ($row) {
-                    $btn = '<a href="' . route('keahlianuser.edit', $row->keahlian_user_id) . '" class="btn btn-warning btn-sm me-1">Edit</a>';
-                    $btn .= '<a href="' . route('keahlianuser.verify_form', $row->keahlian_user_id) . '" class="btn btn-info btn-sm">Verifikasi</a>';
-                    return $btn;
-                })
-                ->rawColumns(['aksi'])
-                ->make(true);
-        }
-        return abort(403);
+        return DataTables::of($data)
+            ->addIndexColumn()
+            ->addColumn('nama_user', fn($row) => $row->user->name ?? '-') // pastikan field 'name' ada di tabel user
+            ->addColumn('keahlian', fn($row) => $row->keahlian->keahlian_nama ?? '-') // sesuai dengan nama kolom di tabel keahlian
+            ->editColumn('sertifikasi', fn($row) => $row->sertifikasi ?? '-')
+            ->editColumn('status_verifikasi', fn($row) => $row->status_verifikasi ?? 'pending')
+            ->addColumn('aksi', function ($row) {
+                $btn = '<button onclick="modalAction(\'' . route('mahasiswa.keahlianuser.edit_ajax', $row->keahlian_user_id) . '\', \'Edit Keahlian\')" class="btn btn-warning btn-sm me-1">Edit</button>';
+                $btn .= '<button class="btn btn-danger btn-sm btn-delete-keahlian" data-url="' . route('mahasiswa.keahlianuser.update_ajax', $row->keahlian_user_id) . '" data-nama="' . ($row->keahlian->keahlian_nama ?? '-') . '">Hapus</button>';
+                return $btn;
+            })
+            ->rawColumns(['aksi'])
+            ->make(true);
     }
+    return abort(403);
+}
 
     // Form tambah (user)
-    public function create()
-    {
-        $keahlians = KeahlianModel::all();
-        return view('keahlianuser.create', compact('keahlians'));
+ public function create()
+{
+    $keahlians = KeahlianModel::all();
+
+    // Jika request AJAX, kirim partial/modal saja
+    if (request()->ajax()) {
+        return view('keahlianuser.modal_create', compact('keahlians'));
     }
 
-    // Simpan data (user)
-    public function store(Request $request)
-    {
-        $userId = Auth::id();
+    // Kalau bukan AJAX, fallback (opsional)
+    return abort(404);
+}
 
-        $validated = $request->validate([
-            'keahlian_id' => 'required|exists:keahlian,keahlian_id',
-            'sertifikasi' => 'nullable|string|max:255',
-        ]);
 
-        $validated['user_id'] = $userId;
-        $validated['status_verifikasi'] = 'pending';
+public function store(Request $request)
+{
+    $userId = Auth::id();
 
-        KeahlianUserModel::create($validated);
+    $validated = $request->validate([
+        'keahlian_id' => 'required|exists:keahlian,keahlian_id',
+        'sertifikasi' => 'nullable|string|max:255',
+    ]);
 
-        return redirect()->route('keahlianuser.index')->with('success', 'Keahlian berhasil ditambahkan dan menunggu verifikasi.');
-    }
+    $validated['user_id'] = $userId;
+    $validated['status_verifikasi'] = 'pending';
+
+    KeahlianUserModel::create($validated);
+    
+    return redirect()->route('mahasiswa.keahlianuser.index')
+                     ->with('success', 'Keahlian berhasil ditambahkan dan menunggu verifikasi.');
+
+}
 
     // Form edit user
     public function edit($id)

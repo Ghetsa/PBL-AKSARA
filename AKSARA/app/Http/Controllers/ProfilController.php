@@ -4,48 +4,37 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\Rule;
 use App\Models\UserModel;
+use Illuminate\Support\Facades\Storage;
 use App\Models\MinatModel;
 use App\Models\KeahlianModel;
 use App\Models\PengalamanModel;
+// use App\Models\PrestasiModel;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Str;
 
 class ProfilController extends Controller
 {
     public function index()
     {
-        $activeMenu = "";
+        $activeMenu = "profil";
         $breadcrumb = (object) [
-            'title' => 'Profil pengguna',
-            'list' => ['Dashboard', 'Profil']
+            'title' => 'Profil Pengguna',
+            'list' => ['Dashboard', 'Profil Saya']
         ];
-
         $user = Auth::user();
+        $loadRelations = ['keahlian', 'minat', 'pengalaman']; // Relasi umum
 
         if ($user->role === 'admin') {
-            $user->load('admin');
+            $loadRelations[] = 'admin';
         } elseif ($user->role === 'dosen') {
-            $user->load([
-                'dosen',
-                'keahlian',
-                'pengalaman',
-                'minat'
-            ]);
+            $loadRelations[] = 'dosen';
         } elseif ($user->role === 'mahasiswa') {
-            $user->load([
-                'mahasiswa.prodi',
-                'mahasiswa.periode',
-                'keahlian',
-                'pengalaman',
-                'minat',
-                'mahasiswa.prestasi'
-            ]);
+            $loadRelations = array_merge($loadRelations, ['mahasiswa.prodi', 'mahasiswa.periode', 'mahasiswa.prestasi']);
         }
+        $user->load($loadRelations);
 
         return view('profil.index', compact('user', 'activeMenu', 'breadcrumb'));
     }
@@ -105,14 +94,13 @@ class ProfilController extends Controller
                 'pengalaman_items.*.pengalaman_kategori' => 'nullable|string|max:255',
             ];
 
-            $validator = Validator::make($request->all(), $rules);
+            $validator = Validator::make($request->all(), $validationRules, [
+                'sertifikasi_file.*.mimes' => 'File sertifikasi harus berupa: pdf, jpg, jpeg, png.',
+                'sertifikasi_file.*.max' => 'Ukuran file sertifikasi maksimal 2MB.',
+            ]);
 
             if ($validator->fails()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Validasi gagal.',
-                    'errors' => $validator->errors()
-                ], 422);
+                return response()->json(['success' => false, 'message' => 'Validasi gagal.', 'errors' => $validator->errors()], 422);
             }
 
             $userData = [
@@ -124,12 +112,9 @@ class ProfilController extends Controller
                 if ($user->foto && Storage::disk('public')->exists($user->foto)) {
                     Storage::disk('public')->delete($user->foto);
                 }
-                $file = $request->file('foto');
-                $filename = 'foto_' . time() . '.' . $file->getClientOriginalExtension();
-                $path = $file->storeAs('profile_photos/' . $user->user_id, $filename, 'public');
+                $path = $request->file('foto')->store('profile_photos/' . $user->user_id, 'public');
                 $userData['foto'] = $path;
             }
-
             $user->update($userData);
 
             if ($user->role === 'dosen' && $user->dosen) {
