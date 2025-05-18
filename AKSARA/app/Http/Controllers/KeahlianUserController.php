@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\KeahlianUserModel;
 use App\Models\KeahlianModel;
 use App\Models\UserModel;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -38,13 +39,13 @@ class KeahlianUserController extends Controller
 
         return DataTables::of($data)
             ->addIndexColumn()
-            ->addColumn('nama_user', fn($row) => $row->user->name ?? '-') // pastikan field 'name' ada di tabel user
-            ->addColumn('keahlian', fn($row) => $row->keahlian->keahlian_nama ?? '-') // sesuai dengan nama kolom di tabel keahlian
+            ->addColumn('nama', fn($row) => $row->user->nama ?? '-') // pastikan field 'nama' ada di tabel user
+            ->addColumn('keahlian_nama', fn($row) => $row->keahlian->keahlian_nama ?? '-') // sesuai dengan nama kolom di tabel keahlian
             ->editColumn('sertifikasi', fn($row) => $row->sertifikasi ?? '-')
             ->editColumn('status_verifikasi', fn($row) => $row->status_verifikasi ?? 'pending')
             ->addColumn('aksi', function ($row) {
-                $btn = '<button onclick="modalAction(\'' . route('mahasiswa.keahlianuser.edit_ajax', $row->keahlian_user_id) . '\', \'Edit Keahlian\')" class="btn btn-warning btn-sm me-1">Edit</button>';
-                $btn .= '<button class="btn btn-danger btn-sm btn-delete-keahlian" data-url="' . route('mahasiswa.keahlianuser.update_ajax', $row->keahlian_user_id) . '" data-nama="' . ($row->keahlian->keahlian_nama ?? '-') . '">Hapus</button>';
+                $btn = '<button onclick="modalAction(\'' . route('mahasiswa.keahlianuser.edit', $row->keahlian_user_id) . '\', \'Edit Keahlian\')" class="btn btn-warning btn-sm me-1">Edit</button>';
+                $btn .= '<button class="btn btn-danger btn-sm btn-delete-keahlian" data-url="' . route('mahasiswa.keahlianuser.update', $row->keahlian_user_id) . '" data-nama="' . ($row->keahlian->keahlian_nama ?? '-') . '">Hapus</button>';
                 return $btn;
             })
             ->rawColumns(['aksi'])
@@ -101,18 +102,32 @@ public function store(Request $request)
     // Form edit user
     public function edit($id)
 {
-    $data = KeahlianUserModel::findOrFail($id);
+    $data = KeahlianUserModel::where('keahlian_user_id', $id)
+        ->where('user_id', Auth::id())
+        ->firstOrFail();
+
     $keahlians = KeahlianModel::all();
 
-    // Pastikan user yang edit adalah pemilik, kecuali admin
     if (Auth::user()->role != 'admin' && $data->user_id != Auth::id()) {
         abort(403);
     }
 
-    return view('keahlianuser.edit', compact('data', 'keahlians'));
+    $breadcrumb = collect([
+        ['url' => route('mahasiswa.keahlianuser.index'), 'title' => 'Keahlian Saya'],
+        ['url' => route('mahasiswa.keahlianuser.edit', $id), 'title' => 'Edit Keahlian'],
+    ]);
+
+
+    return view('keahlianuser.edit', [
+        'keahlianUser' => $data,
+        'keahlians' => $keahlians,
+        'activeMenu' => 'keahlianuser',
+        'breadcrumb' => $breadcrumb,
+        
+    ]);
 }
 
-// Update user
+
 public function update(Request $request, $id)
 {
     $data = KeahlianUserModel::findOrFail($id);
@@ -121,36 +136,28 @@ public function update(Request $request, $id)
         abort(403);
     }
 
-    // Validasi termasuk file upload untuk sertifikasi
     $validated = $request->validate([
         'keahlian_id' => 'required|exists:keahlian,keahlian_id',
-        'sertifikasi' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048', // max 2MB, sama seperti store
+        'sertifikasi' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
     ]);
 
-    // Update field keahlian_id dulu
     $data->keahlian_id = $validated['keahlian_id'];
 
-    // Handle upload file sertifikasi jika ada
     if ($request->hasFile('sertifikasi')) {
-        // Hapus file lama jika ada (opsional, tapi recommended)
-        if ($filePath && Storage::disk('public')->exists($filePath)) {
-                Storage::disk('public')->delete($filePath);
-            }
+        // Hapus file lama jika ada
+        if ($data->sertifikasi && Storage::disk('public')->exists($data->sertifikasi)) {
+            Storage::disk('public')->delete($data->sertifikasi);
+        }
+
         $file = $request->file('sertifikasi');
         $path = $file->store('sertifikasi', 'public');
         $data->sertifikasi = $path;
     }
 
-    // Simpan update
     $data->save();
 
-    // Saat user update, status verifikasi jadi pending lagi kecuali admin
-    if (Auth::user()->role != 'admin') {
-        $data->status_verifikasi = 'pending';
-        $data->save();
-    }
-
-    return redirect()->route('mahasiswa.keahlianuser.index')->with('success', 'Keahlian berhasil diperbarui.');
+    return redirect()->route('mahasiswa.keahlianuser.index')
+        ->with('success', 'Keahlian berhasil diperbarui.');
 }
 
     // Form verifikasi admin

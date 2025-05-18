@@ -77,10 +77,10 @@
             ajax: "{{ route('mahasiswa.keahlianuser.list') }}", 
             columns: [
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', className: 'text-center', orderable: false, searchable: false },
-                { data: 'user.name', name: 'user.name' }, {{-- Nama User --}}
-                { data: 'keahlian.nama', name: 'keahlian.nama' }, {{-- Nama Keahlian --}}
+                { data: 'user.nama', name: 'user.nama' }, {{-- Nama User --}}
+                { data: 'keahlian.keahlian_nama', name: 'keahlian.keahlian_nama' }, {{-- Nama Keahlian --}}
                 { data: 'sertifikasi', name: 'sertifikasi' }, {{-- Sertifikasi --}}
-                { data: 'status_verifikasi_badge', name: 'status_verifikasi', className: 'text-center' }, {{-- Badge Status Verifikasi --}}
+                { data: 'status_verifikasi', name: 'status_verifikasi', className: 'text-center' }, {{-- Badge Status Verifikasi --}}
                 { data: 'aksi', name: 'aksi', className: 'text-center', orderable: false, searchable: false }
             ],
         });
