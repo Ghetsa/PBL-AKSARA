@@ -18,7 +18,7 @@
                                         <th class="text-center" style="width: 5%;">No.</th>
                                         <th>Nama User</th>
                                         <th>Keahlian</th>
-                                        <th>Sertifikasi</th>
+                                        {{-- <th>Sertifikasi</th> --}}
                                         <th>Status Verifikasi</th>
                                         <th class="text-center">Aksi</th>
                                     </tr>
@@ -48,10 +48,10 @@
     <script>
         function modalAction(url, title = 'Form') {
             $('#myModal .modal-content').html(`
-                            <div class="modal-body text-center">
-                                <div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>
-                            </div>
-                        `);
+                                <div class="modal-body text-center">
+                                    <div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>
+                                </div>
+                            `);
 
             $.ajax({
                 url: url,
@@ -86,38 +86,19 @@
                     { data: 'DT_RowIndex', className: 'text-center', orderable: false, searchable: false },
                     { data: 'user_nama', name: 'user.nama' },
                     { data: 'keahlian_nama', name: 'keahlian.keahlian_nama' },
+                    // {
+                    //     data: 'sertifikasi',
+                    //     name: 'sertifikasi',
+                    //     className: 'text-center',
+                    //     orderable: false,
+                    //     searchable: false
+                    // },
                     {
-                        data: 'sertifikasi',
-                        name: 'sertifikasi',
+                        data: 'status_verifikasi_badge',
+                        name: 'status_verifikasi',
                         className: 'text-center',
                         orderable: false,
                         searchable: false
-                    },
-                    {
-                        data: 'status_verifikasi',
-                        name: 'status_verifikasi',
-                        className: 'text-center',
-                        render: function (data) {
-                            let badgeClass = 'secondary';
-                            let label = data;
-
-                            switch (data.toLowerCase()) {
-                                case 'disetujui':
-                                    badgeClass = 'success';
-                                    label = 'Terverifikasi';
-                                    break;
-                                case 'pending':
-                                    badgeClass = 'warning';
-                                    label = 'Menunggu';
-                                    break;
-                                case 'ditolak':
-                                    badgeClass = 'danger';
-                                    label = 'Ditolak';
-                                    break;
-                            }
-
-                            return `<span class="badge bg-${badgeClass}">${label}</span>`;
-                        }
                     },
                     {
                         data: 'aksi',

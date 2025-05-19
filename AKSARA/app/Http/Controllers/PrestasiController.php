@@ -19,7 +19,7 @@ class PrestasiController extends Controller
         $data = PrestasiModel::all();
         $breadcrumb = (object) [
             'title' => 'Manajemen Prestasi',
-            'list' => ['Dashboard', 'Prestasi']
+            'list' => ['Prestasi']
         ];
 
         return view('prestasi.index', compact('data', 'breadcrumb'));
@@ -111,7 +111,7 @@ class PrestasiController extends Controller
         // View ini akan berisi tabel yang diisi oleh DataTables via AJAX call ke listMahasiswa()
         $breadcrumb = (object) [
             'title' => 'Histori Prestasi Saya',
-            'list' => ['Dashboard', 'Prestasi Saya']
+            'list' => ['Prestasi Saya']
         ];
 
         $activeMenu = 'dashboard';
@@ -139,19 +139,24 @@ class PrestasiController extends Controller
                 })
                 ->addColumn('status_verifikasi_badge', function ($row) { // Ganti nama kolom dari 'status_verifikasi'
                     $badgeClass = 'bg-secondary';
-                    $statusText = ucfirst($row->status_verifikasi);
-                    switch ($row->status_verifikasi) {
-                        case 'pending':
-                            $badgeClass = 'bg-warning text-dark';
-                            break;
+                    $label = ucfirst($row->status_verifikasi);
+
+                    switch (strtolower($row->status_verifikasi)) {
                         case 'disetujui':
                             $badgeClass = 'bg-success';
+                            $label = 'Terverifikasi';
+                            break;
+                        case 'pending':
+                            $badgeClass = 'bg-warning';
+                            $label = 'Menunggu';
                             break;
                         case 'ditolak':
                             $badgeClass = 'bg-danger';
+                            $label = 'Ditolak';
                             break;
                     }
-                    return '<span class="badge ' . $badgeClass . '">' . $statusText . '</span>';
+
+                    return '<span class="badge ' . $badgeClass . '">' . $label . '</span>';
                 })
                 ->addColumn('aksi', function ($row) {
                     $btnDetail = '<button type="button" class="btn btn-xs btn-info btn-sm me-1" onclick="modalAction(\'' . route('prestasi.mahasiswa.show_ajax', $row->prestasi_id) . '\', \'Detail Prestasi\')"><i class="ti ti-eye f-18"></i></button>';

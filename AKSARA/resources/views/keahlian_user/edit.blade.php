@@ -29,15 +29,28 @@
         {{-- Sertifikasi --}}
         <div class="mb-3">
             <label for="sertifikasi" class="form-label">Sertifikasi (Opsional)</label>
-            <input type="file" name="sertifikasi" id="sertifikasi" class="form-control" accept=".pdf,.jpg,.jpeg,.png">
-            @if ($data->sertifikasi && Storage::exists($data->sertifikasi))
+            <input type="file" name="sertifikasi" id="sertifikasi" class="form-control" accept="pdf, jpg, jpeg, png">
+                <small class="form-text text-muted">Format: PDF, JPG, JPEG, PNG. Max: 2MB.</small>
+            @if ($data->sertifikasi)
                 <div class="mt-2">
-                    <a href="{{ asset('storage/' . $data->sertifikasi) }}" target="_blank" class="btn btn-sm btn-success">
+                <small class="form-text text-muted mt-1 d-block">File saat ini:
+                    <a href="{{ asset('storage/' . $data->sertifikasi) }}" target="_blank" style="">
                         Lihat Sertifikasi Lama
                     </a>
+                    Kosongkan jika tidak ingin mengubah.
+                    </small>
                 </div>
             @endif
+                <span class="invalid-feedback error-text" id="error-sertifikasi"></span>
         </div>
+        
+         {{-- Catatan Verifikasi --}}
+        @if($data->status_verifikasi == 'ditolak' && $data->catatan_verifikasi)
+            <div class="alert alert-warning">
+                <strong>Catatan Verifikasi Sebelumnya:</strong><br>
+                {{ $data->catatan_verifikasi }}
+            </div>
+        @endif
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>

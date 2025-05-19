@@ -142,6 +142,7 @@ Route::middleware(['auth'])->group(function () {
             Route::put('/update/{id}', [KeahlianUserController::class, 'update'])->name('keahlian_user.update');
             Route::get('/delete/{id}', [KeahlianUserController::class, 'destroy'])->name('keahlian_user.destroy');
             Route::get('/list', [KeahlianUserController::class, 'list'])->name('keahlian_user.list');
+            Route::get('/{id}/show_ajax', [KeahlianUserController::class, 'show_ajax'])->name('keahlian_user.show_ajax');
 
             Route::get('/verifikasi/{id}', [KeahlianUserController::class, 'verifikasi'])->name('keahlian_user.verifikasi');
             Route::post('/verifikasi/{id}', [KeahlianUserController::class, 'prosesVerifikasi'])->name('keahlian_user.prosesVerifikasi');

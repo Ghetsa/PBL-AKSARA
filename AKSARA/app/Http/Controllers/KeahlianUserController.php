@@ -15,38 +15,73 @@ class KeahlianUserController extends Controller
     {
         $data = KeahlianUserModel::with(['keahlian', 'user']);
         $breadcrumb = (object) [
-            'title' => 'Data Keahlian User',
-            'list' => ['Master', 'Keahlian User']
+            'title' => 'Keahlian Saya',
+            'list' => ['Keahlian']
         ];
         $activeMenu = 'keahlian_user';
 
         return view('keahlian_user.index', compact('data', 'breadcrumb', 'activeMenu'));
     }
 
+
+    // ================================================================
+    // |               METHOD UNTUK MAHASISWA DAN DOSEN               |
+    // ================================================================
     public function list(Request $request)
     {
-        $keahlianUser = KeahlianUserModel::with(['keahlian', 'user']);
+        $keahlianUser = KeahlianUserModel::with(['keahlian', 'user'])
+            ->where('user_id', auth()->id());
 
         return DataTables::of($keahlianUser)
             ->addIndexColumn()
             ->addColumn('user_nama', fn($row) => $row->user->nama ?? '-')
             ->addColumn('keahlian_nama', fn($row) => $row->keahlian->keahlian_nama ?? '-')
-            ->addColumn('sertifikasi', function ($row) {
-                if ($row->sertifikasi) {
-                    $url = asset('storage/' . $row->sertifikasi);
-                    return '<a href="' . $url . '" target="_blank" class="btn btn-sm btn-success">Lihat</a>';
+            // ->addColumn('sertifikasi', function ($row) {
+            //     if ($row->sertifikasi) {
+            //         $url = asset('storage/' . $row->sertifikasi);
+            //         return '<a href="' . $url . '" target="_blank" class="btn btn-sm btn-success">Lihat</a>';
+            //     }
+            //     return '<span class="text-muted">-</span>';
+            // })
+            ->addColumn('status_verifikasi_badge', function ($row) {
+                $badgeClass = 'bg-secondary';
+                $label = ucfirst($row->status_verifikasi);
+
+                switch (strtolower($row->status_verifikasi)) {
+                    case 'disetujui':
+                        $badgeClass = 'bg-success';
+                        $label = 'Terverifikasi';
+                        break;
+                    case 'pending':
+                        $badgeClass = 'bg-warning';
+                        $label = 'Menunggu';
+                        break;
+                    case 'ditolak':
+                        $badgeClass = 'bg-danger';
+                        $label = 'Ditolak';
+                        break;
                 }
-                return '<span class="text-muted">-</span>';
+
+                return '<span class="badge ' . $badgeClass . '">' . $label . '</span>';
             })
-            ->addColumn('status_verifikasi', fn($row) => ucfirst($row->status_verifikasi))
             ->addColumn('aksi', function ($row) {
-                $btn = '<button onclick="modalAction(\'' . route('keahlian_user.verifikasi', $row->keahlian_user_id) . '\')" class="btn btn-info btn-sm">Verifikasi</button> ';
-                $btn .= '<button onclick="modalAction(\'' . route('keahlian_user.edit', $row->keahlian_user_id) . '\')" class="btn btn-warning btn-sm">Edit</button> ';
-                $btn .= '<button onclick="deleteConfirmAjax(' . $row->keahlian_user_id . ')" class="btn btn-danger btn-sm">Hapus</button>';
-                return $btn;
+                $btnDetail = '<button type="button" class="btn btn-xs btn-info btn-sm me-1" onclick="modalAction(\'' . route('keahlian_user.show_ajax', $row->keahlian_user_id) . '\', \'Detail Keahlian\')"><i class="ti ti-eye f-18"></i></button>';
+                $btnEdit = '';
+
+                if (in_array($row->status_verifikasi, ['pending', 'ditolak'])) {
+                    $btnEdit = '<button type="button" class="btn btn-xs btn-warning btn-sm me-1" onclick="modalAction(\'' . route('keahlian_user.edit', $row->keahlian_user_id) . '\', \'Edit Keahlian\')"><i class="ti ti-edit-circle f-18"></i></button>';
+                }
+
+                return $btnDetail . $btnEdit;
             })
-            ->rawColumns(['sertifikasi', 'aksi'])
+            ->rawColumns(['sertifikasi', 'status_verifikasi_badge', 'aksi'])
             ->make(true);
+    }
+
+    public function show_ajax($id)
+    {
+        $data = KeahlianUserModel::with(['keahlian', 'user'])->findOrFail($id);
+        return view('keahlian_user.show_ajax', ['keahlianUser' => $data]);
     }
 
     public function create()
@@ -140,6 +175,34 @@ class KeahlianUserController extends Controller
         return redirect()->route('keahlian_user.index')->with('success', 'Data keahlian berhasil dihapus.');
     }
 
+    // ================================================================
+    // |                    METHOD UNTUK ADMIN                    |
+    // ================================================================
+    public function list_admin(Request $request)
+    {
+        $keahlianUser = KeahlianUserModel::with(['keahlian', 'user']);
+
+        return DataTables::of($keahlianUser)
+            ->addIndexColumn()
+            ->addColumn('user_nama', fn($row) => $row->user->nama ?? '-')
+            ->addColumn('keahlian_nama', fn($row) => $row->keahlian->keahlian_nama ?? '-')
+            ->addColumn('sertifikasi', function ($row) {
+                if ($row->sertifikasi) {
+                    $url = asset('storage/' . $row->sertifikasi);
+                    return '<a href="' . $url . '" target="_blank" class="btn btn-sm btn-success">Lihat</a>';
+                }
+                return '<span class="text-muted">-</span>';
+            })
+            ->addColumn('status_verifikasi', fn($row) => ucfirst($row->status_verifikasi))
+            ->addColumn('aksi', function ($row) {
+                $btn = '<button onclick="modalAction(\'' . route('keahlian_user.verifikasi', $row->keahlian_user_id) . '\')" class="btn btn-info btn-sm">Verifikasi</button> ';
+                $btn .= '<button onclick="modalAction(\'' . route('keahlian_user.edit', $row->keahlian_user_id) . '\')" class="btn btn-warning btn-sm">Edit</button> ';
+                $btn .= '<button onclick="deleteConfirmAjax(' . $row->keahlian_user_id . ')" class="btn btn-danger btn-sm">Hapus</button>';
+                return $btn;
+            })
+            ->rawColumns(['sertifikasi', 'aksi'])
+            ->make(true);
+    }
     public function verifikasi($id)
     {
         $data = KeahlianUserModel::with(['user', 'keahlian'])->findOrFail($id);
