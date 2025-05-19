@@ -154,7 +154,7 @@
                     <i class="ti ti-brand-chrome"></i>
                 </li>
                 <li class="pc-item">
-                    <a href="{{ url('mahasiswa/keahlianuser') }}" class="pc-link {{ ($activeMenu == 'keahlian') ? 'active' : '' }}">
+                    <a href="{{ url('mahasiswa/keahlian_user') }}" class="pc-link {{ ($activeMenu == 'keahlian_user') ? 'active' : '' }}">
                         <span class="pc-micon"><i class="ti ti-trophy"></i></span>
                         <span class="pc-mtext">Upload Keahlian</span>
                     </a>

@@ -24,7 +24,7 @@ Route::get('/register', [AuthController::class, 'register'])->name('register');
 Route::post('/register', [AuthController::class, 'postregister'])->name('register');
 
 Route::get('/', function () {
-    $breadcrumb = (object)[
+    $breadcrumb = (object) [
         'title' => 'Landing Page',
         'list' => ['User']
     ];
@@ -36,19 +36,19 @@ Route::middleware(['auth'])->group(function () {
 
     // ===================== DASHBOARD =====================
     Route::get('/dashboard/admin', function () {
-        $breadcrumb = (object)['title' => 'Dashboard', 'list' => ['Admin', 'Dashboard']];
+        $breadcrumb = (object) ['title' => 'Dashboard', 'list' => ['Admin', 'Dashboard']];
         $activeMenu = 'dashboard';
         return view('dashboard.admin', compact('breadcrumb', 'activeMenu'));
     })->name('dashboard');
 
     Route::get('/dashboard/mahasiswa', function () {
-        $breadcrumb = (object)['title' => 'Dashboard', 'list' => ['Mahasiswa', 'Dashboard']];
+        $breadcrumb = (object) ['title' => 'Dashboard', 'list' => ['Mahasiswa', 'Dashboard']];
         $activeMenu = 'dashboard';
         return view('dashboard.mahasiswa', compact('breadcrumb', 'activeMenu'));
     })->name('dashboardMHS');
 
     Route::get('/dashboard/dosen', function () {
-        $breadcrumb = (object)['title' => 'Dashboard', 'list' => ['Dosen', 'Dashboard']];
+        $breadcrumb = (object) ['title' => 'Dashboard', 'list' => ['Dosen', 'Dashboard']];
         $activeMenu = 'dashboard';
         return view('dashboard.mahasiswa', compact('breadcrumb', 'activeMenu'));
     })->name('dashboardDSN');
@@ -57,6 +57,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfilController::class, 'index'])->name('profile.index');
     Route::get('/user/profile_ajax', [ProfilController::class, 'edit_ajax'])->name('profile.edit_ajax');
     Route::put('/user/profile_ajax', [ProfilController::class, 'update_ajax'])->name('profile.update_ajax');
+
+
+
+
 
     // ===================== USER CRUD =====================
     Route::prefix('user')->name('user.')->group(function () {
@@ -120,15 +124,29 @@ Route::middleware(['auth'])->group(function () {
             Route::delete('/{prestasi}/destroy-ajax', [PrestasiController::class, 'destroyAjaxMahasiswa'])->name('destroy_ajax');
         });
 
-        // Keahlian
-        Route::prefix('mahasiswa/keahlianuser')->name('mahasiswa.keahlianuser.')->group(function () {
-            Route::get('/', [KeahlianUserController::class, 'index'])->name('index');
-            Route::get('/list', [KeahlianUserController::class, 'listData'])->name('list');
-            Route::get('/create', [KeahlianUserController::class, 'create'])->name('create');
-            Route::post('/', [KeahlianUserController::class, 'store'])->name('store');
-            Route::get('/{id}/edit', [KeahlianUserController::class, 'edit'])->name('edit');
-            Route::put('/{id}', [KeahlianUserController::class, 'update'])->name('update');
+        // // Keahlian
+        // Route::prefix('mahasiswa/keahlianuser')->name('mahasiswa.keahlianuser.')->group(function () {
+        //     Route::get('/', [KeahlianUserController::class, 'index'])->name('index');
+        //     Route::get('/list', [KeahlianUserController::class, 'listData'])->name('list');
+        //     Route::get('/create', [KeahlianUserController::class, 'create'])->name('create');
+        //     Route::post('/', [KeahlianUserController::class, 'store'])->name('store');
+        //     Route::get('/{id}/edit', [KeahlianUserController::class, 'edit'])->name('edit');
+        //     Route::POST('/{id}', [KeahlianUserController::class, 'update'])->name('update');
+        // });
+
+        Route::prefix('mahasiswa/keahlian_user')->group(function () {
+            Route::get('/', [KeahlianUserController::class, 'index'])->name('keahlian_user.index');
+            Route::get('/create', [KeahlianUserController::class, 'create'])->name('keahlian_user.create');
+            Route::post('/store', [KeahlianUserController::class, 'store'])->name('keahlian_user.store');
+            Route::get('/edit/{id}', [KeahlianUserController::class, 'edit'])->name('keahlian_user.edit');
+            Route::put('/update/{id}', [KeahlianUserController::class, 'update'])->name('keahlian_user.update');
+            Route::get('/delete/{id}', [KeahlianUserController::class, 'destroy'])->name('keahlian_user.destroy');
+            Route::get('/list', [KeahlianUserController::class, 'list'])->name('keahlian_user.list');
+
+            Route::get('/verifikasi/{id}', [KeahlianUserController::class, 'verifikasi'])->name('keahlian_user.verifikasi');
+            Route::post('/verifikasi/{id}', [KeahlianUserController::class, 'prosesVerifikasi'])->name('keahlian_user.prosesVerifikasi');
         });
+
     });
 
     // ===================== ADMIN =====================

@@ -2,193 +2,170 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\KeahlianUserModel;
 use App\Models\KeahlianModel;
+use App\Models\KeahlianUserModel;
 use App\Models\UserModel;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class KeahlianUserController extends Controller
 {
-    // Tampilkan semua data (admin)
     public function index()
     {
+        $data = KeahlianUserModel::with(['keahlian', 'user']);
         $breadcrumb = (object) [
-            'title' => 'Manajemen Keahlian User',
-            'list' => ['Dashboard', 'Keahlian User']
+            'title' => 'Data Keahlian User',
+            'list' => ['Master', 'Keahlian User']
         ];
-        $activeMenu = 'keahlian';
+        $activeMenu = 'keahlian_user';
 
-
-        return view('keahlianuser.index', compact('breadcrumb', 'activeMenu'));
-
-        
+        return view('keahlian_user.index', compact('data', 'breadcrumb', 'activeMenu'));
     }
 
-    // Data untuk datatables ajax (admin)
-    public function listData(Request $request)
-{
-    if ($request->ajax()) {
-        $data = KeahlianUserModel::with(['user', 'keahlian']) // relasi model
-            ->where('user_id', Auth::id()) // tampilkan hanya data milik user login
-            ->orderBy('created_at', 'desc');
+    public function list(Request $request)
+    {
+        $keahlianUser = KeahlianUserModel::with(['keahlian', 'user']);
 
-        return DataTables::of($data)
+        return DataTables::of($keahlianUser)
             ->addIndexColumn()
-            ->addColumn('nama', fn($row) => $row->user->nama ?? '-') // pastikan field 'nama' ada di tabel user
-            ->addColumn('keahlian_nama', fn($row) => $row->keahlian->keahlian_nama ?? '-') // sesuai dengan nama kolom di tabel keahlian
-            ->editColumn('sertifikasi', fn($row) => $row->sertifikasi ?? '-')
-            ->editColumn('status_verifikasi', fn($row) => $row->status_verifikasi ?? 'pending')
+            ->addColumn('user_nama', fn($row) => $row->user->nama ?? '-')
+            ->addColumn('keahlian_nama', fn($row) => $row->keahlian->keahlian_nama ?? '-')
+            ->addColumn('sertifikasi', function ($row) {
+                if ($row->sertifikasi) {
+                    $url = asset('storage/' . $row->sertifikasi);
+                    return '<a href="' . $url . '" target="_blank" class="btn btn-sm btn-success">Lihat</a>';
+                }
+                return '<span class="text-muted">-</span>';
+            })
+            ->addColumn('status_verifikasi', fn($row) => ucfirst($row->status_verifikasi))
             ->addColumn('aksi', function ($row) {
-                $btn = '<button onclick="modalAction(\'' . route('mahasiswa.keahlianuser.edit', $row->keahlian_user_id) . '\', \'Edit Keahlian\')" class="btn btn-warning btn-sm me-1">Edit</button>';
-                $btn .= '<button class="btn btn-danger btn-sm btn-delete-keahlian" data-url="' . route('mahasiswa.keahlianuser.update', $row->keahlian_user_id) . '" data-nama="' . ($row->keahlian->keahlian_nama ?? '-') . '">Hapus</button>';
+                $btn = '<button onclick="modalAction(\'' . route('keahlian_user.verifikasi', $row->keahlian_user_id) . '\')" class="btn btn-info btn-sm">Verifikasi</button> ';
+                $btn .= '<button onclick="modalAction(\'' . route('keahlian_user.edit', $row->keahlian_user_id) . '\')" class="btn btn-warning btn-sm">Edit</button> ';
+                $btn .= '<button onclick="deleteConfirmAjax(' . $row->keahlian_user_id . ')" class="btn btn-danger btn-sm">Hapus</button>';
                 return $btn;
             })
-            ->rawColumns(['aksi'])
+            ->rawColumns(['sertifikasi', 'aksi'])
             ->make(true);
     }
-    return abort(403);
-}
 
-    // Form tambah (user)
- public function create()
-{
-    $keahlians = KeahlianModel::all();
-
-    // Jika request AJAX, kirim partial/modal saja
-    if (request()->ajax()) {
-        return view('keahlianuser.modal_create', compact('keahlians'));
-    }
-
-    // Kalau bukan AJAX, fallback (opsional)
-    return abort(404);
-}
-
-
-public function store(Request $request)
-{
-    $userId = Auth::id();
-
-    $validated = $request->validate([
-        'keahlian_id' => 'required|exists:keahlian,keahlian_id',
-        'sertifikasi' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048', // max 2MB
-    ]);
-
-    $data = [
-        'keahlian_id' => $validated['keahlian_id'],
-        'user_id' => $userId,
-        'status_verifikasi' => 'pending',
-    ];
-
-    // Kalau ada file sertifikasi, simpan dulu filenya
-    if ($request->hasFile('sertifikasi')) {
-        $file = $request->file('sertifikasi');
-        $path = $file->store('sertifikasi', 'public'); // simpan di storage/app/public/sertifikasi
-        $data['sertifikasi'] = $path; // simpan path file ke kolom sertifikasi di DB
-    }
-
-    KeahlianUserModel::create($data);
-    
-    return redirect()->route('mahasiswa.keahlianuser.index')
-                     ->with('success', 'Keahlian berhasil ditambahkan dan menunggu verifikasi.');
-}
-
-
-
-    // Form edit user
-    public function edit($id)
-{
-    $data = KeahlianUserModel::where('keahlian_user_id', $id)
-        ->where('user_id', Auth::id())
-        ->firstOrFail();
-
-    $keahlians = KeahlianModel::all();
-
-    if (Auth::user()->role != 'admin' && $data->user_id != Auth::id()) {
-        abort(403);
-    }
-
-    $breadcrumb = collect([
-        ['url' => route('mahasiswa.keahlianuser.index'), 'title' => 'Keahlian Saya'],
-        ['url' => route('mahasiswa.keahlianuser.edit', $id), 'title' => 'Edit Keahlian'],
-    ]);
-
-
-    return view('keahlianuser.edit', [
-        'keahlianUser' => $data,
-        'keahlians' => $keahlians,
-        'activeMenu' => 'keahlianuser',
-        'breadcrumb' => $breadcrumb,
-        
-    ]);
-}
-
-
-public function update(Request $request, $id)
-{
-    $data = KeahlianUserModel::findOrFail($id);
-
-    if (Auth::user()->role != 'admin' && $data->user_id != Auth::id()) {
-        abort(403);
-    }
-
-    $validated = $request->validate([
-        'keahlian_id' => 'required|exists:keahlian,keahlian_id',
-        'sertifikasi' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
-    ]);
-
-    $data->keahlian_id = $validated['keahlian_id'];
-
-    if ($request->hasFile('sertifikasi')) {
-        // Hapus file lama jika ada
-        if ($data->sertifikasi && Storage::disk('public')->exists($data->sertifikasi)) {
-            Storage::disk('public')->delete($data->sertifikasi);
-        }
-
-        $file = $request->file('sertifikasi');
-        $path = $file->store('sertifikasi', 'public');
-        $data->sertifikasi = $path;
-    }
-
-    $data->save();
-
-    return redirect()->route('mahasiswa.keahlianuser.index')
-        ->with('success', 'Keahlian berhasil diperbarui.');
-}
-
-    // Form verifikasi admin
-    public function verifyForm($id)
+    public function create()
     {
-        $data = KeahlianUserModel::with('user', 'keahlian')->findOrFail($id);
+        $users = UserModel::orderBy('user_id')->get();
+        $keahlianList = KeahlianModel::orderBy('keahlian_nama')->get();
 
-        // Hanya admin yang bisa akses
-        if (Auth::user()->role != 'admin') {
-            abort(403);
-        }
+        $breadcrumb = (object) [
+            'title' => 'Tambah Keahlian User',
+            'list' => ['Master', 'Keahlian User', 'Tambah']
+        ];
+        $activeMenu = 'keahlian_user';
 
-        return view('keahlianuser.verify', compact('data'));
+        return view('keahlian_user.create', compact('users', 'keahlianList', 'breadcrumb', 'activeMenu'));
     }
-
-    // Proses verifikasi admin
-    public function processVerify(Request $request, $id)
+    public function store(Request $request)
     {
-        if (Auth::user()->role != 'admin') {
-            abort(403);
-        }
-
-        $data = KeahlianUserModel::findOrFail($id);
-
-        $validated = $request->validate([
-            'status_verifikasi' => 'required|in:pending,disetujui,ditolak',
-            'catatan_verifikasi' => 'nullable|string|max:500',
+        $request->validate([
+            'keahlian_id' => 'required|exists:keahlian,keahlian_id',
+            'sertifikasi' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
 
-        $data->update($validated);
+        $filePath = null;
+        if ($request->hasFile('sertifikasi')) {
+            $filePath = $request->file('sertifikasi')->store('sertifikasi', 'public');
+        }
 
-        return redirect()->route('keahlianuser.index')->with('success', 'Status verifikasi berhasil diperbarui.');
+        KeahlianUserModel::create([
+            'user_id' => auth()->id(), // atau $request->user_id jika dikirim dari form
+            'keahlian_id' => $request->keahlian_id,
+            'sertifikasi' => $filePath,
+            'status_verifikasi' => 'pending',
+            'catatan_verifikasi' => null,
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Data keahlian berhasil ditambahkan.',
+        ]);
+    }
+
+
+    public function edit($id)
+    {
+        $data = KeahlianUserModel::findOrFail($id);
+        $keahlian = KeahlianModel::orderBy('keahlian_nama')->get();
+
+        $breadcrumb = (object) [
+            'title' => 'Edit Keahlian User',
+            'list' => ['Master', 'Keahlian User', 'Edit']
+        ];
+        $activeMenu = 'keahlian_user';
+
+        return view('keahlian_user.edit', compact('data', 'keahlian', 'breadcrumb', 'activeMenu'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $data = KeahlianUserModel::where('keahlian_user_id', $id)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
+
+        $request->validate([
+            'keahlian_id' => 'required|exists:keahlian,keahlian_id',
+            'sertifikasi' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+        ]);
+
+        if ($request->hasFile('sertifikasi')) {
+            if ($data->sertifikasi && Storage::exists($data->sertifikasi)) {
+                Storage::delete($data->sertifikasi);
+            }
+            $data->sertifikasi = $request->file('sertifikasi')->store('sertifikasi', 'public');
+        }
+
+        $data->keahlian_id = $request->keahlian_id;
+        $data->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Data keahlian berhasil diperbarui.',
+        ]);
+    }
+
+    public function destroy($id)
+    {
+        $data = KeahlianUserModel::findOrFail($id);
+        if ($data->sertifikasi && Storage::exists($data->sertifikasi)) {
+            Storage::delete($data->sertifikasi);
+        }
+        $data->delete();
+        return redirect()->route('keahlian_user.index')->with('success', 'Data keahlian berhasil dihapus.');
+    }
+
+    public function verifikasi($id)
+    {
+        $data = KeahlianUserModel::with(['user', 'keahlian'])->findOrFail($id);
+
+        $breadcrumb = (object) [
+            'title' => 'Verifikasi Keahlian',
+            'list' => ['Master', 'Keahlian User', 'Verifikasi']
+        ];
+        $activeMenu = 'keahlian_user';
+
+        return view('keahlian_user.verifikasi', compact('data', 'breadcrumb', 'activeMenu'));
+    }
+
+    public function prosesVerifikasi(Request $request, $id)
+    {
+        $data = KeahlianUserModel::findOrFail($id);
+
+        $request->validate([
+            'status_verifikasi' => 'required|in:disetujui,ditolak',
+            'catatan_verifikasi' => 'nullable|string',
+        ]);
+
+        $data->status_verifikasi = $request->status_verifikasi;
+        $data->catatan_verifikasi = $request->catatan_verifikasi;
+        $data->save();
+
+        return redirect()->route('keahlian_user.index')->with('success', 'Verifikasi keahlian berhasil diproses.');
     }
 }
