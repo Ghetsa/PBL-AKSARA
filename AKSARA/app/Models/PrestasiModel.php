@@ -19,6 +19,7 @@ class PrestasiModel extends Model
         'dosen_id',
         'nama_prestasi',
         'kategori',
+        'Bidang_id',
         'penyelenggara',
         'tingkat',
         'tahun',
@@ -30,6 +31,10 @@ class PrestasiModel extends Model
     public function mahasiswa()
     {
         return $this->belongsTo(MahasiswaModel::class, 'mahasiswa_id', 'mahasiswa_id');
+    }
+    public function bidang()
+    {
+        return $this->belongsTo(BidangModel::class, 'Bidang_id', 'Bidang_id');
     }
     public function dosen()
     {

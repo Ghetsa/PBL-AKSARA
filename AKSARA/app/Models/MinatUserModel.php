@@ -14,15 +14,16 @@ class MinatUserModel extends Model
     public $timestamps = true;
 
     protected $fillable = [
-        'minat_id',
+        'bidang_id',
         'user_id',
     ];
 
     // Relasi ke model Minat
-    public function minat()
+    public function bidang()
     {
-        return $this->belongsTo(MinatModel::class, 'minat_id', 'minat_id');
+        return $this->belongsTo(BidangModel::class,'bidang_id', 'bidang_id');
     }
+    
 
     // Relasi ke model User
     public function user()

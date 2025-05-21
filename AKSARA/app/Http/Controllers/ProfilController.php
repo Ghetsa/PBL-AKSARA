@@ -11,8 +11,8 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use App\Models\UserModel;
-use App\Models\MinatModel;
-use App\Models\KeahlianModel;
+use App\Models\BidangModel;
+// use App\Models\KeahlianModel;
 use App\Models\PengalamanModel;
 
 class ProfilController extends Controller
@@ -27,25 +27,26 @@ class ProfilController extends Controller
 
         $user = Auth::user();
 
-        if ($user->role === 'admin') {
-            $user->load('admin');
-        } elseif ($user->role === 'dosen') {
+        if ($user->role === 'dosen') {
             $user->load([
                 'dosen',
-                'keahlian',
+                'bidang',
                 'pengalaman',
-                'minat'
+                'keahlianUser',
+                'minatUser',
             ]);
         } elseif ($user->role === 'mahasiswa') {
             $user->load([
                 'mahasiswa.prodi',
                 'mahasiswa.periode',
-                'keahlian',
+                'bidang',
                 'pengalaman',
-                'minat',
+                'keahlianUser',
+                'minatUser',
                 'mahasiswa.prestasi'
             ]);
         }
+
 
         return view('profil.index', compact('user', 'activeMenu', 'breadcrumb'));
     }
@@ -57,25 +58,32 @@ class ProfilController extends Controller
             'mahasiswa.periode',
             'dosen',
             'admin',
-            'minat',
-            'pengalaman'
+            'keahlianUser',
+            'minatUser',
+            'pengalaman',
         ]);
 
-        $allMinatOptions = MinatModel::orderBy('minat_id')->get();
-        $selectedMinat = $user->minat->pluck('nama_minat')->toArray();
+
+        $allMinatOptions = BidangModel::orderBy('bidang_id')->get();
+        $selectedMinat = $user->bidang->pluck('bidang_nama')->toArray();
         $selectedPengalaman = $user->pengalaman;
         $selectedPrestasi = ($user->role === 'mahasiswa' && $user->mahasiswa) ? $user->mahasiswa->prestasi : collect();
+        $keahlianUser = $user->keahlianUser;
+        $minatUser = $user->minatUser;
 
         return view('profil.edit', compact(
             'user',
             'allMinatOptions',
             'selectedMinat',
             'selectedPengalaman',
-            'selectedPrestasi'
+            'selectedPrestasi',
+            'keahlianUser',
+            'minatUser'
         ));
+
     }
 
- public function update_ajax(Request $request)
+    public function update_ajax(Request $request)
     {
         $user = Auth::user();
         DB::beginTransaction();
@@ -96,7 +104,7 @@ class ProfilController extends Controller
                 'minat_pilihan' => 'nullable|array',
                 'minat_pilihan.*' => [
                     'string',
-                    Rule::in(MinatModel::getPilihanMinat()),
+                    Rule::in(BidangModel::getPilihanMinat()),
                 ],
                 'sertifikasi_file' => 'nullable|array',
                 'sertifikasi_file.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
@@ -136,8 +144,8 @@ class ProfilController extends Controller
                 $user->dosen->update($request->only(['gelar', 'no_hp']));
             }
 
-            $selectedMinatIds = $request->input('minat_id', []);
-            $user->minat()->sync($selectedMinatIds);
+            $selectedMinatIds = $request->input('bidang_id', []);
+            $user->minatUser()->sync($selectedMinatIds);
 
             $user->pengalaman()->delete();
             $pengalamanItems = $request->input('pengalaman_items', []);

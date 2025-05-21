@@ -9,8 +9,8 @@
 
         {{-- Nama User (readonly) --}}
         <div class="mb-3">
-            <label class="form-label">Nama User</label>
-            <input type="text" class="form-control" value="{{ auth()->user()->nama }}" disabled>
+            <label class="form-label" hidden>Nama User</label>
+            <input type="text" class="form-control" value="{{ auth()->user()->nama }}" disabled hidden>
         </div>
 
         {{-- Keahlian --}}
@@ -43,7 +43,7 @@
             @endif
                 <span class="invalid-feedback error-text" id="error-sertifikasi"></span>
         </div>
-        
+         
          {{-- Catatan Verifikasi --}}
         @if($data->status_verifikasi == 'ditolak' && $data->catatan_verifikasi)
             <div class="alert alert-warning">

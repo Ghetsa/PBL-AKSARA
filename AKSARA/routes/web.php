@@ -8,6 +8,7 @@ use App\Http\Controllers\PrestasiController;
 use App\Http\Controllers\ProdiController;
 use App\Http\Controllers\PeriodeController;
 use App\Http\Controllers\KeahlianUserController;
+use App\Http\Controllers\LombaController; // Tambahkan ini
 
 /*
 |--------------------------------------------------------------------------
@@ -58,9 +59,18 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/user/profile_ajax', [ProfilController::class, 'edit_ajax'])->name('profile.edit_ajax');
     Route::put('/user/profile_ajax', [ProfilController::class, 'update_ajax'])->name('profile.update_ajax');
 
+    // ===================== LOMBA =====================
+    Route::prefix('lomba')->name('lomba.')->group(function () {
+        Route::get('/', [LombaController::class, 'index'])->name('index');
+        Route::get('/create', [LombaController::class, 'create'])->name('create');
+        Route::post('/', [LombaController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [LombaController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [LombaController::class, 'update'])->name('update');
+        Route::delete('/{id}', [LombaController::class, 'destroy'])->name('destroy');
 
-
-
+        Route::get('/verifikasi/{id}', [LombaController::class, 'verifikasi'])->name('verifikasi');
+        Route::post('/verifikasi/{id}', [LombaController::class, 'prosesVerifikasi'])->name('prosesVerifikasi');
+    });
 
     // ===================== USER CRUD =====================
     Route::prefix('user')->name('user.')->group(function () {
@@ -124,24 +134,14 @@ Route::middleware(['auth'])->group(function () {
             Route::delete('/{prestasi}/destroy-ajax', [PrestasiController::class, 'destroyAjaxMahasiswa'])->name('destroy_ajax');
         });
 
-        // // Keahlian
-        // Route::prefix('mahasiswa/keahlianuser')->name('mahasiswa.keahlianuser.')->group(function () {
-        //     Route::get('/', [KeahlianUserController::class, 'index'])->name('index');
-        //     Route::get('/list', [KeahlianUserController::class, 'listData'])->name('list');
-        //     Route::get('/create', [KeahlianUserController::class, 'create'])->name('create');
-        //     Route::post('/', [KeahlianUserController::class, 'store'])->name('store');
-        //     Route::get('/{id}/edit', [KeahlianUserController::class, 'edit'])->name('edit');
-        //     Route::POST('/{id}', [KeahlianUserController::class, 'update'])->name('update');
-        // });
-
         Route::prefix('mahasiswa/keahlian_user')->group(function () {
             Route::get('/', [KeahlianUserController::class, 'index'])->name('keahlian_user.index');
+            Route::get('/list', [KeahlianUserController::class, 'list'])->name('keahlian_user.list');
             Route::get('/create', [KeahlianUserController::class, 'create'])->name('keahlian_user.create');
             Route::post('/store', [KeahlianUserController::class, 'store'])->name('keahlian_user.store');
             Route::get('/edit/{id}', [KeahlianUserController::class, 'edit'])->name('keahlian_user.edit');
             Route::put('/update/{id}', [KeahlianUserController::class, 'update'])->name('keahlian_user.update');
-            Route::get('/delete/{id}', [KeahlianUserController::class, 'destroy'])->name('keahlian_user.destroy');
-            Route::get('/list', [KeahlianUserController::class, 'list'])->name('keahlian_user.list');
+            Route::delete('/delete/{id}', [KeahlianUserController::class, 'destroy'])->name('keahlian_user.destroy');
             Route::get('/{id}/show_ajax', [KeahlianUserController::class, 'show_ajax'])->name('keahlian_user.show_ajax');
 
             Route::get('/verifikasi/{id}', [KeahlianUserController::class, 'verifikasi'])->name('keahlian_user.verifikasi');
@@ -159,13 +159,18 @@ Route::middleware(['auth'])->group(function () {
             Route::put('/{prestasi}/process-verification-ajax', [PrestasiController::class, 'processVerificationAjaxAdmin'])->name('process_verification_ajax');
         });
 
-        // Keahlian user
-        Route::prefix('keahlianuser')->name('keahlianuser.')->group(function () {
-            Route::get('/', [KeahlianUserController::class, 'index'])->name('index');
-            Route::get('/list', [KeahlianUserController::class, 'listData'])->name('list');
-            Route::get('/create', [KeahlianUserController::class, 'create'])->name('create');
-            Route::get('/{id}/verify', [KeahlianUserController::class, 'verifyForm'])->name('verify_form');
-            Route::post('/{id}/verify', [KeahlianUserController::class, 'processVerify'])->name('process_verify');
+        Route::prefix('admin/keahlian_user')->group(function () {
+            Route::get('/', [KeahlianUserController::class, 'index'])->name('keahlian_user.index');
+            Route::get('/create', [KeahlianUserController::class, 'create'])->name('keahlian_user.create');
+            Route::post('/store', [KeahlianUserController::class, 'store'])->name('keahlian_user.store');
+            Route::get('/edit/{id}', [KeahlianUserController::class, 'edit'])->name('keahlian_user.edit');
+            Route::put('/update/{id}', [KeahlianUserController::class, 'update'])->name('keahlian_user.update');
+            Route::get('/delete/{id}', [KeahlianUserController::class, 'destroy'])->name('keahlian_user.destroy');
+            Route::get('/list', [KeahlianUserController::class, 'list'])->name('keahlian_user.list');
+            Route::get('/{id}/show_ajax', [KeahlianUserController::class, 'show_ajax'])->name('keahlian_user.show_ajax');
+
+            Route::get('/verifikasi/{id}', [KeahlianUserController::class, 'verifikasi'])->name('keahlian_user.verifikasi');
+            Route::post('/verifikasi/{id}', [KeahlianUserController::class, 'prosesVerifikasi'])->name('keahlian_user.prosesVerifikasi');
         });
     });
 

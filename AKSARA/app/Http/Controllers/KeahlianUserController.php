@@ -13,7 +13,7 @@ class KeahlianUserController extends Controller
 {
     public function index()
     {
-        $data = KeahlianUserModel::with(['keahlian', 'user']);
+        $data = KeahlianUserModel::with(['bidang', 'user']);
         $breadcrumb = (object) [
             'title' => 'Keahlian Saya',
             'list' => ['Keahlian']
@@ -29,65 +29,44 @@ class KeahlianUserController extends Controller
     // ================================================================
     public function list(Request $request)
     {
-        $keahlianUser = KeahlianUserModel::with(['keahlian', 'user'])
-            ->where('user_id', auth()->id());
+        if ($request->ajax()) {
+            $data = KeahlianUserModel::with('bidang') // relasi ke tabel bidang saja
+                ->where('user_id', auth()->id()) // hanya data user login
+                ->orderBy('created_at', 'desc');
 
-        return DataTables::of($keahlianUser)
-            ->addIndexColumn()
-            ->addColumn('user_nama', fn($row) => $row->user->nama ?? '-')
-            ->addColumn('keahlian_nama', fn($row) => $row->keahlian->keahlian_nama ?? '-')
-            // ->addColumn('sertifikasi', function ($row) {
-            //     if ($row->sertifikasi) {
-            //         $url = asset('storage/' . $row->sertifikasi);
-            //         return '<a href="' . $url . '" target="_blank" class="btn btn-sm btn-success">Lihat</a>';
-            //     }
-            //     return '<span class="text-muted">-</span>';
-            // })
-            ->addColumn('status_verifikasi_badge', function ($row) {
-                $badgeClass = 'bg-secondary';
-                $label = ucfirst($row->status_verifikasi);
+            return DataTables::of($data)
+                ->addIndexColumn()
+                ->addColumn('bidang_nama', fn($row) => $row->bidang->bidang_nama ?? '-')
+                ->editColumn('sertifikasi', fn($row) => $row->sertifikasi ?? '-')
+                ->editColumn('status_verifikasi', fn($row) => $row->status_verifikasi ?? 'pending')
+                ->addColumn('aksi', function ($row) {
+                    $editUrl = route('keahlian_user.edit', $row->id);
+                    $deleteUrl = route('keahlian_user.destroy', $row->id);
 
-                switch (strtolower($row->status_verifikasi)) {
-                    case 'disetujui':
-                        $badgeClass = 'bg-success';
-                        $label = 'Terverifikasi';
-                        break;
-                    case 'pending':
-                        $badgeClass = 'bg-warning';
-                        $label = 'Menunggu';
-                        break;
-                    case 'ditolak':
-                        $badgeClass = 'bg-danger';
-                        $label = 'Ditolak';
-                        break;
-                }
+                    $btn = '<button onclick="modalAction(\'' . $editUrl . '\', \'Edit Bidang\')" class="btn btn-warning btn-sm me-1">Edit</button>';
+                    $btn .= '<button class="btn btn-danger btn-sm btn-delete-keahlian" data-url="' . $deleteUrl . '" data-nama="' . ($row->bidang->bidang_nama ?? '-') . '">Hapus</button>';
 
-                return '<span class="badge ' . $badgeClass . '">' . $label . '</span>';
-            })
-            ->addColumn('aksi', function ($row) {
-                $btnDetail = '<button type="button" class="btn btn-xs btn-info btn-sm me-1" onclick="modalAction(\'' . route('keahlian_user.show_ajax', $row->keahlian_user_id) . '\', \'Detail Keahlian\')"><i class="ti ti-eye f-18"></i></button>';
-                $btnEdit = '';
+                    return $btn;
+                })
+                ->rawColumns(['aksi'])
+                ->make(true);
+        }
 
-                if (in_array($row->status_verifikasi, ['pending', 'ditolak'])) {
-                    $btnEdit = '<button type="button" class="btn btn-xs btn-warning btn-sm me-1" onclick="modalAction(\'' . route('keahlian_user.edit', $row->keahlian_user_id) . '\', \'Edit Keahlian\')"><i class="ti ti-edit-circle f-18"></i></button>';
-                }
-
-                return $btnDetail . $btnEdit;
-            })
-            ->rawColumns(['sertifikasi', 'status_verifikasi_badge', 'aksi'])
-            ->make(true);
+        return abort(403);
     }
+
+
 
     public function show_ajax($id)
     {
-        $data = KeahlianUserModel::with(['keahlian', 'user'])->findOrFail($id);
+        $data = KeahlianUserModel::with(['bidang', 'user'])->findOrFail($id);
         return view('keahlian_user.show_ajax', ['keahlianUser' => $data]);
     }
 
     public function create()
     {
         $users = UserModel::orderBy('user_id')->get();
-        $keahlianList = KeahlianModel::orderBy('keahlian_nama')->get();
+        $keahlianList = KeahlianModel::orderBy('bidang_nama')->get();
 
         $breadcrumb = (object) [
             'title' => 'Tambah Keahlian User',
@@ -100,7 +79,7 @@ class KeahlianUserController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'keahlian_id' => 'required|exists:keahlian,keahlian_id',
+            'bidang_id' => 'required|exists:bidang,bidang_id',
             'sertifikasi' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
 
@@ -111,7 +90,7 @@ class KeahlianUserController extends Controller
 
         KeahlianUserModel::create([
             'user_id' => auth()->id(), // atau $request->user_id jika dikirim dari form
-            'keahlian_id' => $request->keahlian_id,
+            'bidang_id' => $request->bidang_id,
             'sertifikasi' => $filePath,
             'status_verifikasi' => 'pending',
             'catatan_verifikasi' => null,
@@ -127,7 +106,7 @@ class KeahlianUserController extends Controller
     public function edit($id)
     {
         $data = KeahlianUserModel::findOrFail($id);
-        $keahlian = KeahlianModel::orderBy('keahlian_nama')->get();
+        $keahlian = KeahlianModel::orderBy('bidang_nama')->get();
 
         $breadcrumb = (object) [
             'title' => 'Edit Keahlian User',
@@ -135,7 +114,7 @@ class KeahlianUserController extends Controller
         ];
         $activeMenu = 'keahlian_user';
 
-        return view('keahlian_user.edit', compact('data', 'keahlian', 'breadcrumb', 'activeMenu'));
+        return view('keahlian_user.edit', compact('data', 'bidang', 'breadcrumb', 'activeMenu'));
     }
 
     public function update(Request $request, $id)
@@ -145,7 +124,7 @@ class KeahlianUserController extends Controller
             ->firstOrFail();
 
         $request->validate([
-            'keahlian_id' => 'required|exists:keahlian,keahlian_id',
+            'bidang_id' => 'required|exists:bidang,bidang_id',
             'sertifikasi' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
 
@@ -156,7 +135,7 @@ class KeahlianUserController extends Controller
             $data->sertifikasi = $request->file('sertifikasi')->store('sertifikasi', 'public');
         }
 
-        $data->keahlian_id = $request->keahlian_id;
+        $data->bidang_id = $request->bidang_id;
         $data->save();
 
         return response()->json([
@@ -180,12 +159,12 @@ class KeahlianUserController extends Controller
     // ================================================================
     public function list_admin(Request $request)
     {
-        $keahlianUser = KeahlianUserModel::with(['keahlian', 'user']);
+        $keahlianUser = KeahlianUserModel::with(['bidang', 'user']);
 
         return DataTables::of($keahlianUser)
             ->addIndexColumn()
             ->addColumn('user_nama', fn($row) => $row->user->nama ?? '-')
-            ->addColumn('keahlian_nama', fn($row) => $row->keahlian->keahlian_nama ?? '-')
+            ->addColumn('bidang_nama', fn($row) => $row->bidang->bidang_nama ?? '-')
             ->addColumn('sertifikasi', function ($row) {
                 if ($row->sertifikasi) {
                     $url = asset('storage/' . $row->sertifikasi);
@@ -205,7 +184,7 @@ class KeahlianUserController extends Controller
     }
     public function verifikasi($id)
     {
-        $data = KeahlianUserModel::with(['user', 'keahlian'])->findOrFail($id);
+        $data = KeahlianUserModel::with(['user', 'bidang'])->findOrFail($id);
 
         $breadcrumb = (object) [
             'title' => 'Verifikasi Keahlian',

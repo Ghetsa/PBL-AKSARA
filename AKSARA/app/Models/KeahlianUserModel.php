@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -14,22 +13,36 @@ class KeahlianUserModel extends Model
     public $timestamps = true;
 
     protected $fillable = [
-        'keahlian_id',
+        'bidang_id',
         'user_id',
         'sertifikasi',
         'status_verifikasi',
         'catatan_verifikasi',
     ];
 
-    // Relasi ke tabel keahlian
-    public function keahlian()
+    // Relasi ke tabel bidang
+    public function bidang()
     {
-        return $this->belongsTo(KeahlianModel::class, 'keahlian_id', 'keahlian_id');
+        return $this->belongsTo(BidangModel::class, 'bidang_id', 'bidang_id');
     }
 
-    // Relasi ke tabel users (pastikan kolomnya benar)
+    // Relasi ke User
     public function user()
     {
-        return $this->belongsTo(UserModel::class, 'user_id', 'user_id'); 
+        return $this->belongsTo(UserModel::class, 'user_id', 'user_id');
+    }
+
+    // Custom accessor untuk badge status verifikasi
+    public function getStatusVerifikasiBadgeAttribute()
+    {
+        switch ($this->status_verifikasi) {
+            case 'disetujui':
+                return '<span class="badge bg-success">Disetujui</span>';
+            case 'ditolak':
+                return '<span class="badge bg-danger">Ditolak</span>';
+            case 'pending':
+            default:
+                return '<span class="badge bg-warning text-dark">Pending</span>';
+        }
     }
 }

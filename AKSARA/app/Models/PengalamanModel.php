@@ -14,6 +14,7 @@ class PengalamanModel extends Model
 
     protected $fillable = [
         'user_id',
+        'bidang_id',
         'pengalaman_nama',
         'pengalaman_kategori',
     ];
@@ -22,7 +23,10 @@ class PengalamanModel extends Model
     {
         return $this->belongsTo(UserModel::class, 'user_id', 'user_id');
     }
-
+    public function bidang()
+    {
+        return $this->hasOne(BidangModel::class, 'bidang_id', 'bidang_id');
+    }
     protected $casts = [
         'pengalaman_kategori' => 'string',
     ];

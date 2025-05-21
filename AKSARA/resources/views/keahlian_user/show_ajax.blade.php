@@ -6,10 +6,10 @@
 <div class="modal-body">
   <div class="table-responsive">
     <table class="table table-sm table-bordered">
-      <tr>
+      {{-- <tr>
         <th style="width: 30%;">Nama Pengguna</th>
         <td>{{ $keahlianUser->user->nama ?? '-' }}</td>
-      </tr>
+      </tr> --}}
       <tr>
         <th>Keahlian</th>
         <td>{{ $keahlianUser->keahlian->keahlian_nama ?? '-' }}</td>

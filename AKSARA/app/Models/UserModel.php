@@ -31,6 +31,7 @@ class UserModel extends Authenticatable implements JWTSubject
         'password' => 'hashed',
     ];
 
+    /** JWT Implementation */
     public function getJWTIdentifier()
     {
         return $this->getKey();
@@ -41,54 +42,68 @@ class UserModel extends Authenticatable implements JWTSubject
         return [];
     }
 
+    /**
+     * One-to-One relations
+     */
     public function admin()
     {
         return $this->hasOne(AdminModel::class, 'user_id', 'user_id');
     }
+
     public function dosen()
     {
         return $this->hasOne(DosenModel::class, 'user_id', 'user_id');
     }
+
     public function mahasiswa()
     {
         return $this->hasOne(MahasiswaModel::class, 'user_id', 'user_id');
     }
-    // public function keahlian()
-    // {
-    //     return $this->belongsToMany(KeahlianModel::class, 'keahlian_user', 'user_id', 'keahlian_id')
-    //         ->withPivot('sertifikasi')
-    //         ->withTimestamps();
-    // }
 
-    // public function minat()
-    // {
-    //     return $this->belongsToMany(MinatModel::class, 'minat_user', 'user_id', 'minat_id')
-    //         ->withTimestamps();
-    // }
-
-    // Relasi untuk Keahlian (Many-to-Many)
-    public function keahlian()
+    /**
+     * Many-to-Many relation to Bidang via keahlian_user (gabungan minat & keahlian)
+     */
+    public function bidang()
     {
-        return $this->belongsToMany(KeahlianModel::class, 'keahlian_user', 'user_id', 'keahlian_id')
-            ->withPivot('keahlian_user_id', 'sertifikasi', 'status_verifikasi', 'catatan_verifikasi')
-            ->withTimestamps();
+        return $this->belongsToMany(
+            BidangModel::class,
+            'keahlian_user',
+            'user_id',
+            'bidang_id'
+        )
+        ->withPivot('keahlian_user_id', 'sertifikasi', 'status_verifikasi', 'catatan_verifikasi')
+        ->withTimestamps();
     }
 
-    // Relasi untuk Minat (Many-to-Many)
-    public function minat()
+    /**
+     * One-to-Many relation to KeahlianUserModel
+     */
+    public function keahlianUser()
     {
-        return $this->belongsToMany(MinatModel::class, 'minat_user', 'user_id', 'minat_id')
-            ->withTimestamps();
+        return $this->hasMany(KeahlianUserModel::class, 'user_id', 'user_id');
     }
 
+    /**
+     * One-to-Many relation to MinatUserModel
+     */
+    public function minatUser()
+    {
+        return $this->hasMany(MinatUserModel::class, 'user_id', 'user_id');
+    }
+
+    /**
+     * Other relations
+     */
     public function pengalaman()
     {
         return $this->hasMany(PengalamanModel::class, 'user_id', 'user_id');
     }
+
     public function notifikasi()
     {
         return $this->hasMany(NotifikasiModel::class, 'user_id', 'user_id');
     }
+
     public function lombaDiinput()
     {
         return $this->hasMany(LombaModel::class, 'diinput_oleh', 'user_id');

@@ -52,71 +52,48 @@
                                     </div>
 
                                     @if($user->role == 'dosen' || $user->role == 'mahasiswa')
-                                    <div class="card mt-3">
-                                        <div class="card-header">
-                                            <h4 class="mb-0">Keahlian</h4>
-                                        </div>
-                                        @if($user->keahlian && $user->keahlian->count() > 0)
-                                            <div class="card-body">
-                                                @foreach($user->keahlian as $keahlian_item) {{-- Ganti $k menjadi $keahlian_item --}}
-                                                <div class="mb-3 pb-2 @if(!$loop->last) border-bottom @endif">
-                                                    <h6 class="mb-1">{{ $keahlian_item->keahlian_nama }}</h6>
-                                                    @if($keahlian_item->pivot->sertifikasi)
-                                                        @php
-                                                            $sertifikasiExists = Storage::disk('public')->exists($keahlian_item->pivot->sertifikasi);
-                                                        @endphp
-                                                        @if($sertifikasiExists)
-                                                            <small class="d-block">
-                                                                Sertifikasi: <a href="{{ Storage::url($keahlian_item->pivot->sertifikasi) }}" target="_blank" class="btn-link">Lihat File</a>
-                                                                (@if($keahlian_item->pivot->sertifikasi_status_verifikasi == 'disetujui')
-                                                                    <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i>Disetujui</span>
-                                                                @elseif($keahlian_item->pivot->sertifikasi_status_verifikasi == 'ditolak')
-                                                                    <span class="badge bg-danger"><i class="fas fa-times-circle me-1"></i>Ditolak</span>
-                                                                    @if($keahlian_item->pivot->sertifikasi_catatan_verifikasi)
-                                                                        <em class="d-block text-danger small fst-italic">Catatan: {{ $keahlian_item->pivot->sertifikasi_catatan_verifikasi }}</em>
-                                                                    @endif
-                                                                @else
-                                                                    <span class="badge bg-warning text-dark"><i class="fas fa-hourglass-half me-1"></i>Pending</span>
-                                                                @endif)
-                                                            </small>
-                                                        @else
-                                                            <small class="text-danger d-block">Sertifikat untuk "{{$keahlian_item->keahlian_nama}}" tercatat, namun file tidak ditemukan.</small>
-                                                        @endif
-                                                    @else
-                                                        <small class="text-muted d-block">Belum ada sertifikat diunggah untuk keahlian ini.</small>
-                                                    @endif
-                                                </div>
-                                                @endforeach
-                                            </div>
-                                        @else
-                                            <div class="card-body">
-                                                <p class="mb-0 text-muted">Belum ada keahlian yang ditambahkan.</p>
-                                            </div>
-                                        @endif
-                                    </div>
-                                    @endif
-
-                                    {{-- Card untuk Keahlian --}}
-                                    {{-- @if($user->role == 'dosen' || $user->role == 'mahasiswa')
                                         <div class="card mt-3">
-                                            <div class="card-header d-flex justify-content-between align-items-center">
-                                                <h4>Keahlian</h4>
+                                            <div class="card-header">
+                                                <h4 class="mb-0">Keahlian</h4>
                                             </div>
-                                            @if($user->keahlian && $user->keahlian->count() > 0)
+                                            @if($user->keahlianUser && $user->keahlianUser->count() > 0)
                                                 <div class="card-body">
-                                                    @foreach($user->keahlian as $k)
-                                                        <div class="mb-2 pb-2 @if(!$loop->last) border-bottom @endif">
-                                                            <p class="mb-0 text-lg fw-bold">{{ $k->keahlian_nama }}</p>
-                                                            @if($k->sertifikasi && Storage::disk('public')->exists($k->sertifikasi))
-                                                                <small class="text-muted d-block">
-                                                                    Sertifikasi: <a href="{{ Storage::url($k->sertifikasi) }}"
-                                                                        target="_blank" class="btn btn-link btn-sm p-0">Lihat File</a>
-                                                                </small>
-                                                            @elseif($k->sertifikasi)
-                                                                <small class="text-info d-block">Sertifikasi: {{ $k->sertifikasi }}
-                                                                    (Catatan)</small>
+                                                    @foreach($user->keahlianUser as $keahlian_item)
+                                                        <div class="mb-3 pb-2 @if(!$loop->last) border-bottom @endif">
+                                                            <h6 class="mb-1">{{ $keahlian_item->bidang->bidang_nama ?? '-' }}</h6>
+
+                                                            @if($keahlian_item->sertifikasi)
+                                                                @php
+                                                                    $sertifikasiExists = Storage::disk('public')->exists($keahlian_item->sertifikasi);
+                                                                @endphp
+                                                                @if($sertifikasiExists)
+                                                                    <small class="d-block">
+                                                                        Sertifikasi:
+                                                                        <a href="{{ Storage::url($keahlian_item->sertifikasi) }}"
+                                                                            target="_blank" class="btn-link">Lihat File</a>
+                                                                        (
+                                                                        @if($keahlian_item->status_verifikasi == 'disetujui')
+                                                                            <span class="badge bg-success"><i
+                                                                                    class="fas fa-check-circle me-1"></i>Disetujui</span>
+                                                                        @elseif($keahlian_item->status_verifikasi == 'ditolak')
+                                                                            <span class="badge bg-danger"><i
+                                                                                    class="fas fa-times-circle me-1"></i>Ditolak</span>
+                                                                            @if($keahlian_item->catatan_verifikasi)
+                                                                                <em class="d-block text-danger small fst-italic">Catatan:
+                                                                                    {{ $keahlian_item->catatan_verifikasi }}</em>
+                                                                            @endif
+                                                                        @else
+                                                                            <span class="badge bg-warning text-dark"><i
+                                                                                    class="fas fa-hourglass-half me-1"></i>Pending</span>
+                                                                        @endif
+                                                                        )
+                                                                    </small>
+                                                                @else
+                                                                    <small class="text-danger d-block">File sertifikat tidak ditemukan.</small>
+                                                                @endif
                                                             @else
-                                                                <!-- <small class="text-muted d-block">Sertifikasi: Tidak ada.</small> -->
+                                                                <small class="text-muted d-block">Belum ada sertifikat diunggah untuk
+                                                                    keahlian ini.</small>
                                                             @endif
                                                         </div>
                                                     @endforeach
@@ -127,6 +104,40 @@
                                                 </div>
                                             @endif
                                         </div>
+                                    @endif
+
+
+                                    {{-- Card untuk Keahlian --}}
+                                    {{-- @if($user->role == 'dosen' || $user->role == 'mahasiswa')
+                                    <div class="card mt-3">
+                                        <div class="card-header d-flex justify-content-between align-items-center">
+                                            <h4>Keahlian</h4>
+                                        </div>
+                                        @if($user->keahlian && $user->keahlian->count() > 0)
+                                        <div class="card-body">
+                                            @foreach($user->keahlian as $k)
+                                            <div class="mb-2 pb-2 @if(!$loop->last) border-bottom @endif">
+                                                <p class="mb-0 text-lg fw-bold">{{ $k->keahlian_nama }}</p>
+                                                @if($k->sertifikasi && Storage::disk('public')->exists($k->sertifikasi))
+                                                <small class="text-muted d-block">
+                                                    Sertifikasi: <a href="{{ Storage::url($k->sertifikasi) }}"
+                                                        target="_blank" class="btn btn-link btn-sm p-0">Lihat File</a>
+                                                </small>
+                                                @elseif($k->sertifikasi)
+                                                <small class="text-info d-block">Sertifikasi: {{ $k->sertifikasi }}
+                                                    (Catatan)</small>
+                                                @else
+                                                <!-- <small class="text-muted d-block">Sertifikasi: Tidak ada.</small> -->
+                                                @endif
+                                            </div>
+                                            @endforeach
+                                        </div>
+                                        @else
+                                        <div class="card-body">
+                                            <p class="mb-0 text-muted">Belum ada keahlian yang ditambahkan.</p>
+                                        </div>
+                                        @endif
+                                    </div>
                                     @endif --}}
 
                                 </div>
@@ -199,33 +210,16 @@
 
                                     {{-- Card untuk Minat --}}
                                     @if($user->role == 'dosen' || $user->role == 'mahasiswa')
-                                    <div class="card mt-3">
-                                        <div class="card-header">
-                                            <h4 class="mb-0">Minat</h4>
-                                        </div>
-                                        @if($user->minat && $user->minat->count() > 0)
-                                            <div class="card-body">
-                                                @foreach($user->minat as $minat_item) {{-- Ganti $m menjadi $minat_item --}}
-                                                    <span class="badge bg-light text-dark me-1 mb-1 p-2 fs-6 border">{{ $minat_item->minat_nama }}</span> {{-- Asumsi kolomnya minat_nama --}}
-                                                @endforeach
-                                            </div>
-                                        @else
-                                            <div class="card-body">
-                                                <p class="mb-0 text-muted">Belum ada minat yang ditambahkan.</p>
-                                            </div>
-                                        @endif
-                                    </div>
-                                    @endif
-                                    {{-- @if($user->role == 'dosen' || $user->role == 'mahasiswa')
                                         <div class="card mt-3">
-                                            <div class="card-header d-flex justify-content-between align-items-center">
-                                                <h4>Minat</h4>
+                                            <div class="card-header">
+                                                <h4 class="mb-0">Minat</h4>
                                             </div>
-                                            @if($user->minat && $user->minat->count() > 0)
+                                            @if($user->minatUser && $user->minatUser->count() > 0)
                                                 <div class="card-body">
-                                                    @foreach($user->minat as $m)
-                                                        <span
-                                                            class="badge bg-light text-dark me-1 mb-1 p-2 fs-6">{{ $m->minat_nama ?? $m->minat }}</span>
+                                                    @foreach($user->minatUser as $minat_item)
+                                                        <span class="badge bg-light text-dark me-1 mb-1 p-2 fs-6 border">
+                                                            {{ $minat_item->bidang->bidang_nama ?? '-' }}
+                                                        </span>
                                                     @endforeach
                                                 </div>
                                             @else
@@ -234,6 +228,26 @@
                                                 </div>
                                             @endif
                                         </div>
+                                    @endif
+
+                                    {{-- @if($user->role == 'dosen' || $user->role == 'mahasiswa')
+                                    <div class="card mt-3">
+                                        <div class="card-header d-flex justify-content-between align-items-center">
+                                            <h4>Minat</h4>
+                                        </div>
+                                        @if($user->minat && $user->minat->count() > 0)
+                                        <div class="card-body">
+                                            @foreach($user->minat as $m)
+                                            <span class="badge bg-light text-dark me-1 mb-1 p-2 fs-6">{{ $m->minat_nama ??
+                                                $m->minat }}</span>
+                                            @endforeach
+                                        </div>
+                                        @else
+                                        <div class="card-body">
+                                            <p class="mb-0 text-muted">Belum ada minat yang ditambahkan.</p>
+                                        </div>
+                                        @endif
+                                    </div>
                                     @endif --}}
 
                                     {{-- Card untuk Pengalaman --}}
