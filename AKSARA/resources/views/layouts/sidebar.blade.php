@@ -47,7 +47,7 @@
                     <i class="ti ti-brand-chrome"></i>
                 </li>
                 <li class="pc-item">
-                    <a href="{{ url('/verifikasi') }}" class="pc-link {{ ($activeMenu == 'verifikasi') ? 'active' : '' }}">
+                    <a href="{{ url('/lomba') }}" class="pc-link {{ ($activeMenu == 'lomba') ? 'active' : '' }}">
                         <span class="pc-micon"><i class="ti ti-file-check"></i></span>
                         <span class="pc-mtext">Data Lomba</span>
                     </a>
