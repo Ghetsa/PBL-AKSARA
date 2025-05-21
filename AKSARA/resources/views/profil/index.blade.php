@@ -1,4 +1,4 @@
-{{-- Versi 1 --}}
+{{-- profil/index.blade.php --}}
 @extends('layouts.template')
 
 @section('content')

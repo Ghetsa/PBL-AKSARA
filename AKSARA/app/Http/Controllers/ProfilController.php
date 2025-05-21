@@ -7,9 +7,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
+
 use App\Models\UserModel;
 use App\Models\BidangModel;
 use App\Models\PengalamanModel;

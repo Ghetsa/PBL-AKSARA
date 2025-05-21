@@ -7,12 +7,14 @@ use App\Models\KeahlianUserModel;
 use App\Models\UserModel;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class KeahlianUserController extends Controller
 {
     public function index()
     {
+        
         $breadcrumb = (object) [
             'title' => 'Keahlian Saya',
             'list' => ['Keahlian']
@@ -27,35 +29,42 @@ class KeahlianUserController extends Controller
     // ================================================================
     // |               METHOD UNTUK MAHASISWA DAN DOSEN               |
     // ================================================================
-    public function list(Request $request)
-    {
-        if ($request->ajax()) {
-            $data = KeahlianUserModel::with('bidang') // relasi ke tabel bidang saja
-                ->where('user_id', auth()->id()) // hanya data user login
-                ->orderBy('created_at', 'desc');
-
-            return DataTables::of($data)
-                ->addIndexColumn()
-                ->addColumn('bidang_nama', fn($row) => $row->bidang->bidang_nama ?? '-')
-                ->editColumn('sertifikasi', fn($row) => $row->sertifikasi ?? '-')
-                ->editColumn('status_verifikasi', fn($row) => $row->status_verifikasi_badge)
-                ->addColumn('aksi', function ($row) {
-                    $editUrl = route('keahlian_user.edit', $row->keahlian_user_id);
-                    $deleteUrl = route('keahlian_user.destroy', $row->keahlian_user_id);
-
-
-                    $btn = '<button onclick="modalAction(\'' . $editUrl . '\', \'Edit Bidang\')" class="btn btn-warning btn-sm me-1">Edit</button>';
-                    $btn .= '<button class="btn btn-danger btn-sm btn-delete-keahlian" data-url="' . $deleteUrl . '" data-nama="' . ($row->bidang->bidang_nama ?? '-') . '">Hapus</button>';
-
-                    return $btn;
-                })
-                ->rawColumns(['aksi', 'status_verifikasi'])
-                ->make(true);
+public function list(Request $request)
+{
+    if ($request->ajax()) {
+        $user = Auth::user();
+        
+        // Pastikan user login valid
+        if (!$user) {
+            return response()->json(['error' => 'Akses ditolak.'], 403);
         }
 
-        return abort(403);
+        $user_id = $user->user_id; // Ambil ID dari user yang login langsung
+
+        $data = KeahlianUserModel::with('bidang')
+            ->where('user_id', $user_id)
+            ->orderBy('created_at', 'desc');
+
+        return DataTables::of($data)
+            ->addIndexColumn()
+            ->addColumn('bidang_nama', fn($row) => $row->bidang->bidang_nama ?? '-')
+            ->editColumn('sertifikasi', fn($row) => $row->sertifikasi ?? '-')
+            ->editColumn('status_verifikasi', fn($row) => $row->status_verifikasi_badge)
+            ->addColumn('aksi', function ($row) {
+                $editUrl = route('keahlian_user.edit', $row->keahlian_user_id);
+                $deleteUrl = route('keahlian_user.destroy', $row->keahlian_user_id);
+
+                $btn = '<button onclick="modalAction(\'' . $editUrl . '\', \'Edit Bidang\')" class="btn btn-warning btn-sm me-1">Edit</button>';
+                $btn .= '<button class="btn btn-danger btn-sm btn-delete-keahlian" data-url="' . $deleteUrl . '" data-nama="' . ($row->bidang->bidang_nama ?? '-') . '">Hapus</button>';
+
+                return $btn;
+            })
+            ->rawColumns(['aksi', 'status_verifikasi'])
+            ->make(true);
     }
 
+    return abort(403, 'Akses ditolak.');
+}
 
 
     public function show_ajax($id)
@@ -67,7 +76,7 @@ class KeahlianUserController extends Controller
     public function create()
     {
         $users = UserModel::orderBy('user_id')->get();
-        $keahlianList = BidangModel::orderBy('bidang_nama')->get();
+        $bidang = BidangModel::orderBy('bidang_nama')->get();
 
         $breadcrumb = (object) [
             'title' => 'Tambah Keahlian User',
@@ -75,7 +84,7 @@ class KeahlianUserController extends Controller
         ];
         $activeMenu = 'keahlian_user';
 
-        return view('keahlian_user.create', compact('users', 'keahlianList', 'breadcrumb', 'activeMenu'));
+        return view('keahlian_user.create', compact('users', 'bidang', 'breadcrumb', 'activeMenu'));
     }
     public function store(Request $request)
     {
@@ -107,7 +116,7 @@ class KeahlianUserController extends Controller
     public function edit($id)
     {
         $data = KeahlianUserModel::findOrFail($id);
-        $keahlian = BidangModel::orderBy('bidang_nama')->get();
+        $bidang = BidangModel::orderBy('bidang_nama')->get();
 
         $breadcrumb = (object) [
             'title' => 'Edit Keahlian User',
