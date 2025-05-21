@@ -74,6 +74,16 @@
                         <span class="pc-mtext">Laporan & Analisis</span>
                     </a>
                 </li>
+                <li class="pc-item pc-caption">
+                    <label>Data Keahlian</label>
+                    <i class="ti ti-brand-chrome"></i>
+                </li>
+                <li class="pc-item">
+                    <a href="{{ url('/admin/keahlian_user-verifikasi') }}" class="pc-link {{ ($activeMenu == 'keahlian_user') ? 'active' : '' }}">
+                        <span class="pc-micon"><i class="ti ti-trophy"></i></span>
+                        <span class="pc-mtext">Verifikasi Keahlian</span>
+                    </a>
+                </li>
               {{-- <li class="pc-item pc-hasmenu">
                   <a href="#!" class="pc-link">
                       <span class="pc-micon"><i class="ti ti-menu"></i></span>

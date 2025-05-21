@@ -20,19 +20,19 @@ class KeahlianUserModel extends Model
         'catatan_verifikasi',
     ];
 
-    // Relasi ke tabel bidang
+    // Relasi ke bidang (Many-to-One)
     public function bidang()
     {
         return $this->belongsTo(BidangModel::class, 'bidang_id', 'bidang_id');
     }
 
-    // Relasi ke User
+    // Relasi ke user (Many-to-One)
     public function user()
     {
         return $this->belongsTo(UserModel::class, 'user_id', 'user_id');
     }
 
-    // Custom accessor untuk badge status verifikasi
+    // Accessor untuk badge status_verifikasi
     public function getStatusVerifikasiBadgeAttribute()
     {
         switch ($this->status_verifikasi) {

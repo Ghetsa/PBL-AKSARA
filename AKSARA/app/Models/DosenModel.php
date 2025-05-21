@@ -25,9 +25,9 @@ class DosenModel extends Model
         return $this->belongsTo(UserModel::class, 'user_id', 'user_id');
     }
 
-    public function keahlian()
+    public function bidang()
     {
-        return $this->belongsTo(KeahlianModel::class, 'keahlian_id', 'keahlian_id');
+        return $this->belongsTo(BidangModel::class, 'keahlian_id', 'keahlian_id');
     }
 
     public function bimbinganMahasiswa()

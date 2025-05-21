@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -16,16 +15,16 @@ class MinatUserModel extends Model
     protected $fillable = [
         'bidang_id',
         'user_id',
+        'level',
     ];
 
-    // Relasi ke model Minat
+    // Relasi ke bidang (Many-to-One)
     public function bidang()
     {
-        return $this->belongsTo(BidangModel::class,'bidang_id', 'bidang_id');
+        return $this->belongsTo(BidangModel::class, 'bidang_id', 'bidang_id');
     }
-    
 
-    // Relasi ke model User
+    // Relasi ke user (Many-to-One)
     public function user()
     {
         return $this->belongsTo(UserModel::class, 'user_id', 'user_id');

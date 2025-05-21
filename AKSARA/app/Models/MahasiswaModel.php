@@ -54,4 +54,11 @@ class MahasiswaModel extends Model
     {
         return $this->hasMany(RekomendasiLombaModel::class, 'mahasiswa_id', 'mahasiswa_id');
     }
+
+    public function bidang()
+    {
+        return $this->belongsTo(BidangModel::class, 'keahlian_id', 'keahlian_id');
+    }
+
+    
 }
