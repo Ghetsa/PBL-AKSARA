@@ -7,12 +7,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
+
 use App\Models\UserModel;
 use App\Models\BidangModel;
-// use App\Models\KeahlianModel;
 use App\Models\PengalamanModel;
 
 class ProfilController extends Controller
@@ -30,23 +29,20 @@ class ProfilController extends Controller
         if ($user->role === 'dosen') {
             $user->load([
                 'dosen',
-                'bidang',
                 'pengalaman',
-                'keahlianUser',
-                'minatUser',
+                'keahlianUser.bidang',
+                'minatUser.bidang',
             ]);
         } elseif ($user->role === 'mahasiswa') {
             $user->load([
                 'mahasiswa.prodi',
                 'mahasiswa.periode',
-                'bidang',
+                'mahasiswa.prestasi',
                 'pengalaman',
-                'keahlianUser',
-                'minatUser',
-                'mahasiswa.prestasi'
+                'keahlianUser.bidang',
+                'minatUser.bidang',
             ]);
         }
-
 
         return view('profil.index', compact('user', 'activeMenu', 'breadcrumb'));
     }
@@ -58,14 +54,13 @@ class ProfilController extends Controller
             'mahasiswa.periode',
             'dosen',
             'admin',
-            'keahlianUser',
-            'minatUser',
+            'keahlianUser.bidang',
+            'minatUser.bidang',
             'pengalaman',
         ]);
 
-
-        $allMinatOptions = BidangModel::orderBy('bidang_id')->get();
-        $selectedMinat = $user->bidang->pluck('bidang_nama')->toArray();
+        $allBidangOptions = BidangModel::orderBy('bidang_nama')->get();
+        $selectedMinat = $user->minatUser->pluck('bidang_id')->toArray();
         $selectedPengalaman = $user->pengalaman;
         $selectedPrestasi = ($user->role === 'mahasiswa' && $user->mahasiswa) ? $user->mahasiswa->prestasi : collect();
         $keahlianUser = $user->keahlianUser;
@@ -73,14 +68,13 @@ class ProfilController extends Controller
 
         return view('profil.edit', compact(
             'user',
-            'allMinatOptions',
+            'allBidangOptions',
             'selectedMinat',
             'selectedPengalaman',
             'selectedPrestasi',
             'keahlianUser',
             'minatUser'
         ));
-
     }
 
     public function update_ajax(Request $request)
@@ -102,10 +96,7 @@ class ProfilController extends Controller
                 'keahlian_items.*.nama' => 'required_with:keahlian_items|string|max:255',
                 'keahlian_items.*.sertifikasi' => 'nullable|string|max:255',
                 'minat_pilihan' => 'nullable|array',
-                'minat_pilihan.*' => [
-                    'string',
-                    Rule::in(BidangModel::getPilihanMinat()),
-                ],
+                'minat_pilihan.*' => 'integer|exists:bidang,bidang_id',
                 'sertifikasi_file' => 'nullable|array',
                 'sertifikasi_file.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
                 'pengalaman_items' => 'nullable|array',
@@ -144,9 +135,11 @@ class ProfilController extends Controller
                 $user->dosen->update($request->only(['gelar', 'no_hp']));
             }
 
-            $selectedMinatIds = $request->input('bidang_id', []);
+            // Update Minat
+            $selectedMinatIds = $request->input('minat_pilihan', []);
             $user->minatUser()->sync($selectedMinatIds);
 
+            // Update Pengalaman
             $user->pengalaman()->delete();
             $pengalamanItems = $request->input('pengalaman_items', []);
             $pengalamanToInsert = [];

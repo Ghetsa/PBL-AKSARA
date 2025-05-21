@@ -159,19 +159,19 @@ Route::middleware(['auth'])->group(function () {
             Route::put('/{prestasi}/process-verification-ajax', [PrestasiController::class, 'processVerificationAjaxAdmin'])->name('process_verification_ajax');
         });
 
-        Route::prefix('admin/keahlian_user')->group(function () {
-            Route::get('/', [KeahlianUserController::class, 'index'])->name('keahlian_user.index');
-            Route::get('/create', [KeahlianUserController::class, 'create'])->name('keahlian_user.create');
-            Route::post('/store', [KeahlianUserController::class, 'store'])->name('keahlian_user.store');
-            Route::get('/edit/{id}', [KeahlianUserController::class, 'edit'])->name('keahlian_user.edit');
-            Route::put('/update/{id}', [KeahlianUserController::class, 'update'])->name('keahlian_user.update');
-            Route::get('/delete/{id}', [KeahlianUserController::class, 'destroy'])->name('keahlian_user.destroy');
-            Route::get('/list', [KeahlianUserController::class, 'list'])->name('keahlian_user.list');
-            Route::get('/{id}/show_ajax', [KeahlianUserController::class, 'show_ajax'])->name('keahlian_user.show_ajax');
+        // Route::prefix('admin/keahlian_user')->group(function () {
+        //     Route::get('/', [KeahlianUserController::class, 'index'])->name('keahlian_user.index');
+        //     Route::get('/create', [KeahlianUserController::class, 'create'])->name('keahlian_user.create');
+        //     Route::post('/store', [KeahlianUserController::class, 'store'])->name('keahlian_user.store');
+        //     Route::get('/edit/{id}', [KeahlianUserController::class, 'edit'])->name('keahlian_user.edit');
+        //     Route::put('/update/{id}', [KeahlianUserController::class, 'update'])->name('keahlian_user.update');
+        //     Route::get('/delete/{id}', [KeahlianUserController::class, 'destroy'])->name('keahlian_user.destroy');
+        //     Route::get('/list', [KeahlianUserController::class, 'list'])->name('keahlian_user.list');
+        //     Route::get('/{id}/show_ajax', [KeahlianUserController::class, 'show_ajax'])->name('keahlian_user.show_ajax');
 
-            Route::get('/verifikasi/{id}', [KeahlianUserController::class, 'verifikasi'])->name('keahlian_user.verifikasi');
-            Route::post('/verifikasi/{id}', [KeahlianUserController::class, 'prosesVerifikasi'])->name('keahlian_user.prosesVerifikasi');
-        });
+        //     Route::get('/verifikasi/{id}', [KeahlianUserController::class, 'verifikasi'])->name('keahlian_user.verifikasi');
+        //     Route::post('/verifikasi/{id}', [KeahlianUserController::class, 'prosesVerifikasi'])->name('keahlian_user.prosesVerifikasi');
+        // });
     });
 
     // ===================== DOSEN =====================

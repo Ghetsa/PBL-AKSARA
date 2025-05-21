@@ -81,7 +81,7 @@
             ajax: "{{ route('keahlian_user.list') }}",
             columns: [
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
-                { data: 'bidang_nama', name: 'bidang.bidang_nama' },
+                { data: 'bidang_nama', name: 'bidang_nama' },
                 { data: 'sertifikasi', name: 'sertifikasi' },
                 { data: 'status_verifikasi', name: 'status_verifikasi' },
                 { data: 'aksi', name: 'aksi', orderable: false, searchable: false }
