@@ -76,7 +76,7 @@
                         <div class="row">
                             @foreach ($allMinatOptions as $minatOption)
                                 @php
-                                    $isChecked = $user->bidang->contains('bidang_id', $bidangOption->bidang_id);
+                                    $isChecked = $user->bidang->contains('bidang_id', $minatOption->bidang_id);
                                     $minatSlug = \Illuminate\Support\Str::slug($minatOption->bidang_nama, '_');
                                 @endphp
                                 <div class="col-md-6 mb-2">
@@ -84,7 +84,7 @@
                                         <input class="form-check-input" type="checkbox" name="bidang_id[]"
                                             value="{{ $minatOption->bidang_id }}" id="bidang_{{ $minatSlug }}" {{ $isChecked ? 'checked' : '' }}>
                                         <label class="form-check-label" for="minat_{{ $minatSlug }}">
-                                            {{ $minatOption->minat_nama }}
+                                            {{ $minatOption->bidang_nama }}
                                         </label>
                                     </div>
                                 </div>
