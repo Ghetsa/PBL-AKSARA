@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,6 +18,15 @@ class MinatUserModel extends Model
         'user_id',
         'level',
     ];
+
+    // Definisikan konstanta untuk opsi ENUM level
+    public const LEVEL_MINAT = [
+        'kurang' => 'Kurang Minat',
+        'minat' => 'Minat',
+        'sangat minat' => 'Sangat Minat',
+    ];
+    // Atau jika hanya mau valuenya:
+    // public const OPSI_LEVEL = ['kurang', 'minat', 'sangat minat'];
 
     // Relasi ke bidang (Many-to-One)
     public function bidang()
