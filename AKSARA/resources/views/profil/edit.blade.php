@@ -18,14 +18,14 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group mb-3">
-                                <label for="edit_nama" class="form-label">Nama Lengkap <span class="text-danger">*</span></label>
+                                <label for="edit_nama" class="form-label">Nama Lengkap <span class="text-danger"></span></label>
                                 <input type="text" name="nama" id="edit_nama" class="form-control" value="{{ old('nama', $user->nama) }}" required>
                                 <span class="invalid-feedback error-nama"></span>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group mb-3">
-                                <label for="edit_email" class="form-label">Email <span class="text-danger">*</span></label>
+                                <label for="edit_email" class="form-label">Email <span class="text-danger"></span></label>
                                 <input type="email" name="email" id="edit_email" class="form-control" value="{{ old('email', $user->email) }}" required>
                                  <span class="invalid-feedback error-email"></span>
                             </div>
@@ -204,11 +204,9 @@
     </div>
 </div>
 
-{{-- Kode JavaScript Anda (pastikan sudah sesuai dengan modifikasi di atas) --}}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 $(document).ready(function() {
-    // Toggle visibility of level dropdown based on minat checkbox state
     $('.minat-checkbox').each(function() {
         var $checkbox = $(this);
         var bidangId = $checkbox.data('bidang-id');
@@ -289,7 +287,7 @@ $(document).ready(function() {
         let formData = new FormData(form);
         // formData.append('_method', 'PUT'); // @method('PUT') di form sudah cukup untuk Laravel AJAX
 
-        const submitButton = $(form).find('button[type="submit"]');
+        const submitButton = $(this).find('button[type="submit"]'); // Definisi yang benar
         const originalButtonText = submitButton.html();
         submitButton.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Menyimpan…');
         $('.invalid-feedback').text('').hide(); // Sembunyikan dan kosongkan semua pesan error
@@ -368,7 +366,7 @@ $(document).ready(function() {
                 }
             },
             complete: function () {
-                btn.prop('disabled', false).html(orig);
+                submitButton.prop('disabled', false).html(originalButtonText); // Menggunakan variabel yang benar
             }
         });
     });

@@ -13,35 +13,35 @@ use Illuminate\Validation\Rule;
 use App\Models\UserModel;
 use App\Models\BidangModel;
 use App\Models\PengalamanModel;
-use App\Models\MinatUserModel; // Anda mungkin tidak perlu ini lagi jika relasi User ke Bidang (minat) sudah cukup
+use App\Models\MinatUserModel;
 
 class ProfilController extends Controller
 {
+    // ... (method index() dan edit_ajax() tetap sama seperti jawaban sebelumnya) ...
     public function index()
     {
-        $activeMenu = "profil"; // Definisikan variabel $activeMenu
+        $activeMenu = "profil";
         $breadcrumb = (object) [
             'title' => 'Profil pengguna',
             'list' => ['Dashboard', 'Profil Saya']
         ];
 
         $user = Auth::user();
-        $relationsToLoad = ['pengalaman']; // Relasi umum
+        $relationsToLoad = ['pengalaman'];
 
         if ($user->role === 'dosen') {
-            $relationsToLoad = array_merge($relationsToLoad, ['dosen', 'keahlian', 'minat']); // Gunakan 'keahlian' dan 'minat'
+            $relationsToLoad = array_merge($relationsToLoad, ['dosen', 'keahlian', 'minat']);
         } elseif ($user->role === 'mahasiswa') {
             $relationsToLoad = array_merge($relationsToLoad, [
                 'mahasiswa.prodi',
                 'mahasiswa.periode',
-                'mahasiswa.prestasi', // Jika masih ada relasi ini di MahasiswaModel
-                'keahlian',         // Gunakan 'keahlian'
-                'minat'             // Gunakan 'minat'
+                'mahasiswa.prestasi',
+                'keahlian',
+                'minat'
             ]);
-        } elseif ($user->role === 'admin') { // Jangan lupa handle role admin jika perlu
+        } elseif ($user->role === 'admin') {
             $relationsToLoad[] = 'admin';
         }
-        // Hanya load jika ada relasi yang didefinisikan
         if (!empty($relationsToLoad)) {
             $user->load($relationsToLoad);
         }
@@ -54,46 +54,42 @@ class ProfilController extends Controller
         $user = Auth::user()->load([
             'mahasiswa.prodi',
             'mahasiswa.periode',
-            // 'mahasiswa.prestasi', // Jika prestasi tidak diedit di sini
             'dosen',
             'admin',
-            'keahlian',         // <--- UBAH INI
-            'minat',            // <--- UBAH INI
+            'keahlian',
+            'minat',
             'pengalaman',
         ]);
 
         $allBidangOptions = BidangModel::orderBy('bidang_nama')->get();
 
-        // Mengambil data pivot dari relasi 'keahlian'
         $userKeahlian = $user->keahlian->mapWithKeys(function ($bidang) {
             return [$bidang->bidang_id => [
                 'nama' => $bidang->bidang_nama,
-                'sertifikasi' => $bidang->detailKeahlian->sertifikasi, // Menggunakan alias 'detailKeahlian'
+                'sertifikasi' => $bidang->detailKeahlian->sertifikasi,
                 'sertifikasi_url' => $bidang->detailKeahlian->sertifikasi && Storage::disk('public')->exists($bidang->detailKeahlian->sertifikasi) ? Storage::url($bidang->detailKeahlian->sertifikasi) : null,
                 'status_verifikasi' => $bidang->detailKeahlian->sertifikasi_status_verifikasi,
                 'catatan_verifikasi' => $bidang->detailKeahlian->sertifikasi_catatan_verifikasi,
             ]];
         });
 
-        // Mengambil data pivot dari relasi 'minat'
         $userMinatData = $user->minat->mapWithKeys(function ($bidang) {
             return [$bidang->bidang_id => [
                 'nama' => $bidang->bidang_nama,
-                'level' => $bidang->detailMinat->level ?? null // Menggunakan alias 'detailMinat'
+                'level' => $bidang->detailMinat->level ?? null
             ]];
         });
         $userMinatIds = $user->minat->pluck('bidang_id')->toArray();
 
-
         $selectedPengalaman = $user->pengalaman;
-        $minatLevelOptions = MinatUserModel::LEVEL_MINAT; // Pastikan MinatUserModel punya konstanta ini
+        $minatLevelOptions = MinatUserModel::LEVEL_MINAT;
 
         return view('profil.edit', compact(
             'user',
             'allBidangOptions',
             'userKeahlian',
             'userMinatData',
-            'userMinatIds', // Ditambahkan untuk pre-check checkbox minat
+            'userMinatIds',
             'minatLevelOptions',
             'selectedPengalaman'
         ));
@@ -105,13 +101,20 @@ class ProfilController extends Controller
         DB::beginTransaction();
 
         try {
+            // Aturan validasi diubah: 'nama' dan 'email' tidak lagi 'required' secara default
+            // Mereka akan diupdate hanya jika ada nilainya di request.
             $validationRules = [
-                'nama' => 'required|string|max:255',
-                'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->user_id, 'user_id')],
+                'nama' => 'sometimes|string|max:255', // 'sometimes' berarti validasi jika ada
+                'email' => [
+                    'sometimes', // Validasi jika ada
+                    'email',
+                    'max:255',
+                    Rule::unique('users', 'email')->ignore($user->user_id, 'user_id'),
+                ],
                 'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-                'keahlian_pilihan' => 'nullable|array', // Ini akan berisi bidang_id dari checkbox
+                'keahlian_pilihan' => 'nullable|array',
                 'keahlian_pilihan.*' => 'integer|exists:bidang,bidang_id',
-                'minat_pilihan' => 'nullable|array',   // Ini akan berisi bidang_id dari checkbox
+                'minat_pilihan' => 'nullable|array',
                 'minat_pilihan.*' => 'integer|exists:bidang,bidang_id',
                 'sertifikasi_file' => 'nullable|array',
                 'sertifikasi_file.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
@@ -120,24 +123,19 @@ class ProfilController extends Controller
             ];
 
             if ($user->role === 'dosen') {
-                $validationRules['gelar'] = 'nullable|string|max:100';
-                $validationRules['no_hp'] = 'nullable|string|max:20';
+                // Untuk dosen, gelar dan no_hp juga opsional jika tidak ingin diubah
+                $validationRules['gelar'] = 'sometimes|nullable|string|max:100';
+                $validationRules['no_hp'] = 'sometimes|nullable|string|max:20';
             }
 
-            // Hanya validasi pengalaman_items jika ada input
             if ($request->has('pengalaman_items') && is_array($request->input('pengalaman_items'))) {
                 foreach ($request->input('pengalaman_items') as $key => $value) {
-                    // Hanya validasi jika nama pengalaman diisi (artinya item tersebut dianggap ada)
-                    if (!empty($value['pengalaman_nama'])) {
+                    if (!empty($value['pengalaman_nama']) || !empty($value['pengalaman_kategori'])) { // Validasi jika salah satu field item pengalaman diisi
                         $validationRules["pengalaman_items.{$key}.pengalaman_nama"] = 'required|string|max:255';
-                        $validationRules["pengalaman_items.{$key}.pengalaman_kategori"] = 'nullable|string|max:255|in:Workshop,Magang,Proyek,Organisasi,Pekerjaan'; // Sesuaikan dengan ENUM atau pilihan Anda
-                    } else {
-                        // Jika nama kosong, kategori juga tidak wajib
                         $validationRules["pengalaman_items.{$key}.pengalaman_kategori"] = 'nullable|string|max:255|in:Workshop,Magang,Proyek,Organisasi,Pekerjaan';
                     }
                 }
             }
-
 
             $validator = Validator::make($request->all(), $validationRules, [
                 'sertifikasi_file.*.mimes' => 'File sertifikasi harus berupa: pdf, jpg, jpeg, png.',
@@ -150,7 +148,15 @@ class ProfilController extends Controller
                 return response()->json(['success' => false, 'message' => 'Validasi gagal.', 'errors' => $validator->errors()], 422);
             }
 
-            $userData = $request->only(['nama', 'email']);
+            // Hanya ambil data yang ada di request untuk update user dasar
+            $userData = [];
+            if ($request->filled('nama')) {
+                $userData['nama'] = $request->nama;
+            }
+            if ($request->filled('email')) {
+                $userData['email'] = $request->email;
+            }
+
             if ($request->hasFile('foto')) {
                 if ($user->foto && Storage::disk('public')->exists($user->foto)) {
                     Storage::disk('public')->delete($user->foto);
@@ -160,55 +166,64 @@ class ProfilController extends Controller
                 $path = $file->storeAs('profile_photos/' . $user->user_id, $filename, 'public');
                 $userData['foto'] = $path;
             }
-            $user->update($userData);
+
+            // Hanya update jika ada data yang diubah
+            if (!empty($userData)) {
+                $user->update($userData);
+            }
 
             if ($user->role === 'dosen' && $user->dosen) {
-                $user->dosen->update($request->only(['gelar', 'no_hp']));
+                $dosenDataToUpdate = [];
+                if ($request->filled('gelar')) {
+                    $dosenDataToUpdate['gelar'] = $request->gelar;
+                }
+                if ($request->filled('no_hp')) {
+                    $dosenDataToUpdate['no_hp'] = $request->no_hp;
+                }
+                if (!empty($dosenDataToUpdate)) {
+                    $user->dosen->update($dosenDataToUpdate);
+                }
             }
 
             // --- Handle Keahlian ---
+            // (Logika keahlian tetap sama, karena ini tentang memilih/tidak memilih dan mengunggah file)
+            // Jika checkbox tidak dipilih, relasi akan dihapus oleh sync. Jika dipilih, data pivot akan diupdate/dibuat.
             $selectedBidangIdsForKeahlian = $request->input('keahlian_pilihan', []);
             $dataToSyncKeahlian = [];
-            // Ambil keahlian user yang sudah ada untuk perbandingan file dan status
             $userKeahlianSaatIni = $user->keahlian()->get()->keyBy('bidang_id');
 
+            foreach ($allBidangOptions = BidangModel::all() as $bidang) { // Iterasi semua master bidang
+                $bidangId = $bidang->bidang_id;
+                if (in_array($bidangId, $selectedBidangIdsForKeahlian)) {
+                    $existingPivot = $userKeahlianSaatIni->get($bidangId)->detailKeahlian ?? null;
+                    $pivotData = [
+                        'sertifikasi' => $existingPivot->sertifikasi ?? null,
+                        'status_verifikasi' => $existingPivot->status_verifikasi ?? 'pending',
+                        'catatan_verifikasi' => $existingPivot->catatan_verifikasi ?? null,
+                    ];
 
-            foreach ($selectedBidangIdsForKeahlian as $bidangId) {
-                $existingPivot = $userKeahlianSaatIni->get($bidangId)->detailKeahlian ?? null;
-                $pivotData = [
-                    'sertifikasi' => $existingPivot->sertifikasi ?? null,
-                    'status_verifikasi' => $existingPivot->status_verifikasi ?? 'pending',
-                    'catatan_verifikasi' => $existingPivot->catatan_verifikasi ?? null,
-                ];
-
-                if ($request->hasFile("sertifikasi_file.{$bidangId}")) {
-                    $file = $request->file("sertifikasi_file.{$bidangId}");
-                    if ($pivotData['sertifikasi'] && Storage::disk('public')->exists($pivotData['sertifikasi'])) {
-                        Storage::disk('public')->delete($pivotData['sertifikasi']);
+                    if ($request->hasFile("sertifikasi_file.{$bidangId}")) {
+                        $file = $request->file("sertifikasi_file.{$bidangId}");
+                        if ($pivotData['sertifikasi'] && Storage::disk('public')->exists($pivotData['sertifikasi'])) {
+                            Storage::disk('public')->delete($pivotData['sertifikasi']);
+                        }
+                        $bidangNamaSlug = Str::slug($bidang->bidang_nama);
+                        $fileName = 'sertifikat_' . $user->user_id . '_' . $bidangId . '_' . $bidangNamaSlug . '_' . time() . '.' . $file->getClientOriginalExtension();
+                        $pivotData['sertifikasi'] = $file->storeAs('sertifikasi_keahlian/' . $user->user_id, $fileName, 'public');
+                        $pivotData['status_verifikasi'] = 'pending';
+                        $pivotData['catatan_verifikasi'] = null;
+                    } elseif (!$existingPivot || is_null($existingPivot->sertifikasi)) {
+                        $pivotData['sertifikasi'] = null;
+                        $pivotData['status_verifikasi'] = $existingPivot->status_verifikasi ?? 'pending';
                     }
-                    $bidangModel = BidangModel::find($bidangId);
-                    $bidangNamaSlug = $bidangModel ? Str::slug($bidangModel->bidang_nama) : $bidangId;
-                    $fileName = 'sertifikat_' . $user->user_id . '_' . $bidangId . '_' . $bidangNamaSlug . '_' . time() . '.' . $file->getClientOriginalExtension();
-                    $pivotData['sertifikasi'] = $file->storeAs('sertifikasi_keahlian/' . $user->user_id, $fileName, 'public');
-                    $pivotData['status_verifikasi'] = 'pending';
-                    $pivotData['catatan_verifikasi'] = null;
-                } elseif (!$existingPivot || is_null($existingPivot->sertifikasi)) {
-                    $pivotData['sertifikasi'] = null;
-                    $pivotData['status_verifikasi'] = $existingPivot->status_verifikasi ?? 'pending';
-                }
-                $dataToSyncKeahlian[$bidangId] = $pivotData;
-            }
-
-            // Hapus file sertifikat untuk keahlian yang tidak dipilih lagi
-            foreach ($userKeahlianSaatIni as $bidang_id_lama => $keahlianPivotLama) {
-                if (!in_array($bidang_id_lama, $selectedBidangIdsForKeahlian)) {
-                    if ($keahlianPivotLama->detailKeahlian->sertifikasi && Storage::disk('public')->exists($keahlianPivotLama->detailKeahlian->sertifikasi)) {
-                        Storage::disk('public')->delete($keahlianPivotLama->detailKeahlian->sertifikasi);
+                    $dataToSyncKeahlian[$bidangId] = $pivotData;
+                } else {
+                    if (isset($userKeahlianSaatIni[$bidangId]) && $userKeahlianSaatIni[$bidangId]->detailKeahlian->sertifikasi && Storage::disk('public')->exists($userKeahlianSaatIni[$bidangId]->detailKeahlian->sertifikasi)) {
+                        Storage::disk('public')->delete($userKeahlianSaatIni[$bidangId]->detailKeahlian->sertifikasi);
                     }
                 }
             }
             $user->keahlian()->sync($dataToSyncKeahlian);
-
 
             // --- Handle Minat ---
             $selectedBidangIdsForMinat = $request->input('minat_pilihan', []);
@@ -225,14 +240,12 @@ class ProfilController extends Controller
             if ($request->has('pengalaman_items') && is_array($request->input('pengalaman_items'))) {
                 $pengalamanToInsert = [];
                 foreach ($request->pengalaman_items as $item) {
-                    // Hanya proses jika nama pengalaman diisi
                     if (!empty($item['pengalaman_nama'])) {
                         $pengalamanToInsert[] = [
                             'user_id' => $user->user_id,
-                            // 'bidang_id' => $item['bidang_id'] ?? null, // Sesuaikan jika pengalaman ada bidang_id
                             'pengalaman_nama' => $item['pengalaman_nama'],
                             'pengalaman_kategori' => $item['pengalaman_kategori'] ?? null,
-                            'created_at' => now(), // Tambahkan manual jika model pengalaman tidak auto-timestamp
+                            'created_at' => now(),
                             'updated_at' => now(),
                         ];
                     }

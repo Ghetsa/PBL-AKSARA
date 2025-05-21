@@ -57,7 +57,7 @@ Route::middleware(['auth'])->group(function () {
     // ===================== PROFILE =====================
     Route::get('/profile', [ProfilController::class, 'index'])->name('profile.index');
     Route::get('/user/profile_ajax', [ProfilController::class, 'edit_ajax'])->name('profile.edit_ajax');
-    Route::put('/user/profile_ajax', [ProfilController::class, 'update_ajax'])->name('profile.update_ajax');
+    Route::Post('/user/profile_ajax', [ProfilController::class, 'update_ajax'])->name('profile.update_ajax');
 
     // ===================== LOMBA =====================
     Route::prefix('lomba')->name('lomba.')->group(function () {
@@ -147,7 +147,6 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/verifikasi/{id}', [KeahlianUserController::class, 'verifikasi'])->name('keahlian_user.verifikasi');
             Route::post('/verifikasi/{id}', [KeahlianUserController::class, 'prosesVerifikasi'])->name('keahlian_user.prosesVerifikasi');
         });
-
     });
 
     // ===================== ADMIN =====================
@@ -183,5 +182,4 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{prestasi}/verify-form-ajax', [PrestasiController::class, 'showVerifyFormAjaxDosen'])->name('verify_form_ajax');
         Route::put('/{prestasi}/process-verification-ajax', [PrestasiController::class, 'processVerificationAjaxDosen'])->name('process_verification_ajax');
     });
-
 });
