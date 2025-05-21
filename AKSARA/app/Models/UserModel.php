@@ -71,8 +71,8 @@ class UserModel extends Authenticatable implements JWTSubject
             'user_id',
             'bidang_id'
         )
-        ->withPivot('keahlian_user_id', 'sertifikasi', 'status_verifikasi', 'catatan_verifikasi')
-        ->withTimestamps();
+            ->withPivot('keahlian_user_id', 'sertifikasi', 'status_verifikasi', 'catatan_verifikasi')
+            ->withTimestamps();
     }
 
     /**
@@ -89,6 +89,22 @@ class UserModel extends Authenticatable implements JWTSubject
     public function minatUser()
     {
         return $this->hasMany(MinatUserModel::class, 'user_id', 'user_id');
+    }
+
+    public function keahlian()
+    {
+        return $this->belongsToMany(BidangModel::class, 'keahlian_user', 'user_id', 'bidang_id')
+            ->withPivot('keahlian_user_id', 'sertifikasi', 'status_verifikasi', 'catatan_verifikasi')
+            ->withTimestamps()
+            ->as('detailKeahlian');
+    }
+
+    public function minat()
+    {
+        return $this->belongsToMany(BidangModel::class, 'minat_user', 'user_id', 'bidang_id')
+            ->withPivot('minat_user_id', 'level')
+            ->withTimestamps()
+            ->as('detailMinat');
     }
 
     /**
