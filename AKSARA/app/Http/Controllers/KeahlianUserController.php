@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\KeahlianModel;
+use App\Models\BidangModel;
 use App\Models\KeahlianUserModel;
 use App\Models\UserModel;
 use Illuminate\Http\Request;
@@ -13,15 +13,15 @@ class KeahlianUserController extends Controller
 {
     public function index()
     {
-        $data = KeahlianUserModel::with(['bidang', 'user']);
         $breadcrumb = (object) [
             'title' => 'Keahlian Saya',
             'list' => ['Keahlian']
         ];
         $activeMenu = 'keahlian_user';
 
-        return view('keahlian_user.index', compact('data', 'breadcrumb', 'activeMenu'));
+        return view('keahlian_user.index', compact('breadcrumb', 'activeMenu'));
     }
+
 
 
     // ================================================================
@@ -38,17 +38,18 @@ class KeahlianUserController extends Controller
                 ->addIndexColumn()
                 ->addColumn('bidang_nama', fn($row) => $row->bidang->bidang_nama ?? '-')
                 ->editColumn('sertifikasi', fn($row) => $row->sertifikasi ?? '-')
-                ->editColumn('status_verifikasi', fn($row) => $row->status_verifikasi ?? 'pending')
+                ->editColumn('status_verifikasi', fn($row) => $row->status_verifikasi_badge)
                 ->addColumn('aksi', function ($row) {
-                    $editUrl = route('keahlian_user.edit', $row->id);
-                    $deleteUrl = route('keahlian_user.destroy', $row->id);
+                    $editUrl = route('keahlian_user.edit', $row->keahlian_user_id);
+                    $deleteUrl = route('keahlian_user.destroy', $row->keahlian_user_id);
+
 
                     $btn = '<button onclick="modalAction(\'' . $editUrl . '\', \'Edit Bidang\')" class="btn btn-warning btn-sm me-1">Edit</button>';
                     $btn .= '<button class="btn btn-danger btn-sm btn-delete-keahlian" data-url="' . $deleteUrl . '" data-nama="' . ($row->bidang->bidang_nama ?? '-') . '">Hapus</button>';
 
                     return $btn;
                 })
-                ->rawColumns(['aksi'])
+                ->rawColumns(['aksi', 'status_verifikasi'])
                 ->make(true);
         }
 
@@ -66,7 +67,7 @@ class KeahlianUserController extends Controller
     public function create()
     {
         $users = UserModel::orderBy('user_id')->get();
-        $keahlianList = KeahlianModel::orderBy('bidang_nama')->get();
+        $keahlianList = BidangModel::orderBy('bidang_nama')->get();
 
         $breadcrumb = (object) [
             'title' => 'Tambah Keahlian User',
@@ -106,7 +107,7 @@ class KeahlianUserController extends Controller
     public function edit($id)
     {
         $data = KeahlianUserModel::findOrFail($id);
-        $keahlian = KeahlianModel::orderBy('bidang_nama')->get();
+        $keahlian = BidangModel::orderBy('bidang_nama')->get();
 
         $breadcrumb = (object) [
             'title' => 'Edit Keahlian User',
