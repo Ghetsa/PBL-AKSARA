@@ -76,7 +76,7 @@ public function list(Request $request)
     public function create()
     {
         $users = UserModel::orderBy('user_id')->get();
-        $keahlianList = BidangModel::orderBy('bidang_nama')->get();
+        $bidang = BidangModel::orderBy('bidang_nama')->get();
 
         $breadcrumb = (object) [
             'title' => 'Tambah Keahlian User',
@@ -84,7 +84,7 @@ public function list(Request $request)
         ];
         $activeMenu = 'keahlian_user';
 
-        return view('keahlian_user.create', compact('users', 'keahlianList', 'breadcrumb', 'activeMenu'));
+        return view('keahlian_user.create', compact('users', 'bidang', 'breadcrumb', 'activeMenu'));
     }
     public function store(Request $request)
     {
@@ -116,7 +116,7 @@ public function list(Request $request)
     public function edit($id)
     {
         $data = KeahlianUserModel::findOrFail($id);
-        $keahlian = BidangModel::orderBy('bidang_nama')->get();
+        $bidang = BidangModel::orderBy('bidang_nama')->get();
 
         $breadcrumb = (object) [
             'title' => 'Edit Keahlian User',

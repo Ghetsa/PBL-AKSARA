@@ -15,12 +15,12 @@
 
         {{-- Keahlian --}}
         <div class="mb-3">
-            <label for="keahlian_id" class="form-label">Keahlian</label>
-            <select name="keahlian_id" id="keahlian_id" class="form-select" required>
+            <label for="bidang_id" class="form-label">Bidang Keahlian</label>
+            <select name="bidang_id" id="bidang_id" class="form-select" required>
                 <option value="">-- Pilih Keahlian --</option>
-                @foreach ($keahlian as $item)
-                    <option value="{{ $item->keahlian_id }}" {{ $data->keahlian_id == $item->keahlian_id ? 'selected' : '' }}>
-                        {{ $item->keahlian_nama }}
+                @foreach ($bidang as $item)
+                    <option value="{{ $item->bidang_id }}" {{ $data->bidang_id == $item->bidang_id ? 'selected' : '' }}>
+                        {{ $item->bidang_nama }}
                     </option>
                 @endforeach
             </select>
