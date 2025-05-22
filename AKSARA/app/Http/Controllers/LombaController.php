@@ -40,11 +40,15 @@ class LombaController extends Controller
         return DataTables::of($query)
             ->addIndexColumn()
             ->addColumn('aksi', function ($row) {
-                $editUrl = route('lomba.edit', $row->id);
-                $verifUrl = route('lomba.verifikasi', $row->id);
-                $deleteUrl = route('lomba.destroy', $row->id);
+                // $editUrl = route('lomba.edit', $row->lomba_id);
+                // $verifUrl = route('lomba.verifikasi', $row->lomba_id);
+                // $deleteUrl = route('lomba.destroy', $row->lomba_id);
 
-                return view('components.lomba.aksi-buttons', compact('editUrl', 'verifUrl', 'deleteUrl'));
+                // return view('components.lomba.aksi-buttons', compact('editUrl', 'verifUrl', 'deleteUrl'));
+                $btn = '<button onclick="modalAction(\'' . e(route('lomba.index', $row->lomba_id)) . '\')" class="btn btn-info btn-sm">Detail</button> ';
+                $btn .= '<button onclick="modalAction(\'' . e(route('lomba.edit', $row->lomba_id)) . '\')" class="btn btn-warning btn-sm">Edit</button> ';
+                $btn .= '<button onclick="deleteConfirmAjax(' . e($row->lomba_id) . ')" class="btn btn-danger btn-sm">Hapus</button>';
+                return $btn;
             })
             ->editColumn('pembukaan_pendaftaran', function ($row) {
                 return \Carbon\Carbon::parse($row->pembukaan_pendaftaran)->format('d-m-Y');
