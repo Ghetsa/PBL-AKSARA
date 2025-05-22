@@ -16,8 +16,8 @@
             <tr><th>NIM</th><td>{{ $keahlianUser->user->mahasiswa->nim ?? 'N/A' }}</td></tr>
             <tr><th>Prodi</th><td>{{ $keahlianUser->user->mahasiswa->prodi->nama ?? 'N/A' }}</td></tr>
             {{-- @elseif($keahlianUser->user->role == 'dosen' && $keahlianUser->user->dosen)
-            <tr><th>NIP</th><td>{{ $keahlianUser->user->dosen->nip ?? 'N/A' }}</td></tr>
-            @endif --}}
+            <tr><th>NIP</th><td>{{ $keahlianUser->user->dosen->nip ?? 'N/A' }}</td></tr> --}}
+            @endif
             <tr><th>Bidang Keahlian</th><td>{{ $keahlianUser->bidang->bidang_nama ?? 'N/A' }}</td></tr>
             <tr><th>Nama Sertifikat/Keahlian</th><td>{{ $keahlianUser->nama_sertifikat ?? '-' }}</td></tr>
             <tr><th>Lembaga Penerbit</th><td>{{ $keahlianUser->lembaga_sertifikasi ?? '-' }}</td></tr>
