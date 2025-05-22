@@ -159,6 +159,13 @@ Route::middleware(['auth'])->group(function () {
             Route::put('/{prestasi}/process-verification-ajax', [PrestasiController::class, 'processVerificationAjaxAdmin'])->name('process_verification_ajax');
         });
 
+        Route::prefix('admin/keahlian-verifikasi')->name('keahlian_user.admin.')->group(function () {
+            Route::get('/', [KeahlianUserController::class, 'adminIndex'])->name('index');
+            Route::get('/list', [KeahlianUserController::class, 'list_admin'])->name('list');
+            Route::get('/{id}/verify-form-ajax', [KeahlianUserController::class, 'showVerificationFormAjax'])->name('verify_form_ajax');
+            Route::put('/{id}/process-verification-ajax', [KeahlianUserController::class, 'prosesVerifikasiAjax'])->name('process_verification_ajax');
+        });
+
         // Route::prefix('admin/keahlian_user')->group(function () {
         //     Route::get('/', [KeahlianUserController::class, 'index'])->name('keahlian_user.index');
         //     Route::get('/create', [KeahlianUserController::class, 'create'])->name('keahlian_user.create');

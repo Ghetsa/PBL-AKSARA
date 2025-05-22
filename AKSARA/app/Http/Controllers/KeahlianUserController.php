@@ -182,57 +182,93 @@ class KeahlianUserController extends Controller
     // ================================================================
     // |                    METHOD UNTUK ADMIN                    |
     // ================================================================
-    public function list_admin(Request $request)
+    // Method untuk menampilkan halaman index admin daftar keahlian
+    public function adminIndex()
     {
-        $keahlianUser = KeahlianUserModel::with(['bidang', 'user']);
+        $breadcrumb = (object) [
+            'title' => 'Verifikasi Keahlian Pengguna',
+            'list' => ['Admin', 'Verifikasi Keahlian']
+        ];
+        $activeMenu = 'verifikasi_keahlian';
 
-        return DataTables::of($keahlianUser)
+        return view('keahlian_user.admin.index', compact('breadcrumb', 'activeMenu'));
+    }
+
+    public function list_admin(Request $request) // DataTables untuk admin
+    {
+        $query = KeahlianUserModel::with([
+            'bidang',
+            'user' => function ($qUser) {
+                $qUser->with(['mahasiswa' => function ($qMhs) {
+                    $qMhs->with('prodi'); // Eager load prodi dari mahasiswa
+                }]);
+            }
+        ]);
+
+        if ($request->filled('status_verifikasi')) {
+            $query->where('status_verifikasi', $request->status_verifikasi);
+        }
+
+        return DataTables::of($query)
             ->addIndexColumn()
             ->addColumn('user_nama', fn($row) => $row->user->nama ?? '-')
-            ->addColumn('bidang_nama', fn($row) => $row->bidang->bidang_nama ?? '-')
-            ->addColumn('sertifikasi', function ($row) {
-                if ($row->sertifikasi) {
-                    $url = asset('storage/' . $row->sertifikasi);
-                    return '<a href="' . $url . '" target="_blank" class="btn btn-sm btn-success">Lihat</a>';
-                }
-                return '<span class="text-muted">-</span>';
-            })
-            ->addColumn('status_verifikasi', fn($row) => ucfirst($row->status_verifikasi))
+            ->editColumn('bidang_nama', fn($row) => $row->bidang->bidang_nama ?? '-')
+            ->editColumn('nama_sertifikat', fn($row) => $row->nama_sertifikat ?? '-')
+            ->editColumn('lembaga_sertifikasi', fn($row) => $row->lembaga_sertifikasi ?? '-')
+            ->editColumn('tanggal_perolehan_sertifikat', fn($row) => $row->tanggal_perolehan_sertifikat ? $row->tanggal_perolehan_sertifikat->format('d-m-Y') : '-')
+            ->editColumn('tanggal_kadaluarsa_sertifikat', fn($row) => $row->tanggal_kadaluarsa_sertifikat ? $row->tanggal_kadaluarsa_sertifikat->format('d-m-Y') : '-')
+            ->editColumn('status_verifikasi', fn($row) => $row->status_verifikasi_badge) // Menggunakan accessor
             ->addColumn('aksi', function ($row) {
-                $btn = '<button onclick="modalAction(\'' . route('keahlian_user.verifikasi', $row->keahlian_user_id) . '\')" class="btn btn-info btn-sm">Verifikasi</button> ';
-                $btn .= '<button onclick="modalAction(\'' . route('keahlian_user.edit', $row->keahlian_user_id) . '\')" class="btn btn-warning btn-sm">Edit</button> ';
-                $btn .= '<button onclick="deleteConfirmAjax(' . $row->keahlian_user_id . ')" class="btn btn-danger btn-sm">Hapus</button>';
-                return $btn;
+                // Tombol untuk membuka modal verifikasi
+                $btnVerifikasi = '<button onclick="modalActionKeahlian(\'' . route('keahlian_user.admin.verify_form_ajax', $row->keahlian_user_id) . '\')" class="btn btn-primary btn-sm" title="Verifikasi Keahlian"><i class="fas fa-search-plus"></i> Verifikasi</button>';
+                return $btnVerifikasi;
             })
-            ->rawColumns(['sertifikasi', 'aksi'])
+            ->rawColumns(['aksi', 'status_verifikasi'])
             ->make(true);
     }
-    public function verifikasi($id)
+
+    // Menampilkan form verifikasi dalam modal (AJAX)
+    public function showVerificationFormAjax($id)
     {
-        $data = KeahlianUserModel::with(['user', 'bidang'])->findOrFail($id);
+        $data = KeahlianUserModel::with([
+            'user' => function ($qUser) {
+                $qUser->with(['mahasiswa' => function ($qMhs) {
+                    $qMhs->with('prodi');
+                }, 'dosen']);
+            },
+            'bidang'
+        ])->findOrFail($id);
 
-        $breadcrumb = (object) [
-            'title' => 'Verifikasi Keahlian',
-            'list' => ['Master', 'Keahlian User', 'Verifikasi']
-        ];
-        $activeMenu = 'keahlian_user';
-
-        return view('keahlian_user.admin.verifikasi', compact('data', 'breadcrumb', 'activeMenu'));
+        // Mengirim data ke view AJAX modal, bukan view halaman penuh
+        return view('keahlian_user.admin.verify', ['keahlianUser' => $data]);
     }
 
-    public function prosesVerifikasi(Request $request, $id)
+    // Memproses verifikasi dari form AJAX
+    public function prosesVerifikasiAjax(Request $request, $id)
     {
         $data = KeahlianUserModel::findOrFail($id);
 
         $request->validate([
-            'status_verifikasi' => 'required|in:disetujui,ditolak',
-            'catatan_verifikasi' => 'nullable|string',
+            'status_verifikasi' => 'required|in:disetujui,ditolak,pending',
+            'catatan_verifikasi' => 'nullable|string|max:1000',
         ]);
+
+        // Validasi tambahan: catatan wajib jika ditolak
+        if ($request->status_verifikasi == 'ditolak' && empty(trim($request->catatan_verifikasi))) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Catatan verifikasi wajib diisi jika status ditolak.',
+                'errors' => ['catatan_verifikasi' => ['Catatan verifikasi wajib diisi jika status ditolak.']]
+            ], 422);
+        }
 
         $data->status_verifikasi = $request->status_verifikasi;
         $data->catatan_verifikasi = $request->catatan_verifikasi;
         $data->save();
 
-        return redirect()->route('keahlian_user.index')->with('success', 'Verifikasi keahlian berhasil diproses.');
+        return response()->json([
+            'status' => true,
+            'message' => 'Verifikasi keahlian berhasil diproses.'
+        ]);
     }
 }

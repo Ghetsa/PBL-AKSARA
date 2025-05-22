@@ -79,7 +79,7 @@
                     <i class="ti ti-brand-chrome"></i>
                 </li>
                 <li class="pc-item">
-                    <a href="{{ url('/admin/keahlian_user-verifikasi') }}" class="pc-link {{ ($activeMenu == 'keahlian_user') ? 'active' : '' }}">
+                    <a href="{{ url('/admin/keahlian-verifikasi') }}" class="pc-link {{ ($activeMenu == 'verifikasi_keahlian') ? 'active' : '' }}">
                         <span class="pc-micon"><i class="ti ti-certificate"></i></span>
                         <span class="pc-mtext">Verifikasi Keahlian</span>
                     </a>

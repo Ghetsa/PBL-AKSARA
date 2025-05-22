@@ -230,33 +230,11 @@
                                         </div>
                                     @endif
 
-                                    {{-- @if($user->role == 'dosen' || $user->role == 'mahasiswa')
-                                    <div class="card mt-3">
-                                        <div class="card-header d-flex justify-content-between align-items-center">
-                                            <h4>Minat</h4>
-                                        </div>
-                                        @if($user->minat && $user->minat->count() > 0)
-                                        <div class="card-body">
-                                            @foreach($user->minat as $m)
-                                            <span class="badge bg-light text-dark me-1 mb-1 p-2 fs-6">{{ $m->minat_nama ??
-                                                $m->minat }}</span>
-                                            @endforeach
-                                        </div>
-                                        @else
-                                        <div class="card-body">
-                                            <p class="mb-0 text-muted">Belum ada minat yang ditambahkan.</p>
-                                        </div>
-                                        @endif
-                                    </div>
-                                    @endif --}}
-
                                     {{-- Card untuk Pengalaman --}}
-                                    @if($user->role == 'mahasiswa' || $user->role == 'dosen') {{-- Sesuaikan jika dosen juga
-                                        menampilkan ini --}}
+                                    @if($user->role == 'mahasiswa' || $user->role == 'dosen') 
                                         <div class="card mt-3">
                                             <div class="card-header d-flex justify-content-between align-items-center">
                                                 <h4>Pengalaman</h4>
-                                                {{-- Tombol Edit Pengalaman Dihilangkan (jika diedit via modal utama) --}}
                                             </div>
                                             @if($user->pengalaman && $user->pengalaman->count() > 0)
                                                 <div class="card-body">
@@ -268,7 +246,6 @@
                                                                 @if($p->pengalaman_kategori)
                                                                     <p class="mb-0 text-sm text-muted">{{ $p->pengalaman_kategori }}</p>
                                                                 @endif
-                                                                {{-- Tambahkan detail lain jika ada (misal deskripsi, tahun) --}}
                                                             </li>
                                                         @endforeach
                                                     </ul>
@@ -329,38 +306,6 @@
                                             @endif
                                         </div>
                                     @endif
-                                    {{-- @if($user->role == 'mahasiswa' && $user->mahasiswa && $user->mahasiswa->prestasi && $user->mahasiswa->prestasi->count() > 0)
-                                        <div class="card mt-3">
-                                            <div class="card-header">
-                                                <h4>Prestasi</h4>
-                                            </div>
-                                            <div class="card-body">
-                                                <ul class="list-group list-group-flush">
-                                                    @foreach($user->mahasiswa->prestasi as $index => $pres)
-                                                        @if($index < 3) 
-                                                            <li
-                                                                class="list-group-item px-0 @if(!$loop->first) pt-3 @else pt-0 @endif @if(!$loop->last) pb-3 @else pb-0 @endif">
-                                                                <p class="mb-0 text-lg">{{ $pres->nama_prestasi }}
-                                                                    <span class="text-muted">({{ $pres->tingkat }} -
-                                                                        {{ $pres->tahun }})</span>
-                                                                </p>
-                                                                @if($pres->file_bukti && Storage::disk('public')->exists($pres->file_bukti))
-                                                                    <a href="{{ Storage::url($pres->file_bukti) }}" target="_blank"
-                                                                        class="btn-link text-sm">Lihat Bukti</a>
-                                                                @endif
-                                                            </li>
-                                                        @endif
-                                                    @endforeach
-                                                    @if($user->mahasiswa->prestasi->count() > 3)
-                                                        <li class="list-group-item px-0 pt-3 pb-0 text-center">
-                                                            <a href="{{ route('prestasi.mahasiswa.index') }}">Lihat semua
-                                                                prestasi...</a>
-                                                        </li>
-                                                    @endif
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    @endif --}}
 
                                     <div class="mt-4 text-end">
                                         <button id="btnEditProfile" class="btn btn-primary">
