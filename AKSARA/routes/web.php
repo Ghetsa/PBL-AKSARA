@@ -35,6 +35,12 @@ Route::get('/', function () {
 // ===================== AUTHENTICATED ROUTES =====================
 Route::middleware(['auth'])->group(function () {
 
+    // Route untuk menampilkan form ubah password via AJAX
+    Route::get('/profil/change-password-form', [ProfilController::class, 'showChangePasswordFormAjax'])->name('profil.change_password');
+
+    // Route untuk memproses update password via AJAX
+    Route::put('/profil/update-password', [ProfilController::class, 'updatePasswordAjax'])->name('profil.update_password');
+
     // ===================== DASHBOARD =====================
     Route::get('/dashboard/admin', function () {
         $breadcrumb = (object) ['title' => 'Dashboard', 'list' => ['Admin', 'Dashboard']];

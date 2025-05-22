@@ -25,7 +25,8 @@
                         <a href="{{ route('user.create') }}" class="btn btn-success btn-sm">Tambah</a>
                         {{-- Tombol Tambah User (AJAX) - Memanggil modalAction --}}
                         <button type="button" class="btn btn-primary btn-sm"
-                                onclick="modalAction('{{ route('user.create_ajax') }}')">Tambah Ajax</button>
+                                onclick="modalAction('{{ route('user.create_ajax') }}')">
+                                <i class="fas fa-plus-circle"></i> Tambah Ajax</button>
                     </div>
                 </div>
 

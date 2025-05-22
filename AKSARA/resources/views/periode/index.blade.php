@@ -22,7 +22,8 @@
                     <div class="card-tools">
                         {{-- <a href="{{ route('periode.create') }}" class="btn btn-success btn-sm">Tambah</a> --}}
                         <button type="button" class="btn btn-primary btn-sm"
-                                onclick="modalAction('{{ route('periode.create') }}')">Tambah Ajax</button>
+                                onclick="modalAction('{{ route('periode.create') }}')">
+                                <i class="fas fa-plus-circle"></i> Tambah</button>
                     </div>
                 </div>
 
