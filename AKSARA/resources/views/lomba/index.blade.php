@@ -6,8 +6,12 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
-                <div class="card-header">
+                <div class="card-header d-flex justify-content-between align-items-center">
                     <h3 class="card-title">Daftar Lomba</h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-primary btn-sm"
+                                onclick="modalAction('{{ route('lomba.create') }}')">Tambah Lomba</button>
+                    </div>
                 </div>
                 <div class="card-body">
                     {{-- Flash messages akan ditampilkan oleh SweetAlert --}}
