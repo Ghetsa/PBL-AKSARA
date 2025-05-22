@@ -14,6 +14,8 @@ use App\Models\UserModel;
 use App\Models\BidangModel;
 use App\Models\PengalamanModel;
 use App\Models\MinatUserModel;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 
 class ProfilController extends Controller
 {
@@ -265,6 +267,58 @@ class ProfilController extends Controller
             DB::rollBack();
             Log::error('Error update profil AJAX: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
             return response()->json(['success' => false, 'message' => 'Gagal memperbarui profil. Terjadi kesalahan server.'], 500);
+        }
+    }
+
+    public function showChangePasswordFormAjax()
+    {
+        return view('profil.change_password');
+    }
+
+    public function updatePasswordAjax(Request $request)
+    {
+        $user = Auth::user();
+
+        $validator = Validator::make($request->all(), [
+            'current_password' => ['required', 'string', function ($attribute, $value, $fail) use ($user) {
+                if (!Hash::check($value, $user->password)) {
+                    $fail('Password lama tidak sesuai.');
+                }
+            }],
+            'new_password' => [
+                'required',
+                'string',
+                Password::min(6) // Minimal 6 karakter
+                    ->mixedCase()    // Harus ada huruf besar dan kecil
+                    ->numbers()      // Harus ada angka
+                    ->symbols(),     // Harus ada simbol
+                'confirmed'
+            ],
+        ], [
+            'current_password.required' => 'Password lama wajib diisi.',
+            'new_password.required' => 'Password baru wajib diisi.',
+            'new_password.min' => 'Password baru minimal  karakter.',
+            'new_password.confirmed' => 'Konfirmasi password baru tidak cocok.',
+            'new_password.mixed_case' => 'Password baru harus mengandung setidaknya satu huruf besar dan satu huruf kecil.',
+            'new_password.numbers' => 'Password baru harus mengandung setidakny6a satu angka.',
+            'new_password.symbols' => 'Password baru harus mengandung setidaknya satu simbol (contoh: !@#$%^&*).',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'message' => 'Validasi gagal.', 'errors' => $validator->errors()], 422);
+        }
+
+        try {
+            $user->password = Hash::make($request->new_password);
+            $user->save();
+
+            // Opsional: Logout user dari session lain jika diinginkan setelah ganti password
+            // Auth::logoutOtherDevices($request->current_password);
+
+            return response()->json(['success' => true, 'message' => 'Password berhasil diperbarui.']);
+        } catch (\Exception $e) {
+            Log::error('Error update password AJAX: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+            return response()->json(['success' => false, 'message' => 'Gagal memperbarui password. Terjadi kesalahan server.'], 500);
         }
     }
 }

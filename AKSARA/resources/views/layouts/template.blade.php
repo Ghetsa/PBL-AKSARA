@@ -55,6 +55,15 @@
         </div>
     </div>
     @include('layouts.footer')
+
+    <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                {{-- Konten AJAX form ubah password akan dimuat di sini --}}
+            </div>
+        </div>
+    </div>
+    
     <!-- jQuery -->
     {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}} 
     <script src="{{ asset('mantis/dist/assets/js/plugins/popper.min.js') }}"></script>
@@ -136,6 +145,55 @@
     <script>preset_change("preset-1");</script>
     <script>font_change("Public-Sans");</script>
     @stack('js')
+
+    <script>
+        function openChangePasswordModal() {
+            const modalId = 'changePasswordModal';
+            const url = "{{ route('profil.change_password') }}"; // Pastikan nama route ini benar
+            const targetModal = $(`#${modalId}`);
+            const targetModalContent = targetModal.find('.modal-content');
+            
+            // Tampilkan spinner loading di modal content
+            targetModalContent.html(`
+                <div class="modal-header">
+                    <h5 class="modal-title">Ubah Password</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center py-5">
+                    <div class="spinner-border text-primary" role="status" style="width: 2rem; height: 2rem;">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2 mb-0">Memuat form...</p>
+                </div>
+            `);
+            
+            const modalInstance = bootstrap.Modal.getOrCreateInstance(document.getElementById(modalId));
+            modalInstance.show();
+
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: function (response) {
+                    targetModalContent.html(response); // Muat form yang diterima ke modal
+                },
+                error: function (xhr) {
+                    let errorMessage = 'Gagal memuat form ubah password.';
+                    if(xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    }
+                    targetModalContent.html(`
+                        <div class="modal-header">
+                            <h5 class="modal-title">Error Memuat Form</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body"><p class="text-danger">${errorMessage}</p></div>
+                        <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button></div>
+                    `);
+                }
+            });
+        }
+    </script>
+    
     @yield('page-js')
 </body>
 </html>

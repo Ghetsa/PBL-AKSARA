@@ -10,7 +10,7 @@
                     <h3 class="card-title">Histori Prestasi Saya</h3>
                     <button type="button" class="btn btn-primary btn-sm"
                             onclick="modalAction('{{ route('prestasi.mahasiswa.create_ajax') }}', 'Upload Prestasi Baru')">
-                        <i class="fas fa-plus"></i> Upload Prestasi Baru
+                        <i class="fas fa-plus-circle"></i> Upload Prestasi Baru
                     </button>
                 </div>
                 <div class="card-body">
