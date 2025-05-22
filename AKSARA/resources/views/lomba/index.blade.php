@@ -32,7 +32,7 @@
                     </form>
 
                     <div class="table-responsive">
-                        <table class="table table-bordered table-hover" id="dataDaftarPrestasiAdmin" style="width:100%;">
+                        <table class="table table-bordered table-hover" id="dataDaftarLombaAdmin" style="width:100%;">
                             <thead>
                                 <tr>
                                     <th class="text-center">No.</th>
@@ -95,7 +95,7 @@
             processing: true,
             serverSide: true,
             ajax: {
-                url: "{{ route('prestasi.admin.list') }}",
+                url: "{{ route('lomba.list') }}",
                 data: function (d) { // Mengirim data filter
                     d.search_nama = $('#search_nama_admin').val();
                     d.filter_status = $('#filter_status_admin').val();

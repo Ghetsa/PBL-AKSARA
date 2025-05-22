@@ -15,7 +15,9 @@ class LombaController extends Controller
             'list' => ['Dashboard', 'Lomba']
         ];
 
-        return view('lomba.index', compact('breadcrumb'));
+         $activeMenu = 'lomba';
+
+        return view('lomba.index', compact('breadcrumb', 'activeMenu'));
     }
 
     public function getList(Request $request)
