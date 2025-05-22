@@ -20,6 +20,7 @@
                                 <tr>
                                     <th class="text-center" style="width: 5%;">No.</th>
                                     <th>Prestasi</th>
+                                    <th>Bidang</th>
                                     <th>Kategori</th>
                                     <th>Tingkat</th>
                                     <th>Tahun</th>
@@ -83,6 +84,7 @@
             columns: [
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', className: 'text-center', orderable: false, searchable: false },
                 { data: 'nama_prestasi', name: 'nama_prestasi' },
+                { data: 'bidang_nama', name: 'bidang_nama' },
                 { data: 'kategori', name: 'kategori' },
                 { data: 'tingkat', name: 'tingkat' },
                 { data: 'tahun', name: 'tahun' },

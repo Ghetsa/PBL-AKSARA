@@ -39,6 +39,24 @@
             </div>
         </div>
 
+        {{-- Field Bidang Prestasi --}}
+        <div class="form-group row mb-3">
+            <label for="dosen_id" class="col-sm-3 col-form-label">Bidang Prestasi</label>
+            <div class="col-sm-9">
+                <select class="form-select" id="bidang_id" name="bidang_id">
+                    <option value="">-- Pilih Bidang --</option>
+                    @if(isset($bidangs) && $bidangs->count() > 0)
+                        @foreach($bidangs as $bidang)
+                            <option value="{{ $bidang->id }}" {{ old('bidang_id', $prestasi->bidang_id ?? '') == $bidang->id ? 'selected' : '' }}>
+                                {{ $bidang->nama }}
+                            </option>
+                        @endforeach
+                    @endif
+                </select>
+                <span class="invalid-feedback error-text" id="error-bidang_id"></span>
+            </div>
+        </div>
+
         {{-- Field Penyelenggara --}}
         <div class="form-group row mb-3">
             <label for="penyelenggara" class="col-sm-3 col-form-label">Penyelenggara <span

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Log; // Untuk logging
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use App\Models\DosenModel;
+use App\Models\BidangModel;
 
 class PrestasiController extends Controller
 {
@@ -129,11 +130,11 @@ class PrestasiController extends Controller
 
             $data = PrestasiModel::where('mahasiswa_id', $mahasiswa_id)
                 ->with(['dosenPembimbing.user']) // Eager load relasi dosen dan user terkait dosen
-                ->select(['prestasi_id', 'nama_prestasi', 'kategori', 'tingkat', 'tahun', 'status_verifikasi', 'file_bukti', 'catatan_verifikasi', 'dosen_id']) // Ambil catatan & dosen_id
                 ->orderBy('tahun', 'desc');
 
             return DataTables::of($data)
                 ->addIndexColumn()
+                ->addColumn('bidang_nama', fn($row) => $row->bidang->bidang_nama ?? '-')
                 ->addColumn('dosen_pembimbing', function ($row) {
                     return $row->dosenPembimbing->user->nama ?? ($row->dosenPembimbing->nama ?? '-');
                 })
@@ -175,6 +176,7 @@ class PrestasiController extends Controller
         return abort(403, "Akses ditolak.");
     }
 
+
     public function createFormAjaxMahasiswa()
     {
         $dosens = DosenModel::with('user')->whereHas('user', function ($q) {
@@ -185,9 +187,14 @@ class PrestasiController extends Controller
                 'nama' => $dosen->user->nama ?? 'Nama Dosen Tidak Ada'
             ];
         })->sortBy('nama');
-        return view('prestasi.mahasiswa.create_ajax', compact('dosens'));
+        $bidangs = BidangModel::select('bidang_id', 'bidang_nama')->get()->map(function ($bidang) {
+            return (object) [
+                'id' => $bidang->bidang_id,
+                'nama' => $bidang->bidang_nama ?? 'Nama Bidang Tidak Ada'
+            ];
+        })->sortBy('nama');
+        return view('prestasi.mahasiswa.create_ajax', compact('bidangs', 'dosens'));
     }
-
     public function storeAjaxMahasiswa(Request $request)
     {
         $user = Auth::user();
@@ -203,6 +210,7 @@ class PrestasiController extends Controller
             'tingkat' => ['required', Rule::in(['kota', 'provinsi', 'nasional', 'internasional'])],
             'tahun' => 'required|integer|digits:4|min:1900|max:' . (date('Y') + 1),
             'dosen_id' => 'nullable|integer|exists:dosen,dosen_id',
+            'bidang_id' => 'nullable|integer|exists:bidang,bidang_id',
             'file_bukti' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048', // Max 2MB
         ]);
 
@@ -222,6 +230,7 @@ class PrestasiController extends Controller
             PrestasiModel::create([
                 'mahasiswa_id' => $user->mahasiswa->mahasiswa_id,
                 'dosen_id' => $request->dosen_id,
+                'bidang_id' => $request->bidang_id,
                 'nama_prestasi' => $request->nama_prestasi,
                 'kategori' => $request->kategori,
                 'penyelenggara' => $request->penyelenggara,
@@ -278,9 +287,14 @@ class PrestasiController extends Controller
                 'nama' => $dosen->user->nama ?? 'Nama Dosen Tidak Ada'
             ];
         })->sortBy('nama');
-
+        $bidangs = BidangModel::select('bidang_id', 'bidang_nama')->get()->map(function ($bidang) {
+            return (object) [
+                'id' => $bidang->bidang_id,
+                'nama' => $bidang->bidang_nama ?? 'Nama Bidang Tidak Ada'
+            ];
+        })->sortBy('nama');
         // Kita bisa menggunakan view create_ajax yang sama dengan mengirimkan data $prestasi
-        return view('prestasi.mahasiswa.create_ajax', compact('prestasi', 'dosens'));
+        return view('prestasi.mahasiswa.create_ajax', compact('bidangs', 'prestasi', 'dosens'));
     }
 
     /**
@@ -307,6 +321,7 @@ class PrestasiController extends Controller
             'tingkat' => ['required', Rule::in(['kota', 'provinsi', 'nasional', 'internasional'])],
             'tahun' => 'required|integer|digits:4|min:1900|max:' . (date('Y') + 1),
             'dosen_id' => 'nullable|integer|exists:dosen,dosen_id',
+            'bidang_id' => 'nullable|integer|exists:bidang,bidang_id',
             'file_bukti' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048', // Opsional saat update
         ]);
 
@@ -314,7 +329,7 @@ class PrestasiController extends Controller
             return response()->json(['status' => false, 'message' => 'Validasi gagal.', 'errors' => $validator->errors()], 422);
         }
 
-        $dataToUpdate = $request->only(['nama_prestasi', 'kategori', 'penyelenggara', 'tingkat', 'tahun', 'dosen_id']);
+        $dataToUpdate = $request->only(['nama_prestasi', 'kategori', 'penyelenggara', 'tingkat', 'tahun', 'dosen_id', 'bidang_id']);
 
         if ($request->hasFile('file_bukti')) {
             // Hapus file lama jika ada
