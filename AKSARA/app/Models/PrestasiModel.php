@@ -19,7 +19,7 @@ class PrestasiModel extends Model
         'dosen_id',
         'nama_prestasi',
         'kategori',
-        'Bidang_id',
+        'bidang_id',
         'penyelenggara',
         'tingkat',
         'tahun',
@@ -34,7 +34,7 @@ class PrestasiModel extends Model
     }
     public function bidang()
     {
-        return $this->belongsTo(BidangModel::class, 'Bidang_id', 'Bidang_id');
+        return $this->belongsTo(BidangModel::class, 'bidang_id', 'bidang_id');
     }
     public function dosen()
     {
