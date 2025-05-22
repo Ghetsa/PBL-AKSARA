@@ -20,7 +20,7 @@ class KeahlianUserController extends Controller
         ];
         $activeMenu = 'keahlian_user';
 
-        return view('keahlian_user.index', compact('breadcrumb', 'activeMenu'));
+        return view('keahlian_user.mahasiswa.index', compact('breadcrumb', 'activeMenu'));
     }
 
 
@@ -77,7 +77,7 @@ class KeahlianUserController extends Controller
     public function show_ajax($id)
     {
         $data = KeahlianUserModel::with(['bidang', 'user'])->findOrFail($id);
-        return view('keahlian_user.show_ajax', ['keahlianUser' => $data]);
+        return view('keahlian_user.mahasiswa.show_ajax', ['keahlianUser' => $data]);
     }
 
     public function create()
@@ -91,7 +91,7 @@ class KeahlianUserController extends Controller
         ];
         $activeMenu = 'keahlian_user';
 
-        return view('keahlian_user.create', compact('users', 'bidang', 'breadcrumb', 'activeMenu'));
+        return view('keahlian_user.mahasiswa.create', compact('users', 'bidang', 'breadcrumb', 'activeMenu'));
     }
 
     public function store(Request $request)
@@ -132,7 +132,7 @@ class KeahlianUserController extends Controller
     {
         $data = KeahlianUserModel::where('user_id', auth()->id())->findOrFail($id);
         $bidang = BidangModel::orderBy('bidang_nama')->get();
-        return view('keahlian_user.edit', compact('data', 'bidang'));
+        return view('keahlian_user.mahasiswa.edit', compact('data', 'bidang'));
     }
 
     public function update(Request $request, $id)
@@ -176,7 +176,7 @@ class KeahlianUserController extends Controller
             Storage::delete($data->sertifikasi);
         }
         $data->delete();
-        return redirect()->route('keahlian_user.index')->with('success', 'Data keahlian berhasil dihapus.');
+        return redirect()->route('keahlian_user.mahasiswa.index')->with('success', 'Data keahlian berhasil dihapus.');
     }
 
     // ================================================================
@@ -217,7 +217,7 @@ class KeahlianUserController extends Controller
         ];
         $activeMenu = 'keahlian_user';
 
-        return view('keahlian_user.verifikasi', compact('data', 'breadcrumb', 'activeMenu'));
+        return view('keahlian_user.admin.verifikasi', compact('data', 'breadcrumb', 'activeMenu'));
     }
 
     public function prosesVerifikasi(Request $request, $id)

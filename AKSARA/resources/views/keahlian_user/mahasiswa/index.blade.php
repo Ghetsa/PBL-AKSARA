@@ -37,7 +37,7 @@
 
     {{-- Modal untuk Tambah/Edit/Detail --}}
     <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
-        <div class="modal-dialog modal-lg"> {{-- atau modal-xl jika kontennya banyak --}}
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 {{-- Konten AJAX akan dimuat di sini --}}
             </div>
@@ -77,7 +77,6 @@
     }
 
     $(document).ready(function () {
-        // Tambahkan CSRF token untuk semua request AJAX
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -100,7 +99,6 @@
             ],
         });
 
-        // Fungsi delete Anda sudah ada, pastikan _token dikirim.
         $('body').on('click', '.btn-delete-keahlian', function () {
             const url = $(this).data('url');
             const nama = $(this).data('nama') ?? 'keahlian ini';
