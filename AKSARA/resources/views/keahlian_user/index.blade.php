@@ -1,5 +1,5 @@
 @extends('layouts.template')
-@section('title', $breadcrumb->title)
+@section('title', $breadcrumb->title ?? 'Keahlian Saya') {{-- Tambahkan default title --}}
 
 @section('content')
     <div class="container-fluid">
@@ -7,8 +7,8 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h3 class="card-title">{{ $breadcrumb->title }}</h3>
-                        <button class="btn btn-sm btn-primary" onclick="tambahKeahlian()">Tambah Keahlian</button>
+                        <h3 class="card-title">{{ $breadcrumb->title ?? 'Keahlian Saya' }}</h3>
+                        <button class="btn btn-sm btn-primary" onclick="tambahKeahlian()"><i class="fas fa-plus-circle"></i> Tambah Keahlian</button>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -18,12 +18,14 @@
                                         <th class="text-center" style="width: 5%;">No.</th>
                                         <th>Bidang Keahlian</th>
                                         <th>Sertifikasi</th>
+                                        <th>Lembaga Sertifikasi</th>
+                                        <th>Tanggal Perolehan</th>
+                                        <th>Tanggal Kadaluarsa</th>
                                         <th>Status Verifikasi</th>
-                                        <th class="text-center" style="width: 20%;">Aksi</th>
+                                        <th class="text-center" style="width: 15%;">Aksi</th> {{-- Sesuaikan width jika perlu --}}
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {{-- Data dimuat oleh DataTables AJAX --}}
                                 </tbody>
                             </table>
                         </div>
@@ -33,9 +35,9 @@
         </div>
     </div>
 
-    {{-- Modal untuk Tambah/Edit --}}
+    {{-- Modal untuk Tambah/Edit/Detail --}}
     <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-lg"> {{-- atau modal-xl jika kontennya banyak --}}
             <div class="modal-content">
                 {{-- Konten AJAX akan dimuat di sini --}}
             </div>
@@ -75,19 +77,30 @@
     }
 
     $(document).ready(function () {
+        // Tambahkan CSRF token untuk semua request AJAX
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
         const table = $('#dataKeahlianUser').DataTable({
             processing: true,
             serverSide: true,
             ajax: "{{ route('keahlian_user.list') }}",
             columns: [
-                { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
-                { data: 'bidang_nama', name: 'bidang_nama' },
-                { data: 'sertifikasi', name: 'sertifikasi' },
-                { data: 'status_verifikasi', name: 'status_verifikasi' },
-                { data: 'aksi', name: 'aksi', orderable: false, searchable: false }
+                { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false, className: 'text-center' },
+                { data: 'bidang_nama', name: 'bidang.bidang_nama' }, // Untuk searching/ordering di server
+                { data: 'nama_sertifikat', name: 'nama_sertifikat' },
+                { data: 'lembaga_sertifikasi', name: 'lembaga_sertifikasi' },
+                { data: 'tanggal_perolehan_sertifikat', name: 'tanggal_perolehan_sertifikat', className: 'text-center' },
+                { data: 'tanggal_kadaluarsa_sertifikat', name: 'tanggal_kadaluarsa_sertifikat', className: 'text-center' },
+                { data: 'status_verifikasi', name: 'status_verifikasi', className: 'text-center' },
+                { data: 'aksi', name: 'aksi', orderable: false, searchable: false, className: 'text-center' }
             ],
         });
 
+        // Fungsi delete Anda sudah ada, pastikan _token dikirim.
         $('body').on('click', '.btn-delete-keahlian', function () {
             const url = $(this).data('url');
             const nama = $(this).data('nama') ?? 'keahlian ini';

@@ -1,8 +1,10 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class KeahlianUserModel extends Model
 {
@@ -13,11 +15,20 @@ class KeahlianUserModel extends Model
     public $timestamps = true;
 
     protected $fillable = [
-        'bidang_id',
         'user_id',
-        'sertifikasi',
+        'bidang_id',
+        'sertifikasi', // Path file sertifikat
+        'nama_sertifikat',
+        'lembaga_sertifikasi',
+        'tanggal_perolehan_sertifikat',
+        'tanggal_kadaluarsa_sertifikat',
         'status_verifikasi',
         'catatan_verifikasi',
+    ];
+
+    protected $casts = [
+        'tanggal_perolehan_sertifikat' => 'date',
+        'tanggal_kadaluarsa_sertifikat' => 'date',
     ];
 
     // Relasi ke bidang (Many-to-One)
@@ -44,5 +55,14 @@ class KeahlianUserModel extends Model
             default:
                 return '<span class="badge bg-warning text-dark">Pending</span>';
         }
+    }
+
+    // Accessor untuk link sertifikasi
+    public function getSertifikasiUrlAttribute()
+    {
+        if ($this->sertifikasi && Storage::disk('public')->exists($this->sertifikasi)) {
+            return asset('storage/' . $this->sertifikasi);
+        }
+        return null;
     }
 }

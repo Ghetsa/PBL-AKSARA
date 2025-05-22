@@ -80,7 +80,7 @@
                 </li>
                 <li class="pc-item">
                     <a href="{{ url('/admin/keahlian_user-verifikasi') }}" class="pc-link {{ ($activeMenu == 'keahlian_user') ? 'active' : '' }}">
-                        <span class="pc-micon"><i class="ti ti-trophy"></i></span>
+                        <span class="pc-micon"><i class="ti ti-certificate"></i></span>
                         <span class="pc-mtext">Verifikasi Keahlian</span>
                     </a>
                 </li>
@@ -165,8 +165,8 @@
                 </li>
                 <li class="pc-item">
                     <a href="{{ url('mahasiswa/keahlian_user') }}" class="pc-link {{ ($activeMenu == 'keahlian_user') ? 'active' : '' }}">
-                        <span class="pc-micon"><i class="ti ti-trophy"></i></span>
-                        <span class="pc-mtext">Upload Keahlian</span>
+                        <span class="pc-micon"><i class="ti ti-certificate"></i></span>
+                        <span class="pc-mtext">Keahlian & Sertifikasi</span>
                     </a>
                 </li>
                 {{-- <li class="pc-item">
