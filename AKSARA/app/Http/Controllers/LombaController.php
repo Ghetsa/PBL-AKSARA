@@ -45,7 +45,7 @@ class LombaController extends Controller
                 // $deleteUrl = route('lomba.destroy', $row->lomba_id);
 
                 // return view('components.lomba.aksi-buttons', compact('editUrl', 'verifUrl', 'deleteUrl'));
-                $btn = '<button onclick="modalAction(\'' . e(route('lomba.index', $row->lomba_id)) . '\')" class="btn btn-info btn-sm">Detail</button> ';
+                $btn = '<button onclick="modalAction(\'' . e(route('lomba.show', $row->lomba_id)) . '\')" class="btn btn-info btn-sm">Detail</button> ';
                 $btn .= '<button onclick="modalAction(\'' . e(route('lomba.edit', $row->lomba_id)) . '\')" class="btn btn-warning btn-sm">Edit</button> ';
                 $btn .= '<button onclick="deleteConfirmAjax(' . e($row->lomba_id) . ')" class="btn btn-danger btn-sm">Hapus</button>';
                 return $btn;
@@ -97,6 +97,13 @@ class LombaController extends Controller
         LombaModel::create($validated);
 
         return redirect()->route('lomba.index')->with('success', 'Lomba berhasil ditambahkan');
+    }
+
+    public function show($id)
+    {
+        $lomba = LombaModel::findOrFail($id);
+
+        return view('lomba.show', compact('lomba'));
     }
 
     public function edit($id)
