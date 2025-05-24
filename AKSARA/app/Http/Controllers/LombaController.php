@@ -17,7 +17,7 @@ class LombaController extends Controller
 
         $activeMenu = 'lomba';
 
-        return view('lomba.index', compact('breadcrumb', 'activeMenu'));
+        return view('lomba.admin.index', compact('breadcrumb', 'activeMenu'));
     }
 
     public function getList(Request $request)
@@ -103,13 +103,13 @@ class LombaController extends Controller
     {
         $lomba = LombaModel::findOrFail($id);
 
-        return view('lomba.show', compact('lomba'));
+        return view('lomba.admin.show', compact('lomba'));
     }
 
     public function edit($id)
     {
         $data = LombaModel::findOrFail($id);
-        return view('lomba.edit', compact('data'));
+        return view('lomba.admin.edit', compact('data'));
     }
 
     public function update(Request $request, $id)
@@ -130,13 +130,13 @@ class LombaController extends Controller
         $data = LombaModel::findOrFail($id);
         $data->update($validated);
 
-        return redirect()->route('lomba.index')->with('success', 'Lomba berhasil diupdate');
+        return redirect()->route('lomba.admin.index')->with('success', 'Lomba berhasil diupdate');
     }
 
     public function destroy($id)
     {
         LombaModel::destroy($id);
-        return redirect()->route('lomba.index')->with('success', 'Lomba berhasil dihapus');
+        return redirect()->route('lomba.admin.index')->with('success', 'Lomba berhasil dihapus');
     }
 
     public function verifikasi($id)
