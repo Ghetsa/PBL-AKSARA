@@ -43,20 +43,34 @@ class LombaController extends Controller
                 // $editUrl = route('lomba.edit', $row->lomba_id);
                 // $verifUrl = route('lomba.verifikasi', $row->lomba_id);
                 // $deleteUrl = route('lomba.destroy', $row->lomba_id);
-    
+
                 // return view('components.lomba.aksi-buttons', compact('editUrl', 'verifUrl', 'deleteUrl'));
                 $btn = '<button onclick="modalAction(\'' . e(route('lomba.index', $row->lomba_id)) . '\')" class="btn btn-info btn-sm">Detail</button> ';
                 $btn .= '<button onclick="modalAction(\'' . e(route('lomba.edit', $row->lomba_id)) . '\')" class="btn btn-warning btn-sm">Edit</button> ';
                 $btn .= '<button onclick="deleteConfirmAjax(' . e($row->lomba_id) . ')" class="btn btn-danger btn-sm">Hapus</button>';
                 return $btn;
             })
+
+            ->addColumn('status_verifikasi', function ($row) {
+                switch ($row->status_verifikasi) {
+                    case 'pending':
+                        return '<span class="badge bg-warning text-dark">Pending</span>';
+                    case 'disetujui':
+                        return '<span class="badge bg-success">Disetujui</span>';
+                    case 'ditolak':
+                        return '<span class="badge bg-danger">Ditolak</span>';
+                    default:
+                        return '<span class="badge bg-secondary">Tidak Diketahui</span>';
+                }
+            })
+
             ->editColumn('pembukaan_pendaftaran', function ($row) {
                 return \Carbon\Carbon::parse($row->pembukaan_pendaftaran)->format('d-m-Y');
             })
             ->editColumn('batas_pendaftaran', function ($row) {
                 return \Carbon\Carbon::parse($row->batas_pendaftaran)->format('d-m-Y');
             })
-            ->rawColumns(['aksi'])
+            ->rawColumns(['aksi', 'status_verifikasi'])
             ->make(true);
     }
 
