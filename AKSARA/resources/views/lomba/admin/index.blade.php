@@ -42,7 +42,6 @@
                                     <th class="text-center">No.</th>
                                     <th>Nama Lomba</th>
                                     <th>Kategori</th>
-                                    <th>Bidang Keahlian</th>
                                     <th>Pembukaan Pendaftaran</th>
                                     <th>Penutupan Pendaftaran</th>
                                     <th class="text-center">Status</th>
@@ -109,7 +108,6 @@
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', className: 'text-center', orderable: false, searchable: false },
                 { data: 'nama_lomba', name: 'nama_lomba' }, // Untuk searching di server-side
                 { data: 'kategori', name: 'kategori' },       // Untuk searching di server-side
-                { data: 'bidang_keahlian', name: 'bidang_keahlian' },
                 { data: 'pembukaan_pendaftaran', name: 'pembukaan_pendaftaran' },
                 { data: 'batas_pendaftaran', name: 'batas_pendaftaran' },
                 { data: 'status_verifikasi', name: 'status_verifikasi', className: 'text-center' },

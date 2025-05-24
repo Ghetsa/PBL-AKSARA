@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Str;
 
 use App\Models\UserModel;
 use App\Models\BidangModel;
@@ -29,7 +30,9 @@ class ProfilController extends Controller
         ];
 
         $user = Auth::user();
-        $relationsToLoad = ['pengalaman'];
+        $relationsToLoad = ['pengalaman', 'keahlian', 'minat', 'mahasiswa.prodi', 'mahasiswa.periode', 'dosen', 'admin'];
+        $user->load($relationsToLoad);
+
 
         if ($user->role === 'dosen') {
             $relationsToLoad = array_merge($relationsToLoad, ['dosen', 'keahlian', 'minat']);
@@ -66,20 +69,24 @@ class ProfilController extends Controller
         $allBidangOptions = BidangModel::orderBy('bidang_nama')->get();
 
         $userKeahlian = $user->keahlian->mapWithKeys(function ($bidang) {
-            return [$bidang->bidang_id => [
-                'nama' => $bidang->bidang_nama,
-                'sertifikasi' => $bidang->detailKeahlian->sertifikasi,
-                'sertifikasi_url' => $bidang->detailKeahlian->sertifikasi && Storage::disk('public')->exists($bidang->detailKeahlian->sertifikasi) ? Storage::url($bidang->detailKeahlian->sertifikasi) : null,
-                'status_verifikasi' => $bidang->detailKeahlian->sertifikasi_status_verifikasi,
-                'catatan_verifikasi' => $bidang->detailKeahlian->sertifikasi_catatan_verifikasi,
-            ]];
+            return [
+                $bidang->bidang_id => [
+                    'nama' => $bidang->bidang_nama,
+                    'sertifikasi' => $bidang->detailKeahlian->sertifikasi,
+                    'sertifikasi_url' => $bidang->detailKeahlian->sertifikasi && Storage::disk('public')->exists($bidang->detailKeahlian->sertifikasi) ? Storage::url($bidang->detailKeahlian->sertifikasi) : null,
+                    'status_verifikasi' => $bidang->detailKeahlian->sertifikasi_status_verifikasi,
+                    'catatan_verifikasi' => $bidang->detailKeahlian->sertifikasi_catatan_verifikasi,
+                ]
+            ];
         });
 
         $userMinatData = $user->minat->mapWithKeys(function ($bidang) {
-            return [$bidang->bidang_id => [
-                'nama' => $bidang->bidang_nama,
-                'level' => $bidang->detailMinat->level ?? null
-            ]];
+            return [
+                $bidang->bidang_id => [
+                    'nama' => $bidang->bidang_nama,
+                    'level' => $bidang->detailMinat->level ?? null
+                ]
+            ];
         });
         $userMinatIds = $user->minat->pluck('bidang_id')->toArray();
 
@@ -188,58 +195,64 @@ class ProfilController extends Controller
             }
 
             // --- Handle Keahlian ---
-            // (Logika keahlian tetap sama, karena ini tentang memilih/tidak memilih dan mengunggah file)
-            // Jika checkbox tidak dipilih, relasi akan dihapus oleh sync. Jika dipilih, data pivot akan diupdate/dibuat.
-            $selectedBidangIdsForKeahlian = $request->input('keahlian_pilihan', []);
-            $dataToSyncKeahlian = [];
-            $userKeahlianSaatIni = $user->keahlian()->get()->keyBy('bidang_id');
+            if ($request->has('keahlian_pilihan')) {
+                $selectedBidangIdsForKeahlian = $request->input('keahlian_pilihan', []);
+                $dataToSyncKeahlian = [];
+                $userKeahlianSaatIni = $user->keahlian()->get()->keyBy('bidang_id');
 
-            foreach ($allBidangOptions = BidangModel::all() as $bidang) { // Iterasi semua master bidang
-                $bidangId = $bidang->bidang_id;
-                if (in_array($bidangId, $selectedBidangIdsForKeahlian)) {
-                    $existingPivot = $userKeahlianSaatIni->get($bidangId)->detailKeahlian ?? null;
-                    $pivotData = [
-                        'sertifikasi' => $existingPivot->sertifikasi ?? null,
-                        'status_verifikasi' => $existingPivot->status_verifikasi ?? 'pending',
-                        'catatan_verifikasi' => $existingPivot->catatan_verifikasi ?? null,
-                    ];
+                foreach ($allBidangOptions = BidangModel::all() as $bidang) {
+                    $bidangId = $bidang->bidang_id;
+                    if (in_array($bidangId, $selectedBidangIdsForKeahlian)) {
+                        $existingPivot = $userKeahlianSaatIni->get($bidangId)->detailKeahlian ?? null;
+                        $pivotData = [
+                            'sertifikasi' => $existingPivot->sertifikasi ?? null,
+                            'status_verifikasi' => $existingPivot->status_verifikasi ?? 'pending',
+                            'catatan_verifikasi' => $existingPivot->catatan_verifikasi ?? null,
+                        ];
 
-                    if ($request->hasFile("sertifikasi_file.{$bidangId}")) {
-                        $file = $request->file("sertifikasi_file.{$bidangId}");
-                        if ($pivotData['sertifikasi'] && Storage::disk('public')->exists($pivotData['sertifikasi'])) {
-                            Storage::disk('public')->delete($pivotData['sertifikasi']);
+                        if ($request->hasFile("sertifikasi_file.{$bidangId}")) {
+                            $file = $request->file("sertifikasi_file.{$bidangId}");
+                            if ($pivotData['sertifikasi'] && Storage::disk('public')->exists($pivotData['sertifikasi'])) {
+                                Storage::disk('public')->delete($pivotData['sertifikasi']);
+                            }
+                            $bidangNamaSlug = Str::slug($bidang->bidang_nama);
+                            $fileName = 'sertifikat_' . $user->user_id . '_' . $bidangId . '_' . $bidangNamaSlug . '_' . time() . '.' . $file->getClientOriginalExtension();
+                            $pivotData['sertifikasi'] = $file->storeAs('sertifikasi_keahlian/' . $user->user_id, $fileName, 'public');
+                            $pivotData['status_verifikasi'] = 'pending';
+                            $pivotData['catatan_verifikasi'] = null;
+                        } elseif (!$existingPivot || is_null($existingPivot->sertifikasi)) {
+                            $pivotData['sertifikasi'] = null;
+                            $pivotData['status_verifikasi'] = $existingPivot->status_verifikasi ?? 'pending';
                         }
-                        $bidangNamaSlug = Str::slug($bidang->bidang_nama);
-                        $fileName = 'sertifikat_' . $user->user_id . '_' . $bidangId . '_' . $bidangNamaSlug . '_' . time() . '.' . $file->getClientOriginalExtension();
-                        $pivotData['sertifikasi'] = $file->storeAs('sertifikasi_keahlian/' . $user->user_id, $fileName, 'public');
-                        $pivotData['status_verifikasi'] = 'pending';
-                        $pivotData['catatan_verifikasi'] = null;
-                    } elseif (!$existingPivot || is_null($existingPivot->sertifikasi)) {
-                        $pivotData['sertifikasi'] = null;
-                        $pivotData['status_verifikasi'] = $existingPivot->status_verifikasi ?? 'pending';
-                    }
-                    $dataToSyncKeahlian[$bidangId] = $pivotData;
-                } else {
-                    if (isset($userKeahlianSaatIni[$bidangId]) && $userKeahlianSaatIni[$bidangId]->detailKeahlian->sertifikasi && Storage::disk('public')->exists($userKeahlianSaatIni[$bidangId]->detailKeahlian->sertifikasi)) {
-                        Storage::disk('public')->delete($userKeahlianSaatIni[$bidangId]->detailKeahlian->sertifikasi);
+
+                        $dataToSyncKeahlian[$bidangId] = $pivotData;
+                    } else {
+                        if (isset($userKeahlianSaatIni[$bidangId]) && $userKeahlianSaatIni[$bidangId]->detailKeahlian->sertifikasi && Storage::disk('public')->exists($userKeahlianSaatIni[$bidangId]->detailKeahlian->sertifikasi)) {
+                            Storage::disk('public')->delete($userKeahlianSaatIni[$bidangId]->detailKeahlian->sertifikasi);
+                        }
                     }
                 }
+
+                $user->keahlian()->sync($dataToSyncKeahlian);
             }
-            $user->keahlian()->sync($dataToSyncKeahlian);
 
             // --- Handle Minat ---
-            $selectedBidangIdsForMinat = $request->input('minat_pilihan', []);
-            $minatLevels = $request->input('minat_level', []);
-            $dataToSyncMinat = [];
-            foreach ($selectedBidangIdsForMinat as $bidangId) {
-                $dataToSyncMinat[$bidangId] = ['level' => $minatLevels[$bidangId] ?? 'minat'];
-            }
-            $user->minat()->sync($dataToSyncMinat);
+            if ($request->has('minat_pilihan')) {
+                $selectedBidangIdsForMinat = $request->input('minat_pilihan', []);
+                $minatLevels = $request->input('minat_level', []);
+                $dataToSyncMinat = [];
 
+                foreach ($selectedBidangIdsForMinat as $bidangId) {
+                    $dataToSyncMinat[$bidangId] = ['level' => $minatLevels[$bidangId] ?? 'minat'];
+                }
+
+                $user->minat()->sync($dataToSyncMinat);
+            }
 
             // --- Handle Pengalaman ---
-            $user->pengalaman()->delete();
-            if ($request->has('pengalaman_items') && is_array($request->input('pengalaman_items'))) {
+            if ($request->has('pengalaman_items')) {
+                $user->pengalaman()->delete();
+
                 $pengalamanToInsert = [];
                 foreach ($request->pengalaman_items as $item) {
                     if (!empty($item['pengalaman_nama'])) {
@@ -252,6 +265,7 @@ class ProfilController extends Controller
                         ];
                     }
                 }
+
                 if (!empty($pengalamanToInsert)) {
                     PengalamanModel::insert($pengalamanToInsert);
                 }
@@ -280,11 +294,15 @@ class ProfilController extends Controller
         $user = Auth::user();
 
         $validator = Validator::make($request->all(), [
-            'current_password' => ['required', 'string', function ($attribute, $value, $fail) use ($user) {
-                if (!Hash::check($value, $user->password)) {
-                    $fail('Password lama tidak sesuai.');
+            'current_password' => [
+                'required',
+                'string',
+                function ($attribute, $value, $fail) use ($user) {
+                    if (!Hash::check($value, $user->password)) {
+                        $fail('Password lama tidak sesuai.');
+                    }
                 }
-            }],
+            ],
             'new_password' => [
                 'required',
                 'string',
@@ -300,7 +318,7 @@ class ProfilController extends Controller
             'new_password.min' => 'Password baru minimal  karakter.',
             'new_password.confirmed' => 'Konfirmasi password baru tidak cocok.',
             'new_password.mixed_case' => 'Password baru harus mengandung setidaknya satu huruf besar dan satu huruf kecil.',
-            'new_password.numbers' => 'Password baru harus mengandung setidakny6a satu angka.',
+            'new_password.numbers' => 'Password baru harus mengandung setidaknya satu angka.',
             'new_password.symbols' => 'Password baru harus mengandung setidaknya satu simbol (contoh: !@#$%^&*).',
         ]);
 

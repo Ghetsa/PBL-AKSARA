@@ -21,7 +21,6 @@ class LombaModel extends Model
         'kategori',
         'penyelenggara',
         'tingkat',
-        'bidang_keahlian',
         'biaya',
         'link_pendaftaran',
         'link_penyelenggara',
