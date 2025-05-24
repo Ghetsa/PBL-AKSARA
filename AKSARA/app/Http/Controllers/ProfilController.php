@@ -101,12 +101,13 @@ class ProfilController extends Controller
         }
 
 
-        public function update_ajax(Request $request)
+    public function update_ajax(Request $request)
 {
     $user = Auth::user();
     DB::beginTransaction();
 
     try {
+        // Aturan validasi
         $validationRules = [
             'nama' => 'sometimes|string|max:255',
             'email' => [
@@ -118,24 +119,18 @@ class ProfilController extends Controller
             'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'minat_pilihan' => 'nullable|array',
             'minat_pilihan.*' => 'integer|exists:bidang,bidang_id',
+            'sertifikasi_file' => 'nullable|array',
+            'sertifikasi_file.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
             'minat_level' => 'nullable|array',
-            'minat_level.*' => ['nullable', Rule::in(['kurang', 'minat', 'sangat minat'])],
-            'pengalaman_items' => 'nullable|array',
-            'pengalaman_items.*.id' => 'nullable|integer|exists:pengalaman,id',
-            'pengalaman_items.*.pengalaman_nama' => 'required|string|max:255',
-            'pengalaman_items.*.pengalaman_kategori' => 'nullable|in:pekerjaan,organisasi,magang,proyek,workshop',
+            'minat_level.*' => ['nullable', Rule::in(array_keys(MinatUserModel::LEVEL_MINAT))],
         ];
 
         $validator = Validator::make($request->all(), $validationRules);
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validasi gagal.',
-                'errors' => $validator->errors()
-            ], 422);
+            return response()->json(['success' => false, 'message' => 'Validasi gagal.', 'errors' => $validator->errors()], 422);
         }
 
-        // Update data dasar
+        // Update data dasar (nama dan email)
         $userData = [];
         if ($request->filled('nama')) {
             $userData['nama'] = $request->nama;
@@ -143,6 +138,8 @@ class ProfilController extends Controller
         if ($request->filled('email')) {
             $userData['email'] = $request->email;
         }
+
+        // Update foto profil
         if ($request->hasFile('foto')) {
             if ($user->foto && Storage::disk('public')->exists($user->foto)) {
                 Storage::disk('public')->delete($user->foto);
@@ -152,79 +149,57 @@ class ProfilController extends Controller
             $path = $file->storeAs('profile_photos/' . $user->user_id, $filename, 'public');
             $userData['foto'] = $path;
         }
+
+        // Simpan data dasar jika ada yang berubah
         if (!empty($userData)) {
             $user->update($userData);
         }
 
-        // Update minat
+        // Handle Minat - Perbarui atau buat baru jika ada perubahan
         $selectedBidangIdsForMinat = $request->input('minat_pilihan', []);
         $minatLevels = $request->input('minat_level', []);
-
         $dataToSyncMinat = [];
+
         foreach ($selectedBidangIdsForMinat as $bidangId) {
-            $key = (string)$bidangId;
-            $level = $minatLevels[$key] ?? 'minat';
-            $dataToSyncMinat[$bidangId] = ['level' => $level];
+            $dataToSyncMinat[$bidangId] = ['level' => $minatLevels[$bidangId] ?? 'minat'];
         }
 
-        Log::info('Data minat yang akan disinkronisasi:', $dataToSyncMinat);
-
+        // Update minat dengan sync (mengupdate data yang sudah ada tanpa menghapus yang tidak berubah)
         $user->minat()->sync($dataToSyncMinat);
 
-        // Update pengalaman
-        $inputPengalaman = $request->input('pengalaman_items', []);
-        $idsPengalamanInput = collect($inputPengalaman)->pluck('id')->filter()->all();
-
-        // Hapus pengalaman yang sudah tidak ada di form
-        PengalamanModel::where('user_id', $user->user_id)
-            ->when(!empty($idsPengalamanInput), function ($query) use ($idsPengalamanInput) {
-                return $query->whereNotIn('id', $idsPengalamanInput);
-            })
-            ->delete();
-
-        Log::info('Data pengalaman yang diterima:', $inputPengalaman);
-
-        foreach ($inputPengalaman as $item) {
-            if (!empty($item['pengalaman_nama'])) {
-                if (!empty($item['id'])) {
-                    PengalamanModel::where('id', $item['id'])->update([
-                        'pengalaman_nama' => $item['pengalaman_nama'],
-                        'pengalaman_kategori' => $item['pengalaman_kategori'] ?? null,
-                    ]);
-                } else {
-                    PengalamanModel::create([
+        // Handle Pengalaman - Perbarui atau buat baru jika ada perubahan
+        if ($request->has('pengalaman_items') && is_array($request->input('pengalaman_items'))) {
+            foreach ($request->pengalaman_items as $item) {
+                if (!empty($item['pengalaman_nama'])) {
+                    $pengalamanData = [
                         'user_id' => $user->user_id,
                         'pengalaman_nama' => $item['pengalaman_nama'],
                         'pengalaman_kategori' => $item['pengalaman_kategori'] ?? null,
-                    ]);
+                    ];
+
+                    // Update atau buat pengalaman baru jika tidak ada pengalaman dengan ID yang sama
+                    PengalamanModel::updateOrCreate(
+                        ['user_id' => $user->user_id, 'pengalaman_nama' => $item['pengalaman_nama']], // Kondisi pencarian berdasarkan nama pengalaman
+                        $pengalamanData
+                    );
                 }
             }
         }
 
+        // Commit transaction
         DB::commit();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Profil berhasil diperbarui.',
-            'redirect' => route('profile.index')
-        ]);
+        return response()->json(['success' => true, 'message' => 'Profil berhasil diperbarui.', 'redirect' => route('profile.index')]);
+
     } catch (\Illuminate\Validation\ValidationException $e) {
         DB::rollBack();
-        return response()->json([
-            'success' => false,
-            'message' => 'Validasi gagal.',
-            'errors' => $e->errors()
-        ], 422);
+        return response()->json(['success' => false, 'message' => 'Validasi gagal.', 'errors' => $e->errors()], 422);
     } catch (\Exception $e) {
         DB::rollBack();
         Log::error('Error update profil AJAX: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
-        return response()->json([
-            'success' => false,
-            'message' => 'Gagal memperbarui profil. Terjadi kesalahan server.'
-        ], 500);
+        return response()->json(['success' => false, 'message' => 'Gagal memperbarui profil. Terjadi kesalahan server.'], 500);
     }
 }
-
 
 
     public function showChangePasswordFormAjax()

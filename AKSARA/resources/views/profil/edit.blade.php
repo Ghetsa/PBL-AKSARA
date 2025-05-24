@@ -119,7 +119,6 @@
                                      <button type="button" class="btn btn-sm btn-outline-danger remove-item-btn mb-2"><i class="ti ti-trash"></i></button>
                                  </div>
                                  <div class="row">
-                                    <input type="hidden" name="pengalaman_items[{{ $index }}][id]" value="{{ $pengalaman->id }}">
                                      <div class="col-md-6 mb-2">
                                          <label class="form-label">Nama Pengalaman/Posisi <span class="text-danger">*</span></label>
                                          <input type="text" name="pengalaman_items[{{ $index }}][pengalaman_nama]" class="form-control" value="{{ $pengalaman->pengalaman_nama }}">
@@ -129,11 +128,11 @@
                                          <label class="form-label">Kategori</label>
                                          <select name="pengalaman_items[{{ $index }}][pengalaman_kategori]" class="form-control">
                                             <option value="">-- Pilih Kategori --</option>
-                                            <option value="workshop" {{ (old('pengalaman_kategori', $pengalaman->pengalaman_kategori ?? '') == 'workshop') ? 'selected' : '' }}>Workshop</option>
-                                            <option value="magang" {{ (old('pengalaman_kategori', $pengalaman->pengalaman_kategori ?? '') == 'magang') ? 'selected' : '' }}>Magang</option>
-                                            <option value="proyek" {{ (old('pengalaman_kategori', $pengalaman->pengalaman_kategori ?? '') == 'proyek') ? 'selected' : '' }}>Proyek</option>
-                                            <option value="organisasi" {{ (old('pengalaman_kategori', $pengalaman->pengalaman_kategori ?? '') == 'organisasi') ? 'selected' : '' }}>Organisasi</option>
-                                            <option value="pekerjaan" {{ (old('pengalaman_kategori', $pengalaman->pengalaman_kategori ?? '') == 'pekerjaan') ? 'selected' : '' }}>Pekerjaan</option>
+                                            <option value="Workshop" {{ old('pengalaman_kategori', $pengalaman->pengalaman_kategori ?? '') == 'Workshop' ? 'selected' : '' }}>Workshop</option>
+                                            <option value="Magang" {{ old('pengalaman_kategori', $pengalaman->pengalaman_kategori ?? '') == 'Magang' ? 'selected' : '' }}>Magang</option>
+                                            <option value="Proyek" {{ old('pengalaman_kategori', $pengalaman->pengalaman_kategori ?? '') == 'Proyek' ? 'selected' : '' }}>Proyek</option>
+                                            <option value="Organisasi" {{ old('pengalaman_kategori', $pengalaman->pengalaman_kategori ?? '') == 'Organisasi' ? 'selected' : '' }}>Organisasi</option>
+                                            <option value="Pekerjaan" {{ old('pengalaman_kategori', $pengalaman->pengalaman_kategori ?? '') == 'Pekerjaan' ? 'selected' : '' }}>Pekerjaan</option>
                                         </select>
                                          <span class="invalid-feedback error-pengalaman_items.{{$index}}.pengalaman_kategori"></span>
                                      </div>
@@ -166,13 +165,12 @@
                                         <label class="form-label">Kategori</label>
                                          <select name="pengalaman_items[0][pengalaman_kategori]" class="form-control">
                                             <option value="">-- Pilih Kategori --</option>
-                                            <option value="workshop">Workshop</option>
-                                            <option value="magang">Magang</option>
-                                            <option value="proyek">Proyek</option>
-                                            <option value="organisasi">Organisasi</option>
-                                            <option value="pekerjaan">Pekerjaan</option>
+                                            <option value="Workshop">Workshop</option>
+                                            <option value="Magang">Magang</option>
+                                            <option value="Proyek">Proyek</option>
+                                            <option value="Organisasi">Organisasi</option>
+                                            <option value="Pekerjaan">Pekerjaan</option>
                                         </select>
-
                                         <span class="invalid-feedback error-pengalaman_items.0.pengalaman_kategori"></span>
                                     </div>
                                      {{-- <div class="col-md-12 mb-2">
@@ -204,8 +202,6 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 $(document).ready(function() {
-    let pengalamanIndex = $('#pengalaman-fields-container .pengalaman-item').length || 0;
-
     $('.minat-checkbox').each(function() {
         var $checkbox = $(this);
         var bidangId = $checkbox.data('bidang-id');
@@ -223,6 +219,7 @@ $(document).ready(function() {
         });
     });
 
+    // --- Handle Pengalaman (dynamic input) ---
     function updatePengalamanRemoveButtons() {
         const itemCount = $('#pengalaman-fields-container .pengalaman-item').length;
         $('#pengalaman-fields-container .pengalaman-item').each(function(index) {
@@ -235,14 +232,13 @@ $(document).ready(function() {
                 $currentItem.find('.remove-item-btn').hide();
             }
         });
-        if (itemCount === 0) {
+         if (itemCount === 0) {
             $('#add-pengalaman-btn').click();
         }
     }
 
     $('#add-pengalaman-btn').click(function() {
-        const newIndex = pengalamanIndex++; // increment index
-
+        const newIndex = Date.now(); // Unique index
         const newItemHtml = `
             <div class="pengalaman-item border rounded p-3 mb-3">
                 <div class="d-flex justify-content-end">
@@ -268,7 +264,6 @@ $(document).ready(function() {
                     </div>
                 </div>
             </div>`;
-
         $('#pengalaman-fields-container').append(newItemHtml);
         updatePengalamanRemoveButtons();
     });
@@ -277,39 +272,25 @@ $(document).ready(function() {
         $(this).closest('.pengalaman-item').remove();
         updatePengalamanRemoveButtons();
     });
+    updatePengalamanRemoveButtons(); // Initial call
 
-    updatePengalamanRemoveButtons();
 
+    // Handle form submission
     $('#formUpdateProfile').on('submit', function (e) {
         e.preventDefault();
-        let form = this;
-
-        const submitButton = $(form).find('button[type="submit"]');
-        const originalButtonText = submitButton.html();
-
-        // Disable tombol dan ganti teks jadi spinner
-        submitButton.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Menyimpan…');
-
-        // Handle checkbox dan select minat supaya data dikirim benar
-        $('.minat-checkbox').each(function() {
-            const bidangId = $(this).data('bidang-id');
-            const $levelSelect = $(`#minat_level_${bidangId}`);
-
-            if ($(this).is(':checked')) {
-                $(this).prop('checked', true);
-                $levelSelect.prop('disabled', false);
-            } else {
-                $(this).prop('checked', false);
-                $levelSelect.prop('disabled', false); // tetap enabled supaya terkirim
-                $levelSelect.val(''); // kosongkan nilai level jika checkbox tidak dicentang
-            }
-        });
-
+        let form = this; // Simpan referensi form
         let formData = new FormData(form);
+        // formData.append('_method', 'PUT'); // @method('PUT') di form sudah cukup untuk Laravel AJAX
+
+        const submitButton = $(this).find('button[type="submit"]'); // Definisi yang benar
+        const originalButtonText = submitButton.html();
+        submitButton.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Menyimpan…');
+        $('.invalid-feedback').text('').hide(); // Sembunyikan dan kosongkan semua pesan error
+        $('input, select, textarea').removeClass('is-invalid'); // Hapus class is-invalid
 
         $.ajax({
             url: $(form).attr('action'),
-            method: 'POST', // tetap POST karena ada @method('PUT')
+            method: 'POST', // Method tetap POST karena FormData dan @method('PUT')
             data: formData,
             processData: false,
             contentType: false,
@@ -339,9 +320,10 @@ $(document).ready(function() {
                     let errors = xhr.responseJSON.errors;
                     let firstErrorElement = null;
                     $.each(errors, function (key, messages) {
-                        let sanitizedKey = key.replace(/\./g, '_');
+                        // Penanganan untuk field array (mis: pengalaman_items.0.pengalaman_nama)
+                        let sanitizedKey = key.replace(/\./g, '_'); // Ganti . dengan _
                         let inputElement = $(form).find(`[name="${key}"]`);
-                        if (!inputElement.length && key.includes('.')) {
+                        if (!inputElement.length && key.includes('.')) { // Mencoba mencari elemen array
                              inputElement = $(form).find(`[name^="${key.split('.')[0]}"][name*="[${key.split('.')[1]}]"]`);
                         }
                         if(!inputElement.length && key.startsWith('sertifikasi_file.')){
@@ -349,25 +331,27 @@ $(document).ready(function() {
                             inputElement = $(form).find(`input[name="sertifikasi_file[${bidangIdFromFileKey}]"]`);
                         }
 
+
                         if (inputElement.length) {
                             inputElement.addClass('is-invalid');
                             let errorContainer = inputElement.closest('.form-group, .mb-2, .mb-3, .ms-1').find('.invalid-feedback.error-' + sanitizedKey.split('[')[0]);
-                            if(!errorContainer.length) errorContainer = inputElement.parent().find('.invalid-feedback');
-                            if(!errorContainer.length) inputElement.after('<span class="invalid-feedback d-block error-'+sanitizedKey+'">' + messages[0] + '</span>');
-                            else errorContainer.text(messages[0]).show();
+                             if(!errorContainer.length) errorContainer = inputElement.parent().find('.invalid-feedback'); // fallback
+                             if(!errorContainer.length) inputElement.after('<span class="invalid-feedback d-block error-'+sanitizedKey+'">' + messages[0] + '</span>');
+                             else errorContainer.text(messages[0]).show();
 
                             if (!firstErrorElement) firstErrorElement = inputElement;
                         } else {
-                            $('.modal-body').prepend(`<div class="alert alert-danger alert-dismissible fade show small py-2" role="alert">Error pada ${key}: ${messages[0]}<button type="button" class="btn-close py-2" data-bs-dismiss="alert" aria-label="Close"></button></div>`);
-                            if(!firstErrorElement) firstErrorElement = $('.modal-body .alert-danger').first();
+                             $('.modal-body').prepend(`<div class="alert alert-danger alert-dismissible fade show small py-2" role="alert">Error pada ${key}: ${messages[0]}<button type="button" class="btn-close py-2" data-bs-dismiss="alert" aria-label="Close"></button></div>`);
+                             if(!firstErrorElement) firstErrorElement = $('.modal-body .alert-danger').first();
                         }
                     });
                     if(firstErrorElement && firstErrorElement.length){
+                        // Scroll ke elemen error pertama di dalam modal
                         $(form).closest('.modal-body').animate({
                             scrollTop: firstErrorElement.offset().top - $(form).closest('.modal-body').offset().top + $(form).closest('.modal-body').scrollTop() - 20
                         }, 300);
                     }
-                    Swal.fire({ icon: 'error', title: 'Validasi Gagal', text: xhr.responseJSON.message || 'Periksa kembali isian Anda.' });
+                     Swal.fire({ icon: 'error', title: 'Validasi Gagal', text: xhr.responseJSON.message || 'Periksa kembali isian Anda.' });
                 } else {
                     Swal.fire({
                         icon: 'error',
@@ -377,7 +361,7 @@ $(document).ready(function() {
                 }
             },
             complete: function () {
-                submitButton.prop('disabled', false).html(originalButtonText);
+                submitButton.prop('disabled', false).html(originalButtonText); // Menggunakan variabel yang benar
             }
         });
     });
