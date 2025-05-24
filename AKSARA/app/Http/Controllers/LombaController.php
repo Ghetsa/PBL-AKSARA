@@ -15,7 +15,7 @@ class LombaController extends Controller
             'list' => ['Dashboard', 'Lomba']
         ];
 
-         $activeMenu = 'lomba';
+        $activeMenu = 'lomba';
 
         return view('lomba.index', compact('breadcrumb', 'activeMenu'));
     }
@@ -29,7 +29,7 @@ class LombaController extends Controller
             $search = $request->search_nama;
             $query->where(function ($q) use ($search) {
                 $q->where('nama_lomba', 'like', '%' . $search . '%')
-                  ->orWhere('bidang_keahlian', 'like', '%' . $search . '%');
+                    ->orWhere('bidang_keahlian', 'like', '%' . $search . '%');
             });
         }
 
@@ -43,7 +43,7 @@ class LombaController extends Controller
                 // $editUrl = route('lomba.edit', $row->lomba_id);
                 // $verifUrl = route('lomba.verifikasi', $row->lomba_id);
                 // $deleteUrl = route('lomba.destroy', $row->lomba_id);
-
+    
                 // return view('components.lomba.aksi-buttons', compact('editUrl', 'verifUrl', 'deleteUrl'));
                 $btn = '<button onclick="modalAction(\'' . e(route('lomba.index', $row->lomba_id)) . '\')" class="btn btn-info btn-sm">Detail</button> ';
                 $btn .= '<button onclick="modalAction(\'' . e(route('lomba.edit', $row->lomba_id)) . '\')" class="btn btn-warning btn-sm">Edit</button> ';

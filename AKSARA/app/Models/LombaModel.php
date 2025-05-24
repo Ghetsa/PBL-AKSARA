@@ -12,8 +12,8 @@ class LombaModel extends Model
     protected $table = 'lomba';
     protected $primaryKey = 'lomba_id';
 
-    const CREATED_AT = 'create_at';
-    const UPDATED_AT = 'update_at';
+    const CREATED_AT = 'created_at';
+    const UPDATED_AT = 'updated_at';
 
     protected $fillable = [
         'nama_lomba',
@@ -22,10 +22,13 @@ class LombaModel extends Model
         'penyelenggara',
         'tingkat',
         'bidang_keahlian',
+        'biaya',
         'link_pendaftaran',
+        'link_penyelenggara',
         'batas_pendaftaran',
         'status_verifikasi',
         'diinput_oleh',
+        'poster',
     ];
 
     protected $casts = [
@@ -34,7 +37,8 @@ class LombaModel extends Model
         'kategori' => 'string',
         'tingkat' => 'string',
         'status_verifikasi' => 'string',
-        'tahun' => 'integer',
+        'biaya' => 'integer',
+        'diinput_oleh' => 'integer',
     ];
 
     public function inputBy()
@@ -51,4 +55,9 @@ class LombaModel extends Model
     {
         return $this->hasMany(RekomendasiLombaModel::class, 'lomba_id', 'lomba_id');
     }
+    public function hadiah()
+    {
+        return $this->hasMany(LombaHadiahModel::class, 'lomba_id', 'lomba_id');
+    }
+
 }

@@ -158,7 +158,7 @@
                         </a>
                     </li>
                     <li class="pc-item">
-                        <a href="{{ url('/rekomendasi') }}"
+                        <a href="{{ url('/lomba') }}"
                             class="pc-link {{ $activeMenu == 'rekomendasi' ? 'active' : '' }}">
                             <span class="pc-micon"><i class="ti ti-award"></i></span>
                             <span class="pc-mtext">Rekomendasi Lomba</span>
