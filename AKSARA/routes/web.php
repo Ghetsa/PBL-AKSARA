@@ -71,6 +71,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/list', [LombaController::class, 'getList'])->name('list');
         Route::get('/create', [LombaController::class, 'create'])->name('create');
         Route::post('/', [LombaController::class, 'store'])->name('store');
+        Route::get('/{id}/lomba', [LombaController::class, 'show'])->name('show');
         Route::get('/{id}/edit', [LombaController::class, 'edit'])->name('edit');
         Route::put('/{id}', [LombaController::class, 'update'])->name('update');
         Route::delete('/{id}', [LombaController::class, 'destroy'])->name('destroy');

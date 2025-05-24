@@ -64,7 +64,7 @@
                         <a href="{{ url('/rekomendasi') }}"
                             class="pc-link {{ $activeMenu == 'rekomendasi' ? 'active' : '' }}">
                             <span class="pc-micon"><i class="ti ti-award"></i></span>
-                            <span class="pc-mtext">Rekomendasi Lomba</span>
+                            <span class="pc-mtext">Verifikasi Lomba</span>
                         </a>
                     </li>
                     <li class="pc-item pc-caption">
@@ -154,7 +154,7 @@
                         <a href="{{ url('/verifikasi') }}"
                             class="pc-link {{ $activeMenu == 'verifikasi' ? 'active' : '' }}">
                             <span class="pc-micon"><i class="ti ti-file-check"></i></span>
-                            <span class="pc-mtext">Verifikasi</span>
+                            <span class="pc-mtext">Upload Info Lomba</span>
                         </a>
                     </li>
                     <li class="pc-item">

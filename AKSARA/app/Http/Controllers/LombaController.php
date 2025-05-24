@@ -8,6 +8,9 @@ use Yajra\DataTables\Facades\DataTables;
 
 class LombaController extends Controller
 {
+    //================================================
+    //|        METHOD UNTUK MAHASISWA DAN DOSEN       |
+    //=================================================
     public function index()
     {
         $breadcrumb = (object) [
@@ -17,7 +20,7 @@ class LombaController extends Controller
 
         $activeMenu = 'lomba';
 
-        return view('lomba.index', compact('breadcrumb', 'activeMenu'));
+        return view('lomba.mahasiswa.index', compact('breadcrumb', 'activeMenu'));
     }
 
     public function getList(Request $request)
@@ -28,8 +31,7 @@ class LombaController extends Controller
         if ($request->filled('search_nama')) {
             $search = $request->search_nama;
             $query->where(function ($q) use ($search) {
-                $q->where('nama_lomba', 'like', '%' . $search . '%')
-                    ->orWhere('bidang_keahlian', 'like', '%' . $search . '%');
+                $q->where('nama_lomba', 'like', '%' . $search . '%');
             });
         }
 
@@ -40,23 +42,33 @@ class LombaController extends Controller
         return DataTables::of($query)
             ->addIndexColumn()
             ->addColumn('aksi', function ($row) {
-                // $editUrl = route('lomba.edit', $row->lomba_id);
-                // $verifUrl = route('lomba.verifikasi', $row->lomba_id);
-                // $deleteUrl = route('lomba.destroy', $row->lomba_id);
-    
                 // return view('components.lomba.aksi-buttons', compact('editUrl', 'verifUrl', 'deleteUrl'));
-                $btn = '<button onclick="modalAction(\'' . e(route('lomba.index', $row->lomba_id)) . '\')" class="btn btn-info btn-sm">Detail</button> ';
+                $btn = '<button onclick="modalAction(\'' . e(route('lomba.show', $row->lomba_id)) . '\')" class="btn btn-info btn-sm">Detail</button> ';
                 $btn .= '<button onclick="modalAction(\'' . e(route('lomba.edit', $row->lomba_id)) . '\')" class="btn btn-warning btn-sm">Edit</button> ';
                 $btn .= '<button onclick="deleteConfirmAjax(' . e($row->lomba_id) . ')" class="btn btn-danger btn-sm">Hapus</button>';
                 return $btn;
             })
+
+            ->addColumn('status_verifikasi', function ($row) {
+                switch ($row->status_verifikasi) {
+                    case 'pending':
+                        return '<span class="badge bg-warning text-dark">Pending</span>';
+                    case 'disetujui':
+                        return '<span class="badge bg-success">Disetujui</span>';
+                    case 'ditolak':
+                        return '<span class="badge bg-danger">Ditolak</span>';
+                    default:
+                        return '<span class="badge bg-secondary">Tidak Diketahui</span>';
+                }
+            })
+
             ->editColumn('pembukaan_pendaftaran', function ($row) {
                 return \Carbon\Carbon::parse($row->pembukaan_pendaftaran)->format('d-m-Y');
             })
             ->editColumn('batas_pendaftaran', function ($row) {
                 return \Carbon\Carbon::parse($row->batas_pendaftaran)->format('d-m-Y');
             })
-            ->rawColumns(['aksi'])
+            ->rawColumns(['aksi', 'status_verifikasi'])
             ->make(true);
     }
 
@@ -73,7 +85,6 @@ class LombaController extends Controller
             'kategori' => 'required|in:akademik,non-akademik,lainnya',
             'penyelenggara' => 'required|string|max:255',
             'tingkat' => 'required|in:lokal,nasional,internasional',
-            'bidang_keahlian' => 'required|string|max:255',
             'link_pendaftaran' => 'nullable|string|max:255',
             'batas_pendaftaran' => 'required|date',
             'status_verifikasi' => 'required|in:pending,disetujui,ditolak',
@@ -85,10 +96,17 @@ class LombaController extends Controller
         return redirect()->route('lomba.index')->with('success', 'Lomba berhasil ditambahkan');
     }
 
+    public function show($id)
+    {
+        $lomba = LombaModel::findOrFail($id);
+
+        return view('lomba.admin.show', compact('lomba'));
+    }
+
     public function edit($id)
     {
         $data = LombaModel::findOrFail($id);
-        return view('lomba.edit', compact('data'));
+        return view('lomba.admin.edit', compact('data'));
     }
 
     public function update(Request $request, $id)
@@ -99,7 +117,6 @@ class LombaController extends Controller
             'kategori' => 'required|in:akademik,non-akademik,lainnya',
             'penyelenggara' => 'required|string|max:255',
             'tingkat' => 'required|in:lokal,nasional,internasional',
-            'bidang_keahlian' => 'required|string|max:255',
             'link_pendaftaran' => 'nullable|string|max:255',
             'batas_pendaftaran' => 'required|date',
             'status_verifikasi' => 'required|in:pending,disetujui,ditolak',
@@ -109,13 +126,78 @@ class LombaController extends Controller
         $data = LombaModel::findOrFail($id);
         $data->update($validated);
 
-        return redirect()->route('lomba.index')->with('success', 'Lomba berhasil diupdate');
+        return redirect()->route('lomba.admin.index')->with('success', 'Lomba berhasil diupdate');
+    }
+
+
+    //===================================
+    //|        METHOD UNTUK ADMIN       |
+    //===================================
+    public function indexAdmin()
+    {
+        $breadcrumb = (object) [
+            'title' => 'Manajemen Lomba',
+            'list' => ['Dashboard', 'Lomba']
+        ];
+
+        $activeMenu = 'lomba';
+
+        return view('lomba.mahasiswa.index', compact('breadcrumb', 'activeMenu'));
+    }
+
+    public function getListAdmin(Request $request)
+    {
+        $query = LombaModel::query();
+
+        // Filter pencarian
+        if ($request->filled('search_nama')) {
+            $search = $request->search_nama;
+            $query->where(function ($q) use ($search) {
+                $q->where('nama_lomba', 'like', '%' . $search . '%');
+            });
+        }
+
+        if ($request->filled('filter_status')) {
+            $query->where('status_verifikasi', $request->filter_status);
+        }
+
+        return DataTables::of($query)
+            ->addIndexColumn()
+            ->addColumn('aksi', function ($row) {
+                // return view('components.lomba.aksi-buttons', compact('editUrl', 'verifUrl', 'deleteUrl'));
+                $btn = '<button onclick="modalAction(\'' . e(route('lomba.show', $row->lomba_id)) . '\')" class="btn btn-info btn-sm">Detail</button> ';
+                $btn .= '<button onclick="modalAction(\'' . e(route('lomba.edit', $row->lomba_id)) . '\')" class="btn btn-warning btn-sm">Edit</button> ';
+                $btn .= '<button onclick="deleteConfirmAjax(' . e($row->lomba_id) . ')" class="btn btn-danger btn-sm">Hapus</button>';
+                return $btn;
+            })
+
+            ->addColumn('status_verifikasi', function ($row) {
+                switch ($row->status_verifikasi) {
+                    case 'pending':
+                        return '<span class="badge bg-warning text-dark">Pending</span>';
+                    case 'disetujui':
+                        return '<span class="badge bg-success">Disetujui</span>';
+                    case 'ditolak':
+                        return '<span class="badge bg-danger">Ditolak</span>';
+                    default:
+                        return '<span class="badge bg-secondary">Tidak Diketahui</span>';
+                }
+            })
+
+            ->editColumn('pembukaan_pendaftaran', function ($row) {
+                return \Carbon\Carbon::parse($row->pembukaan_pendaftaran)->format('d-m-Y');
+            })
+            ->editColumn('batas_pendaftaran', function ($row) {
+                return \Carbon\Carbon::parse($row->batas_pendaftaran)->format('d-m-Y');
+            })
+            ->rawColumns(['aksi', 'status_verifikasi'])
+            ->make(true);
     }
 
     public function destroy($id)
     {
         LombaModel::destroy($id);
-        return redirect()->route('lomba.index')->with('success', 'Lomba berhasil dihapus');
+        return redirect()->route('lomba.admin.index')->with('success', 'Lomba berhasil dihapus');
     }
 
     public function verifikasi($id)
