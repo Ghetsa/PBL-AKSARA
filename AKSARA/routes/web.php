@@ -127,35 +127,51 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // ===================== MAHASISWA =====================
-    Route::middleware(['role:mahasiswa'])->group(function () {
+Route::middleware(['role:mahasiswa'])->group(function () {
 
-        // Prestasi
-        Route::prefix('mahasiswa/prestasi')->name('prestasi.mahasiswa.')->group(function () {
-            Route::get('/', [PrestasiController::class, 'indexMahasiswa'])->name('index');
-            Route::get('/list', [PrestasiController::class, 'listMahasiswa'])->name('list');
-            Route::get('/create-ajax', [PrestasiController::class, 'createFormAjaxMahasiswa'])->name('create_ajax');
-            Route::post('/store-ajax', [PrestasiController::class, 'storeAjaxMahasiswa'])->name('store_ajax');
-            Route::get('/edit-ajax/{id}', [PrestasiController::class, 'editAjaxMahasiswa'])->name('edit_ajax');
-            Route::put('/update-ajax/{id}', [PrestasiController::class, 'updateAjaxMahasiswa'])->name('update_ajax');
-            Route::get('/show-ajax/{id}', [PrestasiController::class, 'showAjaxMahasiswa'])->name('show_ajax');
-            Route::get('/{prestasi}/confirm-delete-ajax', [PrestasiController::class, 'confirmDeleteAjaxMahasiswa'])->name('confirm_delete_ajax');
-            Route::delete('/{prestasi}/destroy-ajax', [PrestasiController::class, 'destroyAjaxMahasiswa'])->name('destroy_ajax');
-        });
-
-        Route::prefix('mahasiswa/keahlian_user')->group(function () {
-            Route::get('/', [KeahlianUserController::class, 'index'])->name('keahlian_user.index');
-            Route::get('/list', [KeahlianUserController::class, 'list'])->name('keahlian_user.list');
-            Route::get('/create', [KeahlianUserController::class, 'create'])->name('keahlian_user.create');
-            Route::post('/store', [KeahlianUserController::class, 'store'])->name('keahlian_user.store');
-            Route::get('/edit/{id}', [KeahlianUserController::class, 'edit'])->name('keahlian_user.edit');
-            Route::put('/update/{id}', [KeahlianUserController::class, 'update'])->name('keahlian_user.update');
-            Route::delete('/delete/{id}', [KeahlianUserController::class, 'destroy'])->name('keahlian_user.destroy');
-            Route::get('/{id}/show_ajax', [KeahlianUserController::class, 'show_ajax'])->name('keahlian_user.show_ajax');
-
-            Route::get('/verifikasi/{id}', [KeahlianUserController::class, 'verifikasi'])->name('keahlian_user.verifikasi');
-            Route::post('/verifikasi/{id}', [KeahlianUserController::class, 'prosesVerifikasi'])->name('keahlian_user.prosesVerifikasi');
-        });
+    // ---------- PRESTASI ----------
+    Route::prefix('mahasiswa/prestasi')->name('prestasi.mahasiswa.')->group(function () {
+        Route::get('/', [PrestasiController::class, 'indexMahasiswa'])->name('index');
+        Route::get('/list', [PrestasiController::class, 'listMahasiswa'])->name('list');
+        Route::get('/create-ajax', [PrestasiController::class, 'createFormAjaxMahasiswa'])->name('create_ajax');
+        Route::post('/store-ajax', [PrestasiController::class, 'storeAjaxMahasiswa'])->name('store_ajax');
+        Route::get('/edit-ajax/{id}', [PrestasiController::class, 'editAjaxMahasiswa'])->name('edit_ajax');
+        Route::put('/update-ajax/{id}', [PrestasiController::class, 'updateAjaxMahasiswa'])->name('update_ajax');
+        Route::get('/show-ajax/{id}', [PrestasiController::class, 'showAjaxMahasiswa'])->name('show_ajax');
+        Route::get('/{id}/confirm-delete-ajax', [PrestasiController::class, 'confirmDeleteAjaxMahasiswa'])->name('confirm_delete_ajax');
+        Route::delete('/{id}/destroy-ajax', [PrestasiController::class, 'destroyAjaxMahasiswa'])->name('destroy_ajax');
     });
+
+    // ---------- KEAHLIAN USER ----------
+    Route::prefix('mahasiswa/keahlian_user')->name('keahlian_user.')->group(function () {
+        Route::get('/', [KeahlianUserController::class, 'index'])->name('index');
+        Route::get('/list', [KeahlianUserController::class, 'list'])->name('list');
+        Route::get('/create', [KeahlianUserController::class, 'create'])->name('create');
+        Route::post('/store', [KeahlianUserController::class, 'store'])->name('store');
+        Route::get('/edit/{id}', [KeahlianUserController::class, 'edit'])->name('edit');
+        Route::put('/update/{id}', [KeahlianUserController::class, 'update'])->name('update');
+        Route::delete('/delete/{id}', [KeahlianUserController::class, 'destroy'])->name('destroy');
+        Route::get('/{id}/show_ajax', [KeahlianUserController::class, 'show_ajax'])->name('show_ajax');
+        Route::get('/verifikasi/{id}', [KeahlianUserController::class, 'verifikasi'])->name('verifikasi');
+        Route::post('/verifikasi/{id}', [KeahlianUserController::class, 'prosesVerifikasi'])->name('proses_verifikasi');
+    });
+
+    // ---------- LOMBA ----------
+    Route::prefix('mahasiswa/lomba')->name('lomba.')->group(function () {
+        Route::get('/', [LombaController::class, 'index'])->name('index');
+        Route::get('/list', [LombaController::class, 'getList'])->name('list');
+        Route::get('/create', [LombaController::class, 'create'])->name('create');
+        Route::post('/', [LombaController::class, 'store'])->name('store');
+        Route::get('/{id}/lomba', [LombaController::class, 'show'])->name('show');
+        Route::get('/{id}/edit', [LombaController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [LombaController::class, 'update'])->name('update');
+        Route::delete('/{id}', [LombaController::class, 'destroy'])->name('destroy');
+        Route::get('/verifikasi/{id}', [LombaController::class, 'verifikasi'])->name('verifikasi');
+        Route::post('/verifikasi/{id}', [LombaController::class, 'prosesVerifikasi'])->name('proses_verifikasi');
+    });
+
+});
+
 
     // ===================== ADMIN =====================
     Route::middleware(['role:admin'])->group(function () {

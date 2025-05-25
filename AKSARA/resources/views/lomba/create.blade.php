@@ -12,30 +12,29 @@
             <label for="kode" class="col-sm-3 col-form-label">Nama Lomba</label>
             <div class="col-sm-9">
                 <input type="text" class="form-control" id="nama" name="nama" required>
-                <span class="invalid-feedback error-text" id="error-nama"></span> 
+                <span class="invalid-feedback error-text" id="error-nama"></span>
             </div>
         </div>
 
         <div class="form-group row mb-3">
-                    <label for="role" class="col-sm-3 col-form-label">Kategori Lomba</label>
-                    <div class="col-sm-9">
-                        <select class="form-control @error('role') is-invalid @enderror" id="role" name="role"
-                            required>
-                            <option value="">- Pilih Kategori -</option>
-                            <option value="individu" {{ old('role') == 'individu' ? 'selected' : '' }}>Individu</option>
-                            <option value="kelompok" {{ old('role') == 'kelompok' ? 'selected' : '' }}>Kelompok</option>
-                        </select>
-                        @error('role')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
+            <label for="role" class="col-sm-3 col-form-label">Kategori Lomba</label>
+            <div class="col-sm-9">
+                <select class="form-control @error('role') is-invalid @enderror" id="role" name="role" required>
+                    <option value="">- Pilih Kategori -</option>
+                    <option value="individu" {{ old('role') == 'individu' ? 'selected' : '' }}>Individu</option>
+                    <option value="kelompok" {{ old('role') == 'kelompok' ? 'selected' : '' }}>Kelompok</option>
+                </select>
+                @error('role')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+        </div>
 
         <div class="form-group row mb-3">
             <label for="kode" class="col-sm-3 col-form-label">Bidang Keahlian</label>
             <div class="col-sm-9">
                 <input type="text" class="form-control" id="nama" name="nama" required>
-                <span class="invalid-feedback error-text" id="error-nama"></span> 
+                <span class="invalid-feedback error-text" id="error-nama"></span>
             </div>
         </div>
 
@@ -43,31 +42,31 @@
             <label for="kode" class="col-sm-3 col-form-label">Penyelenggara Lomba</label>
             <div class="col-sm-9">
                 <input type="text" class="form-control" id="nama" name="nama" required>
-                <span class="invalid-feedback error-text" id="error-nama"></span> 
+                <span class="invalid-feedback error-text" id="error-nama"></span>
             </div>
         </div>
 
         <div class="form-group row mb-3">
-                    <label for="role" class="col-sm-3 col-form-label">Tingkat</label>
-                    <div class="col-sm-9">
-                        <select class="form-control @error('role') is-invalid @enderror" id="role" name="role"
-                            required>
-                            <option value="">- Pilih Tingkat -</option>
-                            <option value="lokal" {{ old('role') == 'lokal' ? 'selected' : '' }}>Lokal</option>
-                            <option value="nasional" {{ old('role') == 'nasional' ? 'selected' : '' }}>Nasional</option>
-                            <option value="internasional" {{ old('role') == 'internasional' ? 'selected' : '' }}>Internasional</option>
-                        </select>
-                        @error('role')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
+            <label for="role" class="col-sm-3 col-form-label">Tingkat</label>
+            <div class="col-sm-9">
+                <select class="form-control @error('role') is-invalid @enderror" id="role" name="role" required>
+                    <option value="">- Pilih Tingkat -</option>
+                    <option value="lokal" {{ old('role') == 'lokal' ? 'selected' : '' }}>Lokal</option>
+                    <option value="nasional" {{ old('role') == 'nasional' ? 'selected' : '' }}>Nasional</option>
+                    <option value="internasional" {{ old('role') == 'internasional' ? 'selected' : '' }}>Internasional
+                    </option>
+                </select>
+                @error('role')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+        </div>
 
         <div class="form-group row mb-3">
             <label for="nama" class="col-sm-3 col-form-label">Link Pendaftaran</label>
             <div class="col-sm-9">
                 <input type="text" class="form-control" id="pembukaan" name="pembukaan" required>
-                <span class="invalid-feedback error-text" id="error-pembukaan"></span> 
+                <span class="invalid-feedback error-text" id="error-pembukaan"></span>
             </div>
         </div>
 
@@ -75,14 +74,14 @@
             <label for="nama" class="col-sm-3 col-form-label">Link Penyelenggara</label>
             <div class="col-sm-9">
                 <input type="text" class="form-control" id="pembukaan" name="pembukaan" required>
-                <span class="invalid-feedback error-text" id="error-pembukaan"></span> 
+                <span class="invalid-feedback error-text" id="error-pembukaan"></span>
             </div>
         </div>
         <div class="form-group row mb-3">
             <label for="nama" class="col-sm-3 col-form-label">Poster</label>
             <div class="col-sm-9">
                 <input type="file" class="form-control" id="pembukaan" name="pembukaan" required>
-                <span class="invalid-feedback error-text" id="error-pembukaan"></span> 
+                <span class="invalid-feedback error-text" id="error-pembukaan"></span>
             </div>
         </div>
         {{-- Field Nama Prodi --}}
@@ -90,7 +89,7 @@
             <label for="nama" class="col-sm-3 col-form-label">Pembukaan Pendaftaran</label>
             <div class="col-sm-9">
                 <input type="date" class="form-control" id="pembukaan" name="pembukaan" required>
-                <span class="invalid-feedback error-text" id="error-pembukaan"></span> 
+                <span class="invalid-feedback error-text" id="error-pembukaan"></span>
             </div>
         </div>
 
@@ -98,7 +97,7 @@
             <label for="nama" class="col-sm-3 col-form-label">Penutupan Pendaftaran</label>
             <div class="col-sm-9">
                 <input type="date" class="form-control" id="penutupan" name="penutupan" required>
-                <span class="invalid-feedback error-text" id="error-penutupan"></span> 
+                <span class="invalid-feedback error-text" id="error-penutupan"></span>
             </div>
         </div>
     </div> {{-- Akhir dari modal-body --}}

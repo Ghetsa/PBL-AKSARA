@@ -28,9 +28,6 @@ class LombaModel extends Model
         'status_verifikasi',
         'diinput_oleh',
         'poster',
-    ];
-
-    protected $casts = [
         'pembukaan_pendaftaran' => 'date',
         'batas_pendaftaran' => 'date',
         'kategori' => 'string',
@@ -39,6 +36,7 @@ class LombaModel extends Model
         'biaya' => 'integer',
         'diinput_oleh' => 'integer',
     ];
+
 
     public function inputBy()
     {
