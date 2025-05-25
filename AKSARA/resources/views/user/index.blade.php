@@ -226,10 +226,10 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h3 class="card-title mb-0">Data User</h3>
                     <div class="card-tools">
-                        <a href="{{ route('user.create') }}" class="btn btn-success btn-sm"><i class="fas fa-plus"></i> Tambah (Non-AJAX)</a>
+                        {{-- <a href="{{ route('user.create') }}" class="btn btn-success btn-sm"><i class="fas fa-plus"></i> Tambah (Non-AJAX)</a> --}}
                         <button type="button" class="btn btn-primary btn-sm"
                                 onclick="modalAction('{{ route('user.create_ajax') }}')">
-                                <i class="fas fa-plus-circle"></i> Tambah User (AJAX)</button>
+                                <i class="fas fa-plus-circle"></i> Tambah User</button>
                     </div>
                 </div>
 
@@ -352,12 +352,13 @@
             $('#role_filter, #status_filter').on('change', function () {
                 dataUser.ajax.reload();
             });
+        });
 
-            function deleteConfirmAjax(user_id) {
+        function deleteConfirmAjax(user_id) {
                 modalAction(`{{ url('/user') }}/${user_id}/confirm_ajax`);
                 // Atau menggunakan route helper:
                 // modalAction(`{{ route('user.confirm_ajax', ':id') }}`.replace(':id', user_id));
-            }
-        });
+        }
+        
     </script>
 @endpush

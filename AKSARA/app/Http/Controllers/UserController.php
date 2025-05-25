@@ -66,24 +66,26 @@ class UserController extends Controller
                 }
                 return '<div class="d-flex align-items-center">' . $avatar . '<div>' . $namaText . $detailText . '</div></div>';
             })
-            ->editColumn('role', function ($user) { // MODIFIKASI DI SINI
+            ->editColumn('role', function ($user) {
                 $role = strtolower($user->role);
-                $badgeClass = 'bg-secondary'; // Default badge
-                $textClass = 'text-white'; // Default text color, bisa disesuaikan
+                $badgeBgClass = 'bg-light-secondary';
+                $textColorClass = 'text-secondary';
 
                 switch ($role) {
                     case 'admin':
-                        $badgeClass = 'bg-warning';
+                        $badgeBgClass = 'bg-light-danger';
+                        $textColorClass = 'text-danger';
                         break;
                     case 'dosen':
-                        $badgeClass = 'bg-info';
-                        $textClass = 'text-dark';  // Untuk bg-info, text-dark mungkin lebih baik
+                        $badgeBgClass = 'bg-light-success';
+                        $textColorClass = 'text-success';
                         break;
                     case 'mahasiswa':
-                        $badgeClass = 'bg-primary';
+                        $badgeBgClass = 'bg-light-primary';
+                        $textColorClass = 'text-primary';
                         break;
                 }
-                return '<span class="badge ' . $badgeClass . ' ' . $textClass . '">' . ucfirst($user->role) . '</span>';
+                return '<span class="badge ' . $badgeBgClass . ' ' . $textColorClass . '">' . ucfirst($user->role) . '</span>';
             })
             ->editColumn('status', function ($user) {
                 return $user->status == 'aktif' ? '<span class="badge bg-success">Aktif</span>' : '<span class="badge bg-danger">Nonaktif</span>';
@@ -292,57 +294,43 @@ class UserController extends Controller
                 ]);
             }
 
-            $roleSpecificRules = [];
-            if ($request->role == 'admin') {
-                $roleSpecificRules['nip'] = 'required|string|max:20|unique:admin,nip';
-            } elseif ($request->role == 'dosen') {
-                $roleSpecificRules['nip'] = 'required|string|max:20|unique:dosen,nip';
+            if ($request->role == 'dosen') {
+                $dosenRules = [
+                    'nip' => 'required|string|max:50',
+                ];
+                $request->validate($dosenRules);
+            } elseif ($request->role == 'admin') {
+                $request->validate([
+                    'nip' => 'required|string|max:50',
+                ]);
             } elseif ($request->role == 'mahasiswa') {
-                $roleSpecificRules['nim'] = 'required|string|max:20|unique:mahasiswa,nim';
-                $roleSpecificRules['prodi_id'] = 'required|exists:program_studi,prodi_id';
-                $roleSpecificRules['periode_id'] = 'required|exists:periode,periode_id';
-            }
-
-            $validator = Validator::make($request->all(), array_merge($baseRules, $roleSpecificRules));
-
-            if ($validator->fails()) {
-                return response()->json(['status' => false, 'message' => 'Validasi gagal', 'errors' => $validator->errors()], 422);
-            }
-
-            $fotoPath = null;
-            if ($request->hasFile('foto')) {
-                // User ID belum ada, jadi simpan ke folder sementara atau tanpa user ID dulu
-                // Atau, simpan user dulu baru update foto jika user ID diperlukan di path
-                $fotoPath = $request->file('foto')->store('profile_photos/temp', 'public');
+                $request->validate([
+                    'nim' => 'required|string|max:50|unique:mahasiswa,nim',
+                    'prodi_id' => 'required|exists:program_studi,prodi_id',
+                    'periode_id' => 'required|exists:periode,periode_id',
+                ]);
             }
 
             $user = UserModel::create([
                 'nama' => $request->nama,
                 'email' => $request->email,
-                'password' => Hash::make($request->password), // Gunakan Hash::make
-                'role' => $request->role,
-                'status' => $request->status,
+                'password' => bcrypt($request->password),
                 'no_telepon' => $request->no_telepon,
                 'alamat' => $request->alamat,
-                'foto' => $fotoPath, // Simpan path foto
+                'role' => $request->role,
+                'status' => $request->status,
             ]);
 
-            // Jika fotoPath disimpan ke temp, pindahkan ke folder user_id sekarang
-            if ($fotoPath && str_contains($fotoPath, 'temp')) {
-                $newFotoPath = str_replace('temp', $user->user_id, $fotoPath);
-                if (Storage::disk('public')->exists($fotoPath)) {
-                    Storage::disk('public')->move($fotoPath, $newFotoPath);
-                    $user->foto = $newFotoPath;
-                    $user->save();
-                }
-            }
-
-
-            // ... (logika create AdminModel, DosenModel, MahasiswaModel Anda)
             if ($request->role == 'admin') {
-                AdminModel::create(['user_id' => $user->user_id, 'nip' => $request->nip]);
+                AdminModel::create([
+                    'user_id' => $user->user_id,
+                    'nip' => $request->nip
+                ]);
             } elseif ($request->role == 'dosen') {
-                DosenModel::create(['user_id' => $user->user_id, 'nip' => $request->nip]);
+                DosenModel::create([
+                    'user_id' => $user->user_id,
+                    'nip' => $request->nip,
+                ]);
             } elseif ($request->role == 'mahasiswa') {
                 MahasiswaModel::create([
                     'user_id' => $user->user_id,
@@ -352,56 +340,10 @@ class UserController extends Controller
                 ]);
             }
 
-            return response()->json(['status' => true, 'message' => 'User berhasil ditambahkan']);
-
-            // if ($request->role == 'dosen') {
-            //     $dosenRules = [
-            //         'nip' => 'required|string|max:50',
-            //     ];
-            //     $request->validate($dosenRules);
-            // } elseif ($request->role == 'admin') {
-            //     $request->validate([
-            //         'nip' => 'required|string|max:50',
-            //     ]);
-            // } elseif ($request->role == 'mahasiswa') {
-            //     $request->validate([
-            //         'nim' => 'required|string|max:50|unique:mahasiswa,nim',
-            //         'prodi_id' => 'required|exists:program_studi,prodi_id',
-            //         'periode_id' => 'required|exists:periode,periode_id',
-            //     ]);
-            // }
-
-            // $user = UserModel::create([
-            //     'nama' => $request->nama,
-            //     'email' => $request->email,
-            //     'password' => bcrypt($request->password),
-            //     'role' => $request->role,
-            //     'status' => $request->status,
-            // ]);
-
-            // if ($request->role == 'admin') {
-            //     AdminModel::create([
-            //         'user_id' => $user->user_id,
-            //         'nip' => $request->nip
-            //     ]);
-            // } elseif ($request->role == 'dosen') {
-            //     DosenModel::create([
-            //         'user_id' => $user->user_id,
-            //         'nip' => $request->nip,
-            //     ]);
-            // } elseif ($request->role == 'mahasiswa') {
-            //     MahasiswaModel::create([
-            //         'user_id' => $user->user_id,
-            //         'nim' => $request->nim,
-            //         'prodi_id' => $request->prodi_id,
-            //         'periode_id' => $request->periode_id,
-            //     ]);
-            // }
-
-            // return response()->json([
-            //     'status' => true,
-            //     'message' => 'User berhasil ditambahkan'
-            // ]);
+            return response()->json([
+                'status' => true,
+                'message' => 'User berhasil ditambahkan'
+            ]);
         }
 
         return redirect('/');
@@ -412,7 +354,14 @@ class UserController extends Controller
         $user = UserModel::with(['admin', 'dosen', 'mahasiswa.prodi', 'mahasiswa.periode'])
             ->findOrFail($user_id);
 
-        $roles = ['admin', 'dosen', 'mahasiswa']; // Ini sudah ada di file UserController Anda
+        if (!$user) {
+            if (request()->ajax() || request()->wantsJson()) {
+                return response()->json(['status' => false, 'message' => 'User tidak ditemukan.'], 404);
+            }
+            return abort(404, 'User tidak ditemukan.');
+        }
+
+        $roles = ['admin', 'dosen', 'mahasiswa'];
         $prodi = ProdiModel::select('prodi_id', 'nama')->orderBy('nama')->get();
         $periode = PeriodeModel::select('periode_id', 'semester', 'tahun_akademik')->orderBy('tahun_akademik', 'desc')->orderBy('semester', 'desc')->get();
 
@@ -439,155 +388,63 @@ class UserController extends Controller
     //     return view('user.edit_ajax', compact('user', 'roles', 'prodi', 'periode', 'keahlian'));
     // }
 
-    // public function update_ajax(Request $request, $user_id)
-    // {
-    //     if (!($request->ajax() || $request->wantsJson())) {
-    //         return response()->json(['status' => false, 'message' => 'Akses tidak diizinkan.'], 403);
-    //     }
-
-    //     $user = UserModel::find($user_id);
-    //     if (!$user) {
-    //         return response()->json(['status' => false, 'message' => 'User tidak ditemukan.'], 404);
-    //     }
-
-    //     $baseRules = [
-    //         'nama' => 'required|string|max:255',
-    //         'email' => [
-    //             'required',
-    //             'email',
-    //             Rule::unique('users', 'email')->ignore($user->user_id, 'user_id')
-    //         ],
-    //         'password' => 'nullable|string|min:6', // Password opsional saat update
-    //         'role' => 'required|in:admin,dosen,mahasiswa',
-    //         'status' => 'required|in:aktif,nonaktif',
-    //     ];
-
-    //     // Aturan validasi tambahan berdasarkan role
-    //     $roleRules = [];
-
-    //     if ($request->role === 'admin') {
-    //         $roleRules = [
-    //             'nip' => ['required', 'string', 'max:50', Rule::unique('admin', 'nip')->ignore($user->admin->admin_id ?? null, 'admin_id')],
-    //         ];
-    //     } elseif ($request->role === 'dosen') {
-    //         $roleRules = [
-    //             'nip' => ['required', 'string', 'max:50', Rule::unique('dosen', 'nip')->ignore($user->dosen->dosen_id ?? null, 'dosen_id')],
-    //         ];
-    //     } elseif ($request->role === 'mahasiswa') {
-    //         $roleRules = [
-    //             'nim' => ['required', 'string', 'max:50', Rule::unique('mahasiswa', 'nim')->ignore($user->mahasiswa->mahasiswa_id ?? null, 'mahasiswa_id')],
-    //             'prodi_id' => 'required|exists:program_studi,prodi_id',
-    //             'periode_id' => 'required|exists:periode,periode_id'
-    //         ];
-    //     }
-
-
-    //     $validator = Validator::make($request->all(), array_merge($baseRules, $roleRules));
-
-    //     if ($validator->fails()) {
-    //         return response()->json([
-    //             'status' => false,
-    //             'message' => 'Validasi gagal.',
-    //             'errors' => $validator->errors()
-    //         ], 422);
-    //     }
-
-    //     try {
-
-    //         $userData = [
-    //             'nama' => $request->nama,
-    //             'email' => $request->email,
-    //             'role' => $request->role,
-    //             'status' => $request->status,
-    //         ];
-    //         if ($request->filled('password')) {
-    //             $userData['password'] = Hash::make($request->password);
-    //         }
-    //         $user->update($userData);
-
-    //         if ($request->role == 'dosen') {
-    //             DosenModel::updateOrCreate(
-    //                 ['user_id' => $user->user_id],
-    //                 ['nip' => $request->nip]
-    //             );
-
-    //             if ($user->admin)
-    //                 $user->admin->delete();
-    //             if ($user->mahasiswa)
-    //                 $user->mahasiswa->delete();
-    //         }
-    //         if ($request->role == 'mahasiswa') {
-    //             MahasiswaModel::updateOrCreate(
-    //                 ['user_id' => $user->user_id],
-    //                 [
-    //                     'nim' => $request->nim,
-    //                     'prodi_id' => $request->prodi_id,
-    //                     'periode_id' => $request->periode_id
-    //                 ]
-    //             );
-
-    //             // Hapus data admin dan dosen jika sebelumnya user punya
-    //             if ($user->admin)
-    //                 $user->admin->delete();
-    //             if ($user->dosen)
-    //                 $user->dosen->delete();
-    //         }
-
-    //         // DB::commit();
-    //         return response()->json([
-    //             'status' => true,
-    //             'message' => 'User berhasil diperbarui.'
-    //         ], 200);
-    //     } catch (Exception $e) {
-    //         // DB::rollBack();
-    //         Log::error("Error updating user ID {$user_id}: " . $e->getMessage() . ' Trace: ' . $e->getTraceAsString());
-    //         return response()->json([
-    //             'status' => false,
-    //             'message' => 'Gagal memperbarui user. Terjadi kesalahan server.'
-    //         ], 500);
-    //     }
-    // }
-
     public function update_ajax(Request $request, $user_id)
     {
         if (!($request->ajax() || $request->wantsJson())) {
             return response()->json(['status' => false, 'message' => 'Akses tidak diizinkan.'], 403);
         }
 
-        $user = UserModel::findOrFail($user_id);
-
-        $baseRules = [
-            'nama' => 'required|string|max:100',
-            'email' => ['required', 'email', 'max:100', Rule::unique('users', 'email')->ignore($user->user_id, 'user_id')],
-            'password' => 'nullable|string|min:6|max:100',
-            'role' => 'required|in:admin,dosen,mahasiswa',
-            'status' => 'required|in:aktif,nonaktif',
-            'no_telepon' => 'nullable|string|max:15|regex:/^[0-9\-\+\(\)\s]*$/',
-            'alamat' => 'nullable|string|max:255',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ];
-        // ... (Validasi role-specific Anda yang sudah ada, pastikan unique rule diignore dengan benar)
-        $roleSpecificRules = [];
-        if ($request->role === 'admin') {
-            $admin_id = $user->admin->admin_id ?? null;
-            $roleSpecificRules['nip'] = ['required', 'string', 'max:20', Rule::unique('admin', 'nip')->ignore($admin_id, 'admin_id')];
-        } elseif ($request->role === 'dosen') {
-            $dosen_id = $user->dosen->dosen_id ?? null;
-            $roleSpecificRules['nip'] = ['required', 'string', 'max:20', Rule::unique('dosen', 'nip')->ignore($dosen_id, 'dosen_id')];
-        } elseif ($request->role === 'mahasiswa') {
-            $mahasiswa_id = $user->mahasiswa->mahasiswa_id ?? null;
-            $roleSpecificRules['nim'] = ['required', 'string', 'max:20', Rule::unique('mahasiswa', 'nim')->ignore($mahasiswa_id, 'mahasiswa_id')];
-            $roleSpecificRules['prodi_id'] = 'required|exists:program_studi,prodi_id';
-            $roleSpecificRules['periode_id'] = 'required|exists:periode,periode_id';
+        $user = UserModel::find($user_id);
+        if (!$user) {
+            return response()->json(['status' => false, 'message' => 'User tidak ditemukan.'], 404);
         }
 
-        $validator = Validator::make($request->all(), array_merge($baseRules, $roleSpecificRules));
+        $baseRules = [
+            'nama' => 'required|string|max:255',
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('users', 'email')->ignore($user->user_id, 'user_id')
+            ],
+            'password' => 'nullable|string|min:6', // Password opsional saat update
+            'no_telepon' => 'nullable|string|max:15|regex:/^[0-9\-\+\(\)\s]*$/',
+            'alamat' => 'nullable|string|max:255',
+            'role' => 'required|in:admin,dosen,mahasiswa',
+            'status' => 'required|in:aktif,nonaktif',
+        ];
+
+        // Aturan validasi tambahan berdasarkan role
+        $roleRules = [];
+
+        if ($request->role === 'admin') {
+            $roleRules = [
+                'nip' => ['required', 'string', 'max:50', Rule::unique('admin', 'nip')->ignore($user->admin->admin_id ?? null, 'admin_id')],
+            ];
+        } elseif ($request->role === 'dosen') {
+            $roleRules = [
+                'nip' => ['required', 'string', 'max:50', Rule::unique('dosen', 'nip')->ignore($user->dosen->dosen_id ?? null, 'dosen_id')],
+            ];
+        } elseif ($request->role === 'mahasiswa') {
+            $roleRules = [
+                'nim' => ['required', 'string', 'max:50', Rule::unique('mahasiswa', 'nim')->ignore($user->mahasiswa->mahasiswa_id ?? null, 'mahasiswa_id')],
+                'prodi_id' => 'required|exists:program_studi,prodi_id',
+                'periode_id' => 'required|exists:periode,periode_id'
+            ];
+        }
+
+
+        $validator = Validator::make($request->all(), array_merge($baseRules, $roleRules));
 
         if ($validator->fails()) {
-            return response()->json(['status' => false, 'message' => 'Validasi gagal.', 'errors' => $validator->errors()], 422);
+            return response()->json([
+                'status' => false,
+                'message' => 'Validasi gagal.',
+                'errors' => $validator->errors()
+            ], 422);
         }
 
         try {
+
             $userData = [
                 'nama' => $request->nama,
                 'email' => $request->email,
@@ -599,32 +456,20 @@ class UserController extends Controller
             if ($request->filled('password')) {
                 $userData['password'] = Hash::make($request->password);
             }
-
-            if ($request->hasFile('foto')) {
-                if ($user->foto && Storage::disk('public')->exists($user->foto)) {
-                    Storage::disk('public')->delete($user->foto);
-                }
-                $userData['foto'] = $request->file('foto')->store('profile_photos/' . $user->user_id, 'public');
-            }
-
             $user->update($userData);
 
-            // ... (logika update atau create AdminModel, DosenModel, MahasiswaModel Anda)
-            // Pastikan menghapus data dari role lama jika role berubah
-            $currentRole = $user->getOriginal('role'); // Ambil role sebelum update
-            $newRole = $request->role;
+            if ($request->role == 'dosen') {
+                DosenModel::updateOrCreate(
+                    ['user_id' => $user->user_id],
+                    ['nip' => $request->nip]
+                );
 
-            if ($currentRole !== $newRole) {
-                if ($currentRole === 'admin' && $user->admin) $user->admin->delete();
-                if ($currentRole === 'dosen' && $user->dosen) $user->dosen->delete();
-                if ($currentRole === 'mahasiswa' && $user->mahasiswa) $user->mahasiswa->delete();
+                if ($user->admin)
+                    $user->admin->delete();
+                if ($user->mahasiswa)
+                    $user->mahasiswa->delete();
             }
-
-            if ($newRole == 'admin') {
-                AdminModel::updateOrCreate(['user_id' => $user->user_id], ['nip' => $request->nip]);
-            } elseif ($newRole == 'dosen') {
-                DosenModel::updateOrCreate(['user_id' => $user->user_id], ['nip' => $request->nip]);
-            } elseif ($newRole == 'mahasiswa') {
+            if ($request->role == 'mahasiswa') {
                 MahasiswaModel::updateOrCreate(
                     ['user_id' => $user->user_id],
                     [
@@ -633,13 +478,26 @@ class UserController extends Controller
                         'periode_id' => $request->periode_id
                     ]
                 );
+
+                // Hapus data admin dan dosen jika sebelumnya user punya
+                if ($user->admin)
+                    $user->admin->delete();
+                if ($user->dosen)
+                    $user->dosen->delete();
             }
 
-
-            return response()->json(['status' => true, 'message' => 'User berhasil diperbarui.']);
+            // DB::commit();
+            return response()->json([
+                'status' => true,
+                'message' => 'User berhasil diperbarui.'
+            ], 200);
         } catch (Exception $e) {
+            // DB::rollBack();
             Log::error("Error updating user ID {$user_id}: " . $e->getMessage() . ' Trace: ' . $e->getTraceAsString());
-            return response()->json(['status' => false, 'message' => 'Gagal memperbarui user. Terjadi kesalahan server.'], 500);
+            return response()->json([
+                'status' => false,
+                'message' => 'Gagal memperbarui user. Terjadi kesalahan server.'
+            ], 500);
         }
     }
 

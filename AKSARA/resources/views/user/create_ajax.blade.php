@@ -1,4 +1,4 @@
-<form id="formCreateUser" class="form-horizontal" method="POST" action="{{ route('user.store_ajax') }}">
+<form id="formCreateUser" class="form-horizontal" method="POST" action="{{ route('user.store_ajax') }}" enctype="multipart/form-data">
     @csrf
 
     <div class="modal-header">
@@ -42,6 +42,24 @@
             <div class="col-sm-10">
                 <input type="password" class="form-control" id="password" name="password" required>
                 <span class="invalid-feedback error-text" id="error-password"></span> 
+            </div>
+        </div>
+
+        {{-- No. Telepon --}}
+        <div class="form-group row mb-3">
+            <label for="no_telepon_modal" class="col-sm-2 col-form-label">No. Telepon</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="no_telepon_modal" name="no_telepon">
+                <span class="invalid-feedback error-text" id="error-no_telepon"></span> 
+            </div>
+        </div>
+
+        {{-- Alamat --}}
+        <div class="form-group row mb-3">
+            <label for="alamat_modal" class="col-sm-2 col-form-label">Alamat</label>
+            <div class="col-sm-10">
+                <textarea class="form-control" id="alamat_modal" name="alamat" rows="2"></textarea>
+                <span class="invalid-feedback error-text" id="error-alamat"></span> 
             </div>
         </div>
 

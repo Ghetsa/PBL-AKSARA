@@ -49,6 +49,14 @@
                         <td>{{ $user->email }}</td>
                     </tr>
                     <tr>
+                        <th class="text-end">No. Telepon</th>
+                        <td>{{ $user->no_telepon }}</td>
+                    </tr>
+                    <tr>
+                        <th class="text-end">Alamat</th>
+                        <td>{{ $user->alamat }}</td>
+                    </tr>
+                    <tr>
                         <th class="text-end">Status</th>
                         <td>{{ $user->status }}</td>
                     </tr>

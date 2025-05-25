@@ -55,6 +55,24 @@
             </div>
         </div>
 
+        {{-- No. Telepon --}}
+        <div class="form-group row mb-3">
+            <label for="edit_no_telepon_modal" class="col-sm-2 col-form-label">No. Telepon</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="edit_no_telepon_modal" name="no_telepon" value="{{ old('no_telepon', $user->no_telepon) }}">
+                <span class="invalid-feedback error-text" id="error-edit-no_telepon"></span>
+            </div>
+        </div>
+
+        {{-- Alamat --}}
+        <div class="form-group row mb-3">
+            <label for="edit_alamat_modal" class="col-sm-2 col-form-label">Alamat</label>
+            <div class="col-sm-10">
+                <textarea class="form-control" id="edit_alamat_modal" name="alamat" rows="2">{{ old('alamat', $user->alamat) }}</textarea>
+                <span class="invalid-feedback error-text" id="error-edit-alamat"></span>
+            </div>
+        </div>
+
         {{-- === Field Tambahan (sesuaikan ID dan value) === --}}
         {{-- NIP (Untuk Admin & Dosen) --}}
         <div id="form-edit-nip-modal" style="display: none;">

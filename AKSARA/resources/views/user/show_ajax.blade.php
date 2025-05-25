@@ -21,6 +21,14 @@
                 <td>{{ $user->email }}</td>
             </tr>
             <tr>
+                <th>No. Telepon</th>
+                <td>{{ $user->no_telepon ?: '-' }}</td>
+            </tr>
+            <tr>
+                <th>Alamat</th>
+                <td>{{ $user->alamat ?: '-' }}</td>
+            </tr>
+            <tr>
                 <th>Role</th>
                 <td>{{ ucfirst($user->role) }}</td>
             </tr>
