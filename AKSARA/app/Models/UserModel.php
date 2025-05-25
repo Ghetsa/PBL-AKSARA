@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Support\Facades\Storage;
 
 class UserModel extends Authenticatable implements JWTSubject
 {
@@ -21,6 +22,8 @@ class UserModel extends Authenticatable implements JWTSubject
         'role',
         'status',
         'foto',
+        'no_telepon',
+        'alamat',
     ];
 
     protected $hidden = [
@@ -30,6 +33,29 @@ class UserModel extends Authenticatable implements JWTSubject
     protected $casts = [
         'password' => 'hashed',
     ];
+
+    /**
+     * Accessor untuk mendapatkan URL foto profil.
+     * Menampilkan avatar default jika foto tidak ada atau tidak ditemukan.
+     */
+    public function getFotoUrlAttribute()
+    {
+        if ($this->foto && Storage::disk('public')->exists($this->foto)) {
+            return asset('storage/' . $this->foto);
+        }
+
+        // Avatar default berdasarkan role
+        switch ($this->role) {
+            case 'mahasiswa':
+                return asset('mantis/dist/assets/images/user/1.jpg'); // Sesuaikan path jika berbeda
+            case 'admin':
+                return asset('mantis/dist/assets/images/user/2.jpg'); // Sesuaikan path jika berbeda
+            case 'dosen':
+                return asset('mantis/dist/assets/images/user/3.jpg'); // Sesuaikan path jika berbeda
+            default:
+                return asset('mantis/dist/assets/images/user/avatar-2.jpg'); // Fallback umum
+        }
+    }
 
     /** JWT Implementation */
     public function getJWTIdentifier()
