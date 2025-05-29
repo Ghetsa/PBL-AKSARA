@@ -34,18 +34,10 @@
     <div class="row">
         <div class="col-12">
             <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <div class="card-header d-flex justify-content-between align-items-center">
                     <h3 class="card-title mb-0">Daftar Lomba</h3>
                     {{-- Tombol Tambah Lomba --}}
                     {{-- Pertimbangkan untuk menambahkan @can('lomba-create') atau hak akses serupa --}}
-                    @if(Route::has('lomba.create')) {{-- Cek apakah route 'lomba.create' ada --}}
-                    <div class="card-tools">
-                        <button type="button" class="btn btn-light btn-sm"
-                            onclick="modalAction('{{ route('lomba.create') }}', 'myModal', 'Tambah Lomba Baru')">
-                            <i class="fas fa-plus-circle"></i> Tambah Lomba
-                        </button>
-                    </div>
-                    @endif
                 </div>
 
                 <div class="card-body">

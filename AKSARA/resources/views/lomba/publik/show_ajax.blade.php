@@ -1,6 +1,6 @@
 {{-- resources/views/lomba/show_ajax.blade.php --}}
-<div class="modal-header bg-info text-white">
-    <h5 class="modal-title" id="modalDetailLombaPublikLabel">{{ Str::limit($lomba->nama_lomba, 50) }}</h5>
+<div class="modal-header">
+    <h5 class="modal-title" id="modalDetailLombaPublikLabel">Lomba {{ Str::limit($lomba->nama_lomba, 50) }}</h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
 </div>
 <div class="modal-body" style="max-height: 75vh; overflow-y: auto;">

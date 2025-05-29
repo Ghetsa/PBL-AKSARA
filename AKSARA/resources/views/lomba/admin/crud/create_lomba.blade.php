@@ -1,49 +1,49 @@
-{{-- Form untuk Tambah Lomba oleh Admin --}}
+{{-- Form untuk Tambah Lomba oleh Admin (dimuat di modal) --}}
 <form id="formAdminCreateLomba" action="{{ route('admin.lomba.crud.store_ajax') }}" method="POST" enctype="multipart/form-data">
     @csrf
-    <div class="modal-header bg-primary text-white">
-        <h5 class="modal-title">Tambah Info Lomba Baru (Admin)</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-header">
+        <h5 class="modal-title">Tambah Info Lomba Baru</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
-    <div class="modal-body" style="max-height: 75vh; overflow-y: auto;">
+    <div class="modal-body" style="max-height: 66vh; overflow-y: auto;">
         {{-- Baris Nama Lomba --}}
-        <div class="row mb-3">
-            <label for="crud_create_nama_lomba" class="col-sm-3 col-form-label text-sm-end">Nama Lomba <span class="text-danger">*</span></label>
+        <div class="form-group row mb-3">
+            <label for="crud_c_nama_lomba" class="col-sm-3 col-form-label text-md">Nama Lomba <span class="text-danger">*</span></label>
             <div class="col-sm-9">
-                <input type="text" name="nama_lomba" id="crud_create_nama_lomba" class="form-control" required>
+                <input type="text" name="nama_lomba" id="crud_c_nama_lomba" class="form-control" required>
                 <span class="invalid-feedback error-nama_lomba"></span>
             </div>
         </div>
 
         {{-- Baris Tanggal Pendaftaran --}}
-        <div class="row mb-3">
-            <label for="crud_create_pembukaan_pendaftaran" class="col-sm-3 col-form-label text-sm-end">Pembukaan Pendaftaran <span class="text-danger">*</span></label>
+        <div class="form-group row mb-3">
+            <label for="crud_c_pembukaan_pendaftaran" class="col-sm-3 col-form-label text-md">Pembukaan Pendaftaran <span class="text-danger">*</span></label>
             <div class="col-sm-9">
-                <input type="date" name="pembukaan_pendaftaran" id="crud_create_pembukaan_pendaftaran" class="form-control" required>
+                <input type="date" name="pembukaan_pendaftaran" id="crud_c_pembukaan_pendaftaran" class="form-control" required>
                 <span class="invalid-feedback error-pembukaan_pendaftaran"></span>
             </div>
         </div>
-        <div class="row mb-3">
-            <label for="crud_create_batas_pendaftaran" class="col-sm-3 col-form-label text-sm-end">Batas Pendaftaran <span class="text-danger">*</span></label>
+        <div class="form-group row mb-3">
+            <label for="crud_c_batas_pendaftaran" class="col-sm-3 col-form-label text-md">Batas Pendaftaran <span class="text-danger">*</span></label>
             <div class="col-sm-9">
-                <input type="date" name="batas_pendaftaran" id="crud_create_batas_pendaftaran" class="form-control" required>
+                <input type="date" name="batas_pendaftaran" id="crud_c_batas_pendaftaran" class="form-control" required>
                 <span class="invalid-feedback error-batas_pendaftaran"></span>
             </div>
         </div>
         
         {{-- Baris Kategori & Tingkat --}}
-        <div class="row mb-3">
-            <label for="crud_create_kategori" class="col-sm-3 col-form-label text-sm-end">Kategori Lomba <span class="text-danger">*</span></label>
-            <div class="col-sm-3">
-                <select name="kategori" id="crud_create_kategori" class="form-select" required>
+        <div class="form-group row mb-3">
+            <label for="crud_c_kategori" class="col-sm-3 col-form-label text-md">Kategori Lomba <span class="text-danger">*</span></label>
+            <div class="col-sm-3"> {{-- Dibuat lebih sempit agar Tingkat bisa di sampingnya --}}
+                <select name="kategori" id="crud_c_kategori" class="form-select" required>
                     <option value="individu">Individu</option>
                     <option value="kelompok">Kelompok</option>
                 </select>
                 <span class="invalid-feedback error-kategori"></span>
             </div>
-            <label for="crud_create_tingkat" class="col-sm-3 col-form-label text-sm-end">Tingkat <span class="text-danger">*</span></label>
-            <div class="col-sm-3">
-                <select name="tingkat" id="crud_create_tingkat" class="form-select" required>
+            <label for="crud_c_tingkat" class="col-sm-2 col-form-label text-md-end">Tingkat <span class="text-danger">*</span></label>
+            <div class="col-sm-4"> {{-- Sisa lebar kolom --}}
+                <select name="tingkat" id="crud_c_tingkat" class="form-select" required>
                     <option value="lokal">Lokal/Daerah</option>
                     <option value="nasional">Nasional</option>
                     <option value="internasional">Internasional</option>
@@ -53,57 +53,59 @@
         </div>
 
         {{-- Penyelenggara --}}
-        <div class="row mb-3">
-            <label for="crud_create_penyelenggara" class="col-sm-3 col-form-label text-sm-end">Penyelenggara <span class="text-danger">*</span></label>
+        <div class="form-group row mb-3">
+            <label for="crud_c_penyelenggara" class="col-sm-3 col-form-label text-md">Penyelenggara <span class="text-danger">*</span></label>
             <div class="col-sm-9">
-                <input type="text" name="penyelenggara" id="crud_create_penyelenggara" class="form-control" required>
+                <input type="text" name="penyelenggara" id="crud_c_penyelenggara" class="form-control" required>
                 <span class="invalid-feedback error-penyelenggara"></span>
             </div>
         </div>
 
-        {{-- Bidang Keahlian --}}
-        <div class="row mb-3">
-            <label for="crud_create_bidang_keahlian" class="col-sm-3 col-form-label text-sm-end">Bidang Keahlian <span class="text-danger">*</span></label>
+        {{-- Bidang Keahlian (Jika sebagai input teks biasa) --}}
+        <div class="form-group row mb-3">
+            <label for="crud_c_bidang_keahlian" class="col-sm-3 col-form-label text-md">Bidang Keahlian <span class="text-danger">*</span></label>
             <div class="col-sm-9">
-                <input type="text" name="bidang_keahlian" id="crud_create_bidang_keahlian" class="form-control" placeholder="Cth: Web Development, UI/UX" required>
+                <input type="text" name="bidang_keahlian" id="crud_c_bidang_keahlian" class="form-control" placeholder="Cth: Web Development, UI/UX, Bisnis Digital" required>
+                 <small class="form-text text-muted">Jika lebih dari satu, pisahkan dengan koma (,).</small>
                 <span class="invalid-feedback error-bidang_keahlian"></span>
             </div>
         </div>
         
         {{-- Biaya --}}
-        <div class="row mb-3">
-            <label for="crud_create_biaya" class="col-sm-3 col-form-label text-sm-end">Biaya (Rp)</label>
+        <div class="form-group row mb-3">
+            <label for="crud_c_biaya" class="col-sm-3 col-form-label text-md">Biaya (Rp)</label>
             <div class="col-sm-9">
-                <input type="number" name="biaya" id="crud_create_biaya" class="form-control" min="0" placeholder="Kosongkan jika gratis">
+                <input type="number" name="biaya" id="crud_c_biaya" class="form-control" min="0" placeholder="Kosongkan jika gratis">
                 <span class="invalid-feedback error-biaya"></span>
             </div>
         </div>
 
         {{-- Links --}}
-        <div class="row mb-3">
-            <label for="crud_create_link_pendaftaran" class="col-sm-3 col-form-label text-sm-end">Link Pendaftaran</label>
+        <div class="form-group row mb-3">
+            <label for="crud_c_link_pendaftaran" class="col-sm-3 col-form-label text-md">Link Pendaftaran</label>
             <div class="col-sm-9">
-                <input type="url" name="link_pendaftaran" id="crud_create_link_pendaftaran" class="form-control" placeholder="https://">
+                <input type="url" name="link_pendaftaran" id="crud_c_link_pendaftaran" class="form-control" placeholder="https://">
                 <span class="invalid-feedback error-link_pendaftaran"></span>
             </div>
         </div>
-        <div class="row mb-3">
-            <label for="crud_create_link_penyelenggara" class="col-sm-3 col-form-label text-sm-end">Link Penyelenggara</label>
+        <div class="form-group row mb-3">
+            <label for="crud_c_link_penyelenggara" class="col-sm-3 col-form-label text-md">Link Penyelenggara</label>
             <div class="col-sm-9">
-                <input type="url" name="link_penyelenggara" id="crud_create_link_penyelenggara" class="form-control" placeholder="https://">
+                <input type="url" name="link_penyelenggara" id="crud_c_link_penyelenggara" class="form-control" placeholder="https://">
                 <span class="invalid-feedback error-link_penyelenggara"></span>
             </div>
         </div>
 
         {{-- Poster --}}
-        <div class="row mb-3">
-            <label for="crud_create_poster" class="col-sm-3 col-form-label text-sm-end">Poster Lomba</label>
+        <div class="form-group row mb-3">
+            <label for="crud_c_poster" class="col-sm-3 col-form-label text-md">Poster Lomba</label>
             <div class="col-sm-9">
-                <input type="file" name="poster" id="crud_create_poster" class="form-control" accept="image/jpeg,image/png,image/jpg">
+                <input type="file" name="poster" id="crud_c_poster" class="form-control" accept="image/jpeg,image/png,image/jpg">
                 <small class="form-text text-muted">Opsional. Max 2MB (JPG, PNG).</small>
                 <span class="invalid-feedback error-poster"></span>
             </div>
         </div>
+        {{-- Admin tidak perlu memilih status verifikasi saat create, karena default 'disetujui' --}}
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
@@ -111,82 +113,144 @@
     </div>
 </form>
 <script>
-// JavaScript untuk validasi dan AJAX submit (mirip dengan form edit, tapi action ke store)
 $(document).ready(function() {
-    const form = $('#formAdminCreateLomba');
-    form.validate({
-        // ... rules dan messages ...
-        rules: { /* ... (lihat contoh form edit, sesuaikan field name jika berbeda) ... */
+    const formAdminCreateLomba = $('#formAdminCreateLomba'); // ID form yang benar
+
+    // Custom rule untuk afterDate (jika jQuery validation tidak punya default)
+    $.validator.addMethod("afterDate", function(value, element, params) {
+        if (!value || !$(params).val()) { // Jika salah satu kosong, anggap valid untuk tidak memblokir validasi lain
+            return true;
+        }
+        if (!/Invalid|NaN/.test(new Date(value))) {
+            return new Date(value) >= new Date($(params).val());
+        }
+        return isNaN(value) && isNaN($(params).val()) || (Number(value) >= Number($(params).val()));
+    },'Tanggal batas harus setelah atau sama dengan tanggal pembukaan.');
+
+    $.validator.addMethod("filesize", function(value, element, param) {
+        return this.optional(element) || (element.files[0].size <= param);
+    }, 'Ukuran file maksimal adalah {0} bytes.');
+
+
+    formAdminCreateLomba.validate({
+        rules: {
             nama_lomba: { required: true, maxlength: 255 },
-            pembukaan_pendaftaran: { required: true, date: true },
-            batas_pendaftaran: { required: true, date: true, afterDate: '#crud_create_pembukaan_pendaftaran' },
+            pembukaan_pendaftaran: { required: true, dateISO: true }, // Gunakan dateISO untuk HTML5 date input
+            batas_pendaftaran: { required: true, dateISO: true, afterDate: '#crud_c_pembukaan_pendaftaran' },
             kategori: { required: true },
             penyelenggara: { required: true, maxlength: 255 },
             tingkat: { required: true },
-            bidang_keahlian: { required: true, maxlength: 255 },
+            bidang_keahlian: { required: true, maxlength: 255 }, // Jika teks biasa
+            // 'bidang_keahlian[]': { required: true }, // Jika checkbox/multi-select
             biaya: { number: true, min: 0 },
-            link_pendaftaran: { url: true, maxlength: 255 },
-            link_penyelenggara: { url: true, maxlength: 255 },
+            link_pendaftaran: { url: true, maxlength: 255, nullable: true }, // url dan nullable
+            link_penyelenggara: { url: true, maxlength: 255, nullable: true }, // url dan nullable
             poster: { extension: "jpg|jpeg|png", filesize: 2097152 /* 2MB */ }
         },
-         errorPlacement: function (error, element) {
+        messages: {
+            nama_lomba: { required: "Nama lomba wajib diisi.", maxlength: "Nama lomba maksimal 255 karakter." },
+            pembukaan_pendaftaran: { required: "Tanggal pembukaan wajib diisi.", dateISO: "Format tanggal tidak valid." },
+            batas_pendaftaran: { required: "Tanggal batas pendaftaran wajib diisi.", dateISO: "Format tanggal tidak valid.", afterDate: "Batas pendaftaran harus setelah atau sama dengan tanggal pembukaan." },
+            kategori: { required: "Kategori lomba wajib dipilih." },
+            penyelenggara: { required: "Penyelenggara wajib diisi.", maxlength: "Penyelenggara maksimal 255 karakter." },
+            tingkat: { required: "Tingkat lomba wajib dipilih." },
+            bidang_keahlian: { required: "Bidang keahlian wajib diisi.", maxlength: "Bidang keahlian maksimal 255 karakter." },
+            // 'bidang_keahlian[]': { required: "Pilih minimal satu bidang keahlian." },
+            biaya: { number: "Biaya harus berupa angka.", min: "Biaya tidak boleh negatif." },
+            link_pendaftaran: { url: "Format URL tidak valid.", maxlength: "Link pendaftaran maksimal 255 karakter." },
+            link_penyelenggara: { url: "Format URL tidak valid.", maxlength: "Link penyelenggara maksimal 255 karakter." },
+            poster: { extension: "Format file poster tidak valid (jpg, jpeg, png).", filesize: "Ukuran file poster maksimal 2MB." }
+        },
+        errorElement: 'span',
+        errorPlacement: function (error, element) {
             error.addClass('invalid-feedback');
-            // Untuk input file, tempatkan error setelah elemen itu sendiri
-            if (element.attr("type") == "file") {
-                error.insertAfter(element.next("small")); // Atau setelah elemen itu sendiri jika tidak ada small
-            } else if (element.is("select")) {
-                 error.insertAfter(element);
-            }
-            else {
-                element.closest('.col-sm-9').append(error);
+            // Menempatkan error message di dalam span.invalid-feedback yang sudah ada
+            let errorContainer = element.closest('.col-sm-9').find('.invalid-feedback.error-' + element.attr('name').replace(/\[\]/g, '')); // Hapus [] jika ada
+            if (errorContainer.length) {
+                errorContainer.html(error.html()).show();
+            } else {
+                 // Fallback jika struktur sedikit berbeda atau span tidak ada
+                if (element.attr("type") == "file" || element.is("select")) {
+                     error.insertAfter(element.next("small").length ? element.next("small") : element);
+                } else {
+                    element.closest('.col-sm-9').append(error);
+                }
             }
         },
-        highlight: function (element) { $(element).addClass('is-invalid'); },
-        unhighlight: function (element) { $(element).removeClass('is-invalid'); $(element).closest('.col-sm-9').find('.invalid-feedback').empty();},
+        highlight: function (element, errorClass, validClass) {
+            $(element).addClass('is-invalid').removeClass('is-valid');
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            $(element).removeClass('is-invalid').addClass('is-valid');
+             $(element).closest('.col-sm-9').find('.invalid-feedback.error-' + $(element).attr('name').replace(/\[\]/g, '')).empty().hide();
+        },
         submitHandler: function(form) {
             let formData = new FormData(form);
             const submitButton = $(form).find('button[type="submit"]');
             const originalButtonText = submitButton.html();
-            submitButton.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Menambah...');
-            // Hapus error messages lama
-             $(form).find('.invalid-feedback').text('');
-             $(form).find('.form-control, .form-select').removeClass('is-invalid is-valid');
+
+            submitButton.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Menambah...');
+            $(form).find('.invalid-feedback').text('');
+            $(form).find('.form-control, .form-select').removeClass('is-invalid is-valid');
 
             $.ajax({
-                url: $(form).attr('action'), method: 'POST', data: formData,
-                processData: false, contentType: false, dataType: 'json',
+                url: $(form).attr('action'),
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                dataType: 'json',
                 success: function(response) {
                     if (response.status) {
                         $('#modalFormLombaAdminCrud').modal('hide'); // ID modal untuk CRUD Admin
                         Swal.fire('Berhasil!', response.message, 'success');
-                        if (typeof dtLombaCrudAdmin !== 'undefined') { dtLombaCrudAdmin.ajax.reload(null, false); }
+                        if (typeof dtLombaCrudAdmin !== 'undefined' && dtLombaCrudAdmin.ajax) { // Cek apakah DataTable terdefinisi
+                            dtLombaCrudAdmin.ajax.reload(null, false);
+                        }
                     } else {
                         Swal.fire('Gagal!', response.message || 'Gagal menambah data.', 'error');
+                         if (response.errors) {
+                            $.each(response.errors, function(key, messages) {
+                                let inputElement = $(form).find(`[name="${key}"]`);
+                                let errorContainer = inputElement.closest('.col-sm-9').find('.invalid-feedback.error-' + key);
+                                inputElement.addClass('is-invalid');
+                                if (errorContainer.length) {
+                                    errorContainer.text(messages[0]).show();
+                                } else {
+                                     inputElement.after('<span class="invalid-feedback d-block">' + messages[0] + '</span>');
+                                }
+                            });
+                        }
                     }
                 },
                 error: function(xhr) {
-                    // ... (error handling Anda seperti di form edit) ...
-                    let errors = xhr.responseJSON.errors;
-                    let errorMessages = '<ul>';
-                    if (errors) {
-                        $.each(errors, function(key, messages) {
-                             errorMessages += `<li>${messages[0]}</li>`;
-                            $('#crud_create_' + key).addClass('is-invalid').closest('.col-sm-9').find('.invalid-feedback.error-' + key).text(messages[0]).show();
-                             if(!$('#crud_create_' + key).length) { // fallback for general errors
-                                $(form).find('.modal-body').prepend(`<div class="alert alert-danger py-1 px-2 small">${key}: ${messages[0]}</div>`);
-                            }
-                        });
+                    let errorMessage = 'Terjadi kesalahan server.';
+                     if (xhr.responseJSON) {
+                        errorMessage = xhr.responseJSON.message || errorMessage;
+                        if (xhr.responseJSON.errors) {
+                             let errorMessagesList = '<ul>';
+                            $.each(xhr.responseJSON.errors, function(key, messages) {
+                                 errorMessagesList += `<li>${messages[0]}</li>`;
+                                let inputElement = $(form).find(`[name="${key}"]`);
+                                let errorContainer = inputElement.closest('.col-sm-9').find('.invalid-feedback.error-' + key);
+                                inputElement.addClass('is-invalid');
+                                if (errorContainer.length) {
+                                    errorContainer.text(messages[0]).show();
+                                } else {
+                                     inputElement.after('<span class="invalid-feedback d-block">' + messages[0] + '</span>');
+                                }
+                            });
+                             errorMessagesList += '</ul>';
+                             errorMessage += '<br><small>Detail Error:</small>' + errorMessagesList;
+                        }
                     }
-                     errorMessages += '</ul>';
-                    Swal.fire('Validasi Gagal', xhr.responseJSON.message + '<br>' + errorMessages , 'error');
+                    Swal.fire('Error Validasi!', errorMessage, 'error');
                 },
-                complete: function() { submitButton.prop('disabled', false).html(originalButtonText); }
+                complete: function() {
+                    submitButton.prop('disabled', false).html(originalButtonText);
+                }
             });
         }
     });
-     $.validator.addMethod("afterDate", function(value, element, params) {
-        if (!/Invalid|NaN/.test(new Date(value))) { return new Date(value) >= new Date($(params).val()); }
-        return isNaN(value) && isNaN($(params).val()) || (Number(value) >= Number($(params).val()));
-    },'Tanggal batas harus setelah atau sama dengan tanggal pembukaan.');
 });
 </script>

@@ -76,7 +76,7 @@
                     </li>
 
                     <li class="pc-item pc-caption">
-                        <label>Data Lomba</label>
+                        <label>Lomba</label>
                         <i class="ti ti-brand-chrome"></i>
                     </li>
                     <li class="pc-item">
@@ -93,7 +93,7 @@
                         </a>
                     </li>
                     <li class="pc-item pc-caption">
-                        <label>Data Prestasi</label>
+                        <label>Prestasi</label>
                         <i class="ti ti-brand-chrome"></i>
                     </li>
                     <li class="pc-item">

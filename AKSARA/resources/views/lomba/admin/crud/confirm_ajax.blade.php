@@ -1,9 +1,9 @@
 <form action="{{ route('admin.lomba.crud.destroy_ajax', $lomba->lomba_id) }}" method="POST" id="formDeleteLombaAdminCrud">
     @csrf
     @method('DELETE')
-    <div class="modal-header bg-danger text-white">
+    <div class="modal-header bg-warning">
         <h5 class="modal-title">Konfirmasi Hapus Lomba</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
     </div>
     <div class="modal-body">
         <p>Anda yakin ingin menghapus data lomba berikut secara permanen?</p>

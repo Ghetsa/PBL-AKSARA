@@ -11,7 +11,7 @@
                     {{-- Tombol Tambah Lomba oleh admin tidak ada di sini, tapi di halaman CRUD Admin --}}
                 </div>
                 <div class="card-body">
-                    <div class="row mb-3 gx-3">
+                    <div class="row mb-3">
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="status_verifikasi_filter" class="form-label small">Filter Status:</label>
@@ -34,8 +34,16 @@
                                 </select>
                             </div>
                         </div>
-                        {{-- Untuk filter by penginput role, Anda bisa menambahkan select lagi --}}
-                        {{-- atau jika sering, tambahkan pencarian per kolom di DataTables --}}
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="kategori_lomba_filter_verifikasi" class="form-label small">Filter Kategori Lomba:</label>
+                                <select class="form-select form-select-sm" id="kategori_lomba_filter_verifikasi">
+                                    <option value="">- Semua Kategori -</option>
+                                    <option value="individu">Individu</option>
+                                    <option value="kelompok">Kelompok</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="table-responsive">
@@ -43,11 +51,11 @@
                             <thead>
                                 <tr>
                                     <th class="text-center" style="width:5%;">No.</th>
-                                    <th style="width:25%;">Nama Lomba</th>
+                                    <th>Nama Lomba</th>
                                     <th>Tingkat</th>
                                     <th>Diajukan Oleh</th>
-                                    <th class="text-center" style="width:15%;">Status</th>
-                                    <th class="text-center" style="width:10%;">Aksi</th>
+                                    <th class="text-center">Status</th>
+                                    <th class="text-center">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -101,6 +109,7 @@
                 data: function (d) {
                     d.status_verifikasi_filter = $('#status_verifikasi_filter').val(); // ID filter disesuaikan
                     d.tingkat_lomba_filter = $('#tingkat_lomba_filter_verifikasi').val(); // ID filter disesuaikan
+                    d.kategori_lomba_filter = $('#kategori_lomba_filter_verifikasi').val(); // ID filter disesuaikan
                 }
             },
             columns: [
@@ -114,7 +123,7 @@
             order: [[ 3, "desc" ]] // Default order by tanggal pengajuan (created_at)
         });
 
-        $('#status_verifikasi_filter, #tingkat_lomba_filter_verifikasi').on('change', function () {
+        $('#status_verifikasi_filter, #tingkat_lomba_filter_verifikasi, #kategori_lomba_filter_verifikasi').on('change', function () {
             dataTableVerifikasiLomba.ajax.reload();
         });
 

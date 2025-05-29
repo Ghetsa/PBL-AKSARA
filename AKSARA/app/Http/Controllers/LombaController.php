@@ -630,6 +630,9 @@ class LombaController extends Controller
             if ($request->filled('tingkat_lomba_filter')) { // Jika filter ini tetap ada di view verifikasi
                 $data->where('tingkat', $request->tingkat_lomba_filter);
             }
+            if ($request->filled('kategori_lomba_filter')) {
+                $data->where('kategori', $request->kategori_lomba_filter);
+            }
 
 
             return DataTables::of($data)
@@ -719,6 +722,10 @@ class LombaController extends Controller
 
             if ($request->filled('tingkat_lomba_filter_crud')) {
                 $data->where('tingkat', $request->tingkat_lomba_filter_crud);
+            }
+
+            if ($request->filled('kategori_lomba_filter_crud')) {
+                $data->where('kategori', $request->kategori_lomba_filter_crud);
             }
 
             return DataTables::of($data)

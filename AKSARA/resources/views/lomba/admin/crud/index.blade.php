@@ -13,23 +13,22 @@
                     </button>
                 </div>
                 <div class="card-body">
-                    <div class="row mb-3 gx-2">
+                    <div class="row mb-4">
                         <div class="col-md-4">
-                            <label for="status_filter_crud" class="form-label small">Filter Status Verifikasi:</label>
-                            <select class="form-select form-select-sm" id="status_filter_crud">
-                                <option value="">- Semua Status -</option>
-                                <option value="disetujui" selected>Disetujui</option> {{-- Default ke Disetujui --}}
-                                <option value="pending">Pending</option>
-                                <option value="ditolak">Ditolak</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="tingkat_filter_crud" class="form-label small">Filter Tingkat Lomba:</label>
+                            <label for="tingkat_filter_crud" class="form-label">Filter Tingkat Lomba:</label>
                             <select class="form-select form-select-sm" id="tingkat_filter_crud">
                                 <option value="">- Semua Tingkat -</option>
                                 <option value="lokal">Lokal</option>
                                 <option value="nasional">Nasional</option>
                                 <option value="internasional">Internasional</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="kategori_filter_crud" class="form-label">Filter Kategori Lomba:</label>
+                            <select class="form-select form-select-sm" id="kategori_filter_crud">
+                                <option value="">- Semua Kategori -</option>
+                                <option value="individu">Individu</option>
+                                <option value="kelompok">Kelompok</option>
                             </select>
                         </div>
                     </div>
@@ -38,11 +37,11 @@
                         <thead>
                             <tr>
                                 <th class="text-center" style="width:5%;">No.</th>
-                                <th>Nama Lomba & Poster</th>
+                                <th>Nama Lomba</th>
                                 <th>Penyelenggara</th>
                                 <th>Tingkat</th>
                                 <th>Batas Daftar</th>
-                                <th class="text-center">Status</th>
+                                <th class="text-center">Kategori</th>
                                 <th class="text-center" style="width:18%;">Aksi</th> {{-- Lebar disesuaikan untuk 3 tombol --}}
                             </tr>
                         </thead>
@@ -54,8 +53,8 @@
 </div>
 
 {{-- Modal untuk Form Tambah/Edit Lomba --}}
-<div class="modal fade" id="modalFormLombaAdminCrud" tabindex="-1" aria-labelledby="modalFormLombaAdminCrudLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+<div class="modal fade" role="dialog" id="modalFormLombaAdminCrud" tabindex="-1" aria-labelledby="modalFormLombaAdminCrudLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content"></div>
     </div>
 </div>
@@ -115,8 +114,8 @@
                 url: "{{ route('admin.lomba.crud.list') }}", // Pastikan route ini benar
                 data: function (d) {
                     // Mengambil nilai dari filter, jika kosong, controller akan default ke 'disetujui'
-                    d.status_verifikasi_filter_crud = $('#status_filter_crud').val(); 
                     d.tingkat_lomba_filter_crud = $('#tingkat_filter_crud').val();
+                    d.kategori_lomba_filter_crud = $('#kategori_filter_crud').val();
                 }
             },
             columns: [
@@ -125,14 +124,13 @@
                 { data: 'penyelenggara', name: 'penyelenggara' },
                 { data: 'tingkat', name: 'tingkat', className: 'text-center' },
                 { data: 'batas_pendaftaran', name: 'batas_pendaftaran', className: 'text-center' },
-                { data: 'status_verifikasi', name: 'status_verifikasi', className: 'text-center' },
+                { data: 'kategori', name: 'kategori', className: 'text-center' },
                 { data: 'aksi', name: 'aksi', className: 'text-center', orderable: false, searchable: false }
             ],
-            language: { url: "//cdn.datatables.net/plug-ins/1.13.7/i18n/id.json" },
             order: [[ 4, "desc" ]] // Default order by batas_pendaftaran (atau created_at jika lebih sesuai)
         });
 
-        $('#status_filter_crud, #tingkat_filter_crud').on('change', function () { 
+        $('#tingkat_filter_crud, #kategori_filter_crud').on('change', function () { 
             dtLombaCrudAdmin.ajax.reload(); 
         });
     });

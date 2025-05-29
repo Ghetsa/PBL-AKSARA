@@ -3,11 +3,11 @@
     @method('PUT')
     <input type="hidden" name="status_verifikasi" id="hidden_status_verifikasi_lomba" value="{{ $lomba->status_verifikasi }}">
 
-    <div class="modal-header bg-info text-white">
+    <div class="modal-header">
         <h5 class="modal-title">Verifikasi Info Lomba: {{ Str::limit($lomba->nama_lomba, 40) }}</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
-    <div class="modal-body" style="max-height: 75vh; overflow-y: auto;">
+    <div class="modal-body" style="max-height: 65vh; overflow-y: auto;">
         <h6>Detail Pengajuan Lomba:</h6>
         <div class="table-responsive">
             <table class="table table-sm table-bordered table-striped mb-3">
