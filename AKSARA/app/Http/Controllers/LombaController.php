@@ -285,63 +285,6 @@ class LombaController extends Controller
             ->make(true);
     }
 
-    // === UNTUK MAHASISWA & DOSEN (Pengajuan Lomba) ===
-    // Form pengajuan/tambah lomba oleh mahasiswa dan dosen
-    public function createPengajuanLomba()
-    {
-        // $bidangList = BidangModel::orderBy('bidang_nama')->get(); // Jika perlu
-        return view('lomba.user_create_edit_form_ajax'); // Menggunakan satu form untuk create
-    }
-
-    // Menyimpan pengajuan lomba dari mahasiswa dan dosen, atau lomba baru dari admin
-    public function storeLomba(Request $request)
-    {
-        $user = Auth::user();
-        $validator = Validator::make($request->all(), [
-            'nama_lomba' => 'required|string|max:255',
-            'pembukaan_pendaftaran' => 'required|date',
-            'batas_pendaftaran' => 'required|date|after_or_equal:pembukaan_pendaftaran',
-            'kategori' => 'required|in:individu,kelompok',
-            'penyelenggara' => 'required|string|max:255',
-            'tingkat' => 'required|in:lokal,nasional,internasional',
-            'bidang_keahlian' => 'required|string|max:255',
-            'biaya' => 'nullable|integer|min:0',
-            'link_pendaftaran' => 'nullable|url|max:255',
-            'link_penyelenggara' => 'nullable|url|max:255',
-            'poster' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['status' => false, 'message' => 'Validasi gagal.', 'errors' => $validator->errors()], 422);
-        }
-
-        $posterPath = null;
-        if ($request->hasFile('poster')) {
-            $posterPath = $request->file('poster')->store('lomba_poster', 'public'); // Folder diubah
-        }
-
-        $statusVerifikasi = ($user->role == 'admin') ? 'disetujui' : 'pending';
-        $message = ($user->role == 'admin') ? 'Info lomba berhasil ditambahkan.' : 'Pengajuan info lomba berhasil dikirim dan akan diverifikasi oleh Admin.';
-
-        LombaModel::create([
-            'nama_lomba' => $request->nama_lomba,
-            'pembukaan_pendaftaran' => $request->pembukaan_pendaftaran,
-            'batas_pendaftaran' => $request->batas_pendaftaran,
-            'kategori' => $request->kategori,
-            'penyelenggara' => $request->penyelenggara,
-            'tingkat' => $request->tingkat,
-            'bidang_keahlian' => $request->bidang_keahlian,
-            'biaya' => $request->biaya ?? 0,
-            'link_pendaftaran' => $request->link_pendaftaran,
-            'link_penyelenggara' => $request->link_penyelenggara,
-            'poster' => $posterPath,
-            'status_verifikasi' => $statusVerifikasi,
-            'diinput_oleh' => $user->user_id,
-        ]);
-
-        return response()->json(['status' => true, 'message' => $message]);
-    }
-
     public function create()
     {
         return view('lomba.create');
@@ -410,91 +353,91 @@ class LombaController extends Controller
     //===================================
     //|        METHOD UNTUK ADMIN       |
     //===================================
-    public function indexAdmin()
-    {
-        $breadcrumb = (object) [
-            'title' => 'Manajemen Lomba',
-            'list' => ['Dashboard', 'Lomba']
-        ];
+    // public function indexAdmin()
+    // {
+    //     $breadcrumb = (object) [
+    //         'title' => 'Manajemen Lomba',
+    //         'list' => ['Dashboard', 'Lomba']
+    //     ];
 
-        $activeMenu = 'lomba';
+    //     $activeMenu = 'lomba';
 
-        return view('lomba.mahasiswa.index', compact('breadcrumb', 'activeMenu'));
-    }
+    //     return view('lomba.mahasiswa.index', compact('breadcrumb', 'activeMenu'));
+    // }
 
-    public function getListAdmin(Request $request)
-    {
-        $query = LombaModel::query();
+    // public function getListAdmin(Request $request)
+    // {
+    //     $query = LombaModel::query();
 
-        // Filter pencarian
-        if ($request->filled('search_nama')) {
-            $search = $request->search_nama;
-            $query->where(function ($q) use ($search) {
-                $q->where('nama_lomba', 'like', '%' . $search . '%');
-            });
-        }
+    //     // Filter pencarian
+    //     if ($request->filled('search_nama')) {
+    //         $search = $request->search_nama;
+    //         $query->where(function ($q) use ($search) {
+    //             $q->where('nama_lomba', 'like', '%' . $search . '%');
+    //         });
+    //     }
 
-        if ($request->filled('filter_status')) {
-            $query->where('status_verifikasi', $request->filter_status);
-        }
+    //     if ($request->filled('filter_status')) {
+    //         $query->where('status_verifikasi', $request->filter_status);
+    //     }
 
-        return DataTables::of($query)
-            ->addIndexColumn()
-            ->addColumn('aksi', function ($row) {
-                // return view('components.lomba.aksi-buttons', compact('editUrl', 'verifUrl', 'deleteUrl'));
-                $btn = '<button onclick="modalAction(\'' . e(route('lomba.show', $row->lomba_id)) . '\')" class="btn btn-info btn-sm">Detail</button> ';
-                $btn .= '<button onclick="modalAction(\'' . e(route('lomba.edit', $row->lomba_id)) . '\')" class="btn btn-warning btn-sm">Edit</button> ';
-                $btn .= '<button onclick="deleteConfirmAjax(' . e($row->lomba_id) . ')" class="btn btn-danger btn-sm">Hapus</button>';
-                return $btn;
-            })
+    //     return DataTables::of($query)
+    //         ->addIndexColumn()
+    //         ->addColumn('aksi', function ($row) {
+    //             // return view('components.lomba.aksi-buttons', compact('editUrl', 'verifUrl', 'deleteUrl'));
+    //             $btn = '<button onclick="modalAction(\'' . e(route('lomba.show', $row->lomba_id)) . '\')" class="btn btn-info btn-sm">Detail</button> ';
+    //             $btn .= '<button onclick="modalAction(\'' . e(route('lomba.edit', $row->lomba_id)) . '\')" class="btn btn-warning btn-sm">Edit</button> ';
+    //             $btn .= '<button onclick="deleteConfirmAjax(' . e($row->lomba_id) . ')" class="btn btn-danger btn-sm">Hapus</button>';
+    //             return $btn;
+    //         })
 
-            ->addColumn('status_verifikasi', function ($row) {
-                switch ($row->status_verifikasi) {
-                    case 'pending':
-                        return '<span class="badge bg-warning text-dark">Pending</span>';
-                    case 'disetujui':
-                        return '<span class="badge bg-success">Disetujui</span>';
-                    case 'ditolak':
-                        return '<span class="badge bg-danger">Ditolak</span>';
-                    default:
-                        return '<span class="badge bg-secondary">Tidak Diketahui</span>';
-                }
-            })
+    //         ->addColumn('status_verifikasi', function ($row) {
+    //             switch ($row->status_verifikasi) {
+    //                 case 'pending':
+    //                     return '<span class="badge bg-warning text-dark">Pending</span>';
+    //                 case 'disetujui':
+    //                     return '<span class="badge bg-success">Disetujui</span>';
+    //                 case 'ditolak':
+    //                     return '<span class="badge bg-danger">Ditolak</span>';
+    //                 default:
+    //                     return '<span class="badge bg-secondary">Tidak Diketahui</span>';
+    //             }
+    //         })
 
-            ->editColumn('pembukaan_pendaftaran', function ($row) {
-                return \Carbon\Carbon::parse($row->pembukaan_pendaftaran)->format('d-m-Y');
-            })
-            ->editColumn('batas_pendaftaran', function ($row) {
-                return \Carbon\Carbon::parse($row->batas_pendaftaran)->format('d-m-Y');
-            })
-            ->rawColumns(['aksi', 'status_verifikasi'])
-            ->make(true);
-    }
+    //         ->editColumn('pembukaan_pendaftaran', function ($row) {
+    //             return \Carbon\Carbon::parse($row->pembukaan_pendaftaran)->format('d-m-Y');
+    //         })
+    //         ->editColumn('batas_pendaftaran', function ($row) {
+    //             return \Carbon\Carbon::parse($row->batas_pendaftaran)->format('d-m-Y');
+    //         })
+    //         ->rawColumns(['aksi', 'status_verifikasi'])
+    //         ->make(true);
+    // }
 
-    public function destroy($id)
-    {
-        LombaModel::destroy($id);
-        return redirect()->route('lomba.admin.index')->with('success', 'Lomba berhasil dihapus');
-    }
+    // public function destroy($id)
+    // {
+    //     LombaModel::destroy($id);
+    //     return redirect()->route('lomba.admin.index')->with('success', 'Lomba berhasil dihapus');
+    // }
 
-    public function verifikasi($id)
-    {
-        $data = LombaModel::findOrFail($id);
-        return view('lomba.verifikasi', compact('data'));
-    }
+    // public function verifikasi($id)
+    // {
+    //     $data = LombaModel::findOrFail($id);
+    //     return view('lomba.verifikasi', compact('data'));
+    // }
 
-    public function prosesVerifikasi(Request $request, $id)
-    {
-        $validated = $request->validate([
-            'status_verifikasi' => 'required|in:pending,disetujui,ditolak',
-            'catatan_verifikasi' => 'nullable|string'
-        ]);
+    // public function prosesVerifikasi(Request $request, $id)
+    // {
+    //     $validated = $request->validate([
+    //         'status_verifikasi' => 'required|in:pending,disetujui,ditolak',
+    //         'catatan_verifikasi' => 'nullable|string'
+    //     ]);
 
-        $data = LombaModel::findOrFail($id);
-        $data->update($validated);
+    //     $data = LombaModel::findOrFail($id);
+    //     $data->update($validated);
 
-        return redirect()->route('lomba.index')->with('success', 'Verifikasi berhasil diperbarui');
-    }
+    //     return redirect()->route('lomba.index')->with('success', 'Verifikasi berhasil diperbarui');
+    // }
 
     // =======================================================================
     // METHOD UNTUK TAMPILAN PUBLIK (SEMUA USER LOGIN BISA AKSES)
@@ -567,7 +510,7 @@ class LombaController extends Controller
             'list' => ['Info Lomba', 'Histori Pengajuan']
         ];
         $activeMenu = 'histori_lomba_user';
-        return view('lomba.user_histori_pengajuan', compact('breadcrumb', 'activeMenu'));
+        return view('lomba.histori_pengajuan_lomba', compact('breadcrumb', 'activeMenu'));
     }
 
     /**
@@ -606,16 +549,16 @@ class LombaController extends Controller
     /**
      * Menampilkan form AJAX untuk mahasiswa/dosen mengajukan lomba.
      */
-    public function createPengajuanLombaForm()
+    public function createPengajuanLomba()
     {
         // $bidangList = BidangModel::orderBy('bidang_nama')->get(); // Jika bidang_keahlian adalah select
-        return view('lomba.user_submission_form_ajax'); // compact('bidangList')
+        return view('lomba.create_lomba'); // compact('bidangList')
     }
 
     /**
      * Menyimpan pengajuan lomba dari mahasiswa/dosen.
      */
-    public function storePengajuanLombaDariUser(Request $request)
+    public function storeLomba(Request $request)
     {
         $user = Auth::user();
         $validator = Validator::make($request->all(), [
@@ -705,7 +648,7 @@ class LombaController extends Controller
     public function adminShowVerifyFormAjax($id)
     {
         $lomba = LombaModel::with('inputBy')->findOrFail($id);
-        return view('lomba.admin.verifikasi.verify_form_ajax', compact('lomba'));
+        return view('lomba.admin.verifikasi.verifikasi_lomba', compact('lomba'));
     }
 
     public function adminProcessVerificationAjax(Request $request, $id)
@@ -782,7 +725,7 @@ class LombaController extends Controller
     public function adminCreateLombaFormAjax()
     {
         // $bidangList = BidangModel::orderBy('bidang_nama')->get();
-        return view('lomba.admin.crud.create_edit_form_ajax'); // compact('bidangList')
+        return view('lomba.admin.crud.create_edit_lomba'); // compact('bidangList')
     }
 
     public function adminStoreLombaAjax(Request $request)
@@ -833,7 +776,7 @@ class LombaController extends Controller
     {
         $lomba = LombaModel::findOrFail($id);
         // $bidangList = BidangModel::orderBy('bidang_nama')->get();
-        return view('lomba.admin.crud.create_edit_form_ajax', compact('lomba')); // compact('lomba', 'bidangList')
+        return view('lomba.admin.crud.create_edit_lomba', compact('lomba')); // compact('lomba', 'bidangList')
     }
 
     public function adminUpdateLombaAjax(Request $request, $id)

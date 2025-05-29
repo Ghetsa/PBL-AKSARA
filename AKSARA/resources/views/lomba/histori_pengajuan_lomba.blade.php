@@ -1,4 +1,4 @@
-@extends('layouts.template') {{-- Sesuaikan dengan layout utama Anda --}}
+@extends('layouts.template')
 @section('title', $breadcrumb->title ?? 'Histori Pengajuan Lomba Saya')
 
 @section('content')
