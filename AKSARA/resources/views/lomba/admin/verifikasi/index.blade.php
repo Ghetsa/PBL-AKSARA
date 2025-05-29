@@ -1,33 +1,32 @@
-@extends('layouts.template') {{-- Sesuaikan dengan layout admin Anda --}}
-@section('title', $breadcrumb->title ?? 'Manajemen Informasi Lomba')
+@extends('layouts.template')
+@section('title', $breadcrumb->title ?? 'Verifikasi Pengajuan Lomba')
 
 @section('content')
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
             <div class="card shadow-sm">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h3 class="card-title mb-0">{{ $breadcrumb->title ?? 'Manajemen Informasi Lomba' }}</h3>
-                    </div>
+                <div class="card-header">
+                    <h3 class="card-title mb-0">{{ $breadcrumb->title ?? 'Verifikasi Pengajuan Lomba' }}</h3>
+                    {{-- Tombol Tambah Lomba oleh admin tidak ada di sini, tapi di halaman CRUD Admin --}}
+                </div>
                 <div class="card-body">
-                    <div class="row mb-3 gx-2">
-                        {{-- Filter Status Verifikasi --}}
+                    <div class="row mb-3 gx-3">
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label for="status_verifikasi_filter_admin" class="form-label small">Filter Status Verifikasi:</label>
-                                <select class="form-select form-select-sm" id="status_verifikasi_filter_admin">
+                                <label for="status_verifikasi_filter" class="form-label small">Filter Status:</label>
+                                <select class="form-select form-select-sm" id="status_verifikasi_filter">
                                     <option value="">- Semua Status -</option>
-                                    <option value="pending">Pending</option>
+                                    <option value="pending" selected>Pending</option> {{-- Default ke Pending --}}
                                     <option value="disetujui">Disetujui</option>
                                     <option value="ditolak">Ditolak</option>
                                 </select>
                             </div>
                         </div>
-                        {{-- Filter Tingkat Lomba --}}
                         <div class="col-md-4">
-                             <div class="form-group">
-                                <label for="tingkat_lomba_filter_admin" class="form-label small">Filter Tingkat Lomba:</label>
-                                <select class="form-select form-select-sm" id="tingkat_lomba_filter_admin">
+                            <div class="form-group">
+                                <label for="tingkat_lomba_filter_verifikasi" class="form-label small">Filter Tingkat Lomba:</label>
+                                <select class="form-select form-select-sm" id="tingkat_lomba_filter_verifikasi">
                                     <option value="">- Semua Tingkat -</option>
                                     <option value="lokal">Lokal</option>
                                     <option value="nasional">Nasional</option>
@@ -35,21 +34,20 @@
                                 </select>
                             </div>
                         </div>
-                        {{-- Bisa tambahkan filter lain jika perlu, misal berdasarkan penyelenggara atau bidang --}}
+                        {{-- Untuk filter by penginput role, Anda bisa menambahkan select lagi --}}
+                        {{-- atau jika sering, tambahkan pencarian per kolom di DataTables --}}
                     </div>
 
                     <div class="table-responsive">
-                        <table class="table table-bordered table-hover dt-responsive nowrap" id="dataLombaAdmin" style="width:100%;">
+                        <table class="table table-bordered table-hover dt-responsive nowrap" id="tableVerifikasiLombaAdmin" style="width:100%;">
                             <thead>
                                 <tr>
                                     <th class="text-center" style="width:5%;">No.</th>
-                                    <th>Nama Lomba & Poster</th>
-                                    <th>Penyelenggara</th>
+                                    <th style="width:25%;">Nama Lomba</th>
                                     <th>Tingkat</th>
-                                    <th>Batas Daftar</th>
-                                    <th>Diinput Oleh</th>
-                                    <th class="text-center">Status Verifikasi</th>
-                                    <th class="text-center" style="width:15%;">Aksi</th>
+                                    <th>Diajukan Oleh</th>
+                                    <th class="text-center" style="width:15%;">Status</th>
+                                    <th class="text-center" style="width:10%;">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -61,17 +59,8 @@
     </div>
 </div>
 
-{{-- Modal untuk Form Tambah/Edit Lomba oleh Admin --}}
-<div class="modal fade" id="modalFormLombaAdmin" tabindex="-1" aria-labelledby="modalFormLombaAdminLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content">
-            {{-- Konten AJAX form tambah/edit lomba dimuat di sini --}}
-        </div>
-    </div>
-</div>
-
 {{-- Modal untuk Form Verifikasi Lomba oleh Admin --}}
-<div class="modal fade" id="modalVerifikasiLomba" tabindex="-1" aria-labelledby="modalVerifikasiLombaLabel" aria-hidden="true">
+<div class="modal fade" id="modalVerifikasiLombaAdmin" tabindex="-1" aria-labelledby="modalVerifikasiLombaAdminLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
             {{-- Konten AJAX form verifikasi lomba dimuat di sini --}}
@@ -82,9 +71,9 @@
 
 @push('js')
 <script>
-    var dataTableLombaAdmin;
+    var dataTableVerifikasiLomba; // Pastikan nama variabel unik jika ada DataTable lain di layout
 
-    function modalActionLombaAdmin(url, title = 'Form', modalId = 'modalFormLombaAdmin') { // Default ke modal form
+    function modalActionLombaAdmin(url, title = 'Form Verifikasi', modalId = 'modalVerifikasiLombaAdmin') {
         const targetModal = $(`#${modalId}`);
         const targetModalContent = targetModal.find('.modal-content');
         
@@ -102,73 +91,38 @@
         });
     }
 
-    function deleteLomba(lombaId, namaLomba) {
-        Swal.fire({
-            title: 'Konfirmasi Hapus',
-            html: `Apakah Anda yakin ingin menghapus lomba: <br><strong>${namaLomba}</strong>?`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Ya, Hapus!',
-            cancelButtonText: 'Batal'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                let url = `{{ route('admin.lomba.crud.destroy_ajax', ':id') }}`;
-                url = url.replace(':id', lombaId);
-
-                $.ajax({
-                    url: url,
-                    type: 'POST', // Method DELETE disimulasikan dengan _method
-                    data: {
-                        _method: 'DELETE',
-                        _token: '{{ csrf_token() }}'
-                    },
-                    success: function(response) {
-                        if (response.status) {
-                            Swal.fire('Berhasil!', response.message, 'success');
-                            dataTableLombaAdmin.ajax.reload(null, false);
-                        } else {
-                            Swal.fire('Gagal!', response.message || 'Gagal menghapus data.', 'error');
-                        }
-                    },
-                    error: function(xhr) {
-                        Swal.fire('Error!', (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'Terjadi kesalahan server.', 'error');
-                    }
-                });
-            }
-        });
-    }
-
-
     $(document).ready(function() {
         $.ajaxSetup({ headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') } });
 
-        dataTableLombaAdmin = $('#dataLombaAdmin').DataTable({
+        dataTableVerifikasiLomba = $('#tableVerifikasiLombaAdmin').DataTable({
             processing: true, serverSide: true, responsive: true,
             ajax: {
-                url: "{{ route('admin.lomba.verifikasi.list') }}",
+                url: "{{ route('admin.lomba.verifikasi.list') }}", // Route untuk list data verifikasi
                 data: function (d) {
-                    d.status_verifikasi_filter = $('#status_verifikasi_filter_admin').val();
-                    d.tingkat_lomba_filter = $('#tingkat_lomba_filter_admin').val();
+                    d.status_verifikasi_filter = $('#status_verifikasi_filter').val(); // ID filter disesuaikan
+                    d.tingkat_lomba_filter = $('#tingkat_lomba_filter_verifikasi').val(); // ID filter disesuaikan
                 }
             },
             columns: [
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', className: 'text-center', orderable: false, searchable: false },
-                { data: 'nama_lomba', name: 'nama_lomba' },
-                { data: 'penyelenggara', name: 'penyelenggara' },
-                { data: 'tingkat', name: 'tingkat', className: 'text-center' },
-                { data: 'batas_pendaftaran', name: 'batas_pendaftaran', className: 'text-center' },
-                { data: 'inputBy.nama', name: 'inputBy.nama' }, // Sorting/searching by penginput name
+                { data: 'nama_lomba_display', name: 'nama_lomba' }, // Menggunakan kolom gabungan
+                { data: 'tingkat', name: 'tingkat' }, // Menggunakan kolom gabungan
+                { data: 'diajukan_oleh', name: 'inputBy.nama', orderable: false, searchable: true }, // 'penginput.nama' untuk server-side search
                 { data: 'status_verifikasi', name: 'status_verifikasi', className: 'text-center' },
                 { data: 'aksi', name: 'aksi', className: 'text-center', orderable: false, searchable: false }
             ],
-            language: { url: "//cdn.datatables.net/plug-ins/1.13.7/i18n/id.json" }
+            order: [[ 3, "desc" ]] // Default order by tanggal pengajuan (created_at)
         });
 
-        $('#status_verifikasi_filter_admin, #tingkat_lomba_filter_admin').on('change', function () {
-            dataTableLombaAdmin.ajax.reload();
+        $('#status_verifikasi_filter, #tingkat_lomba_filter_verifikasi').on('change', function () {
+            dataTableVerifikasiLomba.ajax.reload();
         });
+
+        // Inisialisasi tooltip Bootstrap jika ada di halaman ini (misalnya dari tombol 'Ditolak')
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
     });
 </script>
 @endpush

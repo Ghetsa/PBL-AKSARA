@@ -1,4 +1,4 @@
-<form id="formVerifikasiLombaAdmin" method="POST" action="{{ route('admin.lomba.process.verification', $lomba->lomba_id) }}">
+<form id="formVerifikasiLombaAdmin" method="POST" action="{{ route('admin.lomba.verifikasi.proses', $lomba->lomba_id) }}">
     @csrf
     @method('PUT')
     <input type="hidden" name="status_verifikasi" id="hidden_status_verifikasi_lomba" value="{{ $lomba->status_verifikasi }}">

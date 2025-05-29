@@ -23,6 +23,7 @@
                                 <tr>
                                     <th class="text-center" style="width: 5%;">No.</th>
                                     <th>Nama Lomba</th>
+                                    <th>Bidang Lomba</th>
                                     <th>Penyelenggara</th>
                                     <th>Tingkat</th>
                                     <th>Batas Pendaftaran</th>
