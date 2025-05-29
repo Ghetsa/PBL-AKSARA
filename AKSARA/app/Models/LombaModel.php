@@ -29,6 +29,7 @@ class LombaModel extends Model
         'link_penyelenggara',
         'batas_pendaftaran',
         'status_verifikasi',
+        'catatan_verifikasi',
         'diinput_oleh',
         'poster',
     ];
@@ -41,6 +42,7 @@ class LombaModel extends Model
         'kategori' => 'string',
         'tingkat' => 'string',
         'status_verifikasi' => 'string',
+        'catatan_verifikasi' => 'string',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];

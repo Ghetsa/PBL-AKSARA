@@ -107,9 +107,6 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    {{-- <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">Beranda</a>
-                    </li> --}}
                     <li class="nav-item">
                         <a class="nav-link btn btn-primary ms-lg-3" href="#">Fitur</a>
                     </li>
@@ -134,7 +131,6 @@
                 <p class="lead text-muted mb-4">
                     AKSARA merupakan platform sistem informasi pencatatan prestasi yang terintegrasi untuk mencatat, mengelola, dan memantau prestasi mahasiswa secara efisien dan real-time.
                 </p>
-                {{-- Tombol Masuk dan Daftar dipindahkan ke Navbar --}}
             </div>
             <div class="col-md-6 illustration-container">
                 <img src="{{ asset('mantis/dist/assets/images/slider/gedung.jpg') }}" alt="Ilustrasi Prestasi" class="img-fluid" style="max-height: 400px; width: 1000px;">
@@ -143,7 +139,7 @@
 
         <hr class="my-5">
 
-        <div class="row text-center">
+                <div class="row text-center">
             <div class="col-md-4 mb-4">
                 <div class="card shadow-sm border-0">
                     <div class="card-body py-4">
@@ -172,6 +168,66 @@
                 </div>
             </div>
         </div>
+
+        @if(isset($lombas) && $lombas->count() > 0)
+        <section class="lomba-poster-section py-5">
+            <div class="container">
+                <h2 class="section-title text-center mb-4">Informasi Lomba Terbaru</h2>
+                <p class="section-description text-center mb-5">Jangan lewatkan kesempatan untuk berprestasi. Temukan berbagai lomba menarik di sini!</p>
+                <div class="row g-4">
+                    @foreach($lombas as $lomba)
+                    <div class="col-md-6 col-lg-4 d-flex align-items-stretch">
+                        <div class="card shadow-sm h-100">
+                            <a href="{{ $lomba->link_pendaftaran ?: ($lomba->link_penyelenggara ?: '#') }}" target="_blank" rel="noopener noreferrer" title="Kunjungi: {{ $lomba->nama_lomba }}" class="d-block text-decoration-none">
+                                @if($lomba->poster && Storage::disk('public')->exists($lomba->poster))
+                                    <img src="{{ asset('storage/' . $lomba->poster) }}" class="card-img-top" alt="Poster {{ $lomba->nama_lomba }}">
+                                @else
+                                    <div class="card-img-top d-flex align-items-center justify-content-center bg-light text-muted" style="height: 260px;">
+                                        <span>Poster Tidak Tersedia</span>
+                                    </div>
+                                @endif
+                            </a>
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">{{ Str::limit($lomba->nama_lomba, 45) }}</h5>
+                                <p class="card-text small text-muted">
+                                    <i class="fas fa-sitemap fa-fw me-1"></i>Penyelenggara: {{ Str::limit($lomba->penyelenggara, 30) }}<br>
+                                    <i class="fas fa-certificate fa-fw me-1"></i>Tingkat: {{ ucfirst($lomba->tingkat) }}<br>
+                                    <i class="fas fa-tag fa-fw me-1"></i>Kategori: {{ ucfirst($lomba->kategori) }}<br>
+                                    <i class="fas fa-calendar-times fa-fw me-1"></i>Batas Pendaftaran: {{ $lomba->batas_pendaftaran ? $lomba->batas_pendaftaran->format('d M Y') : 'N/A' }}
+                                </p>
+                                @if($lomba->link_pendaftaran)
+                                    <a href="{{ $lomba->link_pendaftaran }}" class="btn btn-primary btn-sm w-100 mt-auto" target="_blank" rel="noopener noreferrer">
+                                        <i class="fas fa-external-link-alt me-1"></i> Daftar Lomba
+                                    </a>
+                                @elseif($lomba->link_penyelenggara)
+                                    <a href="{{ $lomba->link_penyelenggara }}" class="btn btn-outline-secondary btn-sm w-100 mt-auto" target="_blank" rel="noopener noreferrer">
+                                        <i class="fas fa-info-circle me-1"></i> Info Selengkapnya
+                                    </a>
+                                @endif
+                            </div>
+                                @if($lomba->biaya > 0)
+                                <div class="card-footer bg-transparent border-top-0 text-end pb-3">
+                                    <span class="badge bg-light-primary text-primary p-2 badge-custom">Biaya: Rp {{ number_format($lomba->biaya, 0, ',', '.') }}</span>
+                                </div>
+                            @else
+                                    <div class="card-footer bg-transparent border-top-0 text-end pb-3">
+                                    <span class="badge bg-light-success text-success p-2 badge-custom">Gratis</span>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+                @if(Route::has('lomba.index'))
+                <div class="text-center mt-5">
+                    <a href="{{ route('lomba.index') }}" class="btn btn-lg btn-primary">
+                        <i class="fas fa-search me-2"></i> Lihat Semua Info Lomba
+                    </a>
+                </div>
+                @endif
+            </div>
+        </section>
+        @endif
     </div>
     <footer class="footer">
         <div class="container">
@@ -200,11 +256,9 @@
     <script src="{{ asset('mantis/dist/assets/js/plugins/buttons.print.min.js') }}"></script>
     <script src="{{ asset('mantis/dist/assets/js/plugins/buttons.colVis.min.js') }}"></script>
 
-    {{-- jQuery Validation Plugin --}}
     <script src="{{ asset('mantis/dist/assets/js/plugins/jquery-validation/jquery.validate.min.js') }}"></script>
     <script src="{{ asset('mantis/dist/assets/js/plugins/jquery-validation/additional-methods.min.js') }}"></script>
 
-    {{-- Optional: SweetAlert2 untuk notifikasi yang lebih baik --}}
     <script src="{{ asset('mantis/dist/assets/js/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
 
     <script>

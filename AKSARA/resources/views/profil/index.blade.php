@@ -47,6 +47,18 @@
                                                 <h4 class="mb-0 mt-2">{{ $user->nama }}</h4>
                                                 <p class="text-muted text-md">{{ ucfirst($user->role) }}</p>
                                                 <hr class="my-3">
+                                                <div class="d-inline-flex align-items-center justify-content-between w-100 mb-3">
+                                                    <i class="ti ti-mail"></i>
+                                                    <p class="mb-0">{{ ucfirst($user->email) }}</p>
+                                                </div>
+                                                <div class="d-inline-flex align-items-center justify-content-between w-100 mb-3">
+                                                    <i class="ti ti-phone"></i>
+                                                    <p class="mb-0">{{ ucfirst($user->no_telepon) }}</p>
+                                                </div>
+                                                <div class="d-inline-flex align-items-center justify-content-between w-100 mb-3">
+                                                    <i class="ti ti-map-pin"></i>
+                                                    <p class="mb-0">{{ ucfirst($user->alamat) }}</p>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

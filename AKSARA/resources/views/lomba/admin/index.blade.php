@@ -1,56 +1,61 @@
-@extends('layouts.template')
-@section('title', 'Daftar Lomba')
+@extends('layouts.template') {{-- Sesuaikan dengan layout admin Anda --}}
+@section('title', $breadcrumb->title ?? 'Manajemen Informasi Lomba')
 
 @section('content')
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
-            <div class="card">
+            <div class="card shadow-sm">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h3 class="card-title">Daftar Lomba</h3>
-                    <div class="card-tools">
-                        <button type="button" class="btn btn-primary btn-sm"
-                                onclick="modalAction('{{ route('lomba.create') }}')">Tambah Lomba</button>
-                    </div>
+                    <h3 class="card-title mb-0">{{ $breadcrumb->title ?? 'Manajemen Informasi Lomba' }}</h3>
+                    <button class="btn btn-sm btn-primary" onclick="modalActionLombaAdmin('{{ route('admin.lomba.create.form') }}', 'Tambah Info Lomba Baru', 'modalFormLombaAdmin')">
+                        <i class="fas fa-plus-circle me-1"></i> Tambah Lomba
+                    </button>
                 </div>
                 <div class="card-body">
-                    {{-- Flash messages akan ditampilkan oleh SweetAlert --}}
-                    <form method="GET" id="filterFormAdminLomba" class="row g-3 mb-3 align-items-center">
+                    <div class="row mb-3 gx-2">
+                        {{-- Filter Status Verifikasi --}}
                         <div class="col-md-4">
-                            <input type="text" class="form-control form-control-sm" id="search_nama_admin" name="search_nama" placeholder="Cari Nama Prestasi/Mahasiswa/NIM..." value="{{ request('search_nama') }}">
+                            <div class="form-group">
+                                <label for="status_verifikasi_filter_admin" class="form-label small">Filter Status Verifikasi:</label>
+                                <select class="form-select form-select-sm" id="status_verifikasi_filter_admin">
+                                    <option value="">- Semua Status -</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="disetujui">Disetujui</option>
+                                    <option value="ditolak">Ditolak</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="col-md-3">
-                            <select class="form-select form-select-sm" id="filter_status_admin" name="filter_status">
-                                <option value="">-- Semua Status --</option>
-                                <option value="pending" {{ request('filter_status') == 'pending' ? 'selected' : '' }}>Pending</option>
-                                <option value="disetujui" {{ request('filter_status') == 'disetujui' ? 'selected' : '' }}>Disetujui</option>
-                                <option value="ditolak" {{ request('filter_status') == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
-                            </select>
+                        {{-- Filter Tingkat Lomba --}}
+                        <div class="col-md-4">
+                             <div class="form-group">
+                                <label for="tingkat_lomba_filter_admin" class="form-label small">Filter Tingkat Lomba:</label>
+                                <select class="form-select form-select-sm" id="tingkat_lomba_filter_admin">
+                                    <option value="">- Semua Tingkat -</option>
+                                    <option value="lokal">Lokal</option>
+                                    <option value="nasional">Nasional</option>
+                                    <option value="internasional">Internasional</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="col-md-2">
-                            <button type="submit" class="btn btn-primary btn-sm w-100">Filter</button>
-                        </div>
-                         <div class="col-md-2">
-                            <a href="{{ route('lomba.index') }}" class="btn btn-secondary btn-sm w-100">Reset</a>
-                        </div>
-                    </form>
+                        {{-- Bisa tambahkan filter lain jika perlu, misal berdasarkan penyelenggara atau bidang --}}
+                    </div>
 
                     <div class="table-responsive">
-                        <table class="table table-bordered table-hover" id="dataDaftarLombaAdmin" style="width:100%;">
+                        <table class="table table-bordered table-hover dt-responsive nowrap" id="dataLombaAdmin" style="width:100%;">
                             <thead>
                                 <tr>
-                                    <th class="text-center">No.</th>
-                                    <th>Nama Lomba</th>
-                                    <th>Kategori</th>
-                                    <th>Pembukaan Pendaftaran</th>
-                                    <th>Penutupan Pendaftaran</th>
-                                    <th class="text-center">Status</th>
-                                    <th class="text-center">Aksi</th>
+                                    <th class="text-center" style="width:5%;">No.</th>
+                                    <th>Nama Lomba & Poster</th>
+                                    <th>Penyelenggara</th>
+                                    <th>Tingkat</th>
+                                    <th>Batas Daftar</th>
+                                    <th>Diinput Oleh</th>
+                                    <th class="text-center">Status Verifikasi</th>
+                                    <th class="text-center" style="width:15%;">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                {{-- DataTable akan mengisi ini --}}
-                            </tbody>
+                            <tbody></tbody>
                         </table>
                     </div>
                 </div>
@@ -59,67 +64,113 @@
     </div>
 </div>
 
-{{-- Modal Umum untuk form AJAX (pastikan ID ini unik atau gunakan yang sudah ada di layout) --}}
-<div class="modal fade" id="myModalAdmin" tabindex="-1" role="dialog" aria-labelledby="myModalAdminLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
+{{-- Modal untuk Form Tambah/Edit Lomba oleh Admin --}}
+<div class="modal fade" id="modalFormLombaAdmin" tabindex="-1" aria-labelledby="modalFormLombaAdminLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
-            {{-- Konten modal akan dimuat di sini --}}
+            {{-- Konten AJAX form tambah/edit lomba dimuat di sini --}}
+        </div>
+    </div>
+</div>
+
+{{-- Modal untuk Form Verifikasi Lomba oleh Admin --}}
+<div class="modal fade" id="modalVerifikasiLomba" tabindex="-1" aria-labelledby="modalVerifikasiLombaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            {{-- Konten AJAX form verifikasi lomba dimuat di sini --}}
         </div>
     </div>
 </div>
 @endsection
 
 @push('js')
-{{-- Dependensi JS yang diperlukan --}}
 <script>
-    var dataDaftarLombaAdmin;
+    var dataTableLombaAdmin;
 
-    function modalAction(url, modalId = 'myModalAdmin') { // Default ke myModalAdmin
-        const targetModalContent = $(`#${modalId} .modal-content`);
-        targetModalContent.html(''); // Kosongkan dulu
+    function modalActionLombaAdmin(url, title = 'Form', modalId = 'modalFormLombaAdmin') { // Default ke modal form
+        const targetModal = $(`#${modalId}`);
+        const targetModalContent = targetModal.find('.modal-content');
+        
+        targetModalContent.html('<div class="modal-body text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-3 fs-5">Memuat...</p></div>');
+        const modalInstance = bootstrap.Modal.getOrCreateInstance(document.getElementById(modalId));
+        modalInstance.show();
+
         $.ajax({
-            url: url,
-            type: 'GET',
-            success: function (response) {
-                targetModalContent.html(response);
-                const modalInstance = bootstrap.Modal.getOrCreateInstance(document.getElementById(modalId));
-                modalInstance.show();
-            },
+            url: url, type: 'GET',
+            success: function (response) { targetModalContent.html(response); },
             error: function (xhr) {
-                let errorMessage = 'Gagal memuat konten modal.';
-                if(xhr.responseJSON && xhr.responseJSON.message) errorMessage = xhr.responseJSON.message;
-                Swal.fire({ icon: 'error', title: 'Error', text: errorMessage });
+                let msg = xhr.responseJSON?.message ?? 'Gagal memuat konten.';
+                targetModalContent.html(`<div class="modal-header"><h5 class="modal-title">${title}</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div><div class="modal-body"><p class="text-danger">${msg}</p></div>`);
             }
         });
     }
 
+    function deleteLomba(lombaId, namaLomba) {
+        Swal.fire({
+            title: 'Konfirmasi Hapus',
+            html: `Apakah Anda yakin ingin menghapus lomba: <br><strong>${namaLomba}</strong>?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let url = `{{ route('admin.lomba.destroy', ':id') }}`;
+                url = url.replace(':id', lombaId);
+
+                $.ajax({
+                    url: url,
+                    type: 'POST', // Method DELETE disimulasikan dengan _method
+                    data: {
+                        _method: 'DELETE',
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        if (response.status) {
+                            Swal.fire('Berhasil!', response.message, 'success');
+                            dataTableLombaAdmin.ajax.reload(null, false);
+                        } else {
+                            Swal.fire('Gagal!', response.message || 'Gagal menghapus data.', 'error');
+                        }
+                    },
+                    error: function(xhr) {
+                        Swal.fire('Error!', (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'Terjadi kesalahan server.', 'error');
+                    }
+                });
+            }
+        });
+    }
+
+
     $(document).ready(function() {
-        dataDaftarLombaAdmin = $('#dataDaftarLombaAdmin').DataTable({
-            processing: true,
-            serverSide: true,
+        $.ajaxSetup({ headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') } });
+
+        dataTableLombaAdmin = $('#dataLombaAdmin').DataTable({
+            processing: true, serverSide: true, responsive: true,
             ajax: {
-                url: "{{ route('lomba.list') }}",
-                data: function (d) { // Mengirim data filter
-                    d.search_nama = $('#search_nama_admin').val();
-                    d.filter_status = $('#filter_status_admin').val();
+                url: "{{ route('admin.lomba.list') }}",
+                data: function (d) {
+                    d.status_verifikasi_filter = $('#status_verifikasi_filter_admin').val();
+                    d.tingkat_lomba_filter = $('#tingkat_lomba_filter_admin').val();
                 }
             },
             columns: [
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', className: 'text-center', orderable: false, searchable: false },
-                { data: 'nama_lomba', name: 'nama_lomba' }, // Untuk searching di server-side
-                { data: 'kategori', name: 'kategori' },       // Untuk searching di server-side
-                { data: 'pembukaan_pendaftaran', name: 'pembukaan_pendaftaran' },
-                { data: 'batas_pendaftaran', name: 'batas_pendaftaran' },
+                { data: 'nama_lomba', name: 'nama_lomba' },
+                { data: 'penyelenggara', name: 'penyelenggara' },
+                { data: 'tingkat', name: 'tingkat', className: 'text-center' },
+                { data: 'batas_pendaftaran', name: 'batas_pendaftaran', className: 'text-center' },
+                { data: 'inputBy.nama', name: 'inputBy.nama' }, // Sorting/searching by penginput name
                 { data: 'status_verifikasi', name: 'status_verifikasi', className: 'text-center' },
                 { data: 'aksi', name: 'aksi', className: 'text-center', orderable: false, searchable: false }
             ],
-            language: { url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/id.json" }
+            language: { url: "//cdn.datatables.net/plug-ins/1.13.7/i18n/id.json" }
         });
 
-        // Submit form filter akan me-reload datatable
-        $('#filterFormAdminLomba').on('submit', function(e) {
-            e.preventDefault();
-            dataDaftarLombaAdmin.ajax.reload();
+        $('#status_verifikasi_filter_admin, #tingkat_lomba_filter_admin').on('change', function () {
+            dataTableLombaAdmin.ajax.reload();
         });
     });
 </script>
