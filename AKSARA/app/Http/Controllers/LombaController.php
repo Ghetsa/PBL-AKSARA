@@ -12,6 +12,7 @@ use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log; // Untuk logging
 
 class LombaController extends Controller
 {
@@ -710,16 +711,19 @@ class LombaController extends Controller
         if ($request->ajax()) {
             $data = LombaModel::with('inputBy')->orderBy('created_at', 'desc');
 
-            if ($request->filled('status_verifikasi_filter_crud')) {
-                $data->where('status_verifikasi', $request->status_verifikasi_filter_crud);
+            // Filter status: default ke 'disetujui' jika tidak ada filter dari frontend
+            $statusFilter = $request->filled('status_verifikasi_filter_crud') ? $request->status_verifikasi_filter_crud : 'disetujui';
+            if (!empty($statusFilter)) {
+                $data->where('status_verifikasi', $statusFilter);
             }
+
             if ($request->filled('tingkat_lomba_filter_crud')) {
                 $data->where('tingkat', $request->tingkat_lomba_filter_crud);
             }
 
             return DataTables::of($data)
                 ->addIndexColumn()
-                ->editColumn('nama_lomba', function ($row) { /* ... sama seperti di atas ... */
+                ->editColumn('nama_lomba', function ($row) {
                     $html = '<span class="fw-semibold">' . e($row->nama_lomba) . '</span>';
                     if ($row->poster && Storage::disk('public')->exists($row->poster)) {
                         $html .= '<br><a href="' . asset('storage/' . $row->poster) . '" target="_blank" class="badge bg-light-info text-info mt-1"><i class="fas fa-image me-1"></i>Poster</a>';
@@ -727,11 +731,17 @@ class LombaController extends Controller
                     return $html;
                 })
                 ->addColumn('inputBy_nama', fn($row) => $row->inputBy->nama ?? '<span class="text-muted fst-italic">N/A</span>')
-                ->editColumn('status_verifikasi', fn($row) => $row->status_verifikasi_badge)
+                ->editColumn('status_verifikasi', fn($row) => $row->status_verifikasi_badge) // Menggunakan accessor
+                ->editColumn('batas_pendaftaran', fn($row) => $row->batas_pendaftaran ? Carbon::parse($row->batas_pendaftaran)->isoFormat('D MMM YYYY') : '-')
                 ->addColumn('aksi', function ($row) {
-                    $btnEdit = '<button onclick="modalActionLombaAdmin(\'' . route('admin.lomba.crud.edit_form_ajax', $row->lomba_id) . '\', \'Edit Lomba\', \'modalFormLombaAdminCrud\')" class="btn btn-sm btn-warning me-1" title="Edit"><i class="fas fa-edit"></i></button>';
-                    $btnDelete = '<button onclick="deleteLombaCrud(' . $row->lomba_id . ', \'' . e($row->nama_lomba) . '\')" class="btn btn-sm btn-danger" title="Hapus"><i class="fas fa-trash"></i></button>';
-                    return '<div class="btn-group">' . $btnEdit . $btnDelete . '</div>';
+                    // Tombol Detail (menggunakan modal yang sama dengan publik/user)
+                    $btnDetail = '<button onclick="modalActionLombaAdminCrud(\'' . route('lomba.publik.show_ajax', $row->lomba_id) . '\', \'Detail Lomba\', \'modalDetailLombaAdminCrud\')" class="btn btn-sm btn-info me-1" title="Detail"><i class="fas fa-eye"></i></button>';
+
+                    $btnEdit = '<button onclick="modalActionLombaAdminCrud(\'' . route('admin.lomba.crud.edit_form_ajax', $row->lomba_id) . '\', \'Edit Lomba\', \'modalFormLombaAdminCrud\')" class="btn btn-sm btn-warning me-1" title="Edit"><i class="fas fa-edit"></i></button>';
+
+                    $btnDelete = '<button onclick="modalActionLombaAdminCrud(\'' . route('admin.lomba.crud.confirm_delete_ajax', $row->lomba_id) . '\', \'Konfirmasi Hapus Lomba\', \'modalConfirmDeleteLombaAdminCrud\')" class="btn btn-sm btn-danger" title="Hapus"><i class="fas fa-trash"></i></button>';
+
+                    return '<div class="btn-group">' . $btnDetail . $btnEdit . $btnDelete . '</div>';
                 })
                 ->rawColumns(['nama_lomba', 'status_verifikasi', 'aksi', 'inputBy_nama'])
                 ->make(true);
@@ -739,29 +749,35 @@ class LombaController extends Controller
         return abort(403);
     }
 
+    // Menampilkan form TAMBAH lomba (AJAX) untuk admin
     public function adminCreateLombaFormAjax()
     {
-        $bidangList = BidangModel::orderBy('bidang_nama')->get();
-        return view('lomba.admin.crud.create_edit_lomba', compact('bidangList'));
+        // $bidangList = BidangModel::orderBy('bidang_nama')->get(); // Jika bidang_keahlian adalah multi-select
+        // return view('lomba.admin.crud.create_form_ajax', compact('bidangList'));
+        return view('lomba.admin.crud.create_lomba');
     }
 
+    // Menyimpan lomba BARU yang diinput admin (AJAX)
     public function adminStoreLombaAjax(Request $request)
     {
         $user = Auth::user();
-        $validator = Validator::make($request->all(), [ /* ... rules sama seperti storePengajuanLombaDariUser ... */
+        $validator = Validator::make($request->all(), [
             'nama_lomba' => 'required|string|max:255',
             'pembukaan_pendaftaran' => 'required|date',
             'batas_pendaftaran' => 'required|date|after_or_equal:pembukaan_pendaftaran',
             'kategori' => 'required|in:individu,kelompok',
             'penyelenggara' => 'required|string|max:255',
             'tingkat' => 'required|in:lokal,nasional,internasional',
-            'bidang_keahlian' => 'required|array',
+            'bidang_keahlian' => 'required|string|max:255', // Jika teks biasa
+            // 'bidang_keahlian' => 'required|array', // Jika multi-select
+            // 'bidang_keahlian.*' => 'exists:bidang,bidang_id', // Jika multi-select
             'biaya' => 'nullable|integer|min:0',
             'link_pendaftaran' => 'nullable|url|max:255',
             'link_penyelenggara' => 'nullable|url|max:255',
             'poster' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
-        if ($validator->fails()) { /* ... return error ... */
+
+        if ($validator->fails()) {
             return response()->json(['status' => false, 'message' => 'Validasi gagal.', 'errors' => $validator->errors()], 422);
         }
 
@@ -770,15 +786,16 @@ class LombaController extends Controller
             $posterPath = $request->file('poster')->store('lomba_poster', 'public');
         }
 
+        // $bidangKeahlianInput = is_array($request->bidang_keahlian) ? implode(',', $request->bidang_keahlian) : $request->bidang_keahlian;
+
         LombaModel::create([
-            // ... (data request) ...
             'nama_lomba' => $request->nama_lomba,
             'pembukaan_pendaftaran' => $request->pembukaan_pendaftaran,
             'batas_pendaftaran' => $request->batas_pendaftaran,
             'kategori' => $request->kategori,
             'penyelenggara' => $request->penyelenggara,
             'tingkat' => $request->tingkat,
-            'bidang_keahlian' => implode(',', $request->bidang_keahlian),
+            'bidang_keahlian' => $request->bidang_keahlian, // Atau $bidangKeahlianInput jika array
             'biaya' => $request->biaya ?? 0,
             'link_pendaftaran' => $request->link_pendaftaran,
             'link_penyelenggara' => $request->link_penyelenggara,
@@ -789,36 +806,41 @@ class LombaController extends Controller
         return response()->json(['status' => true, 'message' => 'Info lomba baru berhasil ditambahkan.']);
     }
 
+    // Menampilkan form EDIT lomba (AJAX) untuk admin
     public function adminEditLombaFormAjax($id)
     {
         $lomba = LombaModel::findOrFail($id);
-        // $bidangList = BidangModel::orderBy('bidang_nama')->get();
-        return view('lomba.admin.crud.create_edit_lomba', compact('lomba')); // compact('lomba', 'bidangList')
+        // $bidangList = BidangModel::orderBy('bidang_nama')->get(); // Jika bidang_keahlian adalah multi-select
+        // return view('lomba.admin.crud.edit_form_ajax', compact('lomba', 'bidangList'));
+        return view('lomba.admin.crud.edit_lomba', compact('lomba'));
     }
 
+    // Memproses UPDATE lomba oleh admin (AJAX)
     public function adminUpdateLombaAjax(Request $request, $id)
     {
         $lomba = LombaModel::findOrFail($id);
-        $validator = Validator::make($request->all(), [ /* ... rules ... */
+        $validator = Validator::make($request->all(), [
             'nama_lomba' => 'required|string|max:255',
             'pembukaan_pendaftaran' => 'required|date',
             'batas_pendaftaran' => 'required|date|after_or_equal:pembukaan_pendaftaran',
             'kategori' => 'required|in:individu,kelompok',
             'penyelenggara' => 'required|string|max:255',
             'tingkat' => 'required|in:lokal,nasional,internasional',
-            'bidang_keahlian' => 'required|string|max:255',
+            'bidang_keahlian' => 'required|string|max:255', // Jika teks biasa, atau 'required|array'
             'biaya' => 'nullable|integer|min:0',
             'link_pendaftaran' => 'nullable|url|max:255',
             'link_penyelenggara' => 'nullable|url|max:255',
             'poster' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'status_verifikasi' => 'required|in:pending,disetujui,ditolak' // Admin bisa ubah status saat edit
         ]);
-        if ($validator->fails()) { /* ... return error ... */
+
+        if ($validator->fails()) {
             return response()->json(['status' => false, 'message' => 'Validasi gagal.', 'errors' => $validator->errors()], 422);
         }
 
         $updateData = $request->except(['_token', '_method', 'poster']);
         $updateData['biaya'] = $request->biaya ?? 0;
+        // $updateData['bidang_keahlian'] = is_array($request->bidang_keahlian) ? implode(',', $request->bidang_keahlian) : $request->bidang_keahlian;
 
         if ($request->hasFile('poster')) {
             if ($lomba->poster && Storage::disk('public')->exists($lomba->poster)) {
@@ -831,13 +853,44 @@ class LombaController extends Controller
         return response()->json(['status' => true, 'message' => 'Info lomba berhasil diperbarui.']);
     }
 
+    // Menampilkan konfirmasi hapus (AJAX)
+    public function adminConfirmDeleteLombaAjax($id)
+    {
+        $lomba = LombaModel::find($id);
+        if (!$lomba) {
+            // Bisa juga return view error jika diperlukan
+            return response()->json(['message' => 'Data lomba tidak ditemukan.'], 404);
+        }
+        return view('lomba.admin.crud.confirm_ajax', compact('lomba'));
+    }
+
+    // Menghapus lomba oleh admin (AJAX)
     public function adminDestroyLombaAjax($id)
     {
-        $lomba = LombaModel::findOrFail($id);
-        if ($lomba->poster && Storage::disk('public')->exists($lomba->poster)) {
-            Storage::disk('public')->delete($lomba->poster);
+        $lomba = LombaModel::find($id);
+        if (!$lomba) {
+            return response()->json(['status' => false, 'message' => 'Data lomba tidak ditemukan.'], 404);
         }
-        $lomba->delete();
-        return response()->json(['status' => true, 'message' => 'Info lomba berhasil dihapus.']);
+
+        try {
+            if ($lomba->poster && Storage::disk('public')->exists($lomba->poster)) {
+                Storage::disk('public')->delete($lomba->poster);
+            }
+            $lomba->delete();
+            return response()->json(['status' => true, 'message' => 'Info lomba berhasil dihapus.']);
+        } catch (\Exception $e) {
+            Log::error('Gagal hapus lomba: ' . $e->getMessage());
+            return response()->json(['status' => false, 'message' => 'Gagal menghapus lomba. Terjadi kesalahan server.'], 500);
+        }
     }
+
+    // public function adminDestroyLombaAjax($id)
+    // {
+    //     $lomba = LombaModel::findOrFail($id);
+    //     if ($lomba->poster && Storage::disk('public')->exists($lomba->poster)) {
+    //         Storage::disk('public')->delete($lomba->poster);
+    //     }
+    //     $lomba->delete();
+    //     return response()->json(['status' => true, 'message' => 'Info lomba berhasil dihapus.']);
+    // }
 }

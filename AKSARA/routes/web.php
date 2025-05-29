@@ -216,6 +216,7 @@ Route::middleware(['auth'])->group(function () {
                 Route::post('/store-ajax', [LombaController::class, 'adminStoreLombaAjax'])->name('store_ajax'); // Simpan AJAX dari admin
                 Route::get('/{id}/edit-form-ajax', [LombaController::class, 'adminEditLombaFormAjax'])->name('edit_form_ajax'); // Form AJAX edit
                 Route::put('/{id}/update-ajax', [LombaController::class, 'adminUpdateLombaAjax'])->name('update_ajax'); // Update AJAX dari admin
+                Route::get('/{id}/confirm-ajax', [LombaController::class, 'adminConfirmDeleteLombaAjax'])->name('confirm_delete_ajax'); // Hapus AJAX
                 Route::delete('/{id}/destroy-ajax', [LombaController::class, 'adminDestroyLombaAjax'])->name('destroy_ajax'); // Hapus AJAX
             });
         });
