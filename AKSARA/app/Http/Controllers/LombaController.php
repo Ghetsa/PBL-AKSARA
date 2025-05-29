@@ -614,33 +614,49 @@ class LombaController extends Controller
         return view('lomba.admin.verifikasi.index', compact('breadcrumb', 'activeMenu'));
     }
 
-    public function adminListVerifikasiLomba(Request $request)
+    public function adminListVerifikasiLomba(Request $request) // DataTables untuk halaman verifikasi
     {
         if ($request->ajax()) {
-            $data = LombaModel::with('inputBy')->orderBy('created_at', 'desc');
+            $data = LombaModel::with(['inputBy' => function ($query) {
+                // Hanya ambil field yang dibutuhkan dari user untuk mengurangi data
+                $query->select('user_id', 'nama', 'role');
+            }])
+                ->orderBy('created_at', 'desc');
 
             if ($request->filled('status_verifikasi_filter')) {
                 $data->where('status_verifikasi', $request->status_verifikasi_filter);
             }
-            // Anda bisa tambahkan filter lain di sini jika perlu
+            if ($request->filled('tingkat_lomba_filter')) { // Jika filter ini tetap ada di view verifikasi
+                $data->where('tingkat', $request->tingkat_lomba_filter);
+            }
+
 
             return DataTables::of($data)
                 ->addIndexColumn()
-                ->editColumn('nama_lomba', function ($row) {
+                ->addColumn('nama_lomba_display', function ($row) { // Kolom gabungan Nama & Poster
                     $html = '<span class="fw-semibold">' . e($row->nama_lomba) . '</span>';
                     if ($row->poster && Storage::disk('public')->exists($row->poster)) {
-                        $html .= '<br><a href="' . asset('storage/' . $row->poster) . '" target="_blank" class="badge bg-light-info text-info mt-1"><i class="fas fa-image me-1"></i>Poster</a>';
+                        // Thumbnail kecil atau hanya link
+                        $html .= '<br><a href="' . asset('storage/' . $row->poster) . '" target="_blank" data-bs-toggle="tooltip" title="Lihat Poster" class="text-info small"><i class="fas fa-image"></i> Poster</a>';
                     }
                     return $html;
                 })
-                ->addColumn('inputBy_nama', fn($row) => $row->inputBy->nama ?? '<span class="text-muted fst-italic">N/A</span>')
-                ->editColumn('created_at', fn($row) => $row->created_at ? Carbon::parse($row->created_at)->isoFormat('D MMM YYYY, HH:mm') : '-')
+                ->addColumn('diajukan_oleh', function ($row) {
+                    if ($row->inputBy) {
+                        return e($row->inputBy->nama) . '<br><small class="text-muted">(' . e(ucfirst($row->inputBy->role)) . ')</small>';
+                    }
+                    return '<span class="text-muted fst-italic">N/A</span>';
+                })
+                ->editColumn('created_at', function ($row) {
+                    return $row->created_at ? Carbon::parse($row->created_at)->isoFormat('D MMM YYYY, HH:mm') : '-';
+                })
                 ->editColumn('status_verifikasi', fn($row) => $row->status_verifikasi_badge)
                 ->addColumn('aksi', function ($row) {
+                    // Tombol hanya untuk membuka modal verifikasi
                     $btnVerifikasi = '<button onclick="modalActionLombaAdmin(\'' . route('admin.lomba.verifikasi.form_ajax', $row->lomba_id) . '\', \'Verifikasi Lomba\', \'modalVerifikasiLombaAdmin\')" class="btn btn-sm btn-primary" title="Proses Verifikasi"><i class="fas fa-clipboard-check me-1"></i>Verifikasi</button>';
                     return $btnVerifikasi;
                 })
-                ->rawColumns(['nama_lomba', 'status_verifikasi', 'aksi', 'inputBy_nama'])
+                ->rawColumns(['nama_lomba_display', 'diajukan_oleh', 'status_verifikasi', 'aksi'])
                 ->make(true);
         }
         return abort(403);
