@@ -87,6 +87,7 @@
             columns: [
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', className: 'text-center', orderable: false, searchable: false },
                 { data: 'nama_lomba', name: 'nama_lomba' },
+                { data: 'bidang_lomba', name: 'bidang_lomba' },
                 { data: 'penyelenggara', name: 'penyelenggara' },
                 { data: 'tingkat', name: 'tingkat' },
                 { data: 'batas_pendaftaran', name: 'batas_pendaftaran' },
