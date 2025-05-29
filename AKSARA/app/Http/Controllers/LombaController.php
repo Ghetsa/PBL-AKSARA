@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\UserModel;
 use App\Models\LombaModel;
+use App\Models\BidangModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Carbon\Carbon;
@@ -551,8 +552,8 @@ class LombaController extends Controller
      */
     public function createPengajuanLomba()
     {
-        // $bidangList = BidangModel::orderBy('bidang_nama')->get(); // Jika bidang_keahlian adalah select
-        return view('lomba.create_lomba'); // compact('bidangList')
+        $bidangList = BidangModel::orderBy('bidang_nama')->get();
+        return view('lomba.create_lomba', compact('bidangList'));
     }
 
     /**
@@ -568,7 +569,7 @@ class LombaController extends Controller
             'kategori' => 'required|in:individu,kelompok',
             'penyelenggara' => 'required|string|max:255',
             'tingkat' => 'required|in:lokal,nasional,internasional',
-            'bidang_keahlian' => 'required|string|max:255',
+            'bidang_keahlian' => 'required|array',
             'biaya' => 'nullable|integer|min:0',
             'link_pendaftaran' => 'nullable|url|max:255',
             'link_penyelenggara' => 'nullable|url|max:255',
@@ -591,7 +592,7 @@ class LombaController extends Controller
             'kategori' => $request->kategori,
             'penyelenggara' => $request->penyelenggara,
             'tingkat' => $request->tingkat,
-            'bidang_keahlian' => $request->bidang_keahlian,
+            'bidang_keahlian' => implode(',', $request->bidang_keahlian),
             'biaya' => $request->biaya ?? 0,
             'link_pendaftaran' => $request->link_pendaftaran,
             'link_penyelenggara' => $request->link_penyelenggara,
@@ -724,8 +725,8 @@ class LombaController extends Controller
 
     public function adminCreateLombaFormAjax()
     {
-        // $bidangList = BidangModel::orderBy('bidang_nama')->get();
-        return view('lomba.admin.crud.create_edit_lomba'); // compact('bidangList')
+        $bidangList = BidangModel::orderBy('bidang_nama')->get();
+        return view('lomba.admin.crud.create_edit_lomba', compact('bidangList'));
     }
 
     public function adminStoreLombaAjax(Request $request)
@@ -738,7 +739,7 @@ class LombaController extends Controller
             'kategori' => 'required|in:individu,kelompok',
             'penyelenggara' => 'required|string|max:255',
             'tingkat' => 'required|in:lokal,nasional,internasional',
-            'bidang_keahlian' => 'required|string|max:255',
+            'bidang_keahlian' => 'required|array',
             'biaya' => 'nullable|integer|min:0',
             'link_pendaftaran' => 'nullable|url|max:255',
             'link_penyelenggara' => 'nullable|url|max:255',
@@ -761,7 +762,7 @@ class LombaController extends Controller
             'kategori' => $request->kategori,
             'penyelenggara' => $request->penyelenggara,
             'tingkat' => $request->tingkat,
-            'bidang_keahlian' => $request->bidang_keahlian,
+            'bidang_keahlian' => implode(',', $request->bidang_keahlian),
             'biaya' => $request->biaya ?? 0,
             'link_pendaftaran' => $request->link_pendaftaran,
             'link_penyelenggara' => $request->link_penyelenggara,
