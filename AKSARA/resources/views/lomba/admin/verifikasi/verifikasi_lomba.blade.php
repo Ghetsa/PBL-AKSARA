@@ -142,69 +142,82 @@ $(document).ready(function() {
     });
 
     function submitVerificationFormAdminLomba() {
-        const formData = formVerifikasiAdminLomba.serialize(); // Mengambil semua data form termasuk _method dan _token
-        const actionButtonsAdminLomba = $('.btn-verify-action-lomba');
-        const clickedButton = $('.btn-verify-action-lomba[data-status="'+hiddenStatusInputAdminLomba.val()+'"]');
-        const originalButtonHTML = clickedButton.html();
+    const formVerifikasiAdminLomba = $('#formVerifikasiLombaAdmin'); // Pastikan ini didefinisikan
+    const formData = formVerifikasiAdminLomba.serialize(); // Ini akan berisi _token dan data lainnya.
+                                                          // _method=PUT juga akan ada, tapi tidak apa-apa,
+                                                          // karena method AJAX akan jadi PUT.
+    const actionButtonsAdminLomba = $('.btn-verify-action-lomba');
+    const hiddenStatusInputAdminLomba = $('#hidden_status_verifikasi_lomba'); // Untuk tombol clicked
+    const clickedButton = $('.btn-verify-action-lomba[data-status="'+hiddenStatusInputAdminLomba.val()+'"]');
+    const originalButtonHTML = clickedButton.html();
 
-        $.ajax({
-            url: formVerifikasiAdminLomba.attr('action'),
-            method: 'POST', // Laravel akan menghandle @method('PUT')
-            data: formData,
-            dataType: 'json',
-            beforeSend: function() {
-                actionButtonsAdminLomba.prop('disabled', true);
-                clickedButton.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Memproses...');
-            },
-            success: function(response) {
-                // PENTING: Pastikan server mengirim response JSON dengan "status: true" saat BERHASIL.
-                if (response && response.status === true) {
-                    // PENTING: Pastikan ID Modal ('#modalVerifikasiLomba') sesuai dengan ID elemen modal di HTML utama Anda.
-                    $('#modalVerifikasiLomba').modal('hide'); // Menutup modal
-
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Berhasil!',
-                        text: response.message,
-                        timer: 1500, // Menutup otomatis setelah 1.5 detik
-                        showConfirmButton: false
-                    });
-
-                    // PENTING: Pastikan variabel 'dataTableVerifikasiLomba' adalah instance DataTable yang valid.
-                    if (typeof dataTableVerifikasiLomba !== 'undefined' && dataTableVerifikasiLomba !== null) {
-                        dataTableVerifikasiLomba.ajax.reload(null, false); // Reload DataTable tanpa reset paging
-                    } else {
-                        console.warn('Variabel dataTableVerifikasiLomba tidak terdefinisi atau null. DataTable tidak akan di-reload.');
-                        // Opsi fallback jika DataTable tidak ada: reload halaman
-                        // window.location.reload();
-                    }
+    $.ajax({
+        url: formVerifikasiAdminLomba.attr('action'),
+        method: 'PUT', // <--- UBAH MENJADI 'PUT' SECARA LANGSUNG
+        data: formData, // Kirim data form yang sudah diserialisasi.
+                        // Laravel akan membaca _token dari sini.
+        dataType: 'json',
+        beforeSend: function() {
+            actionButtonsAdminLomba.prop('disabled', true);
+            clickedButton.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Memproses...');
+        },
+        success: function(response) {
+            if (response && response.status === true) {
+                $('#modalVerifikasiLombaAdmin').modal('hide');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: response.message,
+                });
+                if (typeof dataTableVerifikasiLomba !== 'undefined' && dataTableVerifikasiLomba !== null) {
+                    dataTableVerifikasiLomba.ajax.reload(null, false);
                 } else {
-                    // Jika response.status bukan true atau response tidak ada.
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Gagal!',
-                        text: (response && response.message) ? response.message : 'Terjadi kesalahan saat memproses permintaan.'
-                    });
+                    console.warn('Variabel dataTableVerifikasiLomba tidak terdefinisi atau null.');
                 }
-            },
-            error: function(xhr) {
-                let errorMessage = 'Terjadi kesalahan server.';
-                if (xhr.responseJSON && xhr.responseJSON.message) {
-                    errorMessage = xhr.responseJSON.message;
-                } else if (xhr.statusText && xhr.status) {
-                    errorMessage = `Error ${xhr.status}: ${xhr.statusText}`;
-                }
+            } else {
                 Swal.fire({
                     icon: 'error',
-                    title: 'Oops...',
-                    html: errorMessage
+                    title: 'Gagal!',
+                    text: (response && response.message) ? response.message : 'Terjadi kesalahan saat memproses permintaan.'
                 });
-            },
-            complete: function() {
-                actionButtonsAdminLomba.prop('disabled', false);
-                clickedButton.html(originalButtonHTML); // Kembalikan teks tombol asli
             }
-        });
-    }
+        },
+        error: function(xhr) {
+            let errorMessage = 'Terjadi kesalahan server.';
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+                errorMessage = xhr.responseJSON.message;
+            } else if (xhr.responseText) { // Menampilkan pesan error dari server jika ada
+                try {
+                    // Mencoba parse responseText jika itu adalah JSON yang berisi pesan error Laravel
+                    const errorResponse = JSON.parse(xhr.responseText);
+                    if (errorResponse.message) {
+                        errorMessage = errorResponse.message;
+                    } else {
+                         // Jika tidak bisa di-parse atau tidak ada .message, tampilkan responseText mentah
+                        errorMessage = xhr.responseText;
+                    }
+                } catch (e) {
+                    // Jika responseText bukan JSON valid, tampilkan apa adanya (mungkin HTML error page)
+                    // Untuk kasus "MethodNotAllowedHttpException", pesan standarnya sudah cukup jelas.
+                    if (xhr.status === 405) { // Method Not Allowed
+                         errorMessage = "Metode yang digunakan tidak didukung untuk rute ini. Server mengharapkan PUT.";
+                    } else {
+                        errorMessage = `Error ${xhr.status}: ${xhr.statusText}. Silakan cek console untuk detail.`;
+                    }
+                    console.error("AJAX Error Details:", xhr);
+                }
+            }
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                html: errorMessage // Menggunakan html agar bisa menampilkan pesan error yang lebih panjang jika perlu
+            });
+        },
+        complete: function() {
+            actionButtonsAdminLomba.prop('disabled', false);
+            clickedButton.html(originalButtonHTML);
+        }
+    });
+}
 });
 </script>
