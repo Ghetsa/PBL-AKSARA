@@ -196,6 +196,18 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{id}/verify-form-ajax', [KeahlianUserController::class, 'showVerificationFormAjax'])->name('verify_form_ajax');
             Route::put('/{id}/process-verification-ajax', [KeahlianUserController::class, 'prosesVerifikasiAjax'])->name('process_verification_ajax');
         });
+        Route::prefix('admin/lomba')->name('lomba.admin.')->group(function () {
+            Route::get('/', [LombaController::class, 'index'])->name('index');
+            Route::get('/list', [LombaController::class, 'getList'])->name('list');
+            Route::get('/create', [LombaController::class, 'create'])->name('create');
+            Route::post('/', [LombaController::class, 'store'])->name('store');
+            Route::get('/{id}/lomba', [LombaController::class, 'show'])->name('show');
+            Route::get('/{id}/edit', [LombaController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [LombaController::class, 'update'])->name('update');
+            Route::delete('/{id}', [LombaController::class, 'destroy'])->name('destroy');
+            Route::get('/verifikasi/{id}', [LombaController::class, 'verifikasi'])->name('verifikasi');
+            Route::post('/verifikasi/{id}', [LombaController::class, 'prosesVerifikasi'])->name('proses_verifikasi');
+        });
 
         // ADMIN - MANAJEMEN & VERIFIKASI LOMBA
         // --- ADMIN ---
@@ -237,15 +249,17 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // ===================== DOSEN =====================
-    Route::middleware(['role:dosen'])->prefix('dosen/prestasi')->name('prestasi.dosen.')->group(function () {
-        Route::get('/', [PrestasiController::class, 'indexDosen'])->name('index');
-        Route::get('/list', [PrestasiController::class, 'listDosen'])->name('list');
-        Route::get('/create-ajax', [PrestasiController::class, 'createFormAjaxDosen'])->name('create_ajax');
-        Route::post('/store-ajax', [PrestasiController::class, 'storeAjaxDosen'])->name('store_ajax');
-        Route::get('/{prestasi}/verify-form-ajax', [PrestasiController::class, 'showVerifyFormAjaxDosen'])->name('verify_form_ajax');
-        Route::put('/{prestasi}/process-verification-ajax', [PrestasiController::class, 'processVerificationAjaxDosen'])->name('process_verification_ajax');
+    Route::middleware(['role:dosen'])->group(function () {
 
-        Route::prefix('lomba-saya')->name('lomba.user.')->group(function () {
+        Route::prefix('dosen/prestasi')->name('prestasi.dosen.')->group(function () {
+            Route::get('/', [PrestasiController::class, 'indexDosen'])->name('index');
+            Route::get('/list', [PrestasiController::class, 'listDosen'])->name('list');
+            Route::get('/create-ajax', [PrestasiController::class, 'createFormAjaxDosen'])->name('create_ajax');
+            Route::post('/store-ajax', [PrestasiController::class, 'storeAjaxDosen'])->name('store_ajax');
+            Route::get('/{prestasi}/verify-form-ajax', [PrestasiController::class, 'showVerifyFormAjaxDosen'])->name('verify_form_ajax');
+            Route::put('/{prestasi}/process-verification-ajax', [PrestasiController::class, 'processVerificationAjaxDosen'])->name('process_verification_ajax');
+        });
+        Route::prefix('lomba-saya')->name('lomba.')->group(function () {
             Route::get('/histori-pengajuan', [LombaController::class, 'historiPengajuanLomba'])->name('histori.index');
             Route::get('/histori-pengajuan/list', [LombaController::class, 'listHistoriPengajuanLomba'])->name('histori.list');
 
@@ -256,7 +270,23 @@ Route::middleware(['auth'])->group(function () {
             // Route::get('/edit-pengajuan/{id}', [LombaController::class, 'editPengajuanLombaForm'])->name('edit_form');
             // Route::put('/update-pengajuan/{id}', [LombaController::class, 'updatePengajuanLomba'])->name('update');
         });
+
+        // ---------- LOMBA ----------
+        Route::prefix('dosen/lomba')->name('lomba.')->group(function () {
+            Route::get('/', [LombaController::class, 'index'])->name('index');
+            Route::get('/list', [LombaController::class, 'getList'])->name('list');
+            Route::get('/create', [LombaController::class, 'create'])->name('create');
+            Route::post('/', [LombaController::class, 'store'])->name('store');
+            Route::get('/{id}/lomba', [LombaController::class, 'show'])->name('show');
+            Route::get('/{id}/edit', [LombaController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [LombaController::class, 'update'])->name('update');
+            Route::delete('/{id}', [LombaController::class, 'destroy'])->name('destroy');
+            Route::get('/verifikasi/{id}', [LombaController::class, 'verifikasi'])->name('verifikasi');
+            Route::post('/verifikasi/{id}', [LombaController::class, 'prosesVerifikasi'])->name('proses_verifikasi');
+        });
+
     });
+
 
     // Route::middleware(['role:mahasiswa, dosen'])->group(function () {
     //     Route::prefix('lomba-saya')->name('lomba.user.')->group(function () {

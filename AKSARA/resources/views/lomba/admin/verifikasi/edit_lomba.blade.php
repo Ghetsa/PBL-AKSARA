@@ -78,40 +78,27 @@
 
         {{-- Bidang --}}
         <div class="row mb-3">
-            <label class="form-label">Bidang Keahlian Relevan <span class="text-danger">*</span></label>
-            <div class="row">
-                @php
-                    // Ambil data terpilih dari input sebelumnya (old) atau dari relasi lomba
-                    $bidang_terpilih = old(
-                        'bidang_keahlian',
-                        isset($lomba) ? $lomba->bidangKeahlian->pluck('bidang_id')->toArray() : []
-                    );
-                @endphp
-
-                @foreach ($bidangList as $bidang)
-                    @php
-                        $inputIdSlug = Str::slug($bidang->bidang_nama);
-                        $isChecked = in_array($bidang->bidang_id, $bidang_terpilih);
-                    @endphp
-                    <div class="col-md-6 mb-3">
-                        <div class="card shadow-sm">
-                            <div class="card-body p-3">
-                                <div class="form-check mb-0">
-                                    <input class="form-check-input" type="checkbox" name="bidang_keahlian[]"
-                                        value="{{ $bidang->bidang_id }}" id="bidang_{{ $inputIdSlug }}"
-                                        {{ $isChecked ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="bidang_{{ $inputIdSlug }}">
-                                        {{ $bidang->bidang_nama }}
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            <h5><i class="ti ti-heart me-2"></i> Bidang</h5>
+            <hr>
+            <select name="bidang_id[]" class="form-control" multiple required>
+                @foreach($allBidangOptions as $b)
+                    <option value="{{ $b->bidang_id }}" {{ $lomba->detailBidang->contains('bidang_id', $b->bidang_id) ? 'selected' : '' }}>
+                        {{ $b->nama_bidang }}
+                    </option>
                 @endforeach
-            </div>
-            <span class="invalid-feedback error-bidang_keahlian d-block"></span>
+            </select>
+            <span class="invalid-feedback error-bidang_pilihan"></span>
         </div>
 
+        {{-- Bidang Keahlian --}}
+        <div class="row mb-3">
+            <label class="col-sm-3 col-form-label">Bidang Keahlian <span class="text-danger">*</span></label>
+            <div class="col-sm-9">
+                <input type="text" name="bidang_keahlian" class="form-control"
+                    value="{{ old('bidang_keahlian', $lomba->bidang_keahlian) }}" required>
+                <span class="invalid-feedback error-bidang_keahlian"></span>
+            </div>
+        </div>
 
         {{-- Biaya --}}
         <div class="row mb-3">
@@ -190,6 +177,7 @@
     </div>
 </form>
 
+
 @push('scripts')
     <script>
         $(document).ready(function () {
@@ -206,48 +194,20 @@
             }
 
             statusSelect.on('change', toggleCatatan);
-            toggleCatatan(); // run saat awal
+            toggleCatatan(); // Jalankan saat load
 
             form.validate({
                 rules: {
-                    nama_lomba: { required: true },
-                    pembukaan_pendaftaran: { required: true, date: true },
-                    batas_pendaftaran: { required: true, date: true },
-                    kategori: { required: true },
-                    tingkat: { required: true },
-                    penyelenggara: { required: true },
-                    'bidang_id[]': { required: true },
-                    status_verifikasi: { required: true },
                     catatan_verifikasi: {
-                        required: function () {
-                            return statusSelect.val() === 'ditolak';
-                        },
                         maxlength: 1000
                     }
                 },
-                messages: {
-                    nama_lomba: "Nama lomba wajib diisi.",
-                    penyelenggara: "Penyelenggara wajib diisi.",
-                    'bidang_id[]': "Minimal pilih satu bidang.",
-                    catatan_verifikasi: {
-                        required: "Catatan harus diisi jika status ditolak.",
-                        maxlength: "Maksimal 1000 karakter."
-                    }
-                },
-                errorPlacement: function (error, element) {
-                    const name = element.attr('name');
-                    form.find('.error-' + name.replace('[]', '')).html(error);
-                },
-                success: function (label, element) {
-                    const name = $(element).attr('name');
-                    form.find('.error-' + name.replace('[]', '')).html('');
-                },
                 submitHandler: function (formEl) {
                     let formData = new FormData(formEl);
-                    const submitBtn = $(formEl).find('button[type="submit"]');
-                    const originalBtnText = submitBtn.html();
+                    const submitButton = $(formEl).find('button[type="submit"]');
+                    const originalText = submitButton.html();
 
-                    submitBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Menyimpan...');
+                    submitButton.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Menyimpan...');
 
                     $.ajax({
                         url: $(formEl).attr('action'),
@@ -268,17 +228,10 @@
                             }
                         },
                         error: function (xhr) {
-                            const res = xhr.responseJSON;
-                            if (res && res.errors) {
-                                $.each(res.errors, function (key, val) {
-                                    form.find('.error-' + key).html('<strong>' + val[0] + '</strong>');
-                                });
-                            } else {
-                                Swal.fire('Error!', 'Terjadi kesalahan saat mengirim data.', 'error');
-                            }
+                            // Tambahkan error handler jika diperlukan
                         },
                         complete: function () {
-                            submitBtn.prop('disabled', false).html(originalBtnText);
+                            submitButton.prop('disabled', false).html(originalText);
                         }
                     });
                 }
