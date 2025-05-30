@@ -533,13 +533,12 @@ class LombaController extends Controller
                 ->editColumn('status_verifikasi', fn($row) => $row->status_verifikasi_badge)
                 ->addColumn('aksi', function ($row) {
                     $catatan = $row->catatan_verifikasi ?? ''; // Pastikan ada kolom catatan_verifikasi di tabel lomba
-                    if ($row->status_verifikasi == 'ditolak' && !empty($catatan)) {
-                        return '<button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" data-bs-placement="top" title="Catatan Admin: ' . e($catatan) . '"><i class="fas fa-info-circle"></i> Ditolak</button>';
+                    $btnEdit = '';
+                    $btnDetail = '<button onclick="modalActionLomba(\'' . route('lomba.show', $row->lomba_id) . '\', \'Detail Lomba\', \'modalDetailLomba\')" class="btn btn-sm btn-info me-1" title="Detail"><i class="fas fa-eye"></i></button>';
+                    if ($row->status_verifikasi == 'ditolak' || $row->status_verifikasi == 'pending') {
+                        $btnEdit = '<button onclick="modalActionLomba(\'' . route('lomba.edit', $row->lomba_id) . '\', \'Edit Pengajuan\', \'modalFormLombaUser\')" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></button>';
                     }
-                    // Tambahkan tombol edit jika user boleh mengedit pengajuan yang 'pending' atau 'ditolak'
-                    // if (in_array($row->status_verifikasi, ['pending', 'ditolak'])) {
-                    //    return '<button onclick="modalActionLomba(\''.route('lomba.user.edit_form', $row->lomba_id).'\', \'Edit Pengajuan\', \'modalFormLombaUser\')" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i> Edit</button>';
-                    // }
+                    return '<div class="btn-group">' . $btnDetail . $btnEdit . '</div>';
                     return '-';
                 })
                 ->rawColumns(['status_verifikasi', 'aksi'])
