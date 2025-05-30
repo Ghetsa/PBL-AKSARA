@@ -75,78 +75,82 @@ class LombaController extends Controller
     // }
 
     private function calculateMooraScores($userId)
-    {
-        $user = UserModel::with(['minat', 'keahlian'])->find($userId);
-        if (!$user) {
-            return [];
-        }
-
-        $userMinatIds = $user->minat->pluck('minat_id')->toArray();
-        $userKeahlianIds = $user->keahlian->pluck('keahlian_id')->toArray();
-
-        $lombas = LombaModel::with(['detailBidang', 'daftarHadiah'])
-            ->where(function ($query) {
-                $query->where('batas_pendaftaran', '>=', Carbon::now()->toDateString())
-                    ->orWhereNull('batas_pendaftaran');
-            })->get();
-
-        if ($lombas->isEmpty()) {
-            return [];
-        }
-
-        $dataMatrix = [];
-
-        foreach ($lombas as $lomba) {
-            $row = [];
-
-            $lombaMinatBidangIds = $lomba->detailBidang
-                ->where('kategori', 'minat')
-                ->pluck('bidang_id')
-                ->toArray();
-            $row['minat'] = !empty(array_intersect($lombaMinatBidangIds, $userMinatIds)) ? 1 : 0;
-
-            $lombaKeahlianBidangIds = $lomba->detailBidang
-                ->where('kategori', 'keahlian')
-                ->pluck('bidang_id')
-                ->toArray();
-            $row['keahlian'] = !empty(array_intersect($lombaKeahlianBidangIds, $userKeahlianIds)) ? 1 : 0;
-
-            $row['tingkat'] = match (strtolower($lomba->tingkat ?? '')) {
-                'lokal' => 1,
-                'kota' => 2,
-                'kabupaten' => 2,
-                'provinsi' => 3,
-                'nasional' => 4,
-                'internasional' => 5,
-                default => 0,
-            };
-
-            $row['hadiah'] = $lomba->daftarHadiah->count();
-
-            if ($lomba->batas_pendaftaran) {
-                $selisihHari = Carbon::now()->diffInDays(Carbon::parse($lomba->batas_pendaftaran), false);
-                $skorHari = match (true) {
-                    $selisihHari < 0 => 0,
-                    $selisihHari == 0 => 1,
-                    $selisihHari <= 7 => 2,
-                    $selisihHari <= 14 => 3,
-                    $selisihHari <= 30 => 4,
-                    default => 5,
-                };
-            } else {
-                $skorHari = 5;
-            }
-            $row['penutupan'] = $skorHari;
-
-            $row['biaya'] = (float) ($lomba->biaya ?? 0);
-
-            $dataMatrix[] = [
-                'lomba' => $lomba,
-                'values' => $row,
-            ];
-        }
-        return $this->processMooraNormalization($dataMatrix);
+{
+    $user = UserModel::with(['minat', 'keahlian'])->find($userId);
+    if (!$user) {
+        return [];
     }
+
+    $userMinatIds = $user->minat->pluck('bidang_id')->toArray();
+    $userKeahlianIds = $user->keahlian->pluck('bidang_id')->toArray();
+
+    $lombas = LombaModel::with(['detailBidang'])->where(function ($query) {
+        $query->where('batas_pendaftaran', '>=', Carbon::now()->toDateString())
+              ->orWhereNull('batas_pendaftaran');
+    })->get();
+
+    if ($lombas->isEmpty()) {
+        return [];
+    }
+
+    $dataMatrix = [];
+
+    foreach ($lombas as $lomba) {
+        $row = [];
+
+        $lombaMinatBidangIds = $lomba->detailBidang
+            ->where('kategori', 'minat')
+            ->pluck('bidang_id')
+            ->toArray();
+
+        $lombaKeahlianBidangIds = $lomba->detailBidang
+            ->where('kategori', 'keahlian')
+            ->pluck('bidang_id')
+            ->toArray();
+
+        // Skor 1 jika ada minimal 1 bidang minat sama antara lomba dan user
+        $row['minat'] = count(array_intersect($lombaMinatBidangIds, $userMinatIds)) > 0 ? 1 : 0;
+
+        // Skor 1 jika ada minimal 1 bidang keahlian sama antara lomba dan user
+        $row['keahlian'] = count(array_intersect($lombaKeahlianBidangIds, $userKeahlianIds)) > 0 ? 1 : 0;
+
+        $row['tingkat'] = match (strtolower($lomba->tingkat ?? '')) {
+            'lokal' => 1,
+            'kota' => 2,
+            'kabupaten' => 2,
+            'provinsi' => 3,
+            'nasional' => 4,
+            'internasional' => 5,
+            default => 0,
+        };
+
+        $row['hadiah'] = $lomba->daftarHadiah->count();
+
+        if ($lomba->batas_pendaftaran) {
+            $selisihHari = Carbon::now()->diffInDays(Carbon::parse($lomba->batas_pendaftaran), false);
+            $row['penutupan'] = match (true) {
+                $selisihHari < 0 => 0,
+                $selisihHari == 0 => 1,
+                $selisihHari <= 7 => 2,
+                $selisihHari <= 14 => 3,
+                $selisihHari <= 30 => 4,
+                default => 5,
+            };
+        } else {
+            $row['penutupan'] = 5;
+        }
+
+        $row['biaya'] = (float) ($lomba->biaya ?? 0);
+
+        $dataMatrix[] = [
+            'lomba' => $lomba,
+            'values' => $row,
+        ];
+    }
+
+    return $this->processMooraNormalization($dataMatrix);
+}
+
 
     private function processMooraNormalization($dataMatrix)
     {
