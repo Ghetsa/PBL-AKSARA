@@ -758,9 +758,8 @@ class LombaController extends Controller
     // Menampilkan form TAMBAH lomba (AJAX) untuk admin
     public function adminCreateLombaFormAjax()
     {
-        // $bidangList = BidangModel::orderBy('bidang_nama')->get(); // Jika bidang_keahlian adalah multi-select
-        // return view('lomba.admin.crud.create_form_ajax', compact('bidangList'));
-        return view('lomba.admin.crud.create_lomba');
+        $bidangList = BidangModel::orderBy('bidang_nama')->get(); // Jika bidang_keahlian adalah multi-select
+        return view('lomba.admin.crud.create_lomba', compact('bidangList'));
     }
 
     // Menyimpan lomba BARU yang diinput admin (AJAX)
