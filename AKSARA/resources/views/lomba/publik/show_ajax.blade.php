@@ -26,7 +26,7 @@
                 <dt class="col-sm-5 col-lg-4">Kategori Peserta:</dt>
                 <dd class="col-sm-7 col-lg-8">{{ ucfirst($lomba->kategori) }}</dd>
 
-                <dt class="col-sm-5 col-lg-4">Bidang Keahlian Relevan:</dt>
+                <dt class="col-sm-5 col-lg-4">Bidang Lomba:</dt>
                 <dd class="col-sm-7 col-lg-8">{{ $lomba->bidang_keahlian ?: '-' }}</dd>
                 
                 <dt class="col-sm-5 col-lg-4">Biaya Pendaftaran:</dt>

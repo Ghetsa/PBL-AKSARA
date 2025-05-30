@@ -1,50 +1,52 @@
 <form id="formVerifikasiLombaAdmin" method="POST" action="{{ route('admin.lomba.verifikasi.proses', $lomba->lomba_id) }}">
     @csrf
-    @method('PUT')
+    @method('PUT') 
     <input type="hidden" name="status_verifikasi" id="hidden_status_verifikasi_lomba" value="{{ $lomba->status_verifikasi }}">
 
     <div class="modal-header">
-        <h5 class="modal-title">Verifikasi Info Lomba: {{ Str::limit($lomba->nama_lomba, 40) }}</h5>
+        <h5 class="modal-title" id="modalVerifikasiLombaLabel">Verifikasi Info Lomba: {{ Str::limit($lomba->nama_lomba, 40) }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
     <div class="modal-body" style="max-height: 65vh; overflow-y: auto;">
         <h6>Detail Pengajuan Lomba:</h6>
         <div class="table-responsive">
             <table class="table table-sm table-bordered table-striped mb-3">
-                <tr><th style="width:35%;">Nama Lomba</th><td>{{ $lomba->nama_lomba }}</td></tr>
-                <tr><th>Diajukan Oleh</th><td>{{ $lomba->penginput->nama ?? 'N/A' }} ({{ ucfirst($lomba->penginput->role ?? 'N/A') }})</td></tr>
-                <tr><th>Penyelenggara</th><td>{{ $lomba->penyelenggara }}</td></tr>
-                <tr><th>Tingkat</th><td>{{ ucfirst($lomba->tingkat) }}</td></tr>
-                <tr><th>Kategori</th><td>{{ ucfirst($lomba->kategori) }}</td></tr>
-                <tr><th>Bidang Keahlian</th><td>{{ $lomba->bidang_keahlian }}</td></tr>
-                <tr><th>Biaya</th><td>{{ $lomba->biaya > 0 ? 'Rp ' . number_format($lomba->biaya, 0, ',', '.') : 'Gratis' }}</td></tr>
-                <tr><th>Pendaftaran Dibuka</th><td>{{ $lomba->pembukaan_pendaftaran ? $lomba->pembukaan_pendaftaran->format('d M Y') : '-' }}</td></tr>
-                <tr><th>Batas Pendaftaran</th><td>{{ $lomba->batas_pendaftaran ? $lomba->batas_pendaftaran->format('d M Y') : '-' }}</td></tr>
-                <tr><th>Link Pendaftaran</th><td>{!! $lomba->link_pendaftaran ? '<a href="'.$lomba->link_pendaftaran.'" target="_blank" rel="noopener noreferrer">Kunjungi</a>' : '-' !!}</td></tr>
-                <tr><th>Link Penyelenggara</th><td>{!! $lomba->link_penyelenggara ? '<a href="'.$lomba->link_penyelenggara.'" target="_blank" rel="noopener noreferrer">Kunjungi</a>' : '-' !!}</td></tr>
-                <tr>
-                    <th>Poster</th>
-                    <td>
-                        @if($lomba->poster && Storage::disk('public')->exists($lomba->poster))
-                            <a href="{{ asset('storage/' . $lomba->poster) }}" target="_blank" class="btn btn-outline-info btn-sm">
-                                <i class="fas fa-image me-1"></i> Lihat Poster
-                            </a>
-                        @else
-                            <span class="text-muted">Tidak ada poster.</span>
-                        @endif
-                    </td>
-                </tr>
-                <tr><th>Tanggal Diajukan</th><td>{{ $lomba->created_at ? $lomba->created_at->format('d M Y H:i') : '-' }}</td></tr>
+                <tbody> {{-- Added tbody for better table structure --}}
+                    <tr><th style="width:35%;">Nama Lomba</th><td>{{ $lomba->nama_lomba }}</td></tr>
+                    <tr><th>Diajukan Oleh</th><td>{{ $lomba->penginput->nama ?? 'N/A' }} ({{ ucfirst($lomba->penginput->role ?? 'N/A') }})</td></tr>
+                    <tr><th>Penyelenggara</th><td>{{ $lomba->penyelenggara }}</td></tr>
+                    <tr><th>Tingkat</th><td>{{ ucfirst($lomba->tingkat) }}</td></tr>
+                    <tr><th>Kategori</th><td>{{ ucfirst($lomba->kategori) }}</td></tr>
+                    <tr><th>Bidang Keahlian</th><td>{{ $lomba->bidang_keahlian }}</td></tr>
+                    <tr><th>Biaya</th><td>{{ $lomba->biaya > 0 ? 'Rp ' . number_format($lomba->biaya, 0, ',', '.') : 'Gratis' }}</td></tr>
+                    <tr><th>Pendaftaran Dibuka</th><td>{{ $lomba->pembukaan_pendaftaran ? \Carbon\Carbon::parse($lomba->pembukaan_pendaftaran)->format('d M Y') : '-' }}</td></tr>
+                    <tr><th>Batas Pendaftaran</th><td>{{ $lomba->batas_pendaftaran ? \Carbon\Carbon::parse($lomba->batas_pendaftaran)->format('d M Y') : '-' }}</td></tr>
+                    <tr><th>Link Pendaftaran</th><td>{!! $lomba->link_pendaftaran ? '<a href="'.htmlspecialchars($lomba->link_pendaftaran).'" target="_blank" rel="noopener noreferrer">Kunjungi</a>' : '-' !!}</td></tr>
+                    <tr><th>Link Penyelenggara</th><td>{!! $lomba->link_penyelenggara ? '<a href="'.htmlspecialchars($lomba->link_penyelenggara).'" target="_blank" rel="noopener noreferrer">Kunjungi</a>' : '-' !!}</td></tr>
+                    <tr>
+                        <th>Poster</th>
+                        <td>
+                            @if($lomba->poster && Storage::disk('public')->exists($lomba->poster))
+                                <a href="{{ asset('storage/' . $lomba->poster) }}" target="_blank" class="btn btn-outline-info btn-sm">
+                                    <i class="fas fa-image me-1"></i> Lihat Poster
+                                </a>
+                            @else
+                                <span class="text-muted">Tidak ada poster.</span>
+                            @endif
+                        </td>
+                    </tr>
+                    <tr><th>Tanggal Diajukan</th><td>{{ $lomba->created_at ? \Carbon\Carbon::parse($lomba->created_at)->format('d M Y H:i') : '-' }}</td></tr>
+                </tbody>
             </table>
         </div>
         <hr>
         <h6>Form Verifikasi:</h6>
-        <div class="form-group row mb-3">
+        <div class="form-group row mb-3"> {{-- Consider using Bootstrap's mb-3 for spacing --}}
             <label for="admin_catatan_verifikasi_lomba" class="col-sm-3 col-form-label text-sm-end">Catatan Verifikasi</label>
             <div class="col-sm-9">
                 <textarea class="form-control" id="admin_catatan_verifikasi_lomba" name="catatan_verifikasi" rows="3" placeholder="Berikan catatan jika pengajuan ditolak atau ada hal yang perlu diperbaiki...">{{ old('catatan_verifikasi', $lomba->catatan_verifikasi ?? '') }}</textarea>
                 <small class="form-text text-muted">Catatan ini akan tampil kepada pengguna jika pengajuan ditolak.</small>
-                <span class="invalid-feedback error-catatan_verifikasi"></span>
+                {{-- Error message will be placed by jQuery Validate --}}
             </div>
         </div>
 
@@ -67,80 +69,140 @@
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+        {{-- Tombol submit utama tidak diperlukan jika aksi dikontrol oleh tombol Setujui/Tolak --}}
     </div>
 </form>
 
 <script>
+// Pastikan skrip ini dieksekusi setelah jQuery dan jQuery Validate dimuat
+// Jika file ini dimuat via AJAX ke dalam modal, pastikan skrip dieksekusi setelah konten dimuat
+// atau gunakan event delegation jika tombol/form belum ada saat document ready awal.
+// Namun, jika ini adalah bagian dari modal yang selalu ada, $(document).ready() cukup.
+
 $(document).ready(function() {
     const formVerifikasiAdminLomba = $('#formVerifikasiLombaAdmin');
     const hiddenStatusInputAdminLomba = $('#hidden_status_verifikasi_lomba');
     const catatanTextareaAdminLomba = $('#admin_catatan_verifikasi_lomba');
 
-    formVerifikasiAdminLomba.validate({
-        rules: {
-            catatan_verifikasi: {
-                maxlength: 500,
-                required: function() {
-                    return hiddenStatusInputAdminLomba.val() === 'ditolak' && catatanTextareaAdminLomba.val().trim() === '';
+    // Inisialisasi jQuery Validate
+    if ($.fn.validate) { // Check if validate plugin is loaded
+        formVerifikasiAdminLomba.validate({
+            rules: {
+                catatan_verifikasi: {
+                    maxlength: 500,
+                    required: function() {
+                        // Hanya wajib jika status yang dipilih adalah 'ditolak'
+                        return hiddenStatusInputAdminLomba.val() === 'ditolak';
+                    }
                 }
+            },
+            messages: {
+                catatan_verifikasi: {
+                    maxlength: "Catatan tidak boleh lebih dari 500 karakter.",
+                    required: "Catatan verifikasi wajib diisi jika status ditolak."
+                }
+            },
+            errorElement: 'span',
+            errorPlacement: function (error, element) {
+                error.addClass('invalid-feedback');
+                element.closest('.col-sm-9').append(error);
+            },
+            highlight: function (element, errorClass, validClass) {
+                $(element).addClass('is-invalid').removeClass('is-valid');
+            },
+            unhighlight: function (element, errorClass, validClass) {
+                $(element).removeClass('is-invalid').addClass('is-valid');
             }
-        },
-        messages: {
-            catatan_verifikasi: {
-                maxlength: "Catatan tidak boleh lebih dari 500 karakter.",
-                required: "Catatan verifikasi wajib diisi jika status ditolak."
-            }
-        },
-        // ... (errorPlacement, highlight, unhighlight sama seperti form lainnya) ...
-        errorElement: 'span',
-        errorPlacement: function (error, element) { error.addClass('invalid-feedback'); element.closest('.col-sm-9').append(error); },
-        highlight: function (element) { $(element).addClass('is-invalid'); },
-        unhighlight: function (element) { $(element).removeClass('is-invalid').addClass('is-valid'); }
-    });
+        });
+    } else {
+        console.warn('jQuery Validate plugin is not loaded.');
+    }
 
+    // Event listener untuk tombol aksi verifikasi
     $('.btn-verify-action-lomba').on('click', function() {
         const status = $(this).data('status');
-        hiddenStatusInputAdminLomba.val(status);
+        hiddenStatusInputAdminLomba.val(status); // Set status tersembunyi
 
+        // Hapus status validasi sebelumnya pada catatan
+        catatanTextareaAdminLomba.removeClass('is-invalid is-valid');
+        catatanTextareaAdminLomba.closest('.col-sm-9').find('.invalid-feedback').remove();
+
+        // Validasi form sebelum submit
         if (formVerifikasiAdminLomba.valid()) {
             submitVerificationFormAdminLomba();
-        } else if (status === 'ditolak' && catatanTextareaAdminLomba.val().trim() === '') {
-            catatanTextareaAdminLomba.focus();
-            Swal.fire('Peringatan', 'Catatan verifikasi wajib diisi jika status ditolak.', 'warning');
+        } else {
+            // Jika validasi gagal, jQuery Validate akan menampilkan pesan error.
+            // Tambahan Swal bisa jika diperlukan untuk UX, tapi biasanya pesan inline cukup.
+            if (status === 'ditolak' && catatanTextareaAdminLomba.val().trim() === '') {
+                 // Fokuskan jika field catatan kosong saat menolak,
+                 // jQuery validate seharusnya sudah menghighlight errornya
+                catatanTextareaAdminLomba.focus();
+            }
         }
     });
 
     function submitVerificationFormAdminLomba() {
-        var formData = formVerifikasiAdminLomba.serialize();
+        const formData = formVerifikasiAdminLomba.serialize(); // Mengambil semua data form termasuk _method dan _token
         const actionButtonsAdminLomba = $('.btn-verify-action-lomba');
         const clickedButton = $('.btn-verify-action-lomba[data-status="'+hiddenStatusInputAdminLomba.val()+'"]');
         const originalButtonHTML = clickedButton.html();
 
         $.ajax({
             url: formVerifikasiAdminLomba.attr('action'),
-            method: 'POST', data: formData, dataType: 'json',
+            method: 'POST', // Laravel akan menghandle @method('PUT')
+            data: formData,
+            dataType: 'json',
             beforeSend: function() {
                 actionButtonsAdminLomba.prop('disabled', true);
                 clickedButton.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Memproses...');
             },
             success: function(response) {
-                if (response.status) {
-                    $('#modalVerifikasiLomba').modal('hide');
-                    Swal.fire({ icon: 'success', title: 'Berhasil!', text: response.message });
-                    if (typeof dataTableLombaAdmin !== 'undefined') { dataTableLombaAdmin.ajax.reload(null, false); }
+                // PENTING: Pastikan server mengirim response JSON dengan "status: true" saat BERHASIL.
+                if (response && response.status === true) {
+                    // PENTING: Pastikan ID Modal ('#modalVerifikasiLomba') sesuai dengan ID elemen modal di HTML utama Anda.
+                    $('#modalVerifikasiLomba').modal('hide'); // Menutup modal
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: response.message,
+                        timer: 1500, // Menutup otomatis setelah 1.5 detik
+                        showConfirmButton: false
+                    });
+
+                    // PENTING: Pastikan variabel 'dataTableVerifikasiLomba' adalah instance DataTable yang valid.
+                    if (typeof dataTableVerifikasiLomba !== 'undefined' && dataTableVerifikasiLomba !== null) {
+                        dataTableVerifikasiLomba.ajax.reload(null, false); // Reload DataTable tanpa reset paging
+                    } else {
+                        console.warn('Variabel dataTableVerifikasiLomba tidak terdefinisi atau null. DataTable tidak akan di-reload.');
+                        // Opsi fallback jika DataTable tidak ada: reload halaman
+                        // window.location.reload();
+                    }
                 } else {
-                    Swal.fire({ icon: 'error', title: 'Gagal!', text: response.message || 'Terjadi kesalahan.' });
+                    // Jika response.status bukan true atau response tidak ada.
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal!',
+                        text: (response && response.message) ? response.message : 'Terjadi kesalahan saat memproses permintaan.'
+                    });
                 }
             },
             error: function(xhr) {
-                // ... (error handling Anda) ...
                 let errorMessage = 'Terjadi kesalahan server.';
-                if (xhr.responseJSON && xhr.responseJSON.message) errorMessage = xhr.responseJSON.message;
-                Swal.fire({ icon: 'error', title: 'Oops...', html: errorMessage });
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMessage = xhr.responseJSON.message;
+                } else if (xhr.statusText && xhr.status) {
+                    errorMessage = `Error ${xhr.status}: ${xhr.statusText}`;
+                }
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    html: errorMessage
+                });
             },
             complete: function() {
                 actionButtonsAdminLomba.prop('disabled', false);
-                clickedButton.html(originalButtonHTML); // Kembalikan ke teks tombol awal
+                clickedButton.html(originalButtonHTML); // Kembalikan teks tombol asli
             }
         });
     }
