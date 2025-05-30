@@ -10,7 +10,7 @@
         <h5 class="modal-title">{{ isset($lomba) ? 'Edit Info Lomba' : 'Ajukan Info Lomba Baru' }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
-    <div class="modal-body" style="max-height: 75vh; overflow-y: auto;">
+    <div class="modal-body" style="max-height: 65vh; overflow-y: auto;">
         {{-- Field-field sama seperti di lomba.mahasiswa.create.blade.php --}}
         {{-- Pastikan value diisi jika $lomba ada (untuk mode edit) --}}
         <div class="row">

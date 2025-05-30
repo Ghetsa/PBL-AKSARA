@@ -154,18 +154,18 @@ Route::middleware(['auth'])->group(function () {
         });
 
         // ---------- LOMBA ----------
-        Route::prefix('mahasiswa/lomba')->name('lomba.')->group(function () {
-            Route::get('/', [LombaController::class, 'index'])->name('index');
-            Route::get('/list', [LombaController::class, 'getList'])->name('list');
-            Route::get('/create', [LombaController::class, 'create'])->name('create');
-            Route::post('/', [LombaController::class, 'store'])->name('store');
-            Route::get('/{id}/lomba', [LombaController::class, 'show'])->name('show');
-            Route::get('/{id}/edit', [LombaController::class, 'edit'])->name('edit');
-            Route::put('/{id}', [LombaController::class, 'update'])->name('update');
-            Route::delete('/{id}', [LombaController::class, 'destroy'])->name('destroy');
-            Route::get('/verifikasi/{id}', [LombaController::class, 'verifikasi'])->name('verifikasi');
-            Route::post('/verifikasi/{id}', [LombaController::class, 'prosesVerifikasi'])->name('proses_verifikasi');
-        });
+        // Route::prefix('mahasiswa/lomba')->name('lomba.')->group(function () {
+        //     Route::get('/', [LombaController::class, 'index'])->name('index');
+        //     Route::get('/list', [LombaController::class, 'getList'])->name('list');
+        //     Route::get('/create', [LombaController::class, 'create'])->name('create');
+        //     Route::post('/', [LombaController::class, 'store'])->name('store');
+        //     Route::get('/{id}/lomba', [LombaController::class, 'show'])->name('show');
+        //     Route::get('/{id}/edit', [LombaController::class, 'edit'])->name('edit');
+        //     Route::put('/{id}', [LombaController::class, 'update'])->name('update');
+        //     Route::delete('/{id}', [LombaController::class, 'destroy'])->name('destroy');
+        //     Route::get('/verifikasi/{id}', [LombaController::class, 'verifikasi'])->name('verifikasi');
+        //     Route::post('/verifikasi/{id}', [LombaController::class, 'prosesVerifikasi'])->name('proses_verifikasi');
+        // });
 
         Route::prefix('lomba-saya')->name('lomba.user.')->group(function () {
             Route::get('/histori-pengajuan', [LombaController::class, 'historiPengajuanLomba'])->name('histori.index');
