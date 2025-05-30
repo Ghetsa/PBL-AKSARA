@@ -226,7 +226,7 @@ class LombaController extends Controller
 
             if ($request->filled('filter_status')) {
                 $status = strtolower($request->filter_status);
-                $today = Carbon::now()->toDateString();
+                $today = Carbon::now('Asia/Jakarta');
 
                 if ($status == 'buka') {
                     $query->where(function ($q) use ($today) {
@@ -255,12 +255,12 @@ class LombaController extends Controller
             })
             ->addColumn('pembukaan_pendaftaran', function ($lomba) {
                 return $lomba->pembukaan_pendaftaran
-                    ? Carbon::parse($lomba->pembukaan_pendaftaran)->isoFormat('D MMMM YYYY')
+                    ? Carbon::parse($lomba->pembukaan_pendaftaran)->setTimezone('Asia/Jakarta')->isoFormat('D MMMM YYYY')
                     : 'N/A';
             })
             ->addColumn('batas_pendaftaran', function ($lomba) {
                 return $lomba->batas_pendaftaran
-                    ? Carbon::parse($lomba->batas_pendaftaran)->isoFormat('D MMMM YYYY')
+                    ? Carbon::parse($lomba->batas_pendaftaran)->setTimezone('Asia/Jakarta')->isoFormat('D MMMM YYYY')
                     : 'N/A';
             })
             ->addColumn('moora_score', function ($lomba) use ($isRekomendasiMode, $mooraScoresMap) {
@@ -476,8 +476,8 @@ class LombaController extends Controller
                     return $html;
                 })
                 ->addColumn('periode_pendaftaran', function ($row) {
-                    $mulai = $row->pembukaan_pendaftaran ? Carbon::parse($row->pembukaan_pendaftaran)->isoFormat('D MMM YYYY') : 'N/A';
-                    $selesai = $row->batas_pendaftaran ? Carbon::parse($row->batas_pendaftaran)->isoFormat('D MMM YYYY') : 'N/A';
+                    $mulai = $row->pembukaan_pendaftaran ? Carbon::parse($row->pembukaan_pendaftaran)->setTimezone('Asia/Jakarta')->isoFormat('D MMM YYYY') : 'N/A';
+                    $selesai = $row->batas_pendaftaran ? Carbon::parse($row->batas_pendaftaran)->setTimezone('Asia/Jakarta')->isoFormat('D MMM YYYY') : 'N/A';
                     return $mulai . ' - ' . $selesai;
                 })
                 ->addColumn('biaya_formatted', fn($row) => $row->biaya > 0 ? 'Rp ' . number_format($row->biaya, 0, ',', '.') : '<span class="badge bg-light-success text-success px-2 py-1">Gratis</span>')
@@ -529,18 +529,16 @@ class LombaController extends Controller
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->editColumn('nama_lomba', fn($row) => e($row->nama_lomba))
-                ->editColumn('batas_pendaftaran', fn($row) => $row->batas_pendaftaran ? Carbon::parse($row->batas_pendaftaran)->isoFormat('D MMM YYYY') : '-')
-                ->editColumn('created_at', fn($row) => $row->created_at ? Carbon::parse($row->created_at)->isoFormat('D MMM YYYY, HH:mm') : '-')
+                ->editColumn('batas_pendaftaran', fn($row) => $row->batas_pendaftaran ? Carbon::parse($row->batas_pendaftaran)->setTimezone('Asia/Jakarta')->isoFormat('D MMM YYYY') : '-')
+                ->editColumn('created_at', fn($row) => $row->created_at ? Carbon::parse($row->created_at)->setTimezone('Asia/Jakarta')->isoFormat('D MMM YYYY, HH:mm') : '-')
                 ->editColumn('status_verifikasi', fn($row) => $row->status_verifikasi_badge)
                 ->addColumn('aksi', function ($row) {
-                    $catatan = $row->catatan_verifikasi ?? ''; // Pastikan ada kolom catatan_verifikasi di tabel lomba
                     $btnEdit = '';
-                    $btnDetail = '<button onclick="modalActionLomba(\'' . route('lomba.show', $row->lomba_id) . '\', \'Detail Lomba\', \'modalDetailLomba\')" class="btn btn-sm btn-info me-1" title="Detail"><i class="fas fa-eye"></i></button>';
+                    $btnDetail = '<button onclick="modalActionLomba(\'' . route('lomba.show', $row->lomba_id) . '\', \'Detail Lomba\', \'modalFormLombaUser\')" class="btn btn-sm btn-info me-1" title="Detail"><i class="fas fa-eye"></i></button>';
                     if ($row->status_verifikasi == 'ditolak' || $row->status_verifikasi == 'pending') {
-                        $btnEdit = '<button onclick="modalActionLomba(\'' . route('lomba.edit', $row->lomba_id) . '\', \'Edit Pengajuan\', \'modalFormLombaUser\')" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></button>';
+                        $btnEdit = '<button onclick="modalActionLomba(\'' . route('lomba.user.edit_form', $row->lomba_id) . '\', \'Edit Pengajuan\', \'modalFormLombaUser\')" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></button>';
                     }
                     return '<div class="btn-group">' . $btnDetail . $btnEdit . '</div>';
-                    return '-';
                 })
                 ->rawColumns(['status_verifikasi', 'aksi'])
                 ->make(true);
@@ -672,7 +670,7 @@ class LombaController extends Controller
                     return '<span class="text-muted fst-italic">N/A</span>';
                 })
                 ->editColumn('created_at', function ($row) {
-                    return $row->created_at ? Carbon::parse($row->created_at)->isoFormat('D MMM YYYY, HH:mm') : '-';
+                    return $row->created_at ? Carbon::parse($row->created_at)->setTimezone('Asia/Jakarta')->isoFormat('D MMM YYYY, HH:mm') : '-';
                 })
                 ->editColumn('status_verifikasi', fn($row) => $row->status_verifikasi_badge)
                 ->addColumn('aksi', function ($row) {
@@ -759,7 +757,7 @@ class LombaController extends Controller
                 })
                 ->addColumn('inputBy_nama', fn($row) => $row->inputBy->nama ?? '<span class="text-muted fst-italic">N/A</span>')
                 ->editColumn('status_verifikasi', fn($row) => $row->status_verifikasi_badge) // Menggunakan accessor
-                ->editColumn('batas_pendaftaran', fn($row) => $row->batas_pendaftaran ? Carbon::parse($row->batas_pendaftaran)->isoFormat('D MMM YYYY') : '-')
+                ->editColumn('batas_pendaftaran', fn($row) => $row->batas_pendaftaran ? Carbon::parse($row->batas_pendaftaran)->setTimezone('Asia/Jakarta')->isoFormat('D MMM YYYY') : '-')
                 ->addColumn('aksi', function ($row) {
                     // Tombol Detail (menggunakan modal yang sama dengan publik/user)
                     $btnDetail = '<button onclick="modalActionLombaAdminCrud(\'' . route('lomba.publik.show_ajax', $row->lomba_id) . '\', \'Detail Lomba\', \'modalDetailLombaAdminCrud\')" class="btn btn-sm btn-info me-1" title="Detail"><i class="fas fa-eye"></i></button>';
