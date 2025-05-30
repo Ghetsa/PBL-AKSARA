@@ -258,6 +258,20 @@ Route::middleware(['auth'])->group(function () {
         });
     });
 
+    // Route::middleware(['role:mahasiswa, dosen'])->group(function () {
+    //     Route::prefix('lomba-saya')->name('lomba.user.')->group(function () {
+    //         Route::get('/histori-pengajuan', [LombaController::class, 'historiPengajuanLomba'])->name('histori.index');
+    //         Route::get('/histori-pengajuan/list', [LombaController::class, 'listHistoriPengajuanLomba'])->name('histori.list');
+
+    //         Route::get('/ajukan-lomba', [LombaController::class, 'createPengajuanLomba'])->name('create_form');
+    //         Route::post('/simpan-lomba', [LombaController::class, 'storeLomba'])->name('store'); // Route ini digunakan untuk store dari semua role
+
+    //         // Jika Anda ingin user bisa mengedit pengajuan mereka yang belum disetujui:
+    //         // Route::get('/edit-pengajuan/{id}', [LombaController::class, 'editPengajuanLombaForm'])->name('edit_form');
+    //         // Route::put('/update-pengajuan/{id}', [LombaController::class, 'updatePengajuanLomba'])->name('update');
+    //     });
+    // });
+
     // --- LOMBA UNTUK SEMUA USER LOGIN (Mahasiswa, Dosen, Admin bisa lihat yang disetujui) ---
     Route::prefix('informasi-lomba')->name('lomba.publik.')->group(function () {
         Route::get('/', [LombaController::class, 'indexLombaPublik'])->name('index'); // Halaman daftar lomba publik

@@ -23,7 +23,7 @@
                             <thead>
                                 <tr>
                                     <th class="text-center" style="width: 5%;">No.</th>
-                                    <th>Nama Lomba & Poster</th>
+                                    <th>Nama Lomba</th>
                                     <th>Penyelenggara</th>
                                     <th>Tingkat</th>
                                     <th>Periode Pendaftaran</th>

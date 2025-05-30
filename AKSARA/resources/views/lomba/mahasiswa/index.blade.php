@@ -43,12 +43,6 @@
                 <div class="card-body">
                     {{-- Form Filter --}}
                     <form id="filterFormLomba" class="row g-3 mb-4 align-items-start">
-                        <div class="col-md-4">
-                            <label for="search_nama" class="form-label">Cari Nama Lomba</label>
-                            <input type="text" class="form-control form-control-sm" id="search_nama" name="search_nama"
-                                   placeholder="Masukkan nama lomba..." value="{{ request('search_nama') }}">
-                        </div>
-
                         <div class="col-md-3">
                             <label for="filter_status" class="form-label">Status Lomba</label>
                             <select class="form-select form-select-sm" id="filter_status" name="filter_status">
