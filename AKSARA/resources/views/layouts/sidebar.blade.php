@@ -23,7 +23,7 @@
                         <a href="{{ route('lomba.index') }}" class="pc-link">Lihat Semua Lomba</a>
                     </li>
                     <li class="pc-item {{ $activeMenu == 'histori_lomba_user' ? 'active' : '' }}">
-                        <a href="{{ route('lomba.user.histori.index') }}" class="pc-link">Histori Pengajuan Saya</a>
+                        <a href="{{ route('lomba.histori.index') }}" class="pc-link">Histori Pengajuan Saya</a>
                     </li>
                 </ul>
             </li>
@@ -176,7 +176,7 @@
                         <i class="ti ti-brand-chrome"></i>
                     </li>
                     <li class="pc-item">
-                        <a href="{{ route('lomba.user.histori.index') }}"
+                        <a href="{{ route('lomba.histori.index') }}"
                             class="pc-link {{ $activeMenu == 'verifikasi' ? 'active' : '' }}">
                             <span class="pc-micon"><i class="ti ti-file-check"></i></span>
                             <span class="pc-mtext">Upload Info Lomba</span>
@@ -258,7 +258,7 @@
                         </a>
                     </li>
                     <li class="pc-item">
-                        <a href="{{ route('lomba.user.histori.index') }}"
+                        <a href="{{ route('lomba.histori.index') }}"
                             class="pc-link {{ $activeMenu == 'verifikasi' ? 'active' : '' }}">
                             <span class="pc-micon"><i class="ti ti-file-check"></i></span>
                             <span class="pc-mtext">Upload Info Lomba</span>

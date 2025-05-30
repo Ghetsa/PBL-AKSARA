@@ -9,7 +9,7 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h3 class="card-title mb-0">{{ $breadcrumb->title ?? 'Histori Pengajuan Lomba Saya' }}</h3>
                     {{-- Tombol "Ajukan Info Lomba" bisa juga diletakkan di halaman utama lomba.index --}}
-                    <button class="btn btn-sm btn-success" onclick="modalActionLomba('{{ route('lomba.user.create_form') }}', 'Ajukan Info Lomba Baru', 'modalFormLombaUser')">
+                    <button class="btn btn-sm btn-success" onclick="modalActionLomba('{{ route('lomba.create_form') }}', 'Ajukan Info Lomba Baru', 'modalFormLombaUser')">
                         <i class="fas fa-plus-circle me-1"></i> Ajukan Info Lomba Baru
                     </button>
                 </div>
@@ -83,7 +83,7 @@
     $(document).ready(function () {
         var historiTable = $('#dataHistoriLombaUser').DataTable({
             processing: true, serverSide: true, responsive: true,
-            ajax: "{{ route('lomba.user.histori.list') }}", // Route baru untuk data histori
+            ajax: "{{ route('lomba.histori.list') }}", // Route baru untuk data histori
             columns: [
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', className: 'text-center', orderable: false, searchable: false },
                 { data: 'nama_lomba', name: 'nama_lomba' },

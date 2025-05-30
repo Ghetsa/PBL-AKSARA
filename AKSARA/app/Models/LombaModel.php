@@ -112,6 +112,10 @@ class LombaModel extends Model
     {
         return $this->hasMany(LombaDetailModel::class, 'lomba_id', 'lomba_id');
     }
+    public function bidangKeahlian()
+    {
+        return $this->hasMany(LombaDetailModel::class, 'lomba_id', 'lomba_id');
+    }
 
     public function bidangTerkait()
     {
@@ -123,11 +127,6 @@ class LombaModel extends Model
             'lomba_id',
             'bidang_id'
         );
-    }
-
-    public function bidang()
-    {
-        return $this->belongsTo(BidangModel::class, 'bidang_id', 'id_bidang');
     }
 
     public function detailLomba()
