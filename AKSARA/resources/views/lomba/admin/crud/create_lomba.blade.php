@@ -148,7 +148,7 @@
         // Custom rule untuk afterDate (jika jQuery validation tidak punya default)
         $.validator.addMethod("afterDate", function(value, element, params) {
             if (!value || !$(params)
-            .val()) { // Jika salah satu kosong, anggap valid untuk tidak memblokir validasi lain
+                .val()) { // Jika salah satu kosong, anggap valid untuk tidak memblokir validasi lain
                 return true;
             }
             if (!/Invalid|NaN/.test(new Date(value))) {
@@ -187,11 +187,9 @@
                 tingkat: {
                     required: true
                 },
-                bidang_keahlian: {
-                    required: true,
-                    maxlength: 255
-                }, // Jika teks biasa
-                // 'bidang_keahlian[]': { required: true }, // Jika checkbox/multi-select
+                'bidang_keahlian[]': {
+                    required: true
+                },
                 biaya: {
                     number: true,
                     min: 0
@@ -235,9 +233,8 @@
                 tingkat: {
                     required: "Tingkat lomba wajib dipilih."
                 },
-                bidang_keahlian: {
-                    required: "Bidang keahlian wajib diisi.",
-                    maxlength: "Bidang keahlian maksimal 255 karakter."
+                'bidang_keahlian[]': {
+                    required: "Minimal pilih satu bidang keahlian",
                 },
                 // 'bidang_keahlian[]': { required: "Pilih minimal satu bidang keahlian." },
                 biaya: {
@@ -290,7 +287,7 @@
 
                 submitButton.prop('disabled', true).html(
                     '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Menambah...'
-                    );
+                );
                 $(form).find('.invalid-feedback').text('');
                 $(form).find('.form-control, .form-select').removeClass('is-invalid is-valid');
 
@@ -304,11 +301,11 @@
                     success: function(response) {
                         if (response.status) {
                             $('#modalFormLombaAdminCrud').modal(
-                            'hide'); // ID modal untuk CRUD Admin
+                                'hide'); // ID modal untuk CRUD Admin
                             Swal.fire('Berhasil!', response.message, 'success');
                             if (typeof dtLombaCrudAdmin !== 'undefined' &&
                                 dtLombaCrudAdmin.ajax
-                                ) { // Cek apakah DataTable terdefinisi
+                            ) { // Cek apakah DataTable terdefinisi
                                 dtLombaCrudAdmin.ajax.reload(null, false);
                             }
                         } else {
@@ -340,7 +337,7 @@
                             if (xhr.responseJSON.errors) {
                                 let errorMessagesList = '<ul>';
                                 $.each(xhr.responseJSON.errors, function(key,
-                                messages) {
+                                    messages) {
                                     errorMessagesList +=
                                         `<li>${messages[0]}</li>`;
                                     let inputElement = $(form).find(
