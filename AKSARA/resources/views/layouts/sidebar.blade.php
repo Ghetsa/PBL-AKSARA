@@ -81,14 +81,14 @@
                     </li>
                     <li class="pc-item">
                         <a href="{{ route('admin.lomba.crud.index') }}" class="pc-link {{ $activeMenu == 'lomba' ? 'active' : '' }}">
-                            <span class="pc-micon"><i class="ti ti-file-check"></i></span>
+                            <span class="pc-micon"><i class="ti ti-award"></i></span>
                             <span class="pc-mtext">Data Lomba</span>
                         </a>
                     </li>
                     <li class="pc-item">
                         <a href="{{ route('admin.lomba.verifikasi.index') }}"
                             class="pc-link {{ $activeMenu == 'rekomendasi' ? 'active' : '' }}">
-                            <span class="pc-micon"><i class="ti ti-award"></i></span>
+                            <span class="pc-micon"><i class="ti ti-file-check"></i></span>
                             <span class="pc-mtext">Verifikasi Lomba</span>
                         </a>
                     </li>

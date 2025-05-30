@@ -36,13 +36,13 @@ $(document).ready(function() {
 
         $.ajax({
             url: $(form).attr('action'),
-            method: 'POST', // Method tetap POST, Laravel handle @method('DELETE')
+            method: 'DELETE', // Method tetap POST, Laravel handle @method('DELETE')
             data: $(form).serialize(),
             dataType: 'json',
             success: function(response) {
                 if (response.status) {
                     $('#modalConfirmDeleteLombaAdminCrud').modal('hide'); // Tutup modal konfirmasi
-                    Swal.fire('Dihapus!', response.message, 'success');
+                    Swal.fire('Berhasil!', response.message, 'success');
                     if (typeof dtLombaCrudAdmin !== 'undefined') { dtLombaCrudAdmin.ajax.reload(null, false); }
                 } else {
                     Swal.fire('Gagal!', response.message || 'Gagal menghapus data.', 'error');

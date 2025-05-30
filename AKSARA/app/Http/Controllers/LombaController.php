@@ -773,7 +773,7 @@ class LombaController extends Controller
             'kategori' => 'required|in:individu,kelompok',
             'penyelenggara' => 'required|string|max:255',
             'tingkat' => 'required|in:lokal,nasional,internasional',
-            'bidang_keahlian' => 'required|array', 
+            'bidang_keahlian' => 'required|array',
             'biaya' => 'nullable|integer|min:0',
             'link_pendaftaran' => 'nullable|url|max:255',
             'link_penyelenggara' => 'nullable|url|max:255',
