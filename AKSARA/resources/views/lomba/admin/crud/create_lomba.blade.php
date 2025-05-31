@@ -2,13 +2,13 @@
 <form id="formAdminCreateLomba" action="{{ route('admin.lomba.crud.store_ajax') }}" method="POST" enctype="multipart/form-data">
     @csrf
     <div class="modal-header">
-        <h5 class="modal-title">Tambah Info Lomba Baru (Admin)</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        <h5 class="modal-title">Tambah Info Lomba Baru</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
     <div class="modal-body" style="max-height: 68vh; overflow-y: auto;">
         {{-- Baris Nama Lomba --}}
         <div class="form-group row mb-3">
-            <label for="crud_c_nama_lomba" class="col-sm-3 col-form-label text-md">Nama Lomba <span class="text-danger">*</span></label>
+            <label for="crud_c_nama_lomba" class="col-sm-3 col-form-label">Nama Lomba <span class="text-danger">*</span></label>
             <div class="col-sm-9">
                 <input type="text" name="nama_lomba" id="crud_c_nama_lomba" class="form-control">
                 <span class="invalid-feedback error-nama_lomba"></span>
@@ -17,14 +17,14 @@
 
         {{-- Baris Tanggal Pendaftaran --}}
         <div class="form-group row mb-3">
-            <label for="crud_c_pembukaan_pendaftaran" class="col-sm-3 col-form-label text-md">Pembukaan Pendaftaran <span class="text-danger">*</span></label>
+            <label for="crud_c_pembukaan_pendaftaran" class="col-sm-3 col-form-label">Pembukaan Pendaftaran <span class="text-danger">*</span></label>
             <div class="col-sm-9">
                 <input type="date" name="pembukaan_pendaftaran" id="crud_c_pembukaan_pendaftaran" class="form-control">
                 <span class="invalid-feedback error-pembukaan_pendaftaran"></span>
             </div>
         </div>
         <div class="form-group row mb-3">
-            <label for="crud_c_batas_pendaftaran" class="col-sm-3 col-form-label text-md">Batas Pendaftaran <span class="text-danger">*</span></label>
+            <label for="crud_c_batas_pendaftaran" class="col-sm-3 col-form-label">Batas Pendaftaran <span class="text-danger">*</span></label>
             <div class="col-sm-9">
                 <input type="date" name="batas_pendaftaran" id="crud_c_batas_pendaftaran" class="form-control">
                 <span class="invalid-feedback error-batas_pendaftaran"></span>
@@ -33,7 +33,7 @@
 
         {{-- Baris Kategori & Tingkat --}}
         <div class="form-group row mb-3">
-            <label for="crud_c_kategori" class="col-sm-3 col-form-label text-md">Kategori Lomba <span class="text-danger">*</span></label>
+            <label for="crud_c_kategori" class="col-sm-3 col-form-label">Kategori Lomba <span class="text-danger">*</span></label>
             <div class="col-sm-3">
                 <select name="kategori" id="crud_c_kategori" class="form-select">
                     <option value="">-- Pilih Kategori --</option>
@@ -42,7 +42,7 @@
                 </select>
                 <span class="invalid-feedback error-kategori"></span>
             </div>
-            <label for="crud_c_tingkat" class="col-sm-2 col-form-label text-md-end ps-0">Tingkat <span class="text-danger">*</span></label>
+            <label for="crud_c_tingkat" class="col-sm-2 col-form-label-end ps-0">Tingkat <span class="text-danger">*</span></label>
             <div class="col-sm-4">
                 <select name="tingkat" id="crud_c_tingkat" class="form-select">
                     <option value="">-- Pilih Tingkat --</option>
@@ -56,7 +56,7 @@
 
         {{-- Penyelenggara --}}
         <div class="form-group row mb-3">
-            <label for="crud_c_penyelenggara" class="col-sm-3 col-form-label text-md">Penyelenggara <span class="text-danger">*</span></label>
+            <label for="crud_c_penyelenggara" class="col-sm-3 col-form-label">Penyelenggara <span class="text-danger">*</span></label>
             <div class="col-sm-9">
                 <input type="text" name="penyelenggara" id="crud_c_penyelenggara" class="form-control">
                 <span class="invalid-feedback error-penyelenggara"></span>
@@ -88,7 +88,7 @@
 
         {{-- Biaya --}}
         <div class="form-group row mb-3">
-            <label for="crud_c_biaya" class="col-sm-3 col-form-label text-md">Biaya (Rp)</label>
+            <label for="crud_c_biaya" class="col-sm-3 col-form-label">Biaya (Rp)</label>
             <div class="col-sm-9">
                 <input type="number" name="biaya" id="crud_c_biaya" class="form-control" min="0" placeholder="Kosongkan jika gratis">
                 <span class="invalid-feedback error-biaya"></span>
@@ -97,14 +97,14 @@
 
         {{-- Links --}}
         <div class="form-group row mb-3">
-            <label for="crud_c_link_pendaftaran" class="col-sm-3 col-form-label text-md">Link Pendaftaran</label>
+            <label for="crud_c_link_pendaftaran" class="col-sm-3 col-form-label">Link Pendaftaran</label>
             <div class="col-sm-9">
                 <input type="url" name="link_pendaftaran" id="crud_c_link_pendaftaran" class="form-control" placeholder="https://contoh.com/daftar">
                 <span class="invalid-feedback error-link_pendaftaran"></span>
             </div>
         </div>
         <div class="form-group row mb-3">
-            <label for="crud_c_link_penyelenggara" class="col-sm-3 col-form-label text-md">Link Penyelenggara</label>
+            <label for="crud_c_link_penyelenggara" class="col-sm-3 col-form-label">Link Penyelenggara</label>
             <div class="col-sm-9">
                 <input type="url" name="link_penyelenggara" id="crud_c_link_penyelenggara" class="form-control" placeholder="https://contoh.com/info">
                 <span class="invalid-feedback error-link_penyelenggara"></span>
@@ -113,7 +113,7 @@
 
         {{-- Poster --}}
         <div class="form-group row mb-3">
-            <label for="crud_c_poster" class="col-sm-3 col-form-label text-md">Poster Lomba</label>
+            <label for="crud_c_poster" class="col-sm-3 col-form-label">Poster Lomba</label>
             <div class="col-sm-9">
                 <input type="file" name="poster" id="crud_c_poster" class="form-control" accept="image/jpeg,image/png,image/jpg">
                 <small class="form-text text-muted">Opsional. Max 2MB (JPG, JPEG, PNG).</small>
