@@ -179,7 +179,7 @@
             serverSide: true,
             responsive: true, // Membuat tabel responsif
             ajax: {
-                url: "{{ route('lomba.list') }}", // Pastikan route ini benar
+                url: "{{ route('lomba.getList') }}", // Pastikan route ini benar
                 data: function(d) {
                     // Kirim data filter dan flag rekomendasi ke server
                     d.search_nama = $('#search_nama').val();

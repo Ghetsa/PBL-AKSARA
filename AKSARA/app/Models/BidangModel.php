@@ -34,7 +34,7 @@ class BidangModel extends Model
   }
 
   // Relasi ke User (Many-to-Many)
-  public function user()
+  public function minatUsers()
   {
     return $this->belongsToMany(UserModel::class, 'minat_user', 'bidang_id', 'user_id')
       ->withTimestamps();
