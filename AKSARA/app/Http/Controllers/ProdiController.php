@@ -9,6 +9,10 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule; // Untuk validasi unique ignore
 use Illuminate\Support\Facades\Log; // Untuk logging
 use Exception; // Untuk menangkap exception
+use Barryvdh\DomPDF\Facade\Pdf;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class ProdiController extends Controller
 {
@@ -45,9 +49,9 @@ class ProdiController extends Controller
                 //     . csrf_field() . method_field('DELETE') .
                 //     '<button type="submit" class="btn btn-danger btn-sm" onclick="return confirm(\'Apakah Anda yakin menghapus data ini?\');">Hapus</button></form>';
                 // Tombol Hapus tetap menggunakan deleteConfirmAjax yang sudah memanggil modalAction
-                $btn = '<button onclick="modalAction(\'' . e(route('prodi.show', $prodi->prodi_id)) . '\')" class="btn btn-info btn-sm">Detail</button> ';
-                $btn .= '<button onclick="modalAction(\'' . e(route('prodi.edit', $prodi->prodi_id)) . '\')" class="btn btn-warning btn-sm">Edit</button> ';
-                $btn .= '<button onclick="deleteConfirmAjax(' . e($prodi->prodi_id) . ')" class="btn btn-danger btn-sm">Hapus</button>';
+                $btn = '<button onclick="modalAction(\'' . e(route('prodi.show', $prodi->prodi_id)) . '\')" class="btn btn-info btn-sm"><i class="fas fa-eye"></i> Detail</button> ';
+                $btn .= '<button onclick="modalAction(\'' . e(route('prodi.edit', $prodi->prodi_id)) . '\')" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> Edit</button> ';
+                $btn .= '<button onclick="deleteConfirmAjax(' . e($prodi->prodi_id) . ')" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> Hapus</button>';
                 return $btn;
             })
             ->rawColumns(['aksi']) // memberitahu bahwa kolom aksi adalah html
@@ -246,5 +250,69 @@ class ProdiController extends Controller
 
         // Jika bukan AJAX, redirect
         return redirect('/');
+    }
+
+    public function export_excel()
+    {
+        $prodi = ProdiModel::select('kode', 'nama')
+            ->orderBy('kode')
+            ->get();
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->setCellValue('A1', 'No');
+        $sheet->setCellValue('B1', 'Kode Prodi');
+        $sheet->setCellValue('C1', 'Nama Prodi');
+        // $sheet->setCellValue('D1', 'Periode Aktif'); // Example if you use periode
+
+        $sheet->getStyle('A1:C1')->getFont()->setBold(true); // Adjust range if more columns
+
+        $no = 1;
+        $baris = 2;
+        foreach ($prodi as $key => $value) {
+            $sheet->setCellValue('A' . $baris, $no);
+            $sheet->setCellValue('B' . $baris, $value->kode);
+            $sheet->setCellValue('C' . $baris, $value->nama);
+            $baris++;
+            $no++;
+        }
+
+        foreach (range('A', 'C') as $columnID) { // Adjust range if more columns
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        $sheet->setTitle('Data Program Studi');
+
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $filename = 'Data Program Studi ' . date('Y-m-d H_i_s') . '.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+        // Additional headers from your example
+        header('Cache-Control: max-age=1'); // Replaced $writer->setPreCalculateFormulas(false);
+        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+        header('Cache-Control: cache, must-revalidate');
+        header('Pragma: public');
+
+
+        $writer->save('php://output');
+        exit;
+    }
+
+    public function export_pdf()
+    {
+        $prodi = ProdiModel::select('kode', 'nama')
+            ->orderBy('kode')
+            ->get();
+
+        $pdf = Pdf::loadView('prodi.export_pdf', ['prodi' => $prodi]);
+        $pdf->setPaper('a4', 'portrait');
+        $pdf->setOption('isRemoteEnabled', true);
+        // $pdf->render(); // render() is often called by stream() or download()
+
+        return $pdf->stream('Data Program Studi ' . date('Y-m-d H_i_s') . '.pdf');
     }
 }

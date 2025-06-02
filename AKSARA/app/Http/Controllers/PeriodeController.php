@@ -47,9 +47,9 @@ class PeriodeController extends Controller
                 //     . csrf_field() . method_field('DELETE') .
                 //     '<button type="submit" class="btn btn-danger btn-sm" onclick="return confirm(\'Apakah Anda yakin menghapus data ini?\');">Hapus</button></form>';
                 // Tombol Hapus tetap menggunakan deleteConfirmAjax yang sudah memanggil modalAction
-                $btn = '<button onclick="modalAction(\'' . e(route('periode.show', $periode->periode_id)) . '\')" class="btn btn-info btn-sm">Detail</button> ';
-                $btn .= '<button onclick="modalAction(\'' . e(route('periode.edit', $periode->periode_id)) . '\')" class="btn btn-warning btn-sm">Edit</button> ';
-                $btn .= '<button onclick="deleteConfirmAjax(' . e($periode->periode_id) . ')" class="btn btn-danger btn-sm">Hapus</button>';
+                $btn = '<button onclick="modalAction(\'' . e(route('periode.show', $periode->periode_id)) . '\')" class="btn btn-info btn-sm"><i class="fas fa-eye"></i> Detail</button> ';
+                $btn .= '<button onclick="modalAction(\'' . e(route('periode.edit', $periode->periode_id)) . '\')" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> Edit</button> ';
+                $btn .= '<button onclick="deleteConfirmAjax(' . e($periode->periode_id) . ')" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> Hapus</button>';
                 return $btn;
             })
             ->rawColumns(['aksi']) // memberitahu bahwa kolom aksi adalah html

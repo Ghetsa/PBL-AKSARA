@@ -41,6 +41,29 @@ Route::middleware(['auth'])->group(function () {
     // Route untuk memproses update password via AJAX
     Route::put('/profil/update-password', [ProfilController::class, 'updatePasswordAjax'])->name('profil.update_password');
 
+    Route::get('/user/export/excel', [App\Http\Controllers\UserController::class, 'export_excel'])->name('user.export.excel');
+    Route::get('/user/export/pdf', [App\Http\Controllers\UserController::class, 'export_pdf'])->name('user.export.pdf');
+
+    // For Prodi
+    Route::get('/prodi/export/excel', [App\Http\Controllers\ProdiController::class, 'export_excel'])->name('prodi.export.excel');
+    Route::get('/prodi/export/pdf', [App\Http\Controllers\ProdiController::class, 'export_pdf'])->name('prodi.export.pdf');
+
+    // For Periode
+    Route::get('/periode/export/excel', [App\Http\Controllers\PeriodeController::class, 'export_excel'])->name('periode.export.excel');
+    Route::get('/periode/export/pdf', [App\Http\Controllers\PeriodeController::class, 'export_pdf'])->name('periode.export.pdf');
+
+    // For Lomba
+    Route::get('/lomba/export/excel', [App\Http\Controllers\LombaController::class, 'export_excel'])->name('lomba.export.excel');
+    Route::get('/lomba/export/pdf', [App\Http\Controllers\LombaController::class, 'export_pdf'])->name('lomba.export.pdf');
+
+    // For Prestasi
+    Route::get('/prestasi/export/excel', [App\Http\Controllers\PrestasiController::class, 'export_excel'])->name('prestasi.export.excel');
+    Route::get('/prestasi/export/pdf', [App\Http\Controllers\PrestasiController::class, 'export_pdf'])->name('prestasi.export.pdf');
+
+    // For Keahlian User
+    Route::get('/keahlian-user/export/excel', [App\Http\Controllers\KeahlianUserController::class, 'export_excel'])->name('keahlian_user.export.excel');
+    Route::get('/keahlian-user/export/pdf', [App\Http\Controllers\KeahlianUserController::class, 'export_pdf'])->name('keahlian_user.export.pdf');
+
     // ===================== DASHBOARD =====================
     // Route::get('/dashboard/admin', function () {
     //     $breadcrumb = (object) ['title' => 'Dashboard', 'list' => ['Admin', 'Dashboard']];

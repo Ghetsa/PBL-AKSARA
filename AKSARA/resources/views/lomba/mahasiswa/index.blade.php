@@ -6,6 +6,394 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <style>
+    .priority-list-container {
+        border: 1px solid #eee;
+        padding: 15px;
+        border-radius: 0.375rem;
+        background-color: #f8f9fa;
+    }
+    .priority-slot {
+        background-color: #fff;
+        border: 1px dashed #ccc;
+        border-radius: 0.25rem;
+        padding: 10px;
+        margin-bottom: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .priority-slot .kriteria-item {
+        cursor: grab;
+        padding: 8px 12px;
+        background-color: #e9ecef;
+        border: 1px solid #dee2e6;
+        border-radius: 0.25rem;
+        width: 100%; /* Agar item mengisi slot */
+        text-align: center;
+    }
+    .priority-slot .priority-label {
+        font-weight: bold;
+        margin-right: 10px;
+        color: #007bff; /* Bootstrap primary color */
+    }
+    .kriteria-bank {
+        border: 1px solid #ddd;
+        padding: 10px;
+        min-height: 50px; /* Tinggi minimal untuk area drop */
+        background-color: #fff;
+        border-radius: 0.25rem;
+    }
+    .kriteria-bank .kriteria-item {
+         margin-bottom: 5px;
+         display: block; /* Agar setiap item di baris baru jika di bank */
+    }
+    .gu-mirror { /* Styling untuk elemen yang di-drag (dari dragula.js, contoh) */
+      position: fixed !important;
+      margin: 0 !important;
+      z-index: 9999 !important;
+      opacity: 0.8;
+      -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
+      filter: alpha(opacity=80);
+    }
+    .gu-hide { display: none !important; }
+    .gu-unselectable { -webkit-user-select: none !important; -moz-user-select: none !important; -ms-user-select: none !important; user-select: none !important; }
+    .gu-transit { opacity: 0.5; -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)"; filter: alpha(opacity=50); }
+
+    .bobot-info {
+        font-size: 0.85em;
+        color: #6c757d;
+    }
+    .handle {
+        cursor: grab;
+        margin-right: 8px;
+        color: #adb5bd;
+    }
+    .handle:hover {
+        color: #495057;
+    }
+</style>
+@endpush
+
+@section('content')
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">{{ $breadcrumb->title ?? 'Daftar Lomba' }}</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3 text-end">
+                        <button class="btn btn-sm btn-info" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePrioritasKriteria" aria-expanded="false" aria-controls="collapsePrioritasKriteria">
+                            <i class="fas fa-sort-amount-down me-1"></i> Atur Prioritas Rekomendasi
+                        </button>
+                    </div>
+
+                    <div class="collapse mb-4" id="collapsePrioritasKriteria">
+                        <div class="card card-body border-info">
+                            <h5 class="card-title card-title-small">Urutkan Kriteria Rekomendasi</h5>
+                            <p class="card-text small text-muted">Seret dan lepas kriteria ke slot prioritas di bawah. Kriteria di slot "Prioritas 1" akan memiliki bobot tertinggi.</p>
+                            
+                            <div class="row mt-2">
+                                <div class="col-md-7">
+                                    <h6>Urutan Prioritas Anda:</h6>
+                                    <div id="prioritySlotsContainer">
+                                        @php
+                                            $bobotPosisi = [ 1 => 30, 2 => 25, 3 => 20, 4 => 10, 5 => 10, 6 => 5 ]; // Persentase
+                                        @endphp
+                                        @foreach($bobotPosisi as $pos => $bobot)
+                                        <div class="priority-slot mb-2" data-posisi="{{ $pos }}">
+                                            <span class="priority-label"><i class="fas fa-list-ol me-1"></i> Prioritas {{ $pos }}:</span>
+                                            <div class="kriteria-dropzone flex-grow-1" style="min-height: 40px; border: 1px dashed #ced4da; border-radius: .25rem; padding: 5px;">
+                                                {{-- Kriteria akan di-drop di sini --}}
+                                            </div>
+                                            <span class="bobot-info ms-2">({{ $bobot }}%)</span>
+                                        </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                                <div class="col-md-5">
+                                    <h6>Pilihan Kriteria (Seret dari sini):</h6>
+                                    <div id="kriteriaBank" class="kriteria-bank p-2">
+                                        @foreach($kriteriaList as $key => $label)
+                                        <div class="kriteria-item" data-kriteria-key="{{ $key }}">
+                                            <i class="fas fa-grip-vertical handle me-2"></i>{{ $label }}
+                                        </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-3">
+                                <button type="button" id="resetUrutanBtn" class="btn btn-sm btn-outline-secondary me-2"><i class="fas fa-undo me-1"></i>Reset Urutan</button>
+                                <button type="button" id="terapkanUrutanBtn" class="btn btn-sm btn-success">
+                                    <i class="fas fa-check me-1"></i> Terapkan & Lihat Rekomendasi
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <form id="filterFormLomba" class="row gx-3 gy-2 align-items-center mb-4">
+                        {{-- ... Form filter biasa tetap sama ... --}}
+                         <div class="col-sm-12 col-md-5">
+                            <label class="form-label visually-hidden" for="search_nama">Cari Nama Lomba</label>
+                            <input type="text" class="form-control form-control-sm" id="search_nama" placeholder="Cari nama lomba...">
+                        </div>
+                        <div class="col-sm-12 col-md-4">
+                            <label class="form-label visually-hidden" for="filter_status">Status Pendaftaran</label>
+                            <select class="form-select form-select-sm" id="filter_status">
+                                <option value="">Semua Status Pendaftaran</option>
+                                <option value="buka">Buka</option>
+                                <option value="tutup">Tutup</option>
+                                <option value="segera hadir">Segera Hadir</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-12 col-md-3">
+                            <button type="submit" class="btn btn-sm btn-primary w-100"><i class="fas fa-search me-1"></i> Cari Lomba</button>
+                        </div>
+                    </form>
+                    <div id="infoRekomendasi" class="alert alert-info alert-dismissible fade show d-none" role="alert">
+                        <i class="fas fa-info-circle me-2"></i>Menampilkan rekomendasi lomba berdasarkan urutan prioritas kriteria Anda.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+
+                    <table class="table table-bordered table-hover dt-responsive nowrap" id="dataTableLomba" style="width:100%;">
+                        <thead>
+                            <tr>
+                                <th class="text-center">No.</th>
+                                <th>Nama Lomba</th>
+                                <th>Penyelenggara</th>
+                                <th>Bidang</th>
+                                <th>Tingkat</th>
+                                <th>Batas Daftar</th>
+                                <th class="text-center">Biaya</th>
+                                <th class="text-center">Status</th>
+                                <th class="text-center" id="kolomSkorRekomendasi" style="display:none;">Skor Rekomendasi</th>
+                                <th class="text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- Modal Detail Lomba --}}
+<div class="modal fade" id="modalDetailLombaPublik" tabindex="-1" aria-labelledby="modalDetailLombaPublikLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content"></div>
+    </div>
+</div>
+@endsection
+
+@push('js')
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+{{-- CDN untuk SortableJS --}}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+
+
+<script>
+    var dtLomba;
+    var isRekomendasiActive = false;
+    // Ambil daftar kriteria dan urutan default dari Blade/PHP
+    const kriteriaList = @json($kriteriaList ?? []);
+    const defaultUrutanKriteriaKeys = @json($defaultUrutanKriteria ?? array_keys($kriteriaList));
+    let sortableSlots = []; // Array untuk menyimpan instance SortableJS
+
+    // Fungsi modal (jika belum global)
+    if (typeof modalActionLomba === 'undefined') {
+        function modalActionLomba(url, title = 'Detail Lomba', modalId = 'modalDetailLombaPublik') {
+            const targetModal = $(`#${modalId}`);
+            const targetModalContent = targetModal.find('.modal-content');
+            targetModalContent.html('<div class="modal-body text-center py-5"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Memuat...</p></div>');
+            const modalInstance = bootstrap.Modal.getOrCreateInstance(document.getElementById(modalId));
+            modalInstance.show();
+            $.ajax({
+                url: url, type: 'GET',
+                success: function (response) { targetModalContent.html(response); },
+                error: function (xhr) { 
+                    let msg = xhr.responseJSON?.message ?? 'Gagal memuat konten.';
+                    targetModalContent.html(`<div class="modal-header bg-danger text-white"><h5 class="modal-title">${title}</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button></div><div class="modal-body"><p class="text-danger">${msg}</p></div>`);
+                }
+            });
+        }
+    }
+
+    // Fungsi untuk menginisialisasi/mereset item kriteria di bank dan slot
+    function setupKriteriaDraggable() {
+        // Kosongkan bank dan slot sebelumnya
+        $('#kriteriaBank').empty();
+        $('.kriteria-dropzone').empty();
+        
+        // Hancurkan instance SortableJS sebelumnya jika ada
+        sortableSlots.forEach(s => s.destroy());
+        sortableSlots = [];
+
+        // Isi bank dengan kriteria default
+        defaultUrutanKriteriaKeys.forEach(key => {
+            if(kriteriaList[key]) {
+                $('#kriteriaBank').append(
+                    `<div class="kriteria-item" data-kriteria-key="${key}">
+                        <i class="fas fa-grip-vertical handle me-2"></i>${kriteriaList[key]}
+                     </div>`
+                );
+            }
+        });
+
+        // Inisialisasi SortableJS untuk bank kriteria
+        new Sortable(document.getElementById('kriteriaBank'), {
+            group: 'sharedKriteria', // Nama grup yang sama untuk drag antar list
+            animation: 150,
+            sort: true // Memungkinkan pengurutan di dalam bank juga
+        });
+
+        // Inisialisasi SortableJS untuk setiap slot prioritas
+        $('.kriteria-dropzone').each(function(index) {
+            let slot = this;
+            let sortable = new Sortable(slot, {
+                group: 'sharedKriteria',
+                animation: 150,
+                onAdd: function (evt) {
+                    // Hanya izinkan satu item per slot
+                    if (slot.children.length > 1) {
+                        // Pindahkan item yang berlebih kembali ke bank atau ke slot asal
+                        let itemToMoveBack = (evt.item === slot.children[0]) ? slot.children[1] : slot.children[0];
+                        document.getElementById('kriteriaBank').appendChild(itemToMoveBack);
+                        // Beri feedback ke user bahwa slot hanya bisa diisi 1 item
+                        if (!$(slot).find('.slot-warning').length) {
+                             $(slot).append('<small class="text-danger slot-warning d-block mt-1">Slot hanya bisa diisi 1 kriteria.</small>');
+                        }
+                         setTimeout(() => $(slot).find('.slot-warning').remove(), 2000);
+                    } else {
+                         $(slot).find('.slot-warning').remove();
+                    }
+                },
+                onRemove: function(evt){
+                     $(slot).find('.slot-warning').remove();
+                }
+            });
+            sortableSlots.push(sortable);
+        });
+    }
+
+
+    $(document).ready(function() {
+        setupKriteriaDraggable(); // Setup awal
+
+        $('#resetUrutanBtn').on('click', function() {
+            setupKriteriaDraggable(); // Reset ke kondisi awal
+            if (isRekomendasiActive) {
+                isRekomendasiActive = false;
+                dtLomba.column('#kolomSkorRekomendasi').visible(false);
+                $('#infoRekomendasi').addClass('d-none');
+                dtLomba.ajax.reload(); 
+                Swal.fire({ icon: 'info', title: 'Mode Rekomendasi Dinonaktifkan', text: 'Urutan prioritas telah direset.', timer: 2000, showConfirmButton: false });
+            }
+        });
+        
+        dtLomba = $('#dataTableLomba').DataTable({
+            // ... (konfigurasi DataTables sama seperti sebelumnya) ...
+            processing: true,
+            serverSide: true,
+            responsive: true,
+            ajax: {
+                url: "{{ route('lomba.getList') }}",
+                type: "POST",
+                headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                data: function (d) {
+                    d.search_nama = $('#search_nama').val();
+                    d.filter_status = $('#filter_status').val();
+                    d.rekomendasi = isRekomendasiActive ? '1' : '0';
+                    if (isRekomendasiActive) {
+                        let urutanKriteriaArray = [];
+                        $('.kriteria-dropzone').each(function() {
+                            let item = $(this).find('.kriteria-item');
+                            if (item.length) {
+                                urutanKriteriaArray.push(item.data('kriteria-key'));
+                            } else {
+                                urutanKriteriaArray.push(null); // atau placeholder jika slot kosong
+                            }
+                        });
+                        d.urutan_kriteria = urutanKriteriaArray;
+                    }
+                },
+                error: function (xhr, error, thrown) {
+                    console.error("DataTables AJAX error: ", xhr.responseText);
+                    Swal.fire({ icon: 'error', title: 'Oops...', text: 'Gagal memuat data lomba. Silakan coba lagi atau hubungi admin.' });
+                }
+            },
+            columns: [
+                { data: 'DT_RowIndex', name: 'DT_RowIndex', className: 'text-center', orderable: false, searchable: false },
+                { data: 'nama_lomba', name: 'lomba.nama_lomba' },
+                { data: 'penyelenggara', name: 'lomba.penyelenggara' },
+                { data: 'bidang_display', name: 'bidang_display', orderable: false, searchable: false },
+                { data: 'tingkat', name: 'lomba.tingkat', className: 'text-center' },
+                { data: 'batas_pendaftaran', name: 'lomba.batas_pendaftaran', className: 'text-center' },
+                { data: 'biaya_display', name: 'lomba.biaya', className: 'text-center', orderable: true }, 
+                { data: 'status_display', name: 'status_display', className: 'text-center', orderable: false, searchable: false},
+                { data: 'moora_score', name: 'moora_score', className: 'text-center', visible: false, orderable: true },
+                { data: 'aksi', name: 'aksi', className: 'text-center', orderable: false, searchable: false }
+            ],
+            order: isRekomendasiActive ? [[8, 'desc']] : [[5, 'asc']], // Kolom skor adalah index ke-8 (0-based), atau batas daftar
+             fnDrawCallback: function (oSettings) {
+                if (isRekomendasiActive && oSettings.fnRecordsDisplay() == 0 && oSettings.aiDisplay.length === 0 && !oSettings.oAjaxData.sSearch ) {
+                     Swal.fire({
+                        icon: 'info',
+                        title: 'Tidak Ada Rekomendasi',
+                        text: 'Tidak ditemukan lomba yang sesuai dengan prioritas kriteria Anda saat ini.',
+                        showConfirmButton: true // Biarkan user menutupnya
+                    });
+                }
+            }
+        });
+
+        $('#terapkanUrutanBtn').on('click', function() {
+            let kriteriaDiSlot = 0;
+            $('.kriteria-dropzone .kriteria-item').each(function(){
+                kriteriaDiSlot++;
+            });
+
+            if (kriteriaDiSlot < defaultUrutanKriteriaKeys.length) { // Cek apakah semua slot terisi
+                Swal.fire('Peringatan', `Harap isi semua ${defaultUrutanKriteriaKeys.length} slot prioritas dengan kriteria dari bank.`, 'warning');
+                return;
+            }
+
+            isRekomendasiActive = true;
+            dtLomba.column('#kolomSkorRekomendasi').visible(true);
+            dtLomba.order([dtLomba.column(':contains(Skor Rekomendasi)').index(), 'desc']).ajax.reload(function(json) {
+                if (json && json.recordsFiltered > 0) {
+                     Swal.fire({ icon: 'success', title: 'Rekomendasi Dimuat!', text: 'Hasil rekomendasi berdasarkan prioritas Anda ditampilkan.', timer: 2000, showConfirmButton: false });
+                }
+            }, false);
+            $('#infoRekomendasi').removeClass('d-none');
+            $('#filterFormLomba').trigger('reset');
+            $('#search_nama').val('');
+            $('#filter_status').val('');
+        });
+
+        $('#filterFormLomba').on('submit', function(e) {
+            e.preventDefault();
+            isRekomendasiActive = false;
+            dtLomba.column('#kolomSkorRekomendasi').visible(false);
+            dtLomba.order([dtLomba.column(':contains(Batas Daftar)').index(), 'asc']).ajax.reload();
+            $('#infoRekomendasi').addClass('d-none');
+        });
+    });
+</script>
+@endpush
+
+{{-- Slider --}}
+{{-- @extends('layouts.template')
+@section('title', $breadcrumb->title ?? 'Informasi & Rekomendasi Lomba')
+
+@push('css')
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
     .form-label-group {
         margin-bottom: 0.5rem;
     }
@@ -31,9 +419,9 @@
         font-weight: 500;
     }
 </style>
-@endpush
+@endpush --}}
 
-@section('content')
+{{-- @section('content')
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
@@ -42,14 +430,12 @@
                     <h6 class="m-0 font-weight-bold text-primary">{{ $breadcrumb->title ?? 'Daftar Lomba' }}</h6>
                 </div>
                 <div class="card-body">
-                    {{-- Tombol Toggle untuk Form Bobot Kriteria --}}
                     <div class="mb-3 text-end">
                         <button class="btn btn-sm btn-info" type="button" data-bs-toggle="collapse" data-bs-target="#collapseBobotKriteria" aria-expanded="false" aria-controls="collapseBobotKriteria">
                             <i class="fas fa-cogs me-1"></i> Atur Prioritas Rekomendasi Lomba
                         </button>
                     </div>
 
-                    {{-- Form Bobot Kriteria (Collapsible) --}}
                     <div class="collapse mb-4" id="collapseBobotKriteria">
                         <div class="card card-body border-info">
                             <h5 class="card-title card-title-small">Sesuaikan Prioritas Kriteria Rekomendasi</h5>
@@ -80,7 +466,6 @@
                         </div>
                     </div>
                     
-                    {{-- Form Filter Pencarian Biasa --}}
                     <form id="filterFormLomba" class="row gx-3 gy-2 align-items-center mb-4">
                         <div class="col-sm-12 col-md-5">
                             <label class="form-label visually-hidden" for="search_nama">Cari Nama Lomba</label>
@@ -126,7 +511,6 @@
     </div>
 </div>
 
-{{-- Modal untuk Detail Lomba Publik --}}
 <div class="modal fade" id="modalDetailLombaPublik" tabindex="-1" aria-labelledby="modalDetailLombaPublikLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content"></div>
@@ -292,7 +676,7 @@
         });
     });
 </script>
-@endpush
+@endpush --}}
 
 {{-- @extends('layouts.template') 
 @section('title', 'Daftar Lomba')

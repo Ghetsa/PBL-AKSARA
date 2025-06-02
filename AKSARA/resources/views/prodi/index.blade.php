@@ -21,6 +21,8 @@
                     <h3 class="card-title">Data Program Studi</h3>
                     <div class="card-tools">
                         {{-- <a href="{{ route('prodi.create') }}" class="btn btn-success btn-sm">Tambah</a> --}}
+                        <a href="{{ route('prodi.export.pdf') }}" class="btn btn-sm btn-warning"><i class="fa fa-file-pdf"></i> Export Prodi (PDF)</a>
+                        <a href="{{ route('prodi.export.excel') }}" class="btn btn-sm btn-success"><i class="fa fa-file-excel"></i> Export Prodi</a>
                         <button type="button" class="btn btn-primary btn-sm"
                                 onclick="modalAction('{{ route('prodi.create') }}')">
                                 <i class="fas fa-plus-circle"></i> Tambah</button>
