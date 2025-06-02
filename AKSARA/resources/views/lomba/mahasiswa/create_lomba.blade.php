@@ -1,5 +1,5 @@
 <form id="formUserLomba"
-    action="{{ isset($lomba) ? route('lomba.user.update', $lomba->lomba_id) : route('lomba.store') }}" method="POST"
+    action="{{ isset($lomba) ? route('lomba.user.update', $lomba->lomba_id) : route('lomba.mhs.store') }}" method="POST"
     enctype="multipart/form-data">
     @csrf
     @if (isset($lomba))

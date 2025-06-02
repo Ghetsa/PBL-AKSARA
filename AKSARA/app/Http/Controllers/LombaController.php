@@ -512,7 +512,131 @@ class LombaController extends Controller
     /**
      * Menampilkan halaman histori pengajuan lomba untuk user yang login.
      */
-    public function historiPengajuanLomba()
+    public function historiPengajuanLombaMhs()
+    {
+        $breadcrumb = (object) [
+            'title' => 'Histori Pengajuan Info Lomba Saya',
+            'list' => ['Info Lomba', 'Histori Pengajuan']
+        ];
+        $activeMenu = 'histori_lomba_user';
+        return view('lomba.mahasiswa.histori_pengajuan_lomba', compact('breadcrumb', 'activeMenu'));
+    }
+
+    /**
+     * Menyediakan data untuk DataTables histori pengajuan lomba user.
+     */
+    public function listHistoriPengajuanLombaMhs(Request $request)
+    {
+        if ($request->ajax()) {
+            $user = Auth::user();
+            $data = LombaModel::where('diinput_oleh', $user->user_id)
+                ->orderBy('created_at', 'desc');
+
+            return DataTables::of($data)
+                ->addIndexColumn()
+                ->editColumn('nama_lomba', fn($row) => e($row->nama_lomba))
+                ->addColumn('bidang_lomba', function ($lomba) {
+                    return $lomba->detailBidang->map(function ($detail) {
+                        return ucfirst($detail->kategori) . ' ' . ($detail->bidang->bidang_nama ?? 'N/A');
+                    })->implode(', ');
+                })
+                ->editColumn('batas_pendaftaran', fn($row) => $row->batas_pendaftaran ? Carbon::parse($row->batas_pendaftaran)->setTimezone('Asia/Jakarta')->isoFormat('D MMM YYYY') : '-')
+                ->editColumn('created_at', fn($row) => $row->created_at ? Carbon::parse($row->created_at)->setTimezone('Asia/Jakarta')->isoFormat('D MMM YYYY, HH:mm') : '-')
+                ->editColumn('status_verifikasi', fn($row) => $row->status_verifikasi_badge)
+                ->addColumn('aksi', function ($row) {
+                    $btnEdit = '';
+                    $btnDetail = '<button onclick="modalActionLomba(\'' . route('lomba.show', $row->lomba_id) . '\', \'Detail Lomba\', \'modalFormLombaUser\')" class="btn btn-sm btn-info me-1" title="Detail"><i class="fas fa-eye"></i></button>';
+                    if ($row->status_verifikasi == 'ditolak' || $row->status_verifikasi == 'pending') {
+                        $btnEdit = '<button onclick="modalActionLomba(\'' . route('lomba.mhs.edit_form', $row->lomba_id) . '\', \'Edit Pengajuan\', \'modalFormLombaUser\')" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></button>';
+                    }
+                    return '<div class="btn-group">' . $btnDetail . $btnEdit . '</div>';
+                })
+                ->rawColumns(['status_verifikasi', 'aksi'])
+                ->make(true);
+        }
+        return abort(403);
+    }
+
+    /**
+     * Menampilkan form AJAX untuk mahasiswa/dosen mengajukan lomba.
+     */
+    public function createPengajuanLombaMhs()
+    {
+        $bidangList = BidangModel::orderBy('bidang_nama')->get();
+        return view('lomba.mahasiswa.create_lomba', compact('bidangList'));
+    }
+
+    /**
+     * Menyimpan pengajuan lomba dari mahasiswa/dosen.
+     */
+
+    public function storeLombaMhs(Request $request)
+    {
+        $user = Auth::user();
+
+        $validator = Validator::make($request->all(), [
+            'nama_lomba' => 'required|string|max:255',
+            'pembukaan_pendaftaran' => 'required|date',
+            'batas_pendaftaran' => 'required|date|after_or_equal:pembukaan_pendaftaran',
+            'kategori' => 'required|in:individu,kelompok',
+            'penyelenggara' => 'required|string|max:255',
+            'tingkat' => 'required|in:lokal,nasional,internasional',
+            'bidang_keahlian' => 'required|array|min:1',
+            'bidang_keahlian.*' => 'exists:bidang,bidang_id',
+            'biaya' => 'nullable|integer|min:0',
+            'link_pendaftaran' => 'nullable|url|max:255',
+            'link_penyelenggara' => 'nullable|url|max:255',
+            'poster' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validasi gagal.',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $posterPath = null;
+        if ($request->hasFile('poster')) {
+            $posterPath = $request->file('poster')->store('lomba_poster', 'public');
+        }
+
+        // Simpan data utama lomba
+        $lomba = LombaModel::create([
+            'nama_lomba' => $request->nama_lomba,
+            'pembukaan_pendaftaran' => $request->pembukaan_pendaftaran,
+            'batas_pendaftaran' => $request->batas_pendaftaran,
+            'kategori' => $request->kategori,
+            'penyelenggara' => $request->penyelenggara,
+            'tingkat' => $request->tingkat,
+            'biaya' => $request->biaya ?? 0,
+            'link_pendaftaran' => $request->link_pendaftaran,
+            'link_penyelenggara' => $request->link_penyelenggara,
+            'poster' => $posterPath,
+            'status_verifikasi' => 'pending',
+            'diinput_oleh' => $user->user_id,
+        ]);
+
+        // Simpan bidang ke lomba_detail
+        foreach ($request->bidang_keahlian as $bidangId) {
+            LombaDetailModel::create([
+                'lomba_id' => $lomba->lomba_id,
+                'bidang_id' => $bidangId
+            ]);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Pengajuan info lomba berhasil dikirim dan akan diverifikasi oleh Admin.'
+        ]);
+    }
+
+
+    /**
+     * Menampilkan halaman histori pengajuan lomba untuk user yang login.
+     */
+    public function historiPengajuanLombaDsn()
     {
         $breadcrumb = (object) [
             'title' => 'Histori Pengajuan Info Lomba Saya',
@@ -525,7 +649,7 @@ class LombaController extends Controller
     /**
      * Menyediakan data untuk DataTables histori pengajuan lomba user.
      */
-    public function listHistoriPengajuanLomba(Request $request)
+    public function listHistoriPengajuanLombaDsn(Request $request)
     {
         if ($request->ajax()) {
             $user = Auth::user();
@@ -542,7 +666,7 @@ class LombaController extends Controller
                     $btnEdit = '';
                     $btnDetail = '<button onclick="modalActionLomba(\'' . route('lomba.show', $row->lomba_id) . '\', \'Detail Lomba\', \'modalFormLombaUser\')" class="btn btn-sm btn-info me-1" title="Detail"><i class="fas fa-eye"></i></button>';
                     if ($row->status_verifikasi == 'ditolak' || $row->status_verifikasi == 'pending') {
-                        $btnEdit = '<button onclick="modalActionLomba(\'' . route('lomba.user.edit_form', $row->lomba_id) . '\', \'Edit Pengajuan\', \'modalFormLombaUser\')" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></button>';
+                        $btnEdit = '<button onclick="modalActionLomba(\'' . route('lomba.dsn.edit_form', $row->lomba_id) . '\', \'Edit Pengajuan\', \'modalFormLombaUser\')" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></button>';
                     }
                     return '<div class="btn-group">' . $btnDetail . $btnEdit . '</div>';
                 })
