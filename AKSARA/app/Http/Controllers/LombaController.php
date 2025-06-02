@@ -42,37 +42,6 @@ class LombaController extends Controller
         return view('lomba.index', compact('breadcrumb', 'activeMenu', 'userRole'));
     }
 
-    // // DataTables untuk daftar lomba yang disetujui (dilihat semua role)
-    // public function listLombaPublik(Request $request) // Ganti nama agar lebih jelas
-    // {
-    //     if ($request->ajax()) {
-    //         $data = LombaModel::where('status_verifikasi', 'disetujui')
-    //             ->orderBy('batas_pendaftaran', 'asc');
-
-    //         return DataTables::of($data)
-    //             ->addIndexColumn()
-    //             ->editColumn('nama_lomba', function ($row) {
-    //                 $html = '<span class="fw-semibold">' . e($row->nama_lomba) . '</span>';
-    //                 if ($row->poster && Storage::disk('public')->exists($row->poster)) {
-    //                     $html .= '<br><a href="' . asset('storage/' . $row->poster) . '" target="_blank" class="badge bg-light-info text-info mt-1">Lihat Poster</a>';
-    //                 }
-    //                 return $html;
-    //             })
-    //             ->addColumn('periode_pendaftaran', function ($row) {
-    //                 $mulai = $row->pembukaan_pendaftaran ? $row->pembukaan_pendaftaran->format('d M Y') : 'N/A';
-    //                 $selesai = $row->batas_pendaftaran ? $row->batas_pendaftaran->format('d M Y') : 'N/A';
-    //                 return $mulai . ' - ' . $selesai;
-    //             })
-    //             ->addColumn('biaya_formatted', fn($row) => $row->biaya > 0 ? 'Rp ' . number_format($row->biaya, 0, ',', '.') : '<span class="badge bg-light-success text-success">Gratis</span>')
-    //             ->addColumn('aksi', function ($row) {
-    //                 $btn = '<button onclick="modalActionLomba(\'' . route('lomba.show.ajax', $row->lomba_id) . '\', \'Detail Lomba\')" class="btn btn-sm btn-outline-primary"><i class="fas fa-eye me-1"></i>Detail</button>';
-    //                 return $btn;
-    //             })
-    //             ->rawColumns(['nama_lomba', 'biaya_formatted', 'aksi'])
-    //             ->make(true);
-    //     }
-    //     return abort(403);
-    // }
 
     private function calculateMooraScores($userId)
     {
@@ -356,103 +325,6 @@ class LombaController extends Controller
         return redirect()->route('lomba.admin.index')->with('success', 'Lomba berhasil diupdate');
     }
 
-
-    //===================================
-    //|        METHOD UNTUK ADMIN       |
-    //===================================
-    // public function indexAdmin()
-    // {
-    //     $breadcrumb = (object) [
-    //         'title' => 'Manajemen Lomba',
-    //         'list' => ['Dashboard', 'Lomba']
-    //     ];
-
-    //     $activeMenu = 'lomba';
-
-    //     return view('lomba.mahasiswa.index', compact('breadcrumb', 'activeMenu'));
-    // }
-
-    // public function getListAdmin(Request $request)
-    // {
-    //     $query = LombaModel::query();
-
-    //     // Filter pencarian
-    //     if ($request->filled('search_nama')) {
-    //         $search = $request->search_nama;
-    //         $query->where(function ($q) use ($search) {
-    //             $q->where('nama_lomba', 'like', '%' . $search . '%');
-    //         });
-    //     }
-
-    //     if ($request->filled('filter_status')) {
-    //         $query->where('status_verifikasi', $request->filter_status);
-    //     }
-
-    //     return DataTables::of($query)
-    //         ->addIndexColumn()
-    //         ->addColumn('aksi', function ($row) {
-    //             // return view('components.lomba.aksi-buttons', compact('editUrl', 'verifUrl', 'deleteUrl'));
-    //             $btn = '<button onclick="modalAction(\'' . e(route('lomba.show', $row->lomba_id)) . '\')" class="btn btn-info btn-sm">Detail</button> ';
-    //             $btn .= '<button onclick="modalAction(\'' . e(route('lomba.edit', $row->lomba_id)) . '\')" class="btn btn-warning btn-sm">Edit</button> ';
-    //             $btn .= '<button onclick="deleteConfirmAjax(' . e($row->lomba_id) . ')" class="btn btn-danger btn-sm">Hapus</button>';
-    //             return $btn;
-    //         })
-
-    //         ->addColumn('status_verifikasi', function ($row) {
-    //             switch ($row->status_verifikasi) {
-    //                 case 'pending':
-    //                     return '<span class="badge bg-warning text-dark">Pending</span>';
-    //                 case 'disetujui':
-    //                     return '<span class="badge bg-success">Disetujui</span>';
-    //                 case 'ditolak':
-    //                     return '<span class="badge bg-danger">Ditolak</span>';
-    //                 default:
-    //                     return '<span class="badge bg-secondary">Tidak Diketahui</span>';
-    //             }
-    //         })
-
-    //         ->editColumn('pembukaan_pendaftaran', function ($row) {
-    //             return \Carbon\Carbon::parse($row->pembukaan_pendaftaran)->format('d-m-Y');
-    //         })
-    //         ->editColumn('batas_pendaftaran', function ($row) {
-    //             return \Carbon\Carbon::parse($row->batas_pendaftaran)->format('d-m-Y');
-    //         })
-    //         ->rawColumns(['aksi', 'status_verifikasi'])
-    //         ->make(true);
-    // }
-
-    // public function destroy($id)
-    // {
-    //     LombaModel::destroy($id);
-    //     return redirect()->route('lomba.admin.index')->with('success', 'Lomba berhasil dihapus');
-    // }
-
-    // public function verifikasi($id)
-    // {
-    //     $data = LombaModel::findOrFail($id);
-    //     return view('lomba.verifikasi', compact('data'));
-    // }
-
-    // public function prosesVerifikasi(Request $request, $id)
-    // {
-    //     $validated = $request->validate([
-    //         'status_verifikasi' => 'required|in:pending,disetujui,ditolak',
-    //         'catatan_verifikasi' => 'nullable|string'
-    //     ]);
-
-    //     $data = LombaModel::findOrFail($id);
-    //     $data->update($validated);
-
-    //     return redirect()->route('lomba.index')->with('success', 'Verifikasi berhasil diperbarui');
-    // }
-
-    // =======================================================================
-    // METHOD UNTUK TAMPILAN PUBLIK (SEMUA USER LOGIN BISA AKSES)
-    // =======================================================================
-
-    /**
-     * Menampilkan halaman daftar lomba yang sudah disetujui (untuk semua role).
-     */
     public function indexLombaPublik()
     {
         $userRole = Auth::user()->role;
@@ -1069,13 +941,4 @@ class LombaController extends Controller
         }
     }
 
-    // public function adminDestroyLombaAjax($id)
-    // {
-    //     $lomba = LombaModel::findOrFail($id);
-    //     if ($lomba->poster && Storage::disk('public')->exists($lomba->poster)) {
-    //         Storage::disk('public')->delete($lomba->poster);
-    //     }
-    //     $lomba->delete();
-    //     return response()->json(['status' => true, 'message' => 'Info lomba berhasil dihapus.']);
-    // }
 }
