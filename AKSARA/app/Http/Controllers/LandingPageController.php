@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\LombaModel; // Pastikan Anda sudah membuat model ini
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Models\PrestasiModel;
 
 class LandingPageController extends Controller
 {
@@ -28,9 +29,15 @@ class LandingPageController extends Controller
             'list' => ['User']
         ];
 
+        // Ambil data prestasi terbaru yang sudah disetujui/valid
+        $prestasiTerbaru = PrestasiModel::where('status_verifikasi', 'disetujui') // Sesuaikan dengan status verifikasi prestasi Anda
+            ->orderBy('tahun', 'desc') // Atau field tanggal yang relevan
+            ->take(6)
+            ->get();
+
         // Jika Anda punya layout berbeda untuk landing page dan area login,
         // pastikan nama view yang dipanggil benar.
-        return view('landing-page', ['lombas' => $lombasDenganPosterValid], compact('breadcrumb'));
+        return view('landing-page', ['lombas' => $lombasDenganPosterValid], compact('breadcrumb', 'prestasiTerbaru'));
         // Jika file blade Anda bernama welcome.blade.php, gunakan 'welcome'
         // return view('welcome', ['lombas' => $lombasDenganPosterValid]);
     }

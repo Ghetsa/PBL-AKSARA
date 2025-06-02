@@ -9,6 +9,7 @@ use App\Http\Controllers\ProdiController;
 use App\Http\Controllers\PeriodeController;
 use App\Http\Controllers\KeahlianUserController;
 use App\Http\Controllers\LandingPageController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LombaController; // Tambahkan ini
 
 /*
@@ -39,23 +40,23 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/profil/update-password', [ProfilController::class, 'updatePasswordAjax'])->name('profil.update_password');
 
     // ===================== DASHBOARD =====================
-    Route::get('/dashboard/admin', function () {
-        $breadcrumb = (object) ['title' => 'Dashboard', 'list' => ['Admin', 'Dashboard']];
-        $activeMenu = 'dashboard';
-        return view('dashboard.admin', compact('breadcrumb', 'activeMenu'));
-    })->name('dashboard');
+    // Route::get('/dashboard/admin', function () {
+    //     $breadcrumb = (object) ['title' => 'Dashboard', 'list' => ['Admin', 'Dashboard']];
+    //     $activeMenu = 'dashboard';
+    //     return view('dashboard.admin', compact('breadcrumb', 'activeMenu'));
+    // })->name('dashboard');
 
-    Route::get('/dashboard/mahasiswa', function () {
-        $breadcrumb = (object) ['title' => 'Dashboard', 'list' => ['Mahasiswa', 'Dashboard']];
-        $activeMenu = 'dashboard';
-        return view('dashboard.mahasiswa', compact('breadcrumb', 'activeMenu'));
-    })->name('dashboardMHS');
+    // Route::get('/dashboard/mahasiswa', function () {
+    //     $breadcrumb = (object) ['title' => 'Dashboard', 'list' => ['Mahasiswa', 'Dashboard']];
+    //     $activeMenu = 'dashboard';
+    //     return view('dashboard.mahasiswa', compact('breadcrumb', 'activeMenu'));
+    // })->name('dashboardMHS');
 
-    Route::get('/dashboard/dosen', function () {
-        $breadcrumb = (object) ['title' => 'Dashboard', 'list' => ['Dosen', 'Dashboard']];
-        $activeMenu = 'dashboard';
-        return view('dashboard.mahasiswa', compact('breadcrumb', 'activeMenu'));
-    })->name('dashboardDSN');
+    // Route::get('/dashboard/dosen', function () {
+    //     $breadcrumb = (object) ['title' => 'Dashboard', 'list' => ['Dosen', 'Dashboard']];
+    //     $activeMenu = 'dashboard';
+    //     return view('dashboard.mahasiswa', compact('breadcrumb', 'activeMenu'));
+    // })->name('dashboardDSN');
 
     // ===================== PROFILE =====================
     Route::get('/profile', [ProfilController::class, 'index'])->name('profile.index');
@@ -125,6 +126,8 @@ Route::middleware(['auth'])->group(function () {
 
     // ===================== MAHASISWA =====================
     Route::middleware(['role:mahasiswa'])->group(function () {
+
+        Route::get('/dashboard-mahasiswa', [DashboardController::class, 'mahasiswaDashboard'])->name('dashboard.mahasiswa');
 
         // ---------- PRESTASI ----------
         Route::prefix('mahasiswa/prestasi')->name('prestasi.mahasiswa.')->group(function () {
@@ -284,7 +287,6 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/verifikasi/{id}', [LombaController::class, 'verifikasi'])->name('verifikasi');
             Route::post('/verifikasi/{id}', [LombaController::class, 'prosesVerifikasi'])->name('proses_verifikasi');
         });
-
     });
 
 

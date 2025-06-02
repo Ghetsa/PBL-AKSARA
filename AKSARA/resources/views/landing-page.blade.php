@@ -228,6 +228,50 @@
             </div>
         </section>
         @endif
+
+        {{-- Prestasi Terbaru Section --}}
+        {{-- <section class="py-5">
+            <div class="container px-5 my-5">
+                <div class="row gx-5 justify-content-center">
+                    <div class="col-lg-8 col-xl-6">
+                        <div class="text-center">
+                            <h2 class="fw-bolder">Prestasi Mahasiswa Terbaru</h2>
+                            <p class="lead fw-normal text-muted mb-5">Lihat pencapaian terkini dari mahasiswa-mahasiswa berprestasi.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row gx-5">
+                    @php
+                        // Placeholder data - idealnya ini dari controller
+                        $prestasiList = [
+                            (object)['nama_prestasi' => 'Juara 1 Lomba Debat Nasional', 'file_bukti' => asset('path/to/default-prestasi-image1.jpg'), 'deskripsi' => 'Tim debat berhasil meraih juara pertama dalam kompetisi debat tingkat nasional yang bergengsi.'],
+                            (object)['nama_prestasi' => 'Medali Emas Olimpiade Sains', 'file_bukti' => asset('path/to/default-prestasi-image2.jpg'), 'deskripsi' => 'Mahasiswa FIB meraih medali emas dalam olimpiade sains antar universitas.'],
+                            (object)['nama_prestasi' => 'Penghargaan Karya Ilmiah Terbaik', 'file_bukti' => asset('path/to/default-prestasi-image3.jpg'), 'deskripsi' => 'Karya ilmiah mahasiswa mendapatkan penghargaan terbaik di konferensi internasional.'],
+                        ];
+                    @endphp
+
+                    @forelse ($prestasiList as $prestasi)
+                    <div class="col-lg-4 mb-5">
+                        <div class="card h-100 shadow border-0">
+                            <img class="card-img-top" src="{{ $prestasi->file_bukti }}" alt="{{ $prestasi->nama_prestasi }}" style="height: 200px; object-fit: cover;" />
+                            <div class="card-body p-4">
+                                <h5 class="card-title mb-3">{{ Str::limit($prestasi->nama_prestasi, 50) }}</h5>
+                                <p class="card-text mb-0">{{ Str::limit($prestasi->deskripsi, 100) }}</p>
+                            </div>
+                            <div class="card-footer p-4 pt-0 bg-transparent border-top-0">
+                                <div class="d-flex align-items-end justify-content-start">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @empty
+                    <div class="col-12 text-center">
+                        <p class="text-muted">Belum ada data prestasi untuk ditampilkan.</p>
+                    </div>
+                    @endforelse
+                </div>
+            </div>
+        </section> --}}
     </div>
     <footer class="footer">
         <div class="container">
@@ -369,7 +413,7 @@
         }
         .hero-title {
             font-size: 2.5rem;
-            color: #2c3e50; /* Warna judul dark gray */
+            color: #2c3e50; /* Warna nama_prestasi dark gray */
             font-weight: 700;
             margin-bottom: 1rem;
         }

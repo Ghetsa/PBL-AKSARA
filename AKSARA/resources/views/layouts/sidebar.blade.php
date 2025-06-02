@@ -165,7 +165,7 @@
             <div class="navbar-content">
                 <ul class="pc-navbar">
                     <li class="pc-item">
-                        <a href="{{ url('/dashboard/mahasiswa') }}"
+                        <a href="{{ route('dashboard.mahasiswa') }}"
                             class="pc-link {{ $activeMenu == 'dashboard' ? 'active' : '' }} ">
                             <span class="pc-micon"><i class="ti ti-dashboard"></i></span>
                             <span class="pc-mtext">Dashboard</span>
