@@ -211,6 +211,8 @@ Route::middleware(['auth'])->group(function () {
 
     // ===================== DOSEN =====================
     Route::middleware(['role:dosen'])->group(function () {
+        Route::get('/dashboard-dosen', [DashboardController::class, 'dosenDashboard'])->name('dashboard.dosen');
+
         // ---------- Lomba Dosen ----------
         Route::prefix('lomba-saya')->name('lomba.')->group(function () {
             Route::get('/histori-pengajuan', [LombaController::class, 'historiPengajuanLombaDsn'])->name('histori.index');

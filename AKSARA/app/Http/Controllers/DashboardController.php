@@ -191,4 +191,56 @@ class DashboardController extends Controller
             'prestasiByTingkat'
         ));
     }
+
+    public function dosenDashboard()
+    {
+        $breadcrumb = (object) ['title' => 'Dashboard Dosen', 'list' => ['Dashboard']];
+        $activeMenu = 'dashboard_dosen'; // atau 'dashboard'
+        $user = Auth::user();
+        $dosen = $user->dosen; // Asumsi ada relasi 'dosen' pada UserModel yang merujuk ke DosenModel
+
+        if (!$dosen) {
+            // Handle jika user dosen tidak memiliki record di tabel dosen
+            return redirect()->route('home')->with('error', 'Data dosen tidak ditemukan.');
+        }
+
+        // Asumsikan DosenModel memiliki relasi bimbinganMahasiswa()
+        // yang mengembalikan mahasiswa yang menjadi bimbingannya.
+        // Dan MahasiswaModel memiliki relasi prestasi()
+        $bimbinganMahasiswaIds = $dosen->bimbinganMahasiswa()->pluck('mahasiswa.mahasiswa_id')->toArray(); // Sesuaikan dengan struktur relasi Anda
+
+        $jumlahbimbinganMahasiswa = count($bimbinganMahasiswaIds);
+
+        $prestasibimbinganMahasiswa = PrestasiModel::whereIn('mahasiswa_id', $bimbinganMahasiswaIds)
+            ->where('status_verifikasi_prestasi', 'disetujui_admin') // Hanya yang disetujui
+            ->orderBy('tanggal_pelaksanaan_prestasi', 'desc')
+            ->take(5) // Ambil 5 terbaru
+            ->get();
+
+        $jumlahPrestasiBimbingan = PrestasiModel::whereIn('mahasiswa_id', $bimbinganMahasiswaIds)
+            ->where('status_verifikasi_prestasi', 'disetujui_admin')
+            ->count();
+
+        // Lomba yang diajukan oleh mahasiswa bimbingan (jika relevan)
+        $lombaDiajukanBimbingan = LombaModel::whereIn('diinput_oleh', function ($query) use ($bimbinganMahasiswaIds) {
+            $query->select('user_id')->from('users')
+                ->join('mahasiswa', 'users.user_id', '=', 'mahasiswa.user_id')
+                ->whereIn('mahasiswa.mahasiswa_id', $bimbinganMahasiswaIds);
+        })
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
+
+
+        return view('dashboard.dosen', compact(
+            'breadcrumb',
+            'activeMenu',
+            'user',
+            'dosen',
+            'jumlahbimbinganMahasiswa',
+            'prestasibimbinganMahasiswa',
+            'jumlahPrestasiBimbingan',
+            'lombaDiajukanBimbingan'
+        ));
+    }
 }
