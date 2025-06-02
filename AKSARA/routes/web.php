@@ -167,6 +167,8 @@ Route::middleware(['auth'])->group(function () {
 
     // ===================== ADMIN =====================
     Route::middleware(['role:admin'])->group(function () {
+        Route::get('/dashboard', [DashboardController::class, 'adminDashboard'])->name('dashboard');
+
         // ---------- Prestasi Verifikasi ----------
         Route::prefix('admin/prestasi-verifikasi')->name('prestasi.admin.')->group(function () {
             Route::get('/', [PrestasiController::class, 'indexAdmin'])->name('index');

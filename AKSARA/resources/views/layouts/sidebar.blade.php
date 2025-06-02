@@ -40,7 +40,7 @@
             <div class="navbar-content">
                 <ul class="pc-navbar">
                     <li class="pc-item">
-                        <a href="{{ url('/dashboard/admin') }}"
+                        <a href="{{ route('dashboard') }}"
                             class="pc-link {{ $activeMenu == 'dashboard' ? 'active' : '' }} ">
                             <span class="pc-micon"><i class="ti ti-dashboard"></i></span>
                             <span class="pc-mtext">Dashboard</span>

@@ -141,4 +141,54 @@ class DashboardController extends Controller
 
         return view('dashboard.mahasiswa', compact('breadcrumb', 'activeMenu', 'prestasiPublik', 'prestasiMahasiswa', 'rekomendasiLomba', 'lombaUmum', 'user'));
     }
+
+    public function adminDashboard()
+    {
+        $breadcrumb = (object) ['title' => 'Dashboard Admin', 'list' => ['Dashboard']];
+        $activeMenu = 'dashboard';
+
+        $totalPrestasi = PrestasiModel::count();
+        $prestasiDisetujui = PrestasiModel::where('status_verifikasi', 'disetujui')->count(); // Sesuaikan field status
+        $prestasiPending = PrestasiModel::where('status_verifikasi', 'pending')->count(); // Sesuaikan field status
+
+        $totalLomba = LombaModel::count();
+        $lombaAktif = LombaModel::where('status_verifikasi', 'disetujui')
+            ->where(function ($query) {
+                $query->where('batas_pendaftaran', '>=', Carbon::now()->toDateString())
+                    ->orWhereNull('batas_pendaftaran');
+            })
+            ->count();
+        $lombaPengajuanPending = LombaModel::where('status_verifikasi', 'pending')->count();
+
+        $totalUser = UserModel::count(); // atau User::count()
+        $totalMahasiswa = UserModel::where('role', 'mahasiswa')->count();
+        $totalDosen = UserModel::where('role', 'dosen')->count();
+
+        // Data untuk chart sederhana (contoh: Lomba berdasarkan tingkat)
+        $lombaByTingkat = LombaModel::selectRaw('tingkat, count(*) as total')
+            ->groupBy('tingkat')
+            ->pluck('total', 'tingkat');
+
+        $prestasiByTingkat = PrestasiModel::where('status_verifikasi', 'disetujui')
+            ->selectRaw('tingkat, count(*) as total')
+            ->groupBy('tingkat')
+            ->pluck('total', 'tingkat');
+
+
+        return view('dashboard.admin', compact(
+            'breadcrumb',
+            'activeMenu',
+            'totalPrestasi',
+            'prestasiDisetujui',
+            'prestasiPending',
+            'totalLomba',
+            'lombaAktif',
+            'lombaPengajuanPending',
+            'totalUser',
+            'totalMahasiswa',
+            'totalDosen',
+            'lombaByTingkat',
+            'prestasiByTingkat'
+        ));
+    }
 }

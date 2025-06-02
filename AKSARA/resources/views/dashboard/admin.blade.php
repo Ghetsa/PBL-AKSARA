@@ -1,5 +1,247 @@
 @extends('layouts.template')
 
+@section('title', $breadcrumb->title ?? 'Dashboard Admin')
+
+@push('css')
+    {{-- CSS untuk Chart.js jika diperlukan --}}
+@endpush
+
+@section('content')
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">{{ $breadcrumb->title }}</h1>
+        {{-- <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> Generate Report</a> --}}
+    </div>
+
+    <div class="row">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Lomba (Semua Status)</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $totalLomba }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar-alt fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Lomba Aktif (Disetujui)</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $lombaAktif }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-bullhorn fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Pengajuan Lomba Pending</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $lombaPengajuanPending }}</div>
+                             <a href="{{ route('admin.lomba.verifikasi.index') }}" class="stretched-link"></a> 
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-hourglass-half fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Total Prestasi (Semua Status)</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $totalPrestasi }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-trophy fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Prestasi Disetujui</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $prestasiDisetujui }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-award fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Prestasi Pending Verifikasi</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $prestasiPending }}</div>
+                            <a href="{{ route('prestasi.admin.index') }}?status_verifikasi=pending" class="stretched-link"></a> {{-- Sesuaikan route & parameter --}}
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-clock fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-danger shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Total Pengguna</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $totalUser }}</div>
+                            <div class="text-xs mt-1">Mhs: {{ $totalMahasiswa }} | Dosen: {{ $totalDosen }}</div>
+                             <a href="{{ route('user.index') }}" class="stretched-link"></a>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xl-6 col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Distribusi Lomba berdasarkan Tingkat</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-pie pt-4 pb-2">
+                        <canvas id="lombaByTingkatChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+         <div class="col-xl-6 col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Distribusi Prestasi berdasarkan Tingkat</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-pie pt-4 pb-2">
+                        <canvas id="prestasiByTingkatChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+@endsection
+
+@push('js')
+    <script src="{{ asset('vendor/chart.js/Chart.min.js') }}"></script> {{-- Pastikan path ini benar --}}
+
+    <script>
+        $(document).ready(function() {
+            // Data untuk Lomba Berdasarkan Tingkat
+            var lombaTingkatLabels = @json($lombaByTingkat->keys());
+            var lombaTingkatData = @json($lombaByTingkat->values());
+            var ctxLombaTingkat = document.getElementById("lombaByTingkatChart");
+            var lombaByTingkatChart = new Chart(ctxLombaTingkat, {
+                type: 'doughnut',
+                data: {
+                    labels: lombaTingkatLabels,
+                    datasets: [{
+                        data: lombaTingkatData,
+                        backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', '#858796'],
+                        hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf', '#dda20a', '#c73021', '#60616f'],
+                        hoverBorderColor: "rgba(234, 236, 244, 1)",
+                    }],
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    tooltips: {
+                        backgroundColor: "rgb(255,255,255)",
+                        bodyFontColor: "#858796",
+                        borderColor: '#dddfeb',
+                        borderWidth: 1,
+                        xPadding: 15,
+                        yPadding: 15,
+                        displayColors: false,
+                        caretPadding: 10,
+                    },
+                    legend: {
+                        display: true,
+                        position: 'bottom'
+                    },
+                    cutoutPercentage: 70,
+                },
+            });
+
+            // Data untuk Prestasi Berdasarkan Tingkat
+            var prestasiTingkatLabels = @json($prestasiByTingkat->keys());
+            var prestasiTingkatData = @json($prestasiByTingkat->values());
+            var ctxPrestasiTingkat = document.getElementById("prestasiByTingkatChart");
+            var prestasiByTingkatChart = new Chart(ctxPrestasiTingkat, {
+                type: 'doughnut', // Atau 'pie'
+                data: {
+                    labels: prestasiTingkatLabels.map(label => label.charAt(0).toUpperCase() + label.slice(1)), // Capitalize
+                    datasets: [{
+                        data: prestasiTingkatData,
+                        backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', '#858796', '#5a5c69', '#d1d3e2'],
+                        hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf', '#dda20a', '#c73021', '#60616f', '#37383e', '#b0b3cd'],
+                        hoverBorderColor: "rgba(234, 236, 244, 1)",
+                    }],
+                },
+                 options: {
+                    maintainAspectRatio: false,
+                    tooltips: {
+                        backgroundColor: "rgb(255,255,255)",
+                        bodyFontColor: "#858796",
+                        borderColor: '#dddfeb',
+                        borderWidth: 1,
+                        xPadding: 15,
+                        yPadding: 15,
+                        displayColors: false,
+                        caretPadding: 10,
+                    },
+                    legend: {
+                        display: true,
+                        position: 'bottom'
+                    },
+                    cutoutPercentage: 70, // Untuk doughnut chart
+                },
+            });
+        });
+    </script>
+@endpush
+
+{{-- @extends('layouts.template')
+
 @section('content')
 <!-- [ Main Content ] start -->
 <div class="row">
@@ -532,4 +774,4 @@
 <!-- [ sample-page ] end -->
 </div>
 <!-- [ Main Content ] end -->
-@endsection
+@endsection --}}
