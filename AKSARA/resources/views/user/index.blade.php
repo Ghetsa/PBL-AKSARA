@@ -23,9 +23,11 @@
                     <div class="card-tools">
                         {{-- <a href="{{ route('user.create') }}" class="btn btn-success btn-sm"><i class="fas fa-plus"></i>
                             Tambah (Non-AJAX)</a> --}}
+                                <a href="{{ url('/user/export_pdf') }}" class="btn btn-sm btn-warning"><i class="fa fa-file-pdf"></i> Export User (PDF)</a>
+                                <a href="{{ url('/user/export_excel') }}" class="btn btn-sm btn-success"><i class="fa fa-file-excel"></i> Export User</a>
                         <button type="button" class="btn btn-primary btn-sm"
                             onclick="modalAction('{{ route('user.create_ajax') }}')">
-                            <i class="fas fa-plus-circle"></i> Tambah User</button>
+                            <i class="fas fa-plus-circle"></i> Tambah User</button> 
                     </div>
                 </div>
 
