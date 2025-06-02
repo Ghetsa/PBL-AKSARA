@@ -6,6 +6,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfilController;
 use App\Http\Controllers\PrestasiController;
 use App\Http\Controllers\ProdiController;
+use App\Http\Controllers\NotifikasiController;
 use App\Http\Controllers\PeriodeController;
 use App\Http\Controllers\KeahlianUserController;
 use App\Http\Controllers\LandingPageController;
@@ -57,6 +58,15 @@ Route::middleware(['auth'])->group(function () {
     //     $activeMenu = 'dashboard';
     //     return view('dashboard.mahasiswa', compact('breadcrumb', 'activeMenu'));
     // })->name('dashboardDSN');
+
+    // ===================== NOTIFIAKSI =====================
+    Route::prefix('notifikasi')->middleware('auth')->group(function () {
+        Route::get('/', [NotifikasiController::class, 'index'])->name('notifikasi.index');
+        Route::get('/{id}', [NotifikasiController::class, 'show'])->name('notifikasi.show');
+        Route::post('/{id}/baca', [NotifikasiController::class, 'markAsRead'])->name('notifikasi.baca');
+        Route::post('/semua-baca', [NotifikasiController::class, 'markAllAsRead'])->name('notifikasi.semua.baca');
+        Route::delete('/{id}', [NotifikasiController::class, 'destroy'])->name('notifikasi.hapus');
+    });
 
     // ===================== PROFILE =====================
     Route::get('/profile', [ProfilController::class, 'index'])->name('profile.index');
