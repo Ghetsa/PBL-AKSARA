@@ -1,5 +1,0 @@
-{
-    "require": {
-        "yajra/laravel-datatables": "10.0"
-    }
-}
