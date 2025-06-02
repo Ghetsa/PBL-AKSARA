@@ -104,7 +104,7 @@
                         </a>
                     </li>
                     <li class="pc-item">
-                        <a href="{{ url('/laporan') }}" class="pc-link {{ $activeMenu == 'laporan' ? 'active' : '' }}">
+                        <a href="{{ route('admin.laporan.index') }}" class="pc-link {{ $activeMenu == 'laporan' ? 'active' : '' }}">
                             <span class="pc-micon"><i class="ti ti-report-analytics"></i></span>
                             <span class="pc-mtext">Laporan & Analisis</span>
                         </a>

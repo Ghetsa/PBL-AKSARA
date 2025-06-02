@@ -10,6 +10,7 @@ use App\Http\Controllers\PeriodeController;
 use App\Http\Controllers\KeahlianUserController;
 use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\LombaController; // Tambahkan ini
 
 /*
@@ -187,6 +188,12 @@ Route::middleware(['auth'])->group(function () {
 
         // ---------- Lomba (CRUD & Verifikasi) ----------
         Route::prefix('admin')->name('admin.')->group(function () {
+            Route::get('/laporan-analisis', [LaporanController::class, 'index'])->name('laporan.index');
+            Route::get('/laporan-analisis/prestasi-data', [LaporanController::class, 'getPrestasiData'])->name('laporan.prestasi.data'); // Untuk DataTables
+            Route::get('/laporan-analisis/lomba-data', [LaporanController::class, 'getLombaData'])->name('laporan.lomba.data');       // Untuk DataTables
+            Route::get('/laporan-analisis/export-prestasi', [LaporanController::class, 'exportPrestasi'])->name('laporan.prestasi.export');
+            Route::get('/laporan-analisis/export-lomba', [LaporanController::class, 'exportLomba'])->name('laporan.lomba.export');
+
             // --- Verifikasi Lomba ---
             Route::prefix('verifikasi-lomba')->name('lomba.verifikasi.')->group(function () {
                 Route::get('/', [LombaController::class, 'adminIndexVerifikasiLomba'])->name('index');
