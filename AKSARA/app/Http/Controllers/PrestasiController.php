@@ -752,4 +752,72 @@ class PrestasiController extends Controller
         }
     }
 
+    public function listDosenAll(Request $request)
+{
+    if ($request->ajax()) {
+
+        $userId = Auth::id();
+
+        $dosen = DosenModel::where('user_id', $userId)->first();
+        if (!$dosen)
+            return abort(403);
+
+        $data = PrestasiModel::with('mahasiswa.user', 'mahasiswa.prodi')
+            ->where('dosen_id', $dosen->dosen_id)
+            ->select('prestasi.*') // Pilih semua kolom dari prestasi
+            ->orderByRaw("FIELD(status_verifikasi, 'pending', 'disetujui', 'ditolak')");
+
+        // Filter
+        if ($request->filled('search_nama')) {
+            $searchTerm = $request->search_nama;
+            $data->where(function ($q) use ($searchTerm) {
+                $q->where('nama_prestasi', 'like', '%' . $searchTerm . '%')
+                    ->orWhereHas('mahasiswa.user', function ($userQuery) use ($searchTerm) {
+                        $userQuery->where('nama', 'like', '%' . $searchTerm . '%');
+                    })
+                    ->orWhereHas('mahasiswa', function ($mhsQuery) use ($searchTerm) {
+                        $mhsQuery->where('nim', 'like', '%' . $searchTerm . '%');
+                    });
+            });
+        }
+        if ($request->filled('filter_status') && in_array($request->filter_status, ['pending', 'disetujui', 'ditolak'])) {
+            $data->where('status_verifikasi', $request->filter_status);
+        }
+
+        return DataTables::of($data)
+            ->addIndexColumn()
+            ->addColumn('nama_mahasiswa', function ($row) {
+                return $row->mahasiswa->user->nama ?? 'N/A';
+            })
+            ->addColumn('nim_mahasiswa', function ($row) {
+                return $row->mahasiswa->nim ?? 'N/A';
+            })
+            ->editColumn('kategori', function ($row) {
+                return ucfirst($row->kategori);
+            })
+            ->editColumn('tingkat', function ($row) {
+                return ucfirst($row->tingkat);
+            })
+            ->addColumn('dosen', function ($row) {
+                return $row->dosen ? $row->dosen->user->nama : '-';
+            })
+            ->editColumn('status_verifikasi', function ($row) {
+                if ($row->status_verifikasi == 'pending') {
+                    return '<span class="badge bg-warning text-dark">Pending</span>';
+                } elseif ($row->status_verifikasi == 'disetujui') {
+                    return '<span class="badge bg-success">Disetujui</span>';
+                } elseif ($row->status_verifikasi == 'ditolak') {
+                    return '<span class="badge bg-danger">Ditolak</span>';
+                }
+                return '<span class="badge bg-secondary">' . ucfirst($row->status_verifikasi) . '</span>';
+            })
+            // Hapus addColumn aksi dan rawColumns aksi
+            ->rawColumns(['status_verifikasi'])
+            ->make(true);
+    }
+    return abort(403);
 }
+
+
+}
+
