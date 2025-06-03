@@ -44,6 +44,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/user/export/excel', [App\Http\Controllers\UserController::class, 'export_excel'])->name('user.export.excel');
     Route::get('/user/export/pdf', [App\Http\Controllers\UserController::class, 'export_pdf'])->name('user.export.pdf');
 
+    Route::get('/user/import', [App\Http\Controllers\UserController::class, 'import'])->name('user.import');
+
     // For Prodi
     Route::get('/prodi/export/excel', [App\Http\Controllers\ProdiController::class, 'export_excel'])->name('prodi.export.excel');
     Route::get('/prodi/export/pdf', [App\Http\Controllers\ProdiController::class, 'export_pdf'])->name('prodi.export.pdf');

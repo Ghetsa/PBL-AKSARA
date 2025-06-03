@@ -22,6 +22,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
@@ -567,79 +568,6 @@ class UserController extends Controller
         return view('user.show_ajax', compact('user'));
     }
 
-    public function export_excel()
-    {
-        // ambil data user yang akan di export
-        $user = UserModel::select('user_id', 'role', 'username', 'nama', 'password') // Ditambahkan user_id untuk konsistensi jika diperlukan
-            ->orderBy('nama') // Ditambahkan order by nama
-            ->with('level')
-            ->get();
-
-        // Load library excel
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet(); // ambil sheet yang aktif
-
-        $sheet->setCellValue('A1', 'No');
-        $sheet->setCellValue('B1', 'Username');
-        $sheet->setCellValue('C1', 'Nama');
-        $sheet->setCellValue('D1', 'Password'); // Sesuai contoh Anda, pertimbangkan keamanan
-        $sheet->setCellValue('E1', 'Role');
-
-        $sheet->getStyle('A1:E1')->getFont()->setBold(true); // bold header
-
-        $no = 1; // nomor data dimulai dari 1
-        $baris = 2; // baris data dimulai dari baris ke-2
-        foreach ($user as $key => $value) {
-            $sheet->setCellValue('A' . $baris, $no);
-            $sheet->setCellValue('B' . $baris, $value->username);
-            $sheet->setCellValue('C' . $baris, $value->nama);
-            $sheet->setCellValue('D' . $baris, $value->password); // Mengekspor password (seperti contoh Anda)
-            $sheet->setCellValue('E' . $baris, $value->level ? $value->level->level_nama : 'N/A'); // ambil nama level
-            $baris++;
-            $no++;
-        }
-
-        foreach (range('A', 'E') as $columnID) {
-            $sheet->getColumnDimension($columnID)->setAutoSize(true); // set auto size untuk kolom
-        }
-
-        $sheet->setTitle('Data User'); // set title sheet
-
-        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
-        $filename = 'Data User ' . date('Y-m-d H_i_s') . '.xlsx'; // Menggunakan H_i_s untuk nama file unik
-
-        // Menyiapkan header untuk file Excel
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename="' . $filename . '"');
-        header('Cache-Control: max-age=0');
-        header('Cache-Control: max-age=1'); // Sesuai contoh Anda
-        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
-        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
-        header('Cache-Control: cache, must-revalidate');
-        header('Pragma: public');
-
-        $writer->save('php://output');
-        exit;
-    }
-
-    public function export_pdf()
-    {
-        $user = UserModel::select('user_id', 'level_id', 'username', 'nama') // Password tidak diambil untuk PDF
-            ->orderBy('level_id')
-            ->orderBy('nama')
-            ->with('level')
-            ->get();
-
-        // view yang akan digenerate adalah user.export_pdf
-        // variabel $user akan dikirimkan ke view tersebut
-        $pdf = Pdf::loadView('user.export_pdf', ['user' => $user]);
-        $pdf->setPaper('a4', 'portrait'); // set ukuran kertas dan orientasi
-        $pdf->setOption('isRemoteEnabled', true); // set true jika ada gambar dari URL
-        // $pdf->render(); // render() seringkali otomatis dipanggil oleh stream()
-
-        return $pdf->stream('Data User ' . date('Y-m-d H_i_s') . '.pdf'); // Menggunakan H_i_s untuk nama file unik
-    }
-
     // public function show_ajax($user_id)
     // {
     //     // Eager load relasi untuk menampilkan data terkait role
@@ -661,4 +589,299 @@ class UserController extends Controller
 
     //     return view('user.show_ajax', compact('user'));
     // }
+
+    public function import()
+    {
+        return view('user.import');
+    }
+
+    public function import_ajax(Request $request)
+    {
+        // Validasi file awal
+        $validator = Validator::make($request->all(), [
+            'file_user_excel' => 'required|mimes:xls,xlsx|max:5120', // Max 5MB
+        ], [
+            'file_user_excel.required' => 'File Excel wajib diunggah.',
+            'file_user_excel.mimes' => 'Format file harus .xls atau .xlsx.',
+            'file_user_excel.max' => 'Ukuran file maksimal 5MB.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validasi file gagal.',
+                'msgField' => $validator->errors()->toArray()
+            ], 422);
+        }
+
+        $file = $request->file('file_user_excel');
+
+        try {
+            $reader = IOFactory::createReaderForFile($file->getPathname());
+            $reader->setReadDataOnly(true); // Hanya baca data, abaikan styling untuk performa
+            $spreadsheet = $reader->load($file->getPathname());
+            $sheet = $spreadsheet->getActiveSheet();
+            $rows = $sheet->toArray(null, true, true, true); // Baca sebagai array asosiatif dengan header
+
+            $importedCount = 0;
+            $errorCount = 0;
+            $errorsDetail = []; // Untuk menyimpan detail error per baris
+
+            // Ambil header (baris pertama)
+            $header = array_map('trim', array_map('strtolower', $rows[1]));
+            unset($rows[1]); // Hapus baris header dari data
+
+            // Ekspektasi header (sesuaikan dengan template Anda, case insensitive)
+            // Ini hanya untuk referensi, validasi akan berdasarkan indeks kolom
+            // $expectedHeaders = ['username', 'nama lengkap', 'email', 'password', 'role', 'nip/nim', 'no telepon', 'alamat', 'kode prodi', 'tahun angkatan'];
+
+            DB::beginTransaction();
+
+            foreach ($rows as $rowIndex => $row) {
+                // Kolom Excel: A=Username, B=Nama, C=Email, D=Password, E=Role,
+                // F=NIP/NIM, G=No Telepon, H=Alamat, I=Kode Prodi, J=Tahun Angkatan
+                $username       = trim($row['A'] ?? '');
+                $nama           = trim($row['B'] ?? '');
+                $email          = trim($row['C'] ?? '');
+                $password       = trim($row['D'] ?? '');
+                $role           = strtolower(trim($row['E'] ?? ''));
+                $nip_nim        = trim($row['F'] ?? '');
+                $no_telepon     = trim($row['G'] ?? null);
+                $alamat         = trim($row['H'] ?? null);
+                $kode_prodi     = trim($row['I'] ?? null);
+                $tahun_angkatan = trim($row['J'] ?? null);
+
+                // Minimal data yang harus ada
+                if (empty($username) || empty($nama) || empty($email) || empty($password) || empty($role)) {
+                    $errorCount++;
+                    $errorsDetail[] = "Baris " . $rowIndex . ": Data tidak lengkap (Username, Nama, Email, Password, Role wajib diisi). Lewati baris ini.";
+                    continue;
+                }
+
+                // Validasi Role
+                if (!in_array($role, ['admin', 'dosen', 'mahasiswa'])) {
+                    $errorCount++;
+                    $errorsDetail[] = "Baris " . $rowIndex . ": Role '$role' tidak valid. Gunakan 'admin', 'dosen', atau 'mahasiswa'. Lewati baris ini.";
+                    continue;
+                }
+
+                // Validasi NIP/NIM berdasarkan Role
+                if (in_array($role, ['admin', 'dosen', 'mahasiswa']) && empty($nip_nim)) {
+                    $errorCount++;
+                    $errorsDetail[] = "Baris " . $rowIndex . ": NIP/NIM wajib diisi untuk role '$role'. Lewati baris ini.";
+                    continue;
+                }
+
+                // Cek duplikasi Username dan Email
+                if (UserModel::where('username', $username)->exists()) {
+                    $errorCount++;
+                    $errorsDetail[] = "Baris " . $rowIndex . ": Username '$username' sudah terdaftar. Lewati baris ini.";
+                    continue;
+                }
+                if (UserModel::where('email', $email)->exists()) {
+                    $errorCount++;
+                    $errorsDetail[] = "Baris " . $rowIndex . ": Email '$email' sudah terdaftar. Lewati baris ini.";
+                    continue;
+                }
+
+                $prodi_id = null;
+                if (!empty($kode_prodi) && in_array($role, ['dosen', 'mahasiswa'])) {
+                    $prodi = ProdiModel::where('prodi_kode', $kode_prodi)->first(); // Menggunakan prodi_kode dari SQL
+                    if (!$prodi) {
+                        $errorCount++;
+                        $errorsDetail[] = "Baris " . $rowIndex . ": Kode Prodi '$kode_prodi' tidak ditemukan. Lewati baris ini.";
+                        continue;
+                    }
+                    $prodi_id = $prodi->prodi_id;
+                } elseif (in_array($role, ['dosen', 'mahasiswa']) && empty($kode_prodi)) {
+                    $errorCount++;
+                    $errorsDetail[] = "Baris " . $rowIndex . ": Kode Prodi wajib diisi untuk role '$role'. Lewati baris ini.";
+                    continue;
+                }
+
+
+                $periode_id = null;
+                if ($role === 'mahasiswa' && !empty($tahun_angkatan)) {
+                    if (!preg_match('/^\d{4}$/', $tahun_angkatan)) {
+                        $errorCount++;
+                        $errorsDetail[] = "Baris " . $rowIndex . ": Format Tahun Angkatan '$tahun_angkatan' tidak valid (gunakan YYYY). Lewati baris ini.";
+                        continue;
+                    }
+                    // Cari periode Ganjil untuk tahun angkatan tersebut
+                    $periode = PeriodeModel::where('semester', 'Ganjil')
+                        ->where('tahun_ajaran', $tahun_angkatan . '/' . ($tahun_angkatan + 1))
+                        ->first();
+                    if (!$periode) {
+                        // Jika tidak ada, coba buat periode baru atau tandai error
+                        // Untuk impor, lebih baik tandai error jika periode tidak ada
+                        $errorCount++;
+                        $errorsDetail[] = "Baris " . $rowIndex . ": Periode Ganjil untuk tahun ajaran " . $tahun_angkatan . "/" . ($tahun_angkatan + 1) . " tidak ditemukan. Pastikan periode sudah ada. Lewati baris ini.";
+                        continue;
+                    }
+                    $periode_id = $periode->periode_id;
+                } elseif ($role === 'mahasiswa' && empty($tahun_angkatan)) {
+                    $errorCount++;
+                    $errorsDetail[] = "Baris " . $rowIndex . ": Tahun Angkatan wajib diisi untuk role 'mahasiswa'. Lewati baris ini.";
+                    continue;
+                }
+
+
+                // Buat User
+                $newUser = UserModel::create([
+                    'username'    => $username,
+                    'nama'        => $nama,
+                    'email'       => $email,
+                    'password'    => Hash::make($password),
+                    'role'        => $role,
+                    'no_telepon'  => $no_telepon,
+                    'alamat'      => $alamat,
+                    'status'      => 'aktif', // Default status
+                    // 'level_id' => $level_id, // Jika Anda punya logika untuk ini
+                ]);
+
+                // Buat data role-specific
+                if ($role === 'admin') {
+                    AdminModel::create([
+                        'user_id' => $newUser->user_id,
+                        'nip'     => $nip_nim,
+                    ]);
+                } elseif ($role === 'dosen') {
+                    DosenModel::create([
+                        'user_id'  => $newUser->user_id,
+                        'nip'      => $nip_nim,
+                        'prodi_id' => $prodi_id,
+                        // 'keahlian_id' => null, // Jika ada default atau diisi nanti
+                    ]);
+                } elseif ($role === 'mahasiswa') {
+                    MahasiswaModel::create([
+                        'user_id'           => $newUser->user_id,
+                        'nim'               => $nip_nim,
+                        'prodi_id'          => $prodi_id,
+                        'periode_id'        => $periode_id, // Periode masuk/angkatan
+                        'mahasiswa_angkatan' => $tahun_angkatan,
+                    ]);
+                }
+                $importedCount++;
+            }
+
+            if ($errorCount > 0) {
+                DB::rollBack();
+                $message = "Impor selesai dengan beberapa kesalahan. ";
+                $message .= $importedCount . " data berhasil diimpor, " . $errorCount . " data gagal.";
+                return response()->json([
+                    'status' => false, // Set false jika ada error agar user tahu tidak semua berhasil
+                    'message' => $message,
+                    'errors_detail' => $errorsDetail
+                ], 400); // atau 200 dengan status false
+            }
+
+            DB::commit();
+            return response()->json([
+                'status' => true,
+                'message' => $importedCount . " data user berhasil diimpor."
+            ]);
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error("Error during Excel import for users: " . $e->getMessage() . "\nStack Trace:\n" . $e->getTraceAsString());
+            return response()->json([
+                'status' => false,
+                'message' => 'Terjadi kesalahan server saat impor: ' . $e->getMessage(),
+                'errors_detail' => ['Kesalahan sistem: ' . $e->getMessage()]
+            ], 500);
+        }
+    }
+
+    public function export_excel()
+    {
+        // ambil data user yang akan di export
+        // Pastikan untuk eager load relasi yang dibutuhkan
+        $users = UserModel::select('user_id', 'nama', 'email', 'role', 'no_telepon', 'alamat') // Tambahkan 'username' jika belum ada
+            ->orderBy('nama')
+            ->with(['admin', 'dosen', 'mahasiswa']) // Eager load relasi
+            ->get();
+
+        // Load library excel
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet(); // ambil sheet yang aktif
+
+        // Set header kolom
+        $sheet->setCellValue('A1', 'No');
+        $sheet->setCellValue('B1', 'Username'); // Ditambahkan/disesuaikan
+        $sheet->setCellValue('C1', 'NIM/NIP');   // Kolom baru
+        $sheet->setCellValue('D1', 'Email');
+        $sheet->setCellValue('E1', 'Role');
+        $sheet->setCellValue('F1', 'No Telepon');
+        $sheet->setCellValue('G1', 'Alamat');
+
+        // Set style bold untuk header
+        $sheet->getStyle('A1:G1')->getFont()->setBold(true);
+
+        $no = 1; // nomor data dimulai dari 1
+        $baris = 2; // baris data dimulai dari baris ke-2
+        foreach ($users as $user) { // Menggunakan $user sebagai iterator
+            $sheet->setCellValue('A' . $baris, $no);
+            $sheet->setCellValue('B' . $baris, $user->nama);
+
+            // Logika untuk NIM/NIP
+            $nim_nip = 'N/A';
+            if (isset($user->role)) {
+                $roleLower = strtolower($user->role);
+                if ($roleLower === 'admin' && $user->admin) {
+                    $nim_nip = $user->admin->nip;
+                } elseif ($roleLower === 'dosen' && $user->dosen) {
+                    $nim_nip = $user->dosen->nip;
+                } elseif ($roleLower === 'mahasiswa' && $user->mahasiswa) {
+                    $nim_nip = $user->mahasiswa->nim;
+                }
+            }
+            $sheet->setCellValue('C' . $baris, $nim_nip);
+
+            $sheet->setCellValue('D' . $baris, $user->email);
+            $sheet->setCellValue('E' . $baris, $user->role);
+            $sheet->setCellValue('F' . $baris, $user->no_telepon);
+            $sheet->setCellValue('G' . $baris, $user->alamat);
+
+            $baris++;
+            $no++;
+        }
+
+        // Set auto size untuk semua kolom yang digunakan
+        foreach (range('A', 'G') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        $sheet->setTitle('Data User'); // set title sheet
+
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $filename = 'Data User ' . date('Y-m-d H_i_s') . '.xlsx'; // Menggunakan H_i_s agar nama file lebih unik
+
+        // Menyiapkan header untuk file Excel
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+        header('Cache-Control: max-age=1'); // Sesuai contoh Anda
+        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+        header('Cache-Control: cache, must-revalidate');
+        header('Pragma: public');
+
+        $writer->save('php://output');
+        exit;
+    }
+
+    public function export_pdf()
+    {
+        $user = UserModel::select('user_id', 'nama', 'email', 'role', 'no_telepon', 'alamat')
+            ->orderBy('nama')
+            ->with(['admin', 'dosen', 'mahasiswa'])
+            ->get();
+
+        // use Barryvdh\DomPDF\Facade\Pdf PDF
+        $pdf = Pdf::loadView('user.export_pdf', ['users' => $user]);
+        $pdf->setPaper('a4', 'portrait'); // set ukuran kertas dan orientasi 
+        $pdf->setOption('isRemoteEnabled', true); // set true jika ada gambar dari URL
+        $pdf->render();
+
+        return $pdf->stream('Data User ' . date('Y-m-d H:i:s') . '.pdf');
+    }
 }

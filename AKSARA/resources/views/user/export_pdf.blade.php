@@ -73,18 +73,32 @@
         <thead>
             <tr>
                 <th class="text-center">No</th>
-                <th>Username</th>
                 <th>Nama</th>
-                <th>Level</th>
+                <th>NIM/NIP</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>No. Telepon</th>
+                <th>Alamat</th>
             </tr>
         </thead>
         <tbody>
-            @foreach($user as $u)
+            @foreach($users as $u)
             <tr>
                 <td class="text-center">{{ $loop->iteration }}</td>
-                <td>{{ $u->username }}</td>
                 <td>{{ $u->nama }}</td>
-                <td>{{ $u->level->level_nama }}</td>
+                    @if($u->role === 'admin' && $u->admin)
+                       <td>{{ $u->admin->nip }}</td> 
+                    @elseif($u->role === 'dosen' && $u->dosen)
+                        <td>{{ $u->dosen->nip }}</td> 
+                    @elseif($u->role === 'mahasiswa' && $u->mahasiswa)
+                        <td>{{ $u->mahasiswa->nim }}</td> 
+                    @else
+                        N/A
+                    @endif
+                <td>{{ $u->email }}</td>
+                <td>{{ $u->role }}</td>
+                <td>{{ $u->no_telepon }}</td>
+                <td>{{ $u->alamat }}</td>
             </tr>
             @endforeach
         </tbody>
