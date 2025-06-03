@@ -77,11 +77,11 @@ Route::middleware(['auth'])->group(function () {
     //     return view('dashboard.mahasiswa', compact('breadcrumb', 'activeMenu'));
     // })->name('dashboardMHS');
 
-    // Route::get('/dashboard/dosen', function () {
-    //     $breadcrumb = (object) ['title' => 'Dashboard', 'list' => ['Dosen', 'Dashboard']];
-    //     $activeMenu = 'dashboard';
-    //     return view('dashboard.mahasiswa', compact('breadcrumb', 'activeMenu'));
-    // })->name('dashboardDSN');
+    Route::get('/dashboard/dosen', function () {
+        $breadcrumb = (object) ['title' => 'Dashboard', 'list' => ['Dosen', 'Dashboard']];
+        $activeMenu = 'dashboard';
+        return view('dashboard.dosen', compact('breadcrumb', 'activeMenu'));
+    })->name('dashboardDSN');
 
     // ===================== NOTIFIAKSI =====================
     Route::prefix('notifikasi')->middleware('auth')->group(function () {

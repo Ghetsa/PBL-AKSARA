@@ -255,7 +255,7 @@
                         </a>
                     </li>
                     <li class="pc-item">
-                        <a href="{{ route('lomba.histori.index') }}"
+                        <a href="{{ route('lomba.dsn.histori.index') }}"
                             class="pc-link {{ $activeMenu == 'verifikasi' ? 'active' : '' }}">
                             <span class="pc-micon"><i class="ti ti-file-check"></i></span>
                             <span class="pc-mtext">Upload Info Lomba</span>
