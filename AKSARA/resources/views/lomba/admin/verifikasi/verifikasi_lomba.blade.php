@@ -9,9 +9,75 @@
     </div>
     <div class="modal-body" style="max-height: 65vh; overflow-y: auto;">
         <h6>Detail Pengajuan Lomba:</h6>
-        <div class="table-responsive">
+        <div class="col-md-12">
+            <dl class="row">
+                <dt class="col-sm-5 col-lg-4">Nama Lomba:</dt>
+                <dd class="col-sm-7 col-lg-8">{{ $lomba->nama_lomba }}</dd>
+
+                <dt class="col-sm-5 col-lg-4">Penyelenggara:</dt>
+                <dd class="col-sm-7 col-lg-8">{{ $lomba->penyelenggara }}</dd>
+
+                <dt class="col-sm-5 col-lg-4">Tingkat:</dt>
+                <dd class="col-sm-7 col-lg-8">{{ ucfirst($lomba->tingkat) }}</dd>
+
+                <dt class="col-sm-5 col-lg-4">Kategori Peserta:</dt>
+                <dd class="col-sm-7 col-lg-8">{{ ucfirst($lomba->kategori) }}</dd>
+
+                <dt class="col-sm-5 col-lg-4">Bidang Lomba:</dt>
+                <dd class="col-sm-7 col-lg-8">
+                    @if($lomba->bidangKeahlian && $lomba->bidangKeahlian->count() > 0)
+                        @foreach($lomba->bidangKeahlian as $detail)
+                            @if($detail->bidang) {{-- Memastikan relasi bidang ada --}}
+                                <span class="badge bg-light-secondary text-dark me-1 mb-1 p-2">{{ e($detail->bidang->bidang_nama) }}</span>
+                            @endif
+                        @endforeach
+                    @else
+                        -
+                    @endif
+                </dd>
+                
+                <dt class="col-sm-5 col-lg-4">Biaya Pendaftaran:</dt>
+                <dd class="col-sm-7 col-lg-8">
+                    @if($lomba->biaya > 0)
+                        Rp {{ number_format($lomba->biaya, 0, ',', '.') }}
+                    @else
+                        <span class="badge bg-light-success text-success px-2 py-1">Gratis</span>
+                    @endif
+                </dd>
+
+                <dt class="col-sm-5 col-lg-4">Pendaftaran Dibuka:</dt>
+                <dd class="col-sm-7 col-lg-8">{{ $lomba->pembukaan_pendaftaran ? $lomba->pembukaan_pendaftaran->isoFormat('D MMMM YYYY') : '-' }}</dd>
+
+                <dt class="col-sm-5 col-lg-4">Batas Pendaftaran:</dt>
+                <dd class="col-sm-7 col-lg-8">{{ $lomba->batas_pendaftaran ? $lomba->batas_pendaftaran->isoFormat('D MMMM YYYY') : '-' }}</dd>
+
+                @if($lomba->link_pendaftaran)
+                <dt class="col-sm-5 col-lg-4">Link Pendaftaran:</dt>
+                <dd class="col-sm-7 col-lg-8"><a href="{{ $lomba->link_pendaftaran }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary"><i class="fas fa-external-link-alt me-1"></i> Kunjungi Link</a></dd>
+                @endif
+
+                @if($lomba->link_penyelenggara)
+                <dt class="col-sm-5 col-lg-4">Link Penyelenggara:</dt>
+                <dd class="col-sm-7 col-lg-8"><a href="{{ $lomba->link_penyelenggara }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary"><i class="fas fa-link me-1"></i> Website Resmi</a></dd>
+                @endif
+
+                 @if($lomba->inputBy) {{-- Menggunakan relasi inputBy --}}
+                <dt class="col-sm-5 col-lg-4">Diajukan Oleh:</dt>
+                <dd class="col-sm-7 col-lg-8">
+                    {{ $lomba->inputBy->nama ?? 'N/A' }}
+                    @if($lomba->inputBy)
+                    ({{ ucfirst($lomba->inputBy->role) }})
+                    @endif
+                </dd>
+                @endif
+
+                <dt class="col-sm-5 col-lg-4">Status Verifikasi:</dt>
+                <dd class="col-sm-7 col-lg-8">{!! $lomba->status_verifikasi_badge !!}</dd>
+            </dl>
+        </div>
+        {{-- <div class="table-responsive">
             <table class="table table-sm table-bordered table-striped mb-3">
-                <tbody> {{-- Added tbody for better table structure --}}
+                <tbody> 
                     <tr><th style="width:35%;">Nama Lomba</th><td>{{ $lomba->nama_lomba }}</td></tr>
                     <tr><th>Diajukan Oleh</th><td>{{ $lomba->penginput->nama ?? 'N/A' }} ({{ ucfirst($lomba->penginput->role ?? 'N/A') }})</td></tr>
                     <tr><th>Penyelenggara</th><td>{{ $lomba->penyelenggara }}</td></tr>
@@ -38,7 +104,7 @@
                     <tr><th>Tanggal Diajukan</th><td>{{ $lomba->created_at ? \Carbon\Carbon::parse($lomba->created_at)->format('d M Y H:i') : '-' }}</td></tr>
                 </tbody>
             </table>
-        </div>
+        </div> --}}
         <hr>
         <h6>Form Verifikasi:</h6>
         <div class="form-group row mb-3"> {{-- Consider using Bootstrap's mb-3 for spacing --}}
