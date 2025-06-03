@@ -248,14 +248,14 @@
                         <i class="ti ti-brand-chrome"></i>
                     </li>
                     <li class="pc-item">
-                        <a href="{{ route('lomba.publik.index') }}"
+                        <a href="{{ route('lomba.dosen.index') }}"
                             class="pc-link {{ $activeMenu == 'lomba' ? 'active' : '' }}">
                             <span class="pc-micon"><i class="ti ti-award"></i></span>
                             <span class="pc-mtext">Daftar Lomba</span>
                         </a>
                     </li>
                     <li class="pc-item">
-                        <a href="{{ route('lomba.dsn.histori.index') }}"
+                        <a href="{{ route('lomba.dosen.histori.index') }}"
                             class="pc-link {{ $activeMenu == 'verifikasi' ? 'active' : '' }}">
                             <span class="pc-micon"><i class="ti ti-file-check"></i></span>
                             <span class="pc-mtext">Upload Info Lomba</span>

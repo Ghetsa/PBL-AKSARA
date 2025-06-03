@@ -1292,6 +1292,57 @@ class LombaController extends Controller
     // METHOD UNTUK MAHASISWA & DOSEN (PENGAJUAN LOMBA & HISTORI)
     // =======================================================================
 
+    public function indexLombaDosen()
+    {
+        $userRole = Auth::user()->role;
+        $breadcrumb = (object) ['title' => 'Informasi Lomba Terkini', 'list' => ['Beranda', 'Info Lomba']];
+        $activeMenu = 'info_lomba_publik'; // Sesuaikan nama activeMenu
+        return view('lomba.dosen.index', compact('breadcrumb', 'activeMenu', 'userRole'));
+    }
+
+    /**
+     * Menyediakan data untuk DataTables daftar lomba yang sudah disetujui.
+     */
+    public function listLombaDosen(Request $request)
+    {
+        if ($request->ajax()) {
+            $data = LombaModel::where('status_verifikasi', 'disetujui')
+                ->orderBy('batas_pendaftaran', 'asc');
+
+            return DataTables::of($data)
+                ->addIndexColumn()
+                ->editColumn('nama_lomba', function ($row) {
+                    $html = '<span class="fw-semibold">' . e($row->nama_lomba) . '</span>';
+                    if ($row->poster && Storage::disk('public')->exists($row->poster)) {
+                        $html .= '<br><a href="' . asset('storage/' . $row->poster) . '" target="_blank" class="badge bg-light-info text-info mt-1"><i class="fas fa-image me-1"></i>Lihat Poster</a>';
+                    }
+                    return $html;
+                })
+                ->addColumn('periode_pendaftaran', function ($row) {
+                    $mulai = $row->pembukaan_pendaftaran ? Carbon::parse($row->pembukaan_pendaftaran)->setTimezone('Asia/Jakarta')->isoFormat('D MMM YYYY') : 'N/A';
+                    $selesai = $row->batas_pendaftaran ? Carbon::parse($row->batas_pendaftaran)->setTimezone('Asia/Jakarta')->isoFormat('D MMM YYYY') : 'N/A';
+                    return $mulai . ' - ' . $selesai;
+                })
+                ->addColumn('biaya_formatted', fn($row) => $row->biaya > 0 ? 'Rp ' . number_format($row->biaya, 0, ',', '.') : '<span class="badge bg-light-success text-success px-2 py-1">Gratis</span>')
+                ->addColumn('aksi', function ($row) {
+                    return '<button onclick="modalActionLomba(\'' . route('lomba.publik.show_ajax', $row->lomba_id) . '\', \'Detail Lomba\', \'modalDetailLombaPublik\')" class="btn btn-sm btn-outline-primary"><i class="fas fa-eye me-1"></i>Detail</button>';
+                })
+                ->rawColumns(['nama_lomba', 'biaya_formatted', 'aksi'])
+                ->make(true);
+        }
+        return abort(403);
+    }
+
+    public function showAjaxLombaDosen($id)
+    {
+        $lomba = LombaModel::where('status_verifikasi', 'disetujui')
+            ->with([
+                'inputBy',
+                'bidangKeahlian.bidang' // Eager load LombaDetailModel dan relasi bidang di dalamnya
+            ])
+            ->findOrFail($id);
+        return view('lomba.dosen.show_ajax', compact('lomba'));
+    }
     /**
      * Menampilkan halaman histori pengajuan lomba untuk user yang login.
      */
@@ -1496,7 +1547,7 @@ class LombaController extends Controller
             'list' => ['Info Lomba', 'Histori Pengajuan']
         ];
         $activeMenu = 'histori_lomba_user';
-        return view('lomba.histori_pengajuan_lomba', compact('breadcrumb', 'activeMenu'));
+        return view('lomba.dosen.histori_pengajuan_lomba', compact('breadcrumb', 'activeMenu'));
     }
 
     /**

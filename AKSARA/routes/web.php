@@ -13,6 +13,7 @@ use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\LombaController; // Tambahkan ini
+use App\Http\Controllers\BimbinganController; // Tambahkan ini
 
 /*
 |--------------------------------------------------------------------------
@@ -256,7 +257,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard-dosen', [DashboardController::class, 'dosenDashboard'])->name('dashboard.dosen');
 
         // ---------- Lomba Dosen ----------
-        Route::prefix('lomba-saya')->name('lomba.dsn.')->group(function () {
+        Route::prefix('lomba-saya')->name('lomba.dosen.')->group(function () {
+            Route::get('/', [LombaController::class, 'indexLombaDosen'])->name('index'); // Halaman daftar lomba Dosen
+            Route::get('/list', [LombaController::class, 'listLombaDosen'])->name('list'); // DataTables lomba Dosen
+            Route::get('/{id}/detail-ajax', [LombaController::class, 'showAjaxLombaDosen'])->name('show_ajax'); // Detail modal
             Route::get('/histori-pengajuan', [LombaController::class, 'historiPengajuanLombaDsn'])->name('histori.index');
             Route::get('/histori-pengajuan/list', [LombaController::class, 'listHistoriPengajuanLombaDsn'])->name('histori.list');
             Route::get('/ajukan-lomba', [LombaController::class, 'createPengajuanLombaMhs'])->name('create_form');
@@ -275,6 +279,8 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/edit-ajax/{id}', [PrestasiController::class, 'editAjaxDosen'])->name('edit_ajax');
             Route::put('/update-ajax/{id}', [PrestasiController::class, 'updateAjaxDosen'])->name('update_ajax');
             Route::get('/show-ajax/{id}', [PrestasiController::class, 'showAjaxDosen'])->name('show_ajax');
+            Route::get('/{id}/verify-form-ajax', [PrestasiController::class, 'showVerifyFormAjaxDosen'])->name('verify_form_ajax');
+            Route::post('/{id}/verify-process-ajax', [PrestasiController::class, 'processVerificationAjaxDosen'])->name('verify_process_ajax');
             Route::get('/{id}/confirm-delete-ajax', [PrestasiController::class, 'confirmDeleteAjaxDosen'])->name('confirm_delete_ajax');
             Route::delete('/{id}/destroy-ajax', [PrestasiController::class, 'destroyAjaxDosen'])->name('destroy_ajax');
         });
@@ -292,7 +298,12 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/verifikasi/{id}', [KeahlianUserController::class, 'verifikasiDosen'])->name('verifikasi');
             Route::post('/verifikasi/{id}', [KeahlianUserController::class, 'prosesVerifikasiDosen'])->name('proses_verifikasi');
         });
+
+        // ---------- Bimbingan Dosen ----------
+        // Menampilkan daftar prestasi mahasiswa yang dibimbing oleh dosen yang login
+        Route::get('/bimbingan', [BimbinganController::class, 'index'])->name('bimbingan.index');
     });
+
 
 
 
