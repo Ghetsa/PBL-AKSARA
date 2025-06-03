@@ -995,7 +995,7 @@ class LombaController extends Controller
                 ->editColumn('status_verifikasi', fn($row) => $row->status_verifikasi_badge)
                 ->addColumn('aksi', function ($row) {
                     $btnEdit = '';
-                    $btnDetail = '<button onclick="modalActionLomba(\'' . route('lomba.show', $row->lomba_id) . '\', \'Detail Lomba\', \'modalFormLombaUser\')" class="btn btn-sm btn-info me-1" title="Detail"><i class="fas fa-eye"></i></button>';
+                    $btnDetail = '<button onclick="modalActionLomba(\'' . route('lomba.publik.show_ajax', $row->lomba_id) . '\', \'Detail Lomba\', \'modalFormLombaUser\')" class="btn btn-sm btn-info me-1" title="Detail"><i class="fas fa-eye"></i></button>';
                     if ($row->status_verifikasi == 'ditolak' || $row->status_verifikasi == 'pending') {
                         $btnEdit = '<button onclick="modalActionLomba(\'' . route('lomba.mhs.edit_form', $row->lomba_id) . '\', \'Edit Pengajuan\', \'modalFormLombaUser\')" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></button>';
                     }
@@ -1063,9 +1063,9 @@ class LombaController extends Controller
             'biaya' => $request->biaya ?? 0,
             'link_pendaftaran' => $request->link_pendaftaran,
             'link_penyelenggara' => $request->link_penyelenggara,
-            'poster' => $posterPath,
             'status_verifikasi' => 'pending',
             'diinput_oleh' => $user->user_id,
+            'poster' => $posterPath,
         ]);
 
         // Simpan bidang ke lomba_detail
@@ -1182,9 +1182,9 @@ class LombaController extends Controller
             'biaya' => $request->biaya ?? 0,
             'link_pendaftaran' => $request->link_pendaftaran,
             'link_penyelenggara' => $request->link_penyelenggara,
-            'poster' => $posterPath,
             'status_verifikasi' => 'pending',
             'diinput_oleh' => $user->user_id,
+            'poster' => $posterPath,
         ]);
 
         // Simpan bidang ke lomba_detail
