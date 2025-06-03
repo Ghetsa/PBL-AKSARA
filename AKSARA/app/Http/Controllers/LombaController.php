@@ -21,9 +21,9 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class LombaController extends Controller
 {
-    //=================================================
-    //|        METHOD UNTUK MAHASISWA DAN DOSEN       |
-    //=================================================
+    //     //=================================================
+//     //|        METHOD UNTUK MAHASISWA DAN DOSEN       |
+//     //=================================================
     public function index()
     {
         $breadcrumb = (object) [
@@ -47,30 +47,269 @@ class LombaController extends Controller
     }
 
 
+    //     private function calculateMooraScores($userId)
+//     {
+//         $user = UserModel::with(['minat', 'keahlian'])->find($userId);
+//         if (!$user) {
+//             return [];
+//         }
+
+    //         $userMinatIds = $user->minat->pluck('bidang_id')->toArray();
+//         $userKeahlianIds = $user->keahlian->pluck('bidang_id')->toArray();
+
+    //         $lombas = LombaModel::with(['detailBidang'])->where(function ($query) {
+//             $query->where('batas_pendaftaran', '>=', Carbon::now()->toDateString())
+//                 ->orWhereNull('batas_pendaftaran');
+//         })->get();
+
+    //         if ($lombas->isEmpty()) {
+//             return [];
+//         }
+
+    //         $dataMatrix = [];
+
+    //         foreach ($lombas as $lomba) {
+//             $row = [];
+
+    //             $lombaMinatBidangIds = $lomba->detailBidang
+//                 ->where('kategori', 'minat')
+//                 ->pluck('bidang_id')
+//                 ->toArray();
+
+    //             $lombaKeahlianBidangIds = $lomba->detailBidang
+//                 ->where('kategori', 'keahlian')
+//                 ->pluck('bidang_id')
+//                 ->toArray();
+
+    //             // Skor 1 jika ada minimal 1 bidang minat sama antara lomba dan user
+//             $row['minat'] = count(array_intersect($lombaMinatBidangIds, $userMinatIds)) > 0 ? 1 : 0;
+
+    //             // Skor 1 jika ada minimal 1 bidang keahlian sama antara lomba dan user
+//             $row['keahlian'] = count(array_intersect($lombaKeahlianBidangIds, $userKeahlianIds)) > 0 ? 1 : 0;
+
+    //             $row['tingkat'] = match (strtolower($lomba->tingkat ?? '')) {
+//                 'lokal' => 1,
+//                 'kota' => 2,
+//                 'kabupaten' => 2,
+//                 'provinsi' => 3,
+//                 'nasional' => 4,
+//                 'internasional' => 5,
+//                 default => 0,
+//             };
+
+    //             $row['hadiah'] = $lomba->daftarHadiah->count();
+
+    //             if ($lomba->batas_pendaftaran) {
+//                 $selisihHari = Carbon::now()->diffInDays(Carbon::parse($lomba->batas_pendaftaran), false);
+//                 $row['penutupan'] = match (true) {
+//                     $selisihHari < 0 => 0,
+//                     $selisihHari == 0 => 1,
+//                     $selisihHari <= 7 => 2,
+//                     $selisihHari <= 14 => 3,
+//                     $selisihHari <= 30 => 4,
+//                     default => 5,
+//                 };
+//             } else {
+//                 $row['penutupan'] = 5;
+//             }
+
+    //             $row['biaya'] = (float) ($lomba->biaya ?? 0);
+
+    //             $dataMatrix[] = [
+//                 'lomba' => $lomba,
+//                 'values' => $row,
+//             ];
+//         }
+
+    //         return $this->processMooraNormalization($dataMatrix);
+//     }
+
+
+    //     private function processMooraNormalization($dataMatrix)
+// {
+//     $criteria = ['minat', 'keahlian', 'tingkat', 'hadiah', 'penutupan', 'biaya'];
+//     $weights = ['minat' => 0.25, 'keahlian' => 0.25, 'tingkat' => 0.15, 'hadiah' => 0.15, 'penutupan' => 0.10, 'biaya' => 0.10];
+//     $benefitCriteria = ['minat', 'keahlian', 'tingkat', 'hadiah', 'penutupan'];
+//     $costCriteria = ['biaya'];
+
+    //     if (empty($dataMatrix)) {
+//         return [];
+//     }
+
+    //     // Hitung pembagi normalisasi
+//     $divisors = [];
+//     foreach ($criteria as $c) {
+//         $sumOfSquares = array_sum(array_map(fn($data) => pow($data['values'][$c], 2), $dataMatrix));
+//         $divisors[$c] = $sumOfSquares > 0 ? sqrt($sumOfSquares) : 1;
+//     }
+
+    //     $results = [];
+//     foreach ($dataMatrix as $item) {
+//         $normalizedValues = [];
+//         $weightedValues = [];
+//         $totalBenefitScore = 0;
+//         $totalCostScore = 0;
+
+    //         foreach ($criteria as $c) {
+//             $normalized = $divisors[$c] != 0 ? $item['values'][$c] / $divisors[$c] : 0;
+//             $weighted = $normalized * $weights[$c];
+//             $normalizedValues[$c] = $normalized;
+//             $weightedValues[$c] = $weighted;
+
+    //             if (in_array($c, $benefitCriteria)) {
+//                 $totalBenefitScore += $weighted;
+//             } else {
+//                 $totalCostScore += $weighted;
+//             }
+//         }
+
+    //         $mooraScore = $totalBenefitScore - $totalCostScore;
+
+    //         $results[] = [
+//             'lomba' => $item['lomba'],
+//             'asli' => $item['values'],                     // Matriks keputusan awal
+//             'normalisasi' => $normalizedValues,           // Hasil normalisasi
+//             'terbobot' => $weightedValues,                // Dikalikan bobot
+//             'benefit' => round($totalBenefitScore, 4),    // Total benefit
+//             'cost' => round($totalCostScore, 4),          // Total cost
+//             'score' => round($mooraScore, 4),             // Skor akhir
+//         ];
+//     }
+
+    //     // Urutkan berdasarkan skor MOORA
+//     usort($results, fn($a, $b) => $b['score'] <=> $a['score']);
+//     return $results;
+// }
+
+    //     public function getList(Request $request)
+//     {
+//         $query = LombaModel::query()->with(['bidangTerkait', 'daftarHadiah']);
+
+    //         $mooraScoresMap = [];
+//         $isRekomendasiMode = $request->rekomendasi == 1;
+
+    //         if ($isRekomendasiMode) {
+//             $userId = Auth::id();
+//             if ($userId) {
+//                 $mooraResults = $this->calculateMooraScores($userId);
+//                 $orderedLombaIds = [];
+//                 foreach ($mooraResults as $result) {
+//                     $mooraScoresMap[$result['lomba']->lomba_id] = $result['score'];
+//                     $orderedLombaIds[] = $result['lomba']->lomba_id;
+//                 }
+
+    //                 if (empty($orderedLombaIds)) {
+//                     return DataTables::of(collect())->make(true);
+//                 }
+
+    //                 $query->whereIn('lomba_id', $orderedLombaIds)
+//                     ->orderByRaw("FIELD(lomba_id, " . implode(',', $orderedLombaIds) . ")");
+//             } else {
+//                 return DataTables::of(collect())->make(true);
+//             }
+//         } else {
+//             if ($request->filled('search_nama')) {
+//                 $query->where('nama_lomba', 'like', '%' . $request->search_nama . '%');
+//             }
+
+    //             if ($request->filled('filter_status')) {
+//                 $status = strtolower($request->filter_status);
+//                 $today = Carbon::now('Asia/Jakarta');
+
+    //                 if ($status == 'buka') {
+//                     $query->where(function ($q) use ($today) {
+//                         $q->whereNull('pembukaan_pendaftaran')
+//                             ->orWhere('pembukaan_pendaftaran', '<=', $today);
+//                     })->where(function ($q) use ($today) {
+//                         $q->whereNull('batas_pendaftaran')
+//                             ->orWhere('batas_pendaftaran', '>=', $today);
+//                     });
+//                 } elseif ($status == 'tutup') {
+//                     $query->whereNotNull('batas_pendaftaran')
+//                         ->where('batas_pendaftaran', '<', $today);
+//                 } elseif ($status == 'segera hadir') {
+//                     $query->whereNotNull('pembukaan_pendaftaran')
+//                         ->where('pembukaan_pendaftaran', '>', $today);
+//                 }
+//             }
+//         }
+
+    //         return DataTables::of($query)
+//             ->addIndexColumn()
+//             ->addColumn('kategori', function ($lomba) {
+//                 return $lomba->detailBidang->map(function ($detail) {
+//                     return ucfirst($detail->kategori) . ': ' . ($detail->bidang->bidang_nama ?? 'N/A');
+//                 })->implode(', ');
+//             })
+//             ->addColumn('pembukaan_pendaftaran', function ($lomba) {
+//                 return $lomba->pembukaan_pendaftaran
+//                     ? Carbon::parse($lomba->pembukaan_pendaftaran)->setTimezone('Asia/Jakarta')->isoFormat('D MMMM YYYY')
+//                     : 'N/A';
+//             })
+//             ->addColumn('batas_pendaftaran', function ($lomba) {
+//                 return $lomba->batas_pendaftaran
+//                     ? Carbon::parse($lomba->batas_pendaftaran)->setTimezone('Asia/Jakarta')->isoFormat('D MMMM YYYY')
+//                     : 'N/A';
+//             })
+//             ->addColumn('moora_score', function ($lomba) use ($isRekomendasiMode, $mooraScoresMap) {
+//                 return $isRekomendasiMode && isset($mooraScoresMap[$lomba->lomba_id])
+//                     ? number_format($mooraScoresMap[$lomba->lomba_id], 4)
+//                     : '-';
+//             })
+//             ->addColumn('status', function ($lomba) {
+//                 $statusDisplay = $lomba->status_pendaftaran_display;
+//                 $badgeClass = match (strtolower($statusDisplay)) {
+//                     'buka' => 'success',
+//                     'tutup' => 'danger',
+//                     'segera hadir' => 'warning',
+//                     default => 'secondary'
+//                 };
+//                 return '<span class="badge bg-' . $badgeClass . '">' . e(ucfirst($statusDisplay)) . '</span>';
+//             })
+//             ->addColumn('aksi', function ($lomba) {
+//                 $detailUrl = route('lomba.show', $lomba->lomba_id);
+//                 return '<div class="text-center btn-group btn-group-sm">'
+//                     . '<a href="' . e($detailUrl) . '" class="btn btn-info btn-sm" title="Lihat Detail">'
+//                     . '<i class="fas fa-eye"></i> Detail</a></div>';
+//             })
+//             ->rawColumns(['status', 'aksi'])
+//             ->make(true);
+//     }
+
+    /**
+     * Hitung MOORA Scores untuk user tertentu, 
+     * sekaligus menyimpan setiap tahapan perhitungan.
+     */
     private function calculateMooraScores($userId)
     {
-        $user = UserModel::with(['minat', 'keahlian'])->find($userId);
+        // Ambil user beserta relasi minat & keahlian
+        $user = \App\Models\UserModel::with(['minat', 'keahlian'])->find($userId);
         if (!$user) {
             return [];
         }
 
+        // Array bidang_id yang jadi minat dan keahlian user
         $userMinatIds = $user->minat->pluck('bidang_id')->toArray();
         $userKeahlianIds = $user->keahlian->pluck('bidang_id')->toArray();
 
-        $lombas = LombaModel::with(['detailBidang'])->where(function ($query) {
-            $query->where('batas_pendaftaran', '>=', Carbon::now()->toDateString())
-                ->orWhereNull('batas_pendaftaran');
-        })->get();
+        // Ambil semua lomba yang status pendaftaran masih berlaku
+        $lombas = LombaModel::with(['detailBidang', 'daftarHadiah'])
+            ->where(function ($query) {
+                $query->where('batas_pendaftaran', '>=', Carbon::now()->toDateString())
+                    ->orWhereNull('batas_pendaftaran');
+            })
+            ->get();
 
         if ($lombas->isEmpty()) {
             return [];
         }
 
+        // Siapkan matriks keputusan awal
         $dataMatrix = [];
-
         foreach ($lombas as $lomba) {
             $row = [];
 
+            // Pisahkan bidang 'minat' dan 'keahlian' pada detailBidang
             $lombaMinatBidangIds = $lomba->detailBidang
                 ->where('kategori', 'minat')
                 ->pluck('bidang_id')
@@ -81,13 +320,15 @@ class LombaController extends Controller
                 ->pluck('bidang_id')
                 ->toArray();
 
-            // Skor 1 jika ada minimal 1 bidang minat sama antara lomba dan user
+            // 1. Skor 'minat': 1 jika ada irisan bidang minat antara lomba & user
             $row['minat'] = count(array_intersect($lombaMinatBidangIds, $userMinatIds)) > 0 ? 1 : 0;
 
-            // Skor 1 jika ada minimal 1 bidang keahlian sama antara lomba dan user
+            // 2. Skor 'keahlian': 1 jika ada irisan bidang keahlian antara lomba & user
             $row['keahlian'] = count(array_intersect($lombaKeahlianBidangIds, $userKeahlianIds)) > 0 ? 1 : 0;
 
-            $row['tingkat'] = match (strtolower($lomba->tingkat ?? '')) {
+            // 3. Skor 'tingkat': lokal=1, kota/kab=2, provinsi=3, nasional=4, internasional=5
+            $tingkatStr = strtolower($lomba->tingkat ?? '');
+            $row['tingkat'] = match ($tingkatStr) {
                 'lokal' => 1,
                 'kota' => 2,
                 'kabupaten' => 2,
@@ -97,8 +338,11 @@ class LombaController extends Controller
                 default => 0,
             };
 
+            // 4. Skor 'hadiah': jumlah item pada daftarHadiah
             $row['hadiah'] = $lomba->daftarHadiah->count();
 
+            // 5. Skor 'penutupan': 
+            //    hitung selisih hari dari sekarang ke batas_pendaftaran, lalu konversi
             if ($lomba->batas_pendaftaran) {
                 $selisihHari = Carbon::now()->diffInDays(Carbon::parse($lomba->batas_pendaftaran), false);
                 $row['penutupan'] = match (true) {
@@ -110,9 +354,11 @@ class LombaController extends Controller
                     default => 5,
                 };
             } else {
+                // Tidak ada batas pendaftaran → nilai maksimal
                 $row['penutupan'] = 5;
             }
 
+            // 6. Skor 'biaya': nilai biaya pendaftaran (cost)
             $row['biaya'] = (float) ($lomba->biaya ?? 0);
 
             $dataMatrix[] = [
@@ -121,82 +367,125 @@ class LombaController extends Controller
             ];
         }
 
+        // Kirim ke proses normalisasi & hitung MOORA lengkap
         return $this->processMooraNormalization($dataMatrix);
     }
 
-
+    /**
+     * Proses normalisasi, pemberian bobot, hitung benefit/cost, dan skor akhir MOORA.
+     * Mengembalikan array detail perhitungan untuk tiap lomba.
+     */
     private function processMooraNormalization($dataMatrix)
     {
+        // Daftar kriteria sesuai urutan
         $criteria = ['minat', 'keahlian', 'tingkat', 'hadiah', 'penutupan', 'biaya'];
-        $weights = ['minat' => 0.25, 'keahlian' => 0.25, 'tingkat' => 0.15, 'hadiah' => 0.15, 'penutupan' => 0.10, 'biaya' => 0.10];
+
+        // Bobot per kriteria (total = 1)
+        $weights = [
+            'minat' => 0.25,
+            'keahlian' => 0.25,
+            'tingkat' => 0.15,
+            'hadiah' => 0.15,
+            'penutupan' => 0.10,
+            'biaya' => 0.10,
+        ];
+
+        // Tentukan mana yang benefit, mana cost
         $benefitCriteria = ['minat', 'keahlian', 'tingkat', 'hadiah', 'penutupan'];
         $costCriteria = ['biaya'];
 
+        // Jika dataMatrix kosong
         if (empty($dataMatrix)) {
             return [];
         }
 
+        // 1. Hitung divisor (akar jumlah kuadrat) untuk tiap kriteria
         $divisors = [];
         foreach ($criteria as $c) {
             $sumOfSquares = array_sum(array_map(fn($data) => pow($data['values'][$c], 2), $dataMatrix));
-            $divisors[$c] = $sumOfSquares > 0 ? sqrt($sumOfSquares) : 1;
+            $divisors[$c] = ($sumOfSquares > 0) ? sqrt($sumOfSquares) : 1;
         }
 
         $results = [];
         foreach ($dataMatrix as $item) {
+            // 2. Hitung nilai normalisasi per kriteria
             $normalizedValues = [];
             foreach ($criteria as $c) {
-                $normalizedValues[$c] = $divisors[$c] != 0 ? $item['values'][$c] / $divisors[$c] : 0;
+                $normalizedValues[$c] = $divisors[$c] != 0
+                    ? $item['values'][$c] / $divisors[$c]
+                    : 0;
             }
 
+            // 3. Hitung nilai terbobot (normalized * bobot)
+            $weightedValues = [];
+            foreach ($criteria as $c) {
+                $weightedValues[$c] = $normalizedValues[$c] * $weights[$c];
+            }
+
+            // 4. Hitung total benefit score dan total cost score
             $totalBenefitScore = 0;
             foreach ($benefitCriteria as $c) {
-                $totalBenefitScore += $normalizedValues[$c] * $weights[$c];
+                $totalBenefitScore += $weightedValues[$c];
             }
 
             $totalCostScore = 0;
             foreach ($costCriteria as $c) {
-                $totalCostScore += $normalizedValues[$c] * $weights[$c];
+                $totalCostScore += $weightedValues[$c];
             }
 
+            // 5. Skor akhir MOORA = (sum benefit) - (sum cost)
             $mooraScore = $totalBenefitScore - $totalCostScore;
+
+            // Simpan detail untuk lomba ini
             $results[] = [
                 'lomba' => $item['lomba'],
-                'score' => round($mooraScore, 4),
+                'asli' => $item['values'],         // Matriks keputusan awal
+                'normalisasi' => $normalizedValues,        // Nilai setelah normalisasi
+                'terbobot' => $weightedValues,          // Nilai setelah dikali bobot
+                'benefit' => round($totalBenefitScore, 4),
+                'cost' => round($totalCostScore, 4),
+                'score' => round($mooraScore, 4),    // Skor MOORA akhir
             ];
         }
 
+        // 6. Urutkan berdasarkan skor MOORA (descending)
         usort($results, fn($a, $b) => $b['score'] <=> $a['score']);
+
         return $results;
     }
 
+    /**
+     * Method untuk DataTables server-side. 
+     * Jika request->rekomendasi == 1, panggil perhitungan MOORA dan sisipkan skor-nya.
+     */
     public function getList(Request $request)
     {
-        $query = LombaModel::query()->with(['bidangTerkait', 'daftarHadiah']);
+        $query = LombaModel::query()->with(['detailBidang', 'daftarHadiah']);
 
         $mooraScoresMap = [];
-        $isRekomendasiMode = $request->rekomendasi == 1;
+        $isRekomendasiMode = ($request->input('rekomendasi') == 1);
 
         if ($isRekomendasiMode) {
             $userId = Auth::id();
             if ($userId) {
+                // Hitung MOORA untuk user saat ini
                 $mooraResults = $this->calculateMooraScores($userId);
                 $orderedLombaIds = [];
+
                 foreach ($mooraResults as $result) {
-                    $mooraScoresMap[$result['lomba']->lomba_id] = $result['score'];
-                    $orderedLombaIds[] = $result['lomba']->lomba_id;
+                    $lombaModel = $result['lomba'];
+                    $mooraScoresMap[$lombaModel->lomba_id] = $result; // simpan seluruh detail
+                    $orderedLombaIds[] = $lombaModel->lomba_id;
                 }
 
-                if (empty($orderedLombaIds)) {
-                    return DataTables::of(collect())->make(true);
+                if (!empty($orderedLombaIds)) {
+                    // Filter dan urutkan sesuai urutan perhitungan MOORA
+                    $query->whereIn('lomba_id', $orderedLombaIds)
+                        ->orderByRaw("FIELD(lomba_id, " . implode(',', $orderedLombaIds) . ")");
                 }
-
-                $query->whereIn('lomba_id', $orderedLombaIds)
-                    ->orderByRaw("FIELD(lomba_id, " . implode(',', $orderedLombaIds) . ")");
-            } else {
-                return DataTables::of(collect())->make(true);
             }
         } else {
+            // Normal mode (fitur filter nama/status)
             if ($request->filled('search_nama')) {
                 $query->where('nama_lomba', 'like', '%' . $request->search_nama . '%');
             }
@@ -226,43 +515,85 @@ class LombaController extends Controller
         return DataTables::of($query)
             ->addIndexColumn()
             ->addColumn('kategori', function ($lomba) {
-                return $lomba->detailBidang->map(function ($detail) {
-                    return ucfirst($detail->kategori) . ': ' . ($detail->bidang->bidang_nama ?? 'N/A');
-                })->implode(', ');
+                return $lomba->detailBidang
+                    ->map(fn($detail) => ucfirst($detail->kategori) . ': ' . ($detail->bidang->bidang_nama ?? 'N/A'))
+                    ->implode(', ');
             })
             ->addColumn('pembukaan_pendaftaran', function ($lomba) {
                 return $lomba->pembukaan_pendaftaran
-                    ? Carbon::parse($lomba->pembukaan_pendaftaran)->setTimezone('Asia/Jakarta')->isoFormat('D MMMM YYYY')
+                    ? Carbon::parse($lomba->pembukaan_pendaftaran)
+                        ->setTimezone('Asia/Jakarta')
+                        ->isoFormat('D MMMM YYYY')
                     : 'N/A';
             })
             ->addColumn('batas_pendaftaran', function ($lomba) {
                 return $lomba->batas_pendaftaran
-                    ? Carbon::parse($lomba->batas_pendaftaran)->setTimezone('Asia/Jakarta')->isoFormat('D MMMM YYYY')
+                    ? Carbon::parse($lomba->batas_pendaftaran)
+                        ->setTimezone('Asia/Jakarta')
+                        ->isoFormat('D MMMM YYYY')
                     : 'N/A';
             })
             ->addColumn('moora_score', function ($lomba) use ($isRekomendasiMode, $mooraScoresMap) {
-                return $isRekomendasiMode && isset($mooraScoresMap[$lomba->lomba_id])
-                    ? number_format($mooraScoresMap[$lomba->lomba_id], 4)
-                    : '-';
+                if ($isRekomendasiMode && isset($mooraScoresMap[$lomba->lomba_id])) {
+                    // Tampilkan skor akhir (rounded, 4 desimal)
+                    $detail = $mooraScoresMap[$lomba->lomba_id];
+                    return number_format($detail['score'], 4);
+                }
+                return '-';
             })
             ->addColumn('status', function ($lomba) {
-                $statusDisplay = $lomba->status_pendaftaran_display;
-                $badgeClass = match (strtolower($statusDisplay)) {
-                    'buka' => 'success',
-                    'tutup' => 'danger',
-                    'segera hadir' => 'warning',
-                    default => 'secondary'
-                };
-                return '<span class="badge bg-' . $badgeClass . '">' . e(ucfirst($statusDisplay)) . '</span>';
+                $today = Carbon::now('Asia/Jakarta');
+                if ($lomba->pembukaan_pendaftaran && $today->lt($lomba->pembukaan_pendaftaran)) {
+                    return 'Segera Hadir';
+                } elseif (
+                    (!$lomba->pembukaan_pendaftaran || $today->gte($lomba->pembukaan_pendaftaran)) &&
+                    (!$lomba->batas_pendaftaran || $today->lte($lomba->batas_pendaftaran))
+                ) {
+                    return 'Buka';
+                } elseif ($lomba->batas_pendaftaran && $today->gt($lomba->batas_pendaftaran)) {
+                    return 'Tutup';
+                } else {
+                    return 'Tidak Diketahui';
+                }
             })
-            ->addColumn('aksi', function ($lomba) {
-                $detailUrl = route('lomba.show', $lomba->lomba_id);
-                return '<div class="text-center btn-group btn-group-sm">'
-                    . '<a href="' . e($detailUrl) . '" class="btn btn-info btn-sm" title="Lihat Detail">'
-                    . '<i class="fas fa-eye"></i> Detail</a></div>';
+            ->addColumn('aksi', function ($lomba) use ($mooraScoresMap, $isRekomendasiMode) {
+                // Tombol "Detail Perhitungan" hanya muncul saat mode rekomendasi aktif
+                $btn = '<a href="javascript:void(0)" data-id="' . $lomba->lomba_id . '" '
+                    . 'class="btn btn-sm btn-primary btn-detail-hitungan" '
+                    . 'data-bs-toggle="tooltip" title="Lihat Langkah Perhitungan">'
+                    . '<i class="fas fa-calculator"></i></a>';
+
+                return '<div class="text-center btn-group btn-group-sm">' . $btn . '</div>';
             })
-            ->rawColumns(['status', 'aksi'])
+            ->rawColumns(['aksi'])
             ->make(true);
+    }
+
+    /**
+     * Method AJAX untuk mengambil detail perhitungan MOORA satu lomba.
+     * Akan dipanggil ketika tombol "btn-detail-hitungan" ditekan.
+     */
+    public function detailMoora(Request $request)
+    {
+        $lombaId = $request->input('lomba_id');
+        $userId = Auth::id();
+
+        // Hitung MOORA sekali lagi agar mudah menampilkan detail di modal
+        $mooraResults = $this->calculateMooraScores($userId);
+        $detail = [];
+        foreach ($mooraResults as $item) {
+            if ($item['lomba']->lomba_id == $lombaId) {
+                $detail = $item;
+                break;
+            }
+        }
+
+        if (empty($detail)) {
+            return response()->json(['error' => 'Data perhitungan tidak ditemukan.'], 404);
+        }
+
+        // Kembalikan view partial (modal content) dengan data detail perhitungan
+        return view('lomba.partial_detail_perhitungan', compact('detail'));
     }
 
     // Fungsi ini akan dipanggil oleh DataTables di view lomba/index.blade.php
@@ -995,11 +1326,11 @@ class LombaController extends Controller
                     })->implode(', ');
                 })
                 ->editColumn('batas_pendaftaran', fn($row) => $row->batas_pendaftaran ? Carbon::parse($row->batas_pendaftaran)->setTimezone('Asia/Jakarta')->isoFormat('D MMM YYYY') : '-')
-                ->editColumn('created_at', fn($row) => $row->created_at ? Carbon::parse($row->created_at)->setTimezone('Asia/Jakarta')->isoFormat('D MMM YYYY, HH:mm') : '-')
+                ->editColumn('created_at', fn($row) => $row->created_at ? Carbon::parse($row->created_at)->setTimezone('Asia/Jakarta')->isoFormat('D MMM YYYY') : '-')
                 ->editColumn('status_verifikasi', fn($row) => $row->status_verifikasi_badge)
                 ->addColumn('aksi', function ($row) {
                     $btnEdit = '';
-                    $btnDetail = '<button onclick="modalActionLomba(\'' . route('lomba.publik.show_ajax', $row->lomba_id) . '\', \'Detail Lomba\', \'modalFormLombaUser\')" class="btn btn-sm btn-info me-1" title="Detail"><i class="fas fa-eye"></i></button>';
+                    $btnDetail = '<button onclick="modalActionLomba(\'' . route('lomba.mhs.show_form', $row->lomba_id) . '\', \'Detail Lomba\', \'modalFormLombaUser\')" class="btn btn-sm btn-info me-1" title="Detail"><i class="fas fa-eye"></i></button>';
                     if ($row->status_verifikasi == 'ditolak' || $row->status_verifikasi == 'pending') {
                         $btnEdit = '<button onclick="modalActionLomba(\'' . route('lomba.mhs.edit_form', $row->lomba_id) . '\', \'Edit Pengajuan\', \'modalFormLombaUser\')" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></button>';
                     }
@@ -1086,6 +1417,76 @@ class LombaController extends Controller
         ]);
     }
 
+    public function editLombaMhs($id)
+    {
+        $lomba = LombaModel::with('bidangKeahlian')->findOrFail($id);
+        $bidangList = BidangModel::all();
+
+        return view('lomba.mahasiswa.edit', [
+            'lomba' => $lomba,
+            'bidangList' => $bidangList,
+        ]);
+    }
+    public function updateLombaMhs(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'nama_lomba' => 'required|string|max:255',
+            'pembukaan_pendaftaran' => 'required|date',
+            'batas_pendaftaran' => 'required|date|after_or_equal:pembukaan_pendaftaran',
+            'kategori' => 'required|in:individu,kelompok',
+            'tingkat' => 'required|in:lokal,nasional,internasional',
+            'penyelenggara' => 'required|string|max:255',
+            'bidang_keahlian' => 'required|array|min:1',
+            'bidang_keahlian.*' => 'exists:bidang,bidang_id',
+            'biaya' => 'nullable|numeric|min:0',
+            'link_pendaftaran' => 'nullable|url',
+            'link_penyelenggara' => 'nullable|url',
+            'poster' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        $lomba = LombaModel::findOrFail($id);
+
+        // Simpan poster baru jika ada
+        if ($request->hasFile('poster')) {
+            if ($lomba->poster && Storage::exists('public/' . $lomba->poster)) {
+                Storage::delete('public/' . $lomba->poster);
+            }
+
+            $poster = $request->file('poster');
+            $posterName = time() . '_' . $poster->getClientOriginalName();
+            $poster->storeAs('public/poster', $posterName);
+            $validated['poster'] = 'poster/' . $posterName;
+        }
+
+        // Update data utama lomba, kecuali bidang_keahlian
+        $lomba->update(collect($validated)->except('bidang_keahlian')->toArray());
+
+        // Hapus relasi bidang sebelumnya
+        $lomba->detailBidang()->delete();
+
+        // Tambah relasi bidang baru ke lomba_detail
+        foreach ($validated['bidang_keahlian'] as $bidangId) {
+            LombaDetailModel::create([
+                'lomba_id' => $lomba->lomba_id,
+                'bidang_id' => $bidangId
+            ]);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Lomba berhasil diperbarui.',
+        ]);
+    }
+
+    public function showLombaMhs($id)
+    {
+        $lomba = LombaModel::with([
+            'inputBy',
+            'bidangKeahlian.bidang'
+        ])
+            ->findOrFail($id);
+        return view('lomba.mahasiswa.show', compact('lomba'));
+    }
 
     /**
      * Menampilkan halaman histori pengajuan lomba untuk user yang login.
@@ -1118,7 +1519,7 @@ class LombaController extends Controller
                 ->editColumn('status_verifikasi', fn($row) => $row->status_verifikasi_badge)
                 ->addColumn('aksi', function ($row) {
                     $btnEdit = '';
-                    $btnDetail = '<button onclick="modalActionLomba(\'' . route('lomba.show', $row->lomba_id) . '\', \'Detail Lomba\', \'modalFormLombaUser\')" class="btn btn-sm btn-info me-1" title="Detail"><i class="fas fa-eye"></i></button>';
+                    $btnDetail = '<button onclick="modalActionLomba(\'' . route('lomba.dsn.show_form', $row->lomba_id) . '\', \'Detail Lomba\', \'modalFormLombaUser\')" class="btn btn-sm btn-info me-1" title="Detail"><i class="fas fa-eye"></i></button>';
                     if ($row->status_verifikasi == 'ditolak' || $row->status_verifikasi == 'pending') {
                         $btnEdit = '<button onclick="modalActionLomba(\'' . route('lomba.dsn.edit_form', $row->lomba_id) . '\', \'Edit Pengajuan\', \'modalFormLombaUser\')" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></button>';
                     }
