@@ -1,6 +1,4 @@
-<form id="formUserLomba"
-    action="{{ isset($lomba) ? route('lomba.user.update', $lomba->lomba_id) : route('lomba.mhs.store') }}" method="POST"
-    enctype="multipart/form-data">
+<form id="formUserLomba" action="{{ route('lomba.mhs.store') }}" method="POST" enctype="multipart/form-data">
     @csrf
     @if (isset($lomba))
         @method('PUT')
@@ -73,29 +71,27 @@
             </div>
 
             <div class="col-md-12 mb-3">
-                <label class="form-label">Bidang Keahlian Relevan <span class="text-danger">*</span></label>
-                <div class="row">
-                    @php
-                        $bidang_terpilih = old(
-                            'bidang_keahlian',
-                            isset($lomba) ? $lomba->bidangKeahlian->pluck('bidang_id')->toArray() : [],
-                        );
-                    @endphp
-
-                    @foreach ($bidangList as $bidang)
-                        <div class="col-md-6">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="bidang_keahlian[]"
-                                    value="{{ $bidang->bidang_id }}" id="bidang_{{ $bidang->bidang_id }}"
-                                    {{ in_array($bidang->bidang_id, $bidang_terpilih) ? 'checked' : '' }}>
-                                <label class="form-check-label" for="bidang_{{ $bidang->bidang_id }}">
-                                    {{ $bidang->bidang_nama }}
-                                </label>
+                <label class="form-label d-block mb-2 text-sm-start">Bidang Keahlian Relevan <span
+                        class="text-danger">*</span></label>
+                <div class="row ps-2">
+                    @if (isset($bidangList) && $bidangList->count() > 0)
+                        @foreach ($bidangList as $bidang)
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="bidang_keahlian[]"
+                                        value="{{ $bidang->bidang_id }}" id="crud_c_bidang_{{ $bidang->bidang_id }}">
+                                    <label class="form-check-label" for="crud_c_bidang_{{ $bidang->bidang_id }}">
+                                        {{ $bidang->bidang_nama }}
+                                    </label>
+                                </div>
                             </div>
-                        </div>
-                    @endforeach
+                        @endforeach
+                    @else
+                        <p class="text-muted">Tidak ada data bidang keahlian.</p>
+                    @endif
                 </div>
-                <span class="invalid-feedback error-bidang_keahlian d-block"></span>
+                {{-- Span ini akan digunakan untuk menampilkan pesan error validasi untuk grup checkbox bidang_keahlian --}}
+                <span class="invalid-feedback error-bidang_keahlian d-block mt-1"></span>
             </div>
 
             <div class="col-md-12 mb-3">
@@ -147,37 +143,55 @@
         // Ambil form dengan ID yang benar
         const formCreate = $('#formUserLomba');
 
+        $.validator.addMethod("afterDate", function(value, element, params) {
+            if (!value || !$(params).val()) {
+                return true;
+            } // Valid jika salah satu tanggal kosong
+            return new Date(value) >= new Date($(params).val());
+        }, 'Tanggal batas harus setelah atau sama dengan tanggal pembukaan.');
+
+        // Custom rule untuk validasi ukuran file
+        $.validator.addMethod("filesize", function(value, element, param) {
+            return this.optional(element) || (element.files[0].size <= param);
+        }, 'Ukuran file maksimal adalah 2MB.');
+
+        $.validator.addMethod("nullableUrl", function(value, element) {
+            if (value === "") return true; // Kosong = valid
+            return /^(ftp|http|https):\/\/[^ "]+$/.test(value); // Validasi URL jika tidak kosong
+        }, "Format URL tidak valid.");
         // Inisialisasi jQuery Validation untuk FORM DI DALAM MODAL
         // Pastikan ignore hidden fields diaktifkan saat inisialisasi
         formCreate.validate({
             rules: {
                 nama_lomba: {
                     required: true,
-                    minlength: 2
+                    maxlength: 255
                 },
                 kategori: {
                     required: true
                 },
                 'bidang_keahlian[]': {
-                    required: true
+                    required: true,
+                    minlength: 1
                 },
                 penyelenggara: {
                     required: true,
-                    minlength: 3
+                    maxlength: 255
                 },
                 tingkat: {
                     required: true
                 },
                 link_pendaftaran: {
-                    required: true,
-                    url: true
+                    nullableUrl: true,
+                    maxlength: 255
                 },
                 link_penyelenggara: {
-                    required: true,
-                    url: true
+                    nullableUrl: true,
+                    maxlength: 255
                 },
                 poster: {
-                    extension: "jpg,jpeg,png,pdf"
+                    extension: "jpg,jpeg,png,pdf",
+                    filesize: 2097152
                 },
                 pembukaan_pendaftaran: {
                     required: true,
@@ -237,11 +251,16 @@
                 $.ajax({
                     url: $(form).attr('action'),
                     method: $(form).attr('method'),
-                    data: $(form).serialize(),
+                    data: formData,
+                    processData: false, // Penting untuk FormData
+                    contentType: false,
                     dataType: 'json',
                     beforeSend: function() {
-                        $(form).find('button[type="submit"]').prop('disabled', true)
-                            .text('Menyimpan...');
+                        $(form).find('button[type="submit"]')
+                            .prop('disabled', true)
+                            .html(
+                                '<span class="spinner-border spinner-border-sm me-1"></span> Menyimpan...'
+                            );
                     },
                     success: function(response) {
                         // Tutup modal utama (#myModal)
@@ -270,12 +289,11 @@
                         }
 
                         // Reset form setelah sukses
-                        form.reset(); // Reset nilai field form
-                        formCreate.validate().resetForm(); // Reset validasi jQuery
-                        formCreate.find('.is-invalid').removeClass(
-                            'is-invalid'); // Hapus class invalid
-                        formCreate.find('.is-valid').removeClass(
-                            'is-valid'); // Hapus class valid
+                        $(form)[0].reset();
+                        formCreate.resetForm(); // resetForm milik validator
+                        $(form).find('.is-invalid, .is-valid').removeClass(
+                            'is-invalid is-valid');
+                        $('.error-text').text('').hide();
                     },
                     error: function(xhr, status, error) {
                         // Aktifkan kembali tombol submit
@@ -310,6 +328,11 @@
                             $('#' + key).addClass(
                                 'is-invalid'); // Tambahkan class is-invalid
                         });
+                        if (Object.keys(errors).length > 0) {
+                            const firstErrorField = Object.keys(errors)[0];
+                            $('#' + firstErrorField).focus();
+                        }
+
                         if (Object.keys(errors).length ===
                             0) { // Jika tidak ada error validasi spesifik
                             if (typeof Swal !== 'undefined') {
