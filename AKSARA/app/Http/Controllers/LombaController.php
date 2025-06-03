@@ -1972,4 +1972,84 @@ class LombaController extends Controller
             return response()->json(['status' => false, 'message' => 'Gagal menghapus lomba. Terjadi kesalahan server.'], 500);
         }
     }
+
+    public function export_excel()
+    {
+        // ambil data user yang akan di export
+        // Pastikan untuk eager load relasi yang dibutuhkan
+        $lomba = LombaModel::select('lomba_id', 'nama_lomba', 'penyelenggara', 'tingkat', 'biaya', 'pembukaan_pendaftaran', 'batas_pendaftaran')
+            ->where('status_verifikasi', 'disetujui')
+            ->orderBy('nama_lomba')
+            ->get();
+
+        // Load library excel
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet(); // ambil sheet yang aktif
+
+        // Set header kolom
+        $sheet->setCellValue('A1', 'No');
+        $sheet->setCellValue('B1', 'Nama Lomba'); // Ditambahkan/disesuaikan
+        $sheet->setCellValue('C1', 'Penyelenggara');   // Kolom baru
+        $sheet->setCellValue('D1', 'Tingkat');
+        $sheet->setCellValue('E1', 'Biaya');
+        $sheet->setCellValue('F1', 'Pembukaan Pendaftaran');
+        $sheet->setCellValue('G1', 'Batas Pendaftaran');
+
+        // Set style bold untuk header
+        $sheet->getStyle('A1:G1')->getFont()->setBold(true);
+
+        $no = 1; // nomor data dimulai dari 1
+        $baris = 2; // baris data dimulai dari baris ke-2
+        foreach ($lomba as $lomba) { // Menggunakan $user sebagai iterator
+            $sheet->setCellValue('A' . $baris, $no);
+            $sheet->setCellValue('B' . $baris, $lomba->nama_lomba);
+            $sheet->setCellValue('C' . $baris, $lomba->penyelenggara);
+            $sheet->setCellValue('D' . $baris, $lomba->tingkat);
+            $sheet->setCellValue('E' . $baris, $lomba->biaya);
+            $sheet->setCellValue('F' . $baris, $lomba->pembukaan_pendaftaran);
+            $sheet->setCellValue('G' . $baris, $lomba->batas_pendaftaran);
+
+            $baris++;
+            $no++;
+        }
+
+        // Set auto size untuk semua kolom yang digunakan
+        foreach (range('A', 'G') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        $sheet->setTitle('Data Lomba'); // set title sheet
+
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $filename = 'Data Lomba ' . date('Y-m-d H_i_s') . '.xlsx'; // Menggunakan H_i_s agar nama file lebih unik
+
+        // Menyiapkan header untuk file Excel
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+        header('Cache-Control: max-age=1'); // Sesuai contoh Anda
+        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+        header('Cache-Control: cache, must-revalidate');
+        header('Pragma: public');
+
+        $writer->save('php://output');
+        exit;
+    }
+
+    public function export_pdf()
+    {
+        $lomba = LombaModel::select('lomba_id', 'nama_lomba', 'penyelenggara', 'tingkat', 'biaya', 'pembukaan_pendaftaran', 'batas_pendaftaran')
+            ->where('status_verifikasi', 'disetujui')
+            ->orderBy('nama_lomba')
+            ->get();
+
+        // use Barryvdh\DomPDF\Facade\Pdf PDF
+        $pdf = Pdf::loadView('lomba.export_pdf', ['lomba' => $lomba]);
+        $pdf->setPaper('a4', 'portrait'); // set ukuran kertas dan orientasi 
+        $pdf->setOption('isRemoteEnabled', true); // set true jika ada gambar dari URL
+        $pdf->render();
+
+        return $pdf->stream('Data User ' . date('Y-m-d H:i:s') . '.pdf');
+    }
 }

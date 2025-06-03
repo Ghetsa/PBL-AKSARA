@@ -8,9 +8,13 @@
             <div class="card shadow-sm">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h3 class="card-title mb-0">{{ $breadcrumb->title ?? 'Manajemen Data Lomba' }}</h3>
-                    <button class="btn btn-sm btn-primary" onclick="modalActionLombaAdminCrud('{{ route('admin.lomba.crud.create_form_ajax') }}', 'Tambah Info Lomba Baru', 'modalFormLombaAdminCrud')">
-                        <i class="fas fa-plus-circle me-1"></i> Tambah Lomba
-                    </button>
+                    <div class="menu">
+                        <a href="{{ route('lomba.export.pdf') }}" class="btn btn-sm btn-warning"><i class="fa fa-file-pdf"></i> Export Lomba (PDF)</a>
+                        <a href="{{ route('lomba.export.excel') }}" class="btn btn-sm btn-success"><i class="fa fa-file-excel"></i> Export Lomba</a>
+                        <button class="btn btn-sm btn-primary" onclick="modalActionLombaAdminCrud('{{ route('admin.lomba.crud.create_form_ajax') }}', 'Tambah Info Lomba Baru', 'modalFormLombaAdminCrud')">
+                            <i class="fas fa-plus-circle me-1"></i> Tambah Lomba
+                        </button>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="row mb-4">
