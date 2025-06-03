@@ -101,6 +101,7 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('lomba')->name('lomba.')->group(function () {
         Route::get('/', [LombaController::class, 'indexLomba'])->name('index');
         Route::get('/list', [LombaController::class, 'getList'])->name('getList');
+        Route::get('detail-moora', [LombaController::class, 'detailMoora'])->name('detailMoora');
         Route::get('/create', [LombaController::class, 'create'])->name('create');
         Route::post('/', [LombaController::class, 'store'])->name('store');
         Route::get('/{id}/lomba', [LombaController::class, 'show'])->name('show');
