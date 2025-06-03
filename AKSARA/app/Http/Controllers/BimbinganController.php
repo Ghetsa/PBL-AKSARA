@@ -37,7 +37,7 @@ class BimbinganController extends Controller
     return datatables()->of($prestasi)
       ->addIndexColumn()
       ->addColumn('mahasiswa_nama', fn($item) => $item->mahasiswa->user->nama ?? '-')
-      ->addColumn('bidang_nama', fn($item) => $item->bidang->nama ?? '-')
+      ->addColumn('bidang_nama', fn($item) => $item->bidang->bidang_nama ?? '-')
       ->editColumn('kategori', fn($item) => ucfirst($item->kategori))
       ->editColumn('tingkat', fn($item) => ucfirst($item->tingkat))
       ->editColumn('status_verifikasi', function ($item) {
@@ -49,7 +49,7 @@ class BimbinganController extends Controller
         };
       })
       ->addColumn('aksi', function ($item) {
-        $verifyUrl = route('prestasi.dosen.verify_form_ajax', $item->prestasi_id);
+        $verifyUrl = route('bimbingan.verify_form', $item->prestasi_id);
         return '<button type="button" class="btn btn-sm btn-info" onclick="modalAction(\'' . $verifyUrl . '\')">
                         <i class="fas fa-search-plus"></i> Verifikasi
                     </button>';

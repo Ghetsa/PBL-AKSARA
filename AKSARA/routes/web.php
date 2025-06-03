@@ -303,8 +303,8 @@ Route::middleware(['auth'])->group(function () {
         Route::prefix('bimbingan')->name('bimbingan.')->group(function () {
             Route::get('/', [BimbinganController::class, 'index'])->name('index');
             Route::get('/list', [BimbinganController::class, 'list'])->name('list');
-            Route::get('/{id}/verify-form-ajax', [BimbinganController::class, 'showVerifyForm'])->name('verify_form_ajax');
-            Route::post('/{id}/verify-process-ajax', [BimbinganController::class, 'processVerification'])->name('verify_process_ajax');
+            Route::get('/{id}/verify-form-ajax', [BimbinganController::class, 'showVerifyForm'])->name('verify_form');
+            Route::post('/{id}/verify-process-ajax', [BimbinganController::class, 'processVerification'])->name('verify_process');
             Route::get('/{id}/show-ajax', [BimbinganController::class, 'showAjax'])->name('show_ajax');
         });
 
