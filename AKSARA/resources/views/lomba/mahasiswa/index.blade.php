@@ -1,4 +1,4 @@
-@extends('layouts.template')
+{{-- @extends('layouts.template')
 @section('title', $breadcrumb->title ?? 'Informasi & Rekomendasi Lomba')
 
 @push('css')
@@ -105,7 +105,6 @@
                                         <div class="priority-slot mb-2" data-posisi="{{ $pos }}">
                                             <span class="priority-label"><i class="fas fa-list-ol me-1"></i> Prioritas {{ $pos }}:</span>
                                             <div class="kriteria-dropzone flex-grow-1" style="min-height: 40px; border: 1px dashed #ced4da; border-radius: .25rem; padding: 5px;">
-                                                {{-- Kriteria akan di-drop di sini --}}
                                             </div>
                                             <span class="bobot-info ms-2">({{ $bobot }}%)</span>
                                         </div>
@@ -134,7 +133,6 @@
                     </div>
                     
                     <form id="filterFormLomba" class="row gx-3 gy-2 align-items-center mb-4">
-                        {{-- ... Form filter biasa tetap sama ... --}}
                          <div class="col-sm-12 col-md-5">
                             <label class="form-label visually-hidden" for="search_nama">Cari Nama Lomba</label>
                             <input type="text" class="form-control form-control-sm" id="search_nama" placeholder="Cari nama lomba...">
@@ -179,7 +177,6 @@
     </div>
 </div>
 
-{{-- Modal Detail Lomba --}}
 <div class="modal fade" id="modalDetailLombaPublik" tabindex="-1" aria-labelledby="modalDetailLombaPublikLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content"></div>
@@ -191,7 +188,6 @@
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-{{-- CDN untuk SortableJS --}}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
 
 
@@ -383,7 +379,7 @@
         });
     });
 </script>
-@endpush
+@endpush --}}
 
 {{-- Slider --}}
 {{-- @extends('layouts.template')
@@ -678,7 +674,7 @@
 </script>
 @endpush --}}
 
-{{-- @extends('layouts.template') 
+@extends('layouts.template') 
 @section('title', 'Daftar Lomba')
 
 @push('css')
@@ -737,15 +733,13 @@
                             <button type="button" id="btnReset" class="btn btn-secondary btn-sm">
                                 <i class="fas fa-sync-alt"></i> Reset
                             </button>
-                        </div>
-
-                             <button type="button" id="btnRekomendasi" class="btn btn-success btn-sm">
-                                <i class="fas fa-star"></i> Tampilkan Rekomendasi Saya
-                            </button>
+                            <button type="button" id="btnRekomendasi" class="btn btn-success btn-sm">
+                               <i class="fas fa-star"></i> Tampilkan Rekomendasi Saya
+                           </button>
                         </div>
                     </form>
 
-                    <div id="infoRekomendasi" class="alert alert-info alert-dismissible fade show small p-2" role="alert" style="display: none;">
+                    <div id="infoRekomendasi" class="alert alert-info alert-dismissible fade show sma ll p-2" role="alert" style="display: none;">
                         <strong><i class="fas fa-info-circle"></i> Info:</strong> Menampilkan daftar lomba berdasarkan hasil rekomendasi MOORA untuk preferensi Anda.
                         <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
@@ -965,4 +959,4 @@
 
     });
 </script>
-@endpush --}}
+@endpush
