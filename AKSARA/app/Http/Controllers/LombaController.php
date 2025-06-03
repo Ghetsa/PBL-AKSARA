@@ -338,12 +338,10 @@ class LombaController extends Controller
 
             // Pisahkan bidang 'minat' dan 'keahlian' pada detailBidang
             $lombaMinatBidangIds = $lomba->detailBidang
-                ->where('kategori', 'minat')
                 ->pluck('bidang_id')
                 ->toArray();
 
             $lombaKeahlianBidangIds = $lomba->detailBidang
-                ->where('kategori', 'keahlian')
                 ->pluck('bidang_id')
                 ->toArray();
 
