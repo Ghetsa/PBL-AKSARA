@@ -18,6 +18,10 @@ use Illuminate\Support\Facades\Log; // Untuk logging
 use Exception; // Untuk menangkap exception
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Barryvdh\DomPDF\Facade\Pdf;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class UserController extends Controller
 {
@@ -561,6 +565,79 @@ class UserController extends Controller
             }
         ])->findOrFail($user_id);
         return view('user.show_ajax', compact('user'));
+    }
+
+    public function export_excel()
+    {
+        // ambil data user yang akan di export
+        $user = UserModel::select('user_id', 'role', 'username', 'nama', 'password') // Ditambahkan user_id untuk konsistensi jika diperlukan
+            ->orderBy('nama') // Ditambahkan order by nama
+            ->with('level')
+            ->get();
+
+        // Load library excel
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet(); // ambil sheet yang aktif
+
+        $sheet->setCellValue('A1', 'No');
+        $sheet->setCellValue('B1', 'Username');
+        $sheet->setCellValue('C1', 'Nama');
+        $sheet->setCellValue('D1', 'Password'); // Sesuai contoh Anda, pertimbangkan keamanan
+        $sheet->setCellValue('E1', 'Role');
+
+        $sheet->getStyle('A1:E1')->getFont()->setBold(true); // bold header
+
+        $no = 1; // nomor data dimulai dari 1
+        $baris = 2; // baris data dimulai dari baris ke-2
+        foreach ($user as $key => $value) {
+            $sheet->setCellValue('A' . $baris, $no);
+            $sheet->setCellValue('B' . $baris, $value->username);
+            $sheet->setCellValue('C' . $baris, $value->nama);
+            $sheet->setCellValue('D' . $baris, $value->password); // Mengekspor password (seperti contoh Anda)
+            $sheet->setCellValue('E' . $baris, $value->level ? $value->level->level_nama : 'N/A'); // ambil nama level
+            $baris++;
+            $no++;
+        }
+
+        foreach (range('A', 'E') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true); // set auto size untuk kolom
+        }
+
+        $sheet->setTitle('Data User'); // set title sheet
+
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $filename = 'Data User ' . date('Y-m-d H_i_s') . '.xlsx'; // Menggunakan H_i_s untuk nama file unik
+
+        // Menyiapkan header untuk file Excel
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+        header('Cache-Control: max-age=1'); // Sesuai contoh Anda
+        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+        header('Cache-Control: cache, must-revalidate');
+        header('Pragma: public');
+
+        $writer->save('php://output');
+        exit;
+    }
+
+    public function export_pdf()
+    {
+        $user = UserModel::select('user_id', 'level_id', 'username', 'nama') // Password tidak diambil untuk PDF
+            ->orderBy('level_id')
+            ->orderBy('nama')
+            ->with('level')
+            ->get();
+
+        // view yang akan digenerate adalah user.export_pdf
+        // variabel $user akan dikirimkan ke view tersebut
+        $pdf = Pdf::loadView('user.export_pdf', ['user' => $user]);
+        $pdf->setPaper('a4', 'portrait'); // set ukuran kertas dan orientasi
+        $pdf->setOption('isRemoteEnabled', true); // set true jika ada gambar dari URL
+        // $pdf->render(); // render() seringkali otomatis dipanggil oleh stream()
+
+        return $pdf->stream('Data User ' . date('Y-m-d H_i_s') . '.pdf'); // Menggunakan H_i_s untuk nama file unik
     }
 
     // public function show_ajax($user_id)
