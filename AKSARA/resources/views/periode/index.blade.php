@@ -21,6 +21,8 @@
                     <h3 class="card-title">Data Periode Semester</h3>
                     <div class="card-tools">
                         {{-- <a href="{{ route('periode.create') }}" class="btn btn-success btn-sm">Tambah</a> --}}
+                        <a href="{{ route('periode.export.pdf') }}" class="btn btn-sm btn-warning"><i class="fa fa-file-pdf"></i> Export Periode (PDF)</a>
+                        <a href="{{ route('periode.export.excel') }}" class="btn btn-sm btn-success"><i class="fa fa-file-excel"></i> Export Periode</a>
                         <button type="button" class="btn btn-primary btn-sm"
                                 onclick="modalAction('{{ route('periode.create') }}')">
                                 <i class="fas fa-plus-circle"></i> Tambah</button>

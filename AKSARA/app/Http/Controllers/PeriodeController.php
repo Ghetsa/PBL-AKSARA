@@ -9,6 +9,10 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule; // Untuk validasi unique ignore
 use Illuminate\Support\Facades\Log; // Untuk logging
 use Exception; // Untuk menangkap exception
+use Barryvdh\DomPDF\Facade\Pdf;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class PeriodeController extends Controller
 {
@@ -71,7 +75,7 @@ class PeriodeController extends Controller
 
             if ($validator->fails()) {
                 return response()->json([
-                    'status' => false,
+                    '' => false,
                     'message' => 'Validasi gagal.',
                     'msgField' => $validator->errors()
                 ]);
@@ -84,7 +88,7 @@ class PeriodeController extends Controller
                 ]);
 
             return response()->json([
-                'status' => true,
+                '' => true,
                 'message' => 'Data periode semester berhasil ditambahkan'
             ]);
         }
@@ -101,7 +105,7 @@ class PeriodeController extends Controller
             // Jika menggunakan if (!request()->ajax()) di atas, ini tidak akan dieksekusi jika request bukan AJAX
             // Jika view dipanggil langsung (tanpa AJAX), Anda mungkin ingin redirect atau abort
             if (request()->ajax() || request()->wantsJson()) {
-                return response()->json(['status' => false, 'message' => 'Data periode semester tidak ditemukan.'], 404);
+                return response()->json(['' => false, 'message' => 'Data periode semester tidak ditemukan.'], 404);
             }
             abort(404, 'Data periode semester tidak ditemukan.');
         }
@@ -112,7 +116,7 @@ class PeriodeController extends Controller
     public function update(Request $request, $periode_id)
     {
         if (!($request->ajax() || $request->wantsJson())) {
-            return response()->json(['status' => false, 'message' => 'Akses tidak diizinkan'], 403);
+            return response()->json(['' => false, 'message' => 'Akses tidak diizinkan'], 403);
         }
 
         $periode = PeriodeModel
@@ -120,7 +124,7 @@ class PeriodeController extends Controller
 
         if (!$periode) {
             return response()->json([
-                'status' => false,
+                '' => false,
                 'message' => 'Data periode semester tidak ditemukan.'
             ], 404);
         }
@@ -132,7 +136,7 @@ class PeriodeController extends Controller
 
         if ($validator->fails()) {
             return response()->json([
-                'status' => false,
+                '' => false,
                 'message' => 'Validasi gagal.',
                 'errors' => $validator->errors()
             ], 422);
@@ -144,15 +148,15 @@ class PeriodeController extends Controller
             $periode->save();
 
             return response()->json([
-                'status' => true,
+                '' => true,
                 'message' => 'Data periode semester berhasil diperbarui',
                 'data' => $periode // Opsional: kirim data yang diupdate
-            ], 200); // Status 200 untuk OK
+            ], 200); //  200 untuk OK
 
         } catch (Exception $e) {
             Log::error("Error updating periode ID {$periode_id}: " . $e->getMessage());
             return response()->json([
-                'status' => false,
+                '' => false,
                 'message' => 'Gagal memperbarui data periode semester. Terjadi kesalahan server.'
             ], 500);
         }
@@ -165,7 +169,7 @@ class PeriodeController extends Controller
 
         if (!$periode) {
             if (request()->ajax() || request()->wantsJson()) {
-                return response()->json(['status' => false, 'message' => 'Data periode semester tidak ditemukan.'], 404);
+                return response()->json(['' => false, 'message' => 'Data periode semester tidak ditemukan.'], 404);
             }
             // Jika bukan AJAX, bisa redirect atau abort
             return abort(404, 'Data periode semester tidak ditemukan.');
@@ -192,18 +196,18 @@ class PeriodeController extends Controller
                     $periode->delete(); // Hapus data periode 
 
                     return response()->json([
-                        'status' => true,
+                        '' => true,
                         'message' => 'Data berhasil dihapus'
                     ]);
                 } catch (\Exception $e) {
                     return response()->json([
-                        'status' => false,
+                        '' => false,
                         'message' => 'Gagal menghapus data: ' . $e->getMessage()
                     ], 500);
                 }
             } else {
                 return response()->json([
-                    'status' => false,
+                    '' => false,
                     'message' => 'Data tidak ditemukan'
                 ], 404); // Kembalikan 404 jika periode tidak ditemukan
             }
@@ -211,5 +215,67 @@ class PeriodeController extends Controller
 
         // Jika bukan AJAX, redirect
         return redirect('/');
+    }
+
+    public function export_excel()
+    {
+        $periode = PeriodeModel::select('periode_id', 'semester', 'tahun_akademik')
+            ->orderBy('tahun_akademik', 'desc')
+            ->orderBy('semester', 'desc')
+            ->get();
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->setCellValue('A1', 'No');
+        $sheet->setCellValue('B1', 'Semester');
+        $sheet->setCellValue('C1', 'Tahun Akademik');
+
+        $sheet->getStyle('A1:DC1')->getFont()->setBold(true);
+
+        $no = 1;
+        $baris = 2;
+        foreach ($periode as $key => $value) {
+            $sheet->setCellValue('A' . $baris, $no);
+            $sheet->setCellValue('B' . $baris, $value->semester);
+            $sheet->setCellValue('C' . $baris, $value->tahun_akademik);
+            $baris++;
+            $no++;
+        }
+
+        foreach (range('A', 'D') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        $sheet->setTitle('Data Periode Semester');
+
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $filename = 'Data Periode Semester ' . date('Y-m-d H_i_s') . '.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+        header('Cache-Control: max-age=1');
+        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+        header('Cache-Control: cache, must-revalidate');
+        header('Pragma: public');
+
+        $writer->save('php://output');
+        exit;
+    }
+
+    public function export_pdf()
+    {
+        $periode = PeriodeModel::select('periode_id', 'semester', 'tahun_akademik')
+            ->orderBy('tahun_akademik', 'desc')
+            ->orderBy('semester', 'desc')
+            ->get();
+
+        $pdf = Pdf::loadView('periode.export_pdf', ['periode' => $periode]);
+        $pdf->setPaper('a4', 'portrait');
+        $pdf->setOption('isRemoteEnabled', true);
+
+        return $pdf->stream('Data Periode Semester ' . date('Y-m-d H_i_s') . '.pdf');
     }
 }

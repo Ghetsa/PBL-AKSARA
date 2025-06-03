@@ -77,11 +77,11 @@ Route::middleware(['auth'])->group(function () {
     //     return view('dashboard.mahasiswa', compact('breadcrumb', 'activeMenu'));
     // })->name('dashboardMHS');
 
-    // Route::get('/dashboard/dosen', function () {
-    //     $breadcrumb = (object) ['title' => 'Dashboard', 'list' => ['Dosen', 'Dashboard']];
-    //     $activeMenu = 'dashboard';
-    //     return view('dashboard.mahasiswa', compact('breadcrumb', 'activeMenu'));
-    // })->name('dashboardDSN');
+    Route::get('/dashboard/dosen', function () {
+        $breadcrumb = (object) ['title' => 'Dashboard', 'list' => ['Dosen', 'Dashboard']];
+        $activeMenu = 'dashboard';
+        return view('dashboard.dosen', compact('breadcrumb', 'activeMenu'));
+    })->name('dashboardDSN');
 
     // ===================== NOTIFIAKSI =====================
     Route::prefix('notifikasi')->middleware('auth')->group(function () {
@@ -167,6 +167,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/histori-pengajuan-mhs/list', [LombaController::class, 'listHistoriPengajuanLombaMhs'])->name('histori.list');
             Route::get('/ajukan-lomba-mhs', [LombaController::class, 'createPengajuanLombaMhs'])->name('create_form');
             Route::post('/simpan-lomba-mhs', [LombaController::class, 'storeLombaMhs'])->name('store');
+            Route::get('/show-lomba-mhs/{id}', [LombaController::class, 'showLombaMhs'])->name('show_form');
             Route::get('/edit-lomba-mhs/{id}', [LombaController::class, 'editLombaMhs'])->name('edit_form');
             Route::put('/update-lomba-mhs/{id}', [LombaController::class, 'updateLombaMhs'])->name('update_form');
         });
@@ -255,11 +256,14 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard-dosen', [DashboardController::class, 'dosenDashboard'])->name('dashboard.dosen');
 
         // ---------- Lomba Dosen ----------
-        Route::prefix('lomba-saya')->name('lomba.')->group(function () {
+        Route::prefix('lomba-saya')->name('lomba.dsn.')->group(function () {
             Route::get('/histori-pengajuan', [LombaController::class, 'historiPengajuanLombaDsn'])->name('histori.index');
             Route::get('/histori-pengajuan/list', [LombaController::class, 'listHistoriPengajuanLombaDsn'])->name('histori.list');
-            Route::get('/ajukan-lomba', [LombaController::class, 'createPengajuanLomba'])->name('create_form');
+            Route::get('/ajukan-lomba', [LombaController::class, 'createPengajuanLombaMhs'])->name('create_form');
             Route::post('/simpan-lomba', [LombaController::class, 'storeLomba'])->name('store');
+            Route::get('/show-lomba-dsn/{id}', [LombaController::class, 'showLombaMhs'])->name('show_form');
+            Route::get('/edit-lomba-dsn/{id}', [LombaController::class, 'editLombaMhs'])->name('edit_form');
+            Route::put('/update-lomba-dsn/{id}', [LombaController::class, 'updateLombaMhs'])->name('update_form');
         });
 
         // ---------- Prestasi Dosen ----------

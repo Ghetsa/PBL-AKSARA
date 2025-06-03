@@ -49,7 +49,7 @@ class AuthController extends Controller
                     'status' => true,
                     'message' => 'Login Dosen Berhasil',
                     // Arahkan ke halaman user setelah login berhasil
-                    'redirect' => route('dashboard.dosen')
+                    'redirect' => route('dashboardDSN')
                 ]);
             }
 
