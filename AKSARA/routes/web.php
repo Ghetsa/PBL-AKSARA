@@ -282,10 +282,10 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/edit-ajax/{id}', [PrestasiController::class, 'editAjaxDosen'])->name('edit_ajax');
             Route::put('/update-ajax/{id}', [PrestasiController::class, 'updateAjaxDosen'])->name('update_ajax');
             Route::get('/show-ajax/{id}', [PrestasiController::class, 'showAjaxDosen'])->name('show_ajax');
-            Route::get('/{id}/verify-form-ajax', [PrestasiController::class, 'showVerifyFormAjaxDosen'])->name('verify_form_ajax');
-            Route::post('/{id}/verify-process-ajax', [PrestasiController::class, 'processVerificationAjaxDosen'])->name('verify_process_ajax');
-            Route::get('/{id}/confirm-delete-ajax', [PrestasiController::class, 'confirmDeleteAjaxDosen'])->name('confirm_delete_ajax');
-            Route::delete('/{id}/destroy-ajax', [PrestasiController::class, 'destroyAjaxDosen'])->name('destroy_ajax');
+            Route::get('//verify-form-ajax/{prestasi}', [PrestasiController::class, 'showVerifyFormAjaxDosen'])->name('verify_form_ajax');
+            Route::put('/verify-process-ajax/{prestasi}', [PrestasiController::class, 'processVerificationAjaxDosen'])->name('verify_process_ajax');
+            Route::get('/confirm-delete-ajax/{id}', [PrestasiController::class, 'confirmDeleteAjaxDosen'])->name('confirm_delete_ajax');
+            Route::delete('/destroy-ajax/{id}', [PrestasiController::class, 'destroyAjaxDosen'])->name('destroy_ajax');
         });
 
         // ---------- Keahlian Dosen ----------

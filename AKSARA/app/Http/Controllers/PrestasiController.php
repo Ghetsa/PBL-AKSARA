@@ -721,7 +721,7 @@ class PrestasiController extends Controller
         return view('prestasi.dosen.verify_ajax', compact('prestasi'));
     }
 
-    public function processVerificationAjaxDosen(Request $request, $prestasi_id)
+    public function processVerificationAjaxDosen(Request $request, PrestasiModel $prestasi)
     {
         $validator = Validator::make($request->all(), [
             'status_verifikasi' => ['required', Rule::in(['pending', 'disetujui', 'ditolak'])],
@@ -737,7 +737,7 @@ class PrestasiController extends Controller
         }
 
         try {
-            $prestasi = PrestasiModel::findOrFail($prestasi_id); // Ambil manual
+            // $prestasi = PrestasiModel::findOrFail($prestasi_id); // Ambil manual
             $prestasi->status_verifikasi = $request->status_verifikasi;
             $prestasi->catatan_verifikasi = $request->catatan_verifikasi;
             $prestasi->save();
