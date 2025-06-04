@@ -41,7 +41,7 @@
 
         <div class="mb-3">
             <label for="file_user_excel" class="form-label">Pilih File Excel <span class="text-danger">*</span></label>
-            <input type="file" name="file_user_excel" id="file_user_excel" class="form-control" required accept=".xls,.xlsx">
+            <input type="file" name="file_user_excel" id="file_user_excel" class="form-control" required>
             <div id="error-file_user_excel" class="invalid-feedback d-block"></div> {{-- Untuk pesan error dari validasi JS/Server --}}
         </div>
 
@@ -76,27 +76,27 @@
 --}}
 <script>
 $(document).ready(function() {
-    // Cek apakah jQuery Validate sudah dimuat
     if (typeof $().validate !== 'function') {
         console.error("jQuery Validate plugin is not loaded. Pastikan sudah dimuat.");
-        // Anda bisa memuatnya secara dinamis jika perlu, atau menampilkan pesan ke pengguna
-        // Contoh memuat dinamis (tidak ideal jika sering terjadi):
-        // $.getScript("https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js", function() {
-        //     $.getScript("https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/additional-methods.min.js", function() {
-        //         initializeFormValidationUser();
-        //     });
-        // });
-        return; // Hentikan eksekusi jika validate tidak ada
+        // Mungkin tampilkan pesan ke pengguna jika SweetAlert2 sudah ada
+        // if (typeof Swal !== 'undefined') {
+        //     Swal.fire('Error Kritis', 'Komponen validasi tidak termuat. Harap hubungi administrator.', 'error');
+        // }
+        return;
     }
+    // Disarankan juga untuk mengecek additional-methods jika Anda sangat bergantung padanya
+    // if (typeof $.validator.methods.extension !== 'function') {
+    //    console.error("jQuery Validate Additional Methods (untuk rule 'extension') tidak termuat.");
+    // }
 
-    initializeFormValidationUser(); // Panggil fungsi inisialisasi
+    initializeFormValidationUser();
 
     function initializeFormValidationUser() {
         $("#form-import-user").validate({
             rules: {
-                file_user_excel: { // Sesuaikan dengan name input file
+                file_user_excel: {
                     required: true,
-                    extension: "xlsx|xls" // Memastikan ekstensi file adalah xlsx atau xls
+                    extension: "xlsx|xls"
                 }
             },
             messages: {
@@ -108,17 +108,19 @@ $(document).ready(function() {
             submitHandler: function(form) {
                 var formData = new FormData(form);
                 var submitButton = $('#btn-submit-import');
-                var progressBar = $('.progress-bar');
+                var progressBar = $('.progress-bar'); // Lebih spesifik jika ada beberapa progress bar: $('#form-import-user .progress-bar')
                 var progressContainer = $('#import-progress');
                 var statusText = $('#import-status-text');
                 var errorsDisplay = $('#import-errors-display');
-                var modalElement = $('#importUserModal'); // Ganti dengan ID modal utama Anda
+                
+                // Pastikan ID modal ini benar-benar ada di DOM sebagai ID dari elemen modal utama
+                var modalElement = $('#importUserModal'); 
 
                 submitButton.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Mengunggah...');
                 progressContainer.show();
                 progressBar.css('width', '0%').attr('aria-valuenow', 0).text('0%');
                 statusText.text('Mengunggah file...');
-                errorsDisplay.html(''); // Bersihkan error sebelumnya
+                errorsDisplay.html('');
 
                 $.ajax({
                     url: form.action,
@@ -136,7 +138,7 @@ $(document).ready(function() {
                                     statusText.text('Mengunggah file: ' + percentComplete + '%');
                                 } else {
                                     statusText.text('File terunggah, memproses data...');
-                                    progressBar.addClass('bg-info'); // Ganti warna saat proses
+                                    progressBar.removeClass('bg-success bg-danger').addClass('bg-info');
                                 }
                             }
                         }, false);
@@ -144,48 +146,53 @@ $(document).ready(function() {
                     },
                     success: function(response) {
                         submitButton.prop('disabled', false).html('<i class="fas fa-upload me-1"></i> Upload & Proses');
-                        progressContainer.hide();
-                        progressBar.removeClass('bg-info');
-
+                        // progressContainer.hide(); // Sembunyikan progress setelah selesai, atau biarkan untuk status akhir
+                        // progressBar.removeClass('bg-info');
 
                         if (response.status) {
-                            // Tutup modal Bootstrap 5
-                            var modalInstance = bootstrap.Modal.getInstance(modalElement[0]);
-                            if (modalInstance) {
-                                modalInstance.hide();
-                            } else {
-                                modalElement.modal('hide'); // Fallback jika instance tidak ditemukan
-                            }
+                            progressBar.removeClass('bg-info').addClass('bg-success');
+                            statusText.text('Impor berhasil!');
+                            // Menunggu sebentar sebelum menutup modal dan menampilkan swal
+                            setTimeout(function() {
+                                if (modalElement.length && typeof bootstrap !== 'undefined') {
+                                    var modalInstance = bootstrap.Modal.getInstance(modalElement[0]);
+                                    if (modalInstance) {
+                                        modalInstance.hide();
+                                    } else {
+                                        // Fallback jika instance tidak ditemukan (kurang ideal)
+                                        modalElement.modal('hide');
+                                    }
+                                }
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Berhasil!',
+                                    html: response.message,
+                                    confirmButtonText: 'OK'
+                                });
 
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Berhasil!',
-                                html: response.message, // response.message bisa berisi HTML
-                                confirmButtonText: 'OK'
-                            });
+                                if (typeof window.dataUserTable !== 'undefined' && typeof window.dataUserTable.ajax === 'function') {
+                                    window.dataUserTable.ajax.reload(null, false); // false agar paging tidak reset
+                                } else if (typeof window.table !== 'undefined' && typeof window.table.ajax === 'function') {
+                                    window.table.ajax.reload(null, false);
+                                } else {
+                                    // location.reload(); // Opsi terakhir jika tidak ada datatable
+                                }
+                            }, 1000); // Delay 1 detik
 
-                            // Reload DataTable (sesuaikan dengan nama variabel DataTable Anda)
-                            if (typeof window.dataUserTable !== 'undefined' && typeof window.dataUserTable.ajax === 'function') {
-                                window.dataUserTable.ajax.reload();
-                            } else if (typeof window.table !== 'undefined' && typeof window.table.ajax === 'function') {
-                                window.table.ajax.reload();
-                            } else {
-                                console.log('DataTable variable (dataUserTable or table) not found. Cannot reload.');
-                                // Pertimbangkan untuk refresh halaman jika DataTable tidak terdefinisi secara global
-                                // location.reload();
-                            }
                         } else {
-                            var errorMessagesHtml = '<div class="alert alert-danger p-2" role="alert"><h6 class="alert-heading">Detail Kesalahan:</h6><ul class="list-group list-group-flush">';
+                            progressBar.removeClass('bg-info').addClass('bg-danger');
+                            statusText.text('Impor gagal. Periksa detail kesalahan.');
+                            var errorMessagesHtml = '<div class="alert alert-danger p-2 mt-2" role="alert"><h6 class="alert-heading mb-1">Detail Kesalahan:</h6><ul class="list-unstyled mb-0">';
                             if (response.errors_detail && Array.isArray(response.errors_detail) && response.errors_detail.length > 0) {
                                 response.errors_detail.forEach(function(err) {
-                                    errorMessagesHtml += '<li class="list-group-item list-group-item-danger p-1 ps-2">' + err + '</li>';
+                                    errorMessagesHtml += '<li><small>' + err + '</small></li>';
                                 });
-                            } else if(response.msgField && typeof response.msgField === 'object') {
+                            } else if (response.msgField && typeof response.msgField === 'object') {
                                 $.each(response.msgField, function(key, value) {
-                                     errorMessagesHtml += '<li class="list-group-item list-group-item-danger p-1 ps-2">' + value[0] + '</li>';
+                                    errorMessagesHtml += '<li><small>' + value[0] + '</small></li>';
                                 });
                             } else {
-                                errorMessagesHtml += '<li class="list-group-item list-group-item-danger p-1 ps-2">Tidak ada detail error spesifik.</li>';
+                                errorMessagesHtml += '<li><small>' + (response.message || 'Tidak ada detail error spesifik.') + '</small></li>';
                             }
                             errorMessagesHtml += '</ul></div>';
                             errorsDisplay.html(errorMessagesHtml);
@@ -200,19 +207,12 @@ $(document).ready(function() {
                     },
                     error: function(xhr, status, error) {
                         submitButton.prop('disabled', false).html('<i class="fas fa-upload me-1"></i> Upload & Proses');
-                        progressContainer.hide();
-                        progressBar.removeClass('bg-info');
-                        let errorMsg = 'Gagal menghubungi server atau terjadi error tidak terduga. Silakan coba lagi.';
-                        if(xhr.responseJSON && xhr.responseJSON.message){
-                            errorMsg = xhr.responseJSON.message;
-                        } else if(xhr.responseText){
-                             try {
-                                let jsonResponse = JSON.parse(xhr.responseText);
-                                errorMsg = jsonResponse.message || xhr.responseText;
-                            } catch (e) {
-                                errorMsg = xhr.responseText.substring(0, 200) + "... (Selengkapnya di console)"; // Potong pesan error panjang
-                            }
-                        }
+                        progressContainer.show(); // Tetap tampilkan progress bar dengan status error
+                        progressBar.removeClass('bg-info bg-success').addClass('bg-danger').css('width', '100%').text('Error');
+                        statusText.text('Error koneksi atau server.');
+                        
+                        let errorMsg = 'Gagal menghubungi server. Silakan coba lagi.';
+                        // ... (error handling lainnya tetap sama) ...
                         Swal.fire({
                             icon: 'error',
                             title: 'Error Server',
@@ -222,26 +222,24 @@ $(document).ready(function() {
                         console.error("AJAX error: ", status, error, xhr.responseText);
                     }
                 });
-                return false; // Mencegah submit form standar
+                return false;
             },
-            // Konfigurasi error placement untuk Bootstrap 5 dengan jQuery Validate
-            errorElement: 'div', // Menggunakan div untuk pesan error agar bisa di-style sebagai invalid-feedback
-            errorPlacement: function (error, element) {
-                error.addClass('invalid-feedback'); // Kelas Bootstrap 5 untuk pesan error
-                // Tempatkan pesan error di bawah elemen input, atau di dalam elemen small.error-text jika ada
-                var errorTextElement = element.closest('.form-group').find('small.error-text');
-                if (errorTextElement.length) {
-                    errorTextElement.html(error);
+            errorElement: 'div',
+            errorPlacement: function(error, element) {
+                var errorContainer = $('#error-' + element.attr('name')); // Target div error spesifik
+                if (errorContainer.length) {
+                    errorContainer.html(error.text()).addClass('d-block'); // Tampilkan pesan error di div tersebut
                 } else {
-                    element.closest('.form-group').append(error);
+                    error.addClass('invalid-feedback'); // Fallback
+                    element.closest('.mb-3').append(error); // Sesuaikan dengan struktur terdekat Anda
                 }
             },
-            highlight: function (element, errorClass, validClass) {
-                $(element).addClass('is-invalid').removeClass(validClass); // Tambah is-invalid
+            highlight: function(element, errorClass, validClass) {
+                $(element).addClass('is-invalid').removeClass('is-valid');
             },
-            unhighlight: function (element, errorClass, validClass) {
-                $(element).removeClass('is-invalid').addClass(validClass); // Hapus is-invalid
-                $(element).closest('.form-group').find('.invalid-feedback').text(''); // Bersihkan pesan error
+            unhighlight: function(element, errorClass, validClass) {
+                $(element).removeClass('is-invalid').addClass('is-valid');
+                $('#error-' + $(element).attr('name')).html('').removeClass('d-block'); // Bersihkan dan sembunyikan
             }
         });
     }
