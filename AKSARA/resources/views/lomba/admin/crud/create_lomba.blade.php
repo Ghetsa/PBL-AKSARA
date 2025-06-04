@@ -1,9 +1,10 @@
+{{-- Form untuk Tambah Lomba oleh Admin (dimuat di modal) --}}
 {{-- Pastikan variabel $bidangList sudah di-pass ke view ini dari controller adminCreateLombaFormAjax --}}
 <form id="formAdminCreateLomba" action="{{ route('admin.lomba.crud.store_ajax') }}" method="POST" enctype="multipart/form-data">
     @csrf
     <div class="modal-header">
         <h5 class="modal-title">Tambah Info Lomba Baru</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
     <div class="modal-body" style="max-height: 68vh; overflow-y: auto;">
         {{-- Baris Nama Lomba --}}
@@ -17,7 +18,7 @@
 
         {{-- Baris Tanggal Pendaftaran --}}
         <div class="form-group row mb-3">
-            <label for="crud_c_pembukaan_pendaftaran" class="col-sm-3 col-form-label">Pembukaan Pendaftaran <span class="text-danger">*</span></label>
+            <label for="crud_c_pembukaan_pendaftaran" class="col-sm-3 col-form-label">Pembukaan Pendaftaran <span class="text-danger"></span></label>
             <div class="col-sm-9">
                 <input type="date" name="pembukaan_pendaftaran" id="crud_c_pembukaan_pendaftaran" class="form-control">
                 <span class="invalid-feedback error-pembukaan_pendaftaran"></span>
@@ -33,19 +34,19 @@
 
         {{-- Baris Kategori & Tingkat --}}
         <div class="form-group row mb-3">
-            <label for="crud_c_kategori" class="col-sm-3 col-form-label">Kategori Lomba <span class="text-danger">*</span></label>
+            <label for="crud_c_kategori" class="col-sm-3 col-form-label">Kategori Peserta <span class="text-danger">*</span></label>
             <div class="col-sm-3">
                 <select name="kategori" id="crud_c_kategori" class="form-select">
-                    <option value="">-- Pilih Kategori --</option>
+                    <option value="">-- Pilih --</option>
                     <option value="individu">Individu</option>
                     <option value="kelompok">Kelompok</option>
                 </select>
                 <span class="invalid-feedback error-kategori"></span>
             </div>
-            <label for="crud_c_tingkat" class="col-sm-2 col-form-label-end ps-0">Tingkat <span class="text-danger">*</span></label>
+            <label for="crud_c_tingkat" class="col-sm-2 col-form-label ps-0">Tingkat <span class="text-danger">*</span></label>
             <div class="col-sm-4">
                 <select name="tingkat" id="crud_c_tingkat" class="form-select">
-                    <option value="">-- Pilih Tingkat --</option>
+                    <option value="">-- Pilih --</option>
                     <option value="lokal">Lokal/Daerah</option>
                     <option value="nasional">Nasional</option>
                     <option value="internasional">Internasional</option>
@@ -64,8 +65,8 @@
         </div>
 
         {{-- Bidang Keahlian --}}
-        <div class="col-md-12 mb-3">
-            <label class="form-label d-block mb-2 text-sm-start">Bidang Keahlian Relevan <span class="text-danger">*</span></label>
+        <div class="col-md-12 mb-3 px-0"> 
+            <label class="form-label d-block mb-2 text">Bidang Keahlian Lomba <span class="text-danger">*</span></label>
             <div class="row ps-2">
                 @if(isset($bidangList) && $bidangList->count() > 0)
                     @foreach ($bidangList as $bidang)
@@ -82,8 +83,7 @@
                     <p class="text-muted">Tidak ada data bidang keahlian.</p>
                 @endif
             </div>
-            {{-- Span ini akan digunakan untuk menampilkan pesan error validasi untuk grup checkbox bidang_keahlian --}}
-            <span class="invalid-feedback error-bidang_keahlian d-block mt-1"></span>
+            <span class="invalid-feedback error-bidang_keahlian d-block mt-1 ps-2"></span>
         </div>
 
         {{-- Biaya --}}
@@ -92,6 +92,22 @@
             <div class="col-sm-9">
                 <input type="number" name="biaya" id="crud_c_biaya" class="form-control" min="0" placeholder="Kosongkan jika gratis">
                 <span class="invalid-feedback error-biaya"></span>
+            </div>
+        </div>
+
+        {{-- Input Hadiah Dinamis --}}
+        <div class="form-group row mb-3">
+            <label class="col-sm-3 col-form-label">Hadiah Lomba</label>
+            <div class="col-sm-9">
+                <div id="hadiahInputsContainerCreate">
+                    {{-- Input hadiah pertama --}}
+                    <div class="input-group mb-2 hadiah-input-group">
+                        <input type="text" name="hadiah[]" class="form-control form-control-sm" placeholder="Contoh: Uang Tunai Rp 1.000.000">
+                        <button type="button" class="btn btn-sm btn-danger remove-hadiah-btn-create"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+                <button type="button" id="addHadiahBtnCreate" class="btn btn-sm btn-outline-success mt-1"><i class="fas fa-plus"></i> Tambah Hadiah</button>
+                <span class="invalid-feedback error-hadiah d-block"></span>
             </div>
         </div>
 
@@ -131,27 +147,19 @@
 $(document).ready(function() {
     const formAdminCreateLomba = $('#formAdminCreateLomba');
 
-    // Custom rule untuk validasi tanggal: batas_pendaftaran harus setelah atau sama dengan pembukaan_pendaftaran
     $.validator.addMethod("afterDate", function(value, element, params) {
-        if (!value || !$(params).val()) { return true; } // Valid jika salah satu tanggal kosong
+        if (!value || !$(params).val()) { return true; }
         return new Date(value) >= new Date($(params).val());
     }, 'Tanggal batas harus setelah atau sama dengan tanggal pembukaan.');
 
-    // Custom rule untuk validasi ukuran file
     $.validator.addMethod("filesize", function(value, element, param) {
         return this.optional(element) || (element.files[0].size <= param);
     }, 'Ukuran file maksimal adalah 2MB.');
 
-    // Custom rule untuk memastikan field bisa kosong (nullable) tapi jika diisi harus valid (misal: URL)
-    // Ini berguna jika Anda tidak menggunakan `required` tapi ada aturan format lain.
-    // jQuery Validate secara default akan mengabaikan field kosong kecuali ada `required`.
-    // Jika Anda hanya ingin validasi format jika field diisi, aturan seperti `url: true` sudah cukup.
-    // Menambahkan ini untuk kejelasan jika diperlukan.
     $.validator.addMethod("nullableUrl", function(value, element) {
-        if (value === "") return true; // Kosong = valid
-        return /^(ftp|http|https):\/\/[^ "]+$/.test(value); // Validasi URL jika tidak kosong
+        if (value === "") return true;
+        return /^(ftp|http|https):\/\/[^ "]+$/.test(value);
     }, "Format URL tidak valid.");
-
 
     formAdminCreateLomba.validate({
         rules: {
@@ -161,24 +169,26 @@ $(document).ready(function() {
             kategori: { required: true },
             penyelenggara: { required: true, maxlength: 255 },
             tingkat: { required: true },
-            'bidang_keahlian[]': { required: true, minlength: 1 }, // 'bidang_keahlian[]' untuk array checkbox
-            biaya: { number: true, min: 0 }, // Dihapus 'nullable: true' karena jQuery Validate defaultnya non-required fields are optional
+            'bidang_keahlian[]': { required: true, minlength: 1 },
+            biaya: { number: true, min: 0 },
             link_pendaftaran: { nullableUrl: true, maxlength: 255 },
             link_penyelenggara: { nullableUrl: true, maxlength: 255 },
-            poster: { extension: "jpg|jpeg|png", filesize: 2097152 } // 2MB = 2 * 1024 * 1024 bytes
+            poster: { extension: "jpg|jpeg|png", filesize: 2097152 },
+            'hadiah[]': { maxlength: 255 } // Validasi untuk setiap item hadiah
         },
         messages: {
             nama_lomba: { required: "Nama lomba wajib diisi.", maxlength: "Nama lomba maksimal 255 karakter." },
             pembukaan_pendaftaran: { required: "Tanggal pembukaan wajib diisi.", dateISO: "Format tanggal tidak valid." },
             batas_pendaftaran: { required: "Batas pendaftaran wajib diisi.", dateISO: "Format tanggal tidak valid.", afterDate: "Batas pendaftaran harus setelah atau sama dengan tanggal pembukaan." },
-            kategori: { required: "Kategori lomba wajib dipilih." },
+            kategori: { required: "Kategori peserta wajib dipilih." },
             penyelenggara: { required: "Penyelenggara wajib diisi.", maxlength: "Penyelenggara maksimal 255 karakter." },
             tingkat: { required: "Tingkat lomba wajib dipilih." },
             'bidang_keahlian[]': { required: "Pilih minimal satu bidang keahlian.", minlength: "Pilih minimal satu bidang keahlian." },
             biaya: { number: "Biaya harus berupa angka.", min: "Biaya tidak boleh negatif." },
             link_pendaftaran: { nullableUrl: "Format URL pendaftaran tidak valid.", maxlength: "Link pendaftaran maksimal 255 karakter." },
             link_penyelenggara: { nullableUrl: "Format URL penyelenggara tidak valid.", maxlength: "Link penyelenggara maksimal 255 karakter." },
-            poster: { extension: "Format file poster tidak valid (hanya JPG, JPEG, PNG).", filesize: "Ukuran file poster maksimal 2MB." }
+            poster: { extension: "Format file poster tidak valid (hanya JPG, JPEG, PNG).", filesize: "Ukuran file poster maksimal 2MB." },
+            'hadiah[]': { maxlength: "Deskripsi hadiah maksimal 255 karakter."}
         },
         errorElement: 'span',
         errorPlacement: function (error, element) {
@@ -186,15 +196,16 @@ $(document).ready(function() {
             let fieldName = element.attr('name');
 
             if (fieldName === "bidang_keahlian[]") {
-                // Tempatkan error untuk grup checkbox 'bidang_keahlian[]' pada span khusus.
                 element.closest('.col-md-12.mb-3').find('span.error-bidang_keahlian').html(error.html()).show();
+            } else if (fieldName === "hadiah[]") {
+                $('#hadiahInputsContainerCreate').closest('.col-sm-9').find('span.error-hadiah').html(error.html()).show();
+                 // Jika ingin error per input hadiah:
+                 // element.closest('.input-group').after(error);
             } else if (element.closest('.col-sm-9').length) {
-                // Untuk field lain yang berada dalam struktur .col-sm-9
                 let errorContainer = element.closest('.col-sm-9').find('.invalid-feedback.error-' + fieldName.replace(/\[\]/g, ''));
                 if (errorContainer.length) {
                     errorContainer.html(error.html()).show();
                 } else {
-                     // Fallback jika tidak ada span error spesifik
                     if (element.next("small.form-text").length) {
                          error.insertAfter(element.next("small.form-text"));
                     } else {
@@ -202,14 +213,13 @@ $(document).ready(function() {
                     }
                 }
             } else {
-                // Fallback umum jika struktur tidak cocok
                 element.after(error);
             }
         },
         highlight: function (element, errorClass, validClass) {
             $(element).addClass('is-invalid').removeClass('is-valid');
             if ($(element).attr("name") === "bidang_keahlian[]") {
-                $(element).closest('.form-check').addClass('is-invalid-item'); // Tambahkan kelas ke item checkbox
+                $(element).closest('.form-check').addClass('is-invalid-item');
             }
         },
         unhighlight: function (element, errorClass, validClass) {
@@ -217,49 +227,45 @@ $(document).ready(function() {
             let fieldName = $(element).attr('name');
             if (fieldName === "bidang_keahlian[]") {
                 $(element).closest('.form-check').removeClass('is-invalid-item');
-                // Sembunyikan pesan error grup jika tidak ada checkbox lain yang invalid
                 if (!$(element).closest('.col-md-12.mb-3').find('input[name="bidang_keahlian[]"].is-invalid').length) {
                     $(element).closest('.col-md-12.mb-3').find('span.error-bidang_keahlian').empty().hide();
                 }
+            } else if (fieldName === "hadiah[]") {
+                 if (!$('#hadiahInputsContainerCreate').find('input[name="hadiah[]"].is-invalid').length) {
+                    $('#hadiahInputsContainerCreate').closest('.col-sm-9').find('span.error-hadiah').empty().hide();
+                 }
             } else if ($(element).closest('.col-sm-9').length) {
                 $(element).closest('.col-sm-9').find('.invalid-feedback.error-' + fieldName.replace(/\[\]/g, '')).empty().hide();
             }
         },
         submitHandler: function(form) {
-            // Mencegah submit form standar
-            // e.preventDefault(); // Tidak diperlukan secara eksplisit karena submitHandler sudah melakukannya
-
             let formData = new FormData(form);
             const submitButton = $(form).find('button[type="submit"]');
             const originalButtonText = submitButton.html();
 
             submitButton.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Menambah...');
             
-            // Bersihkan error messages sebelumnya
             $(form).find('.invalid-feedback').text('').hide();
             $(form).find('.form-control, .form-select, .form-check-input').removeClass('is-invalid is-valid');
             $(form).find('.form-check.is-invalid-item').removeClass('is-invalid-item');
-
 
             $.ajax({
                 url: $(form).attr('action'),
                 method: 'POST',
                 data: formData,
-                processData: false, // Penting untuk FormData
-                contentType: false, // Penting untuk FormData
-                dataType: 'json',   // Beritahu jQuery untuk mengharapkan JSON
+                processData: false, 
+                contentType: false, 
+                dataType: 'json',   
                 success: function(response) {
                     if (response.status) {
-                        $('#modalFormLombaAdminCrud').modal('hide'); // Gunakan ID modal yang benar
+                        $('#modalFormLombaAdminCrud').modal('hide'); 
                         Swal.fire({
                             title: 'Berhasil!',
                             text: response.message,
                             icon: 'success',
-                            // timer: 2000, // Tutup otomatis setelah 2 detik
-                            // showConfirmButton: false
                         });
                         if (typeof dtLombaCrudAdmin !== 'undefined' && dtLombaCrudAdmin.ajax) {
-                            dtLombaCrudAdmin.ajax.reload(null, false); // Reload DataTable tanpa reset paging
+                            dtLombaCrudAdmin.ajax.reload(null, false); 
                         }
                     } else {
                         Swal.fire({
@@ -267,17 +273,19 @@ $(document).ready(function() {
                             text: response.message || 'Gagal menambah data. Periksa kembali isian Anda.',
                             icon: 'error'
                         });
-                        // Tampilkan error validasi dari server jika ada
                         if (response.errors) {
                             $.each(response.errors, function(key, messages) {
-                                let inputName = key.replace(/\./g, '_'); // Untuk error array seperti 'bidang_keahlian.0'
-                                let inputElement = $(form).find(`[name^="${inputName.split('_')[0]}"]`); // Cari berdasarkan nama dasar
+                                let inputName = key.replace(/\./g, '_'); 
+                                let inputElement = $(form).find(`[name^="${inputName.split('_')[0]}"]`); 
                                 if (key === 'bidang_keahlian' || key.startsWith('bidang_keahlian.')) {
-                                     inputElement = $(form).find(`[name="bidang_keahlian[]"]`).first(); // Target grup checkbox
+                                     inputElement = $(form).find(`[name="bidang_keahlian[]"]`).first(); 
                                      let errorContainer = inputElement.closest('.col-md-12.mb-3').find('span.error-bidang_keahlian');
                                      errorContainer.html(messages[0]).show();
                                      inputElement.closest('.col-md-12.mb-3').find('input[name="bidang_keahlian[]"]').addClass('is-invalid');
-
+                                } else if (key === 'hadiah' || key.startsWith('hadiah.')) {
+                                    let errorContainer = $('#hadiahInputsContainerCreate').closest('.col-sm-9').find('span.error-hadiah');
+                                    errorContainer.html(messages[0]).show(); 
+                                    $('#hadiahInputsContainerCreate').find('input[name="hadiah[]"]').addClass('is-invalid');
                                 } else if (inputElement.length) {
                                     inputElement.addClass('is-invalid');
                                     let errorContainer = inputElement.closest('.col-sm-9').find('.invalid-feedback.error-' + inputName);
@@ -292,7 +300,6 @@ $(document).ready(function() {
                     }
                 },
                 error: function(xhr) {
-                    // Penanganan error AJAX (misal: server error 500, koneksi putus)
                     let errorMessage = 'Terjadi kesalahan pada server. Silakan coba lagi nanti.';
                     if (xhr.responseJSON) {
                         errorMessage = xhr.responseJSON.message || (xhr.responseJSON.errors ? 'Terjadi kesalahan validasi.' : errorMessage);
@@ -307,22 +314,38 @@ $(document).ready(function() {
                     }
                     Swal.fire({
                         title: 'Error!',
-                        html: errorMessage, // Gunakan html agar list bisa dirender
+                        html: errorMessage,
                         icon: 'error'
                     });
                 },
                 complete: function() {
-                    // Kembalikan tombol submit ke keadaan semula
                     submitButton.prop('disabled', false).html(originalButtonText);
                 }
             });
-        } // Akhir dari submitHandler
-    }); // Akhir dari .validate()
+        }
+    });
 
-    // Tambahan: Jika ada input tanggal, pastikan browser mendukungnya atau gunakan datepicker
-    if (!Modernizr.inputtypes.date) { // Contoh jika menggunakan Modernizr untuk deteksi fitur
-        $('input[type=date]').datepicker({ dateFormat: 'yy-mm-dd' }); // Fallback ke jQuery UI Datepicker
-    }
+    // Logika untuk menambah/menghapus input hadiah
+    $('#addHadiahBtnCreate').on('click', function() {
+        const newHadiahInput = `
+            <div class="input-group mb-2 hadiah-input-group">
+                <input type="text" name="hadiah[]" class="form-control form-control-sm" placeholder="Deskripsi hadiah lainnya...">
+                <button type="button" class="btn btn-sm btn-danger remove-hadiah-btn-create"><i class="fas fa-trash"></i></button>
+            </div>
+        `;
+        $('#hadiahInputsContainerCreate').append(newHadiahInput);
+    });
 
-}); // Akhir dari document.ready
+    $('#hadiahInputsContainerCreate').on('click', '.remove-hadiah-btn-create', function() {
+        if ($('#hadiahInputsContainerCreate .hadiah-input-group').length > 1) {
+            $(this).closest('.hadiah-input-group').remove();
+        } else {
+            $(this).closest('.hadiah-input-group').find('input[name="hadiah[]"]').val('');
+        }
+    });
+    
+    // if (typeof Modernizr !== 'undefined' && !Modernizr.inputtypes.date) { 
+    //     $('input[type=date]').datepicker({ dateFormat: 'yy-mm-dd' });
+    // }
+});
 </script>

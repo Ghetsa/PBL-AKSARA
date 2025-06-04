@@ -50,15 +50,14 @@ class LaporanController extends Controller
             'tingkatKompetisiList',
             'totalPrestasiDisetujui',
             'totalLombaDisetujui',
-            'mahasiswaBerprestasiCount',
-            'prestasiPerTahun'
+            'mahasiswaBerprestasiCount'
         ));
     }
 
     public function getPrestasiData(Request $request)
     {
         if ($request->ajax()) {
-            $data = PrestasiModel::with(['mahasiswa.user', 'mahasiswa.prodi', 'periode']) // Tambah relasi jika perlu
+            $data = PrestasiModel::with(['mahasiswa.user', 'mahasiswa.prodi', 'dosen.user']) // Tambah relasi jika perlu
                 ->where('status_verifikasi', 'disetujui'); // Hanya yang disetujui
 
             if ($request->filled('filter_tahun_akademik')) {

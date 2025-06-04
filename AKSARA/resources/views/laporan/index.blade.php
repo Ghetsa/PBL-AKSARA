@@ -113,12 +113,13 @@
                         <tr>
                             <th>No</th>
                             <th>Nama Mahasiswa</th>
+                            <th>Dosen Pembimbing</th>
                             <th>NIM & Prodi</th>
                             <th>Nama Prestasi</th>
                             <th>Tingkat</th>
                             <th>Kategori</th>
                             <th>Tanggal</th>
-                            <th>Penyelenggara</th>
+                            {{-- <th>Penyelenggara</th> --}}
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -215,12 +216,12 @@
             columns: [
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
                 { data: 'mahasiswa', name: 'mahasiswa.user.nama', orderable: false }, // Search akan kompleks, bisa di-disable
-                { data: 'mahasiswa.nim', name: 'mahasiswa.nim', visible: false, searchable: true }, // Untuk search by NIM
+                { data: 'mahasiswa', name: 'mahasiswa.nim', visible: false, searchable: true }, // Untuk search by NIM
+                { data: 'dosen', name: 'dosen.user.nama', visible: false, searchable: true }, // Untuk search by NIM
                 { data: 'nama_prestasi', name: 'nama_prestasi' },
-                { data: 'tingkat_prestasi', name: 'tingkat_prestasi' },
-                { data: 'kategori_prestasi', name: 'kategori_prestasi' },
-                { data: 'tanggal_pelaksanaan_prestasi', name: 'tanggal_pelaksanaan_prestasi' },
-                { data: 'penyelenggara_prestasi', name: 'penyelenggara_prestasi' }
+                { data: 'tingkat', name: 'tingkat' },
+                { data: 'kategori', name: 'kategori' },
+                { data: 'penyelenggara', name: 'penyelenggara' }
             ],
             // dom: 'Bfrtip', // Untuk menampilkan tombol export
             // buttons: [
@@ -283,45 +284,6 @@
         }
         updateExportLombaLink(); // Panggil saat awal
 
-        // Chart Prestasi per Tahun
-        var ctxPrestasiTahun = document.getElementById("prestasiPerTahunChart");
-        if (ctxPrestasiTahun) {
-            var prestasiPerTahunLabels = @json($prestasiPerTahun->keys());
-            var prestasiPerTahunData = @json($prestasiPerTahun->values());
-            new Chart(ctxPrestasiTahun, {
-                type: 'bar',
-                data: {
-                    labels: prestasiPerTahunLabels,
-                    datasets: [{
-                        label: "Jumlah Prestasi",
-                        backgroundColor: "#4e73df",
-                        hoverBackgroundColor: "#2e59d9",
-                        borderColor: "#4e73df",
-                        data: prestasiPerTahunData,
-                    }],
-                },
-                options: {
-                    maintainAspectRatio: false,
-                    scales: {
-                        xAxes: [{
-                            gridLines: { display: false, drawBorder: false },
-                            ticks: { maxTicksLimit: 10 }
-                        }],
-                        yAxes: [{
-                            ticks: { min: 0, precision:0, beginAtZero: true, maxTicksLimit: 5, padding: 10,}, // Pastikan sumbu Y mulai dari 0 dan integer
-                            gridLines: { color: "rgb(234, 236, 244)", zeroLineColor: "rgb(234, 236, 244)", drawBorder: false, borderDash: [2], zeroLineBorderDash: [2] }
-                        }],
-                    },
-                    legend: { display: false },
-                    tooltips: {
-                        titleMarginBottom: 10, titleFontColor: '#6e707e', titleFontSize: 14,
-                        backgroundColor: "rgb(255,255,255)", bodyFontColor: "#858796",
-                        borderColor: '#dddfeb', borderWidth: 1, xPadding: 15, yPadding: 15,
-                        displayColors: false, caretPadding: 10,
-                    },
-                }
-            });
-        }
     });
     </script>
 @endpush

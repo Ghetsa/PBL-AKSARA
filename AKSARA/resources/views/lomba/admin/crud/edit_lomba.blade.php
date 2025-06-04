@@ -21,7 +21,7 @@
 
         {{-- Tanggal Pendaftaran --}}
         <div class="form-group row mb-3">
-            <label for="crud_e_pembukaan_pendaftaran" class="col-sm-3 col-form-label">Pembukaan Pendaftaran <span class="text-danger">*</span></label>
+            <label for="crud_e_pembukaan_pendaftaran" class="col-sm-3 col-form-label">Pembukaan Pendaftaran <span class="text-danger"></span></label>
             <div class="col-sm-9">
                 <input type="date" name="pembukaan_pendaftaran" id="crud_e_pembukaan_pendaftaran" class="form-control" value="{{ old('pembukaan_pendaftaran', optional($lomba->pembukaan_pendaftaran)->format('Y-m-d')) }}">
                 <span class="invalid-feedback error-pembukaan_pendaftaran"></span>
@@ -38,10 +38,10 @@
 
         {{-- Kategori & Tingkat --}}
         <div class="form-group row mb-3">
-            <label for="crud_e_kategori" class="col-sm-3 col-form-label">Kategori <span class="text-danger">*</span></label>
+            <label for="crud_e_kategori" class="col-sm-3 col-form-label">Kategori Peserta <span class="text-danger">*</span></label>
             <div class="col-sm-3">
                 <select name="kategori" id="crud_e_kategori" class="form-select">
-                    <option value="">-- Pilih Kategori --</option>
+                    <option value="">-- Pilih --</option>
                     <option value="individu" {{ old('kategori', $lomba->kategori) == 'individu' ? 'selected' : '' }}>Individu</option>
                     <option value="kelompok" {{ old('kategori', $lomba->kategori) == 'kelompok' ? 'selected' : '' }}>Kelompok</option>
                 </select>
@@ -51,7 +51,7 @@
             <label for="crud_e_tingkat" class="col-sm-2 col-form-label ps-0">Tingkat <span class="text-danger">*</span></label>
             <div class="col-sm-4">
                 <select name="tingkat" id="crud_e_tingkat" class="form-select">
-                     <option value="">-- Pilih Tingkat --</option>
+                     <option value="">-- Pilih --</option>
                     <option value="lokal" {{ old('tingkat', $lomba->tingkat) == 'lokal' ? 'selected' : '' }}>Lokal/Daerah</option>
                     <option value="nasional" {{ old('tingkat', $lomba->tingkat) == 'nasional' ? 'selected' : '' }}>Nasional</option>
                     <option value="internasional" {{ old('tingkat', $lomba->tingkat) == 'internasional' ? 'selected' : '' }}>Internasional</option>
@@ -70,23 +70,17 @@
         </div>
 
         {{-- Bidang Keahlian --}}
-        <div class="col-md-12 mb-3">
-            <label class="form-label d-block mb-2 text-sm-start">Bidang Keahlian Relevan <span class="text-danger">*</span></label>
+        <div class="col-md-12 mb-3 px-0">
+            <label class="form-label d-block mb-2 text-sm-start">Bidang Keahlian Lomba <span class="text-danger">*</span></label>
             <div class="row ps-2">
                 @php
-                    // Pastikan $lomba->bidangKeahlian adalah collection atau array yang bisa di-pluck
-                    $bidang_terpilih = old('bidang_keahlian', ($lomba->bidangKeahlian && method_exists($lomba->bidangKeahlian, 'pluck')) ? $lomba->bidangKeahlian->pluck('bidang_id')->toArray() : ($lomba->bidang_keahlian ?? []));
-                    if (!is_array($bidang_terpilih) && is_string($bidang_terpilih)) { // Jika bidang_keahlian disimpan sebagai string CSV di model lama
-                        $bidang_terpilih = explode(',', $bidang_terpilih);
-                    } elseif (!is_array($bidang_terpilih)) {
-                        $bidang_terpilih = [];
-                    }
+                    $bidangLombaIds = old('bidang_keahlian', $lomba->bidangKeahlian->pluck('bidang_id')->toArray() ?? []);
                 @endphp
                 @if(isset($bidangList) && $bidangList->count() > 0)
                     @foreach ($bidangList as $bidang)
                         @php
-                            $inputIdSlug = Str::slug($bidang->bidang_nama) . '_edit_' . $bidang->bidang_id; // ID unik untuk edit
-                            $isChecked = in_array($bidang->bidang_id, $bidang_terpilih);
+                            $inputIdSlug = Str::slug($bidang->bidang_nama) . '_edit_' . $bidang->bidang_id;
+                            $isChecked = in_array($bidang->bidang_id, $bidangLombaIds);
                         @endphp
                         <div class="col-md-6">
                             <div class="form-check mb-2">
@@ -101,7 +95,7 @@
                      <p class="text-muted">Tidak ada data bidang keahlian.</p>
                 @endif
             </div>
-            <span class="invalid-feedback error-bidang_keahlian d-block mt-1"></span>
+            <span class="invalid-feedback error-bidang_keahlian d-block mt-1 ps-2"></span>
         </div>
 
 
@@ -111,6 +105,31 @@
             <div class="col-sm-9">
                 <input type="number" name="biaya" id="crud_e_biaya" class="form-control" min="0" value="{{ old('biaya', $lomba->biaya) }}">
                 <span class="invalid-feedback error-biaya"></span>
+            </div>
+        </div>
+
+        {{-- Input Hadiah Dinamis --}}
+        <div class="form-group row mb-3">
+            <label class="col-sm-3 col-form-label">Hadiah Lomba</label>
+            <div class="col-sm-9">
+                <div id="hadiahInputsContainerEdit">
+                    @if($lomba->daftarHadiah && $lomba->daftarHadiah->count() > 0)
+                        @foreach($lomba->daftarHadiah as $index => $itemHadiah)
+                        <div class="input-group mb-2 hadiah-input-group">
+                            <input type="text" name="hadiah[]" class="form-control form-control-sm" placeholder="Contoh: Uang Tunai Rp 1.000.000" value="{{ old('hadiah.'.$index, $itemHadiah->hadiah) }}">
+                            <button type="button" class="btn btn-sm btn-danger remove-hadiah-btn-edit"><i class="fas fa-trash"></i></button>
+                        </div>
+                        @endforeach
+                    @else
+                        {{-- Sediakan minimal satu input jika tidak ada hadiah sebelumnya --}}
+                        <div class="input-group mb-2 hadiah-input-group">
+                            <input type="text" name="hadiah[]" class="form-control form-control-sm" placeholder="Contoh: Uang Tunai Rp 1.000.000">
+                            <button type="button" class="btn btn-sm btn-danger remove-hadiah-btn-edit"><i class="fas fa-trash"></i></button>
+                        </div>
+                    @endif
+                </div>
+                <button type="button" id="addHadiahBtnEdit" class="btn btn-sm btn-outline-success mt-1"><i class="fas fa-plus"></i> Tambah Hadiah</button>
+                <span class="invalid-feedback error-hadiah d-block"></span>
             </div>
         </div>
 
@@ -145,8 +164,8 @@
                 <span class="invalid-feedback error-poster"></span>
             </div>
         </div>
-         {{-- Status Verifikasi & Catatan --}}
-        @if(isset($isAdmin) && $isAdmin) {{-- Hanya tampilkan untuk admin --}}
+         {{-- Status Verifikasi & Catatan (jika admin) --}}
+        @if(isset($isAdmin) && $isAdmin)
             <div class="form-group row mb-3">
                 <label for="crud_edit_status_verifikasi" class="col-sm-3 col-form-label">Status Verifikasi <span class="text-danger">*</span></label>
                 <div class="col-sm-9">
@@ -166,11 +185,10 @@
                     <span class="invalid-feedback error-catatan_verifikasi"></span>
                 </div>
             </div>
-        @else {{-- Untuk user, status tidak bisa diubah, hanya ditampilkan atau tidak sama sekali --}}
+        @else 
+            {{-- Jika form ini diakses oleh user biasa untuk edit pengajuan mereka, status tidak bisa diubah --}}
             <input type="hidden" name="status_verifikasi" value="{{ $lomba->status_verifikasi }}">
         @endif
-
-
     </div>
 
     <div class="modal-footer">
@@ -182,24 +200,20 @@
 <script>
 $(document).ready(function () {
     const formEditLomba = $('#formAdminEditLomba');
-    // Variabel untuk status verifikasi hanya relevan jika ditampilkan untuk admin
-    const statusSelectEdit = $('#crud_edit_status_verifikasi'); // Mungkin tidak ada jika bukan admin
-    const catatanWrapperEdit = $('#crud_edit_catatan_verifikasi_wrapper');
-    const catatanTextareaEdit = $('#crud_edit_catatan_verifikasi');
-
-    if (statusSelectEdit.length) { // Cek apakah elemen ada (form admin)
+    
+    // Logika untuk toggle catatan verifikasi (jika form admin)
+    if ($('#crud_edit_status_verifikasi').length) { 
         function toggleCatatanEdit() {
-            if (statusSelectEdit.val() === 'ditolak') {
-                catatanWrapperEdit.slideDown();
+            if ($('#crud_edit_status_verifikasi').val() === 'ditolak') {
+                $('#crud_edit_catatan_verifikasi_wrapper').slideDown();
             } else {
-                catatanWrapperEdit.slideUp();
-                catatanTextareaEdit.removeClass('is-invalid').next('.invalid-feedback.error-catatan_verifikasi').empty().hide();
+                $('#crud_edit_catatan_verifikasi_wrapper').slideUp();
+                $('#crud_edit_catatan_verifikasi').removeClass('is-invalid').next('.invalid-feedback.error-catatan_verifikasi').empty().hide();
             }
         }
-        statusSelectEdit.on('change', toggleCatatanEdit);
-        toggleCatatanEdit();
+        $('#crud_edit_status_verifikasi').on('change', toggleCatatanEdit);
+        toggleCatatanEdit(); // Panggil saat load
     }
-
 
     $.validator.addMethod("afterDate", function(value, element, params) {
         if (!value || !$(params).val()) { return true; }
@@ -215,7 +229,7 @@ $(document).ready(function () {
         return /^(ftp|http|https):\/\/[^ "]+$/.test(value);
     }, "Format URL tidak valid.");
 
-    let validationRules = {
+    let validationRulesEdit = {
         nama_lomba: { required: true, maxlength: 255 },
         pembukaan_pendaftaran: { required: true, dateISO: true },
         batas_pendaftaran: { required: true, dateISO: true, afterDate: '#crud_e_pembukaan_pendaftaran' },
@@ -226,41 +240,42 @@ $(document).ready(function () {
         biaya: { number: true, min: 0 },
         link_pendaftaran: { nullableUrl: true, maxlength: 255 },
         link_penyelenggara: { nullableUrl: true, maxlength: 255 },
-        poster: { extension: "jpg|jpeg|png", filesize: 2097152 }
+        poster: { extension: "jpg|jpeg|png", filesize: 2097152 },
+        'hadiah[]': { maxlength: 255 }
     };
 
-    let validationMessages = {
+    let validationMessagesEdit = {
         nama_lomba: { required: "Nama lomba wajib diisi.", maxlength: "Nama lomba maksimal 255 karakter." },
         pembukaan_pendaftaran: { required: "Tanggal pembukaan wajib diisi.", dateISO: "Format tanggal tidak valid." },
         batas_pendaftaran: { required: "Batas pendaftaran wajib diisi.", dateISO: "Format tanggal tidak valid.", afterDate: "Batas pendaftaran harus setelah atau sama dengan tanggal pembukaan." },
-        kategori: { required: "Kategori lomba wajib dipilih." },
+        kategori: { required: "Kategori peserta wajib dipilih." },
         penyelenggara: { required: "Penyelenggara wajib diisi.", maxlength: "Penyelenggara maksimal 255 karakter." },
         tingkat: { required: "Tingkat lomba wajib dipilih." },
         'bidang_keahlian[]': { required: "Pilih minimal satu bidang keahlian.", minlength: "Pilih minimal satu bidang keahlian." },
         biaya: { number: "Biaya harus berupa angka.", min: "Biaya tidak boleh negatif." },
         link_pendaftaran: { nullableUrl: "Format URL pendaftaran tidak valid.", maxlength: "Link pendaftaran maksimal 255 karakter." },
         link_penyelenggara: { nullableUrl: "Format URL penyelenggara tidak valid.", maxlength: "Link penyelenggara maksimal 255 karakter." },
-        poster: { extension: "Format file poster tidak valid (hanya JPG, JPEG, PNG).", filesize: "Ukuran file poster maksimal 2MB." }
+        poster: { extension: "Format file poster tidak valid (hanya JPG, JPEG, PNG).", filesize: "Ukuran file poster maksimal 2MB." },
+        'hadiah[]': { maxlength: "Deskripsi hadiah maksimal 255 karakter."}
     };
-
+    
     // Tambahkan aturan validasi untuk status & catatan jika form admin
-    if (statusSelectEdit.length) {
-        validationRules.status_verifikasi = { required: true };
-        validationRules.catatan_verifikasi = {
-            required: function() { return statusSelectEdit.val() === 'ditolak'; },
+    if ($('#crud_edit_status_verifikasi').length) {
+        validationRulesEdit.status_verifikasi = { required: true };
+        validationRulesEdit.catatan_verifikasi = {
+            required: function() { return $('#crud_edit_status_verifikasi').val() === 'ditolak'; },
             maxlength: 1000
         };
-        validationMessages.status_verifikasi = { required: "Status verifikasi wajib dipilih." };
-        validationMessages.catatan_verifikasi = {
+        validationMessagesEdit.status_verifikasi = { required: "Status verifikasi wajib dipilih." };
+        validationMessagesEdit.catatan_verifikasi = {
             required: "Catatan verifikasi wajib diisi jika status ditolak.",
             maxlength: "Catatan verifikasi maksimal 1000 karakter."
         };
     }
 
-
     formEditLomba.validate({
-        rules: validationRules,
-        messages: validationMessages,
+        rules: validationRulesEdit,
+        messages: validationMessagesEdit,
         errorElement: 'span',
         errorPlacement: function (error, element) {
             error.addClass('invalid-feedback');
@@ -268,6 +283,8 @@ $(document).ready(function () {
 
             if (fieldName === "bidang_keahlian[]") {
                 element.closest('.col-md-12.mb-3').find('span.error-bidang_keahlian').html(error.html()).show();
+            } else if (fieldName === "hadiah[]") {
+                $('#hadiahInputsContainerEdit').closest('.col-sm-9').find('span.error-hadiah').html(error.html()).show();
             } else if (element.closest('.col-sm-9').length) {
                 let errorContainer = element.closest('.col-sm-9').find('.invalid-feedback.error-' + fieldName.replace(/\[\]/g, ''));
                 if (errorContainer.length) {
@@ -297,6 +314,10 @@ $(document).ready(function () {
                 if (!$(element).closest('.col-md-12.mb-3').find('input[name="bidang_keahlian[]"].is-invalid').length) {
                     $(element).closest('.col-md-12.mb-3').find('span.error-bidang_keahlian').empty().hide();
                 }
+            } else if (fieldName === "hadiah[]") {
+                 if (!$('#hadiahInputsContainerEdit').find('input[name="hadiah[]"].is-invalid').length) {
+                    $('#hadiahInputsContainerEdit').closest('.col-sm-9').find('span.error-hadiah').empty().hide();
+                 }
             } else if ($(element).closest('.col-sm-9').length) {
                 $(element).closest('.col-sm-9').find('.invalid-feedback.error-' + fieldName.replace(/\[\]/g, '')).empty().hide();
             }
@@ -315,9 +336,9 @@ $(document).ready(function () {
             $.ajax({
                 url: $(form).attr('action'),
                 method: 'POST', 
-                headers: { // Tambahkan header ini
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'), // Jika belum di-setup global
-                    'X-HTTP-Method-Override': 'PUT' // Ini kuncinya
+                headers: { 
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'), 
+                    'X-HTTP-Method-Override': 'PUT'
                 },
                 data: formData,
                 processData: false,
@@ -329,7 +350,7 @@ $(document).ready(function () {
                         Swal.fire({
                             title: 'Berhasil!',
                             text: response.message,
-                            icon: 'success'
+                            icon: 'success',
                         });
                         if (typeof dtLombaCrudAdmin !== 'undefined' && dtLombaCrudAdmin.ajax) {
                             dtLombaCrudAdmin.ajax.reload(null, false);
@@ -343,19 +364,22 @@ $(document).ready(function () {
                         if (response.errors) {
                             $.each(response.errors, function(key, messages) {
                                 let inputName = key.replace(/\./g, '_');
-                                let inputElement = $(form).find(`[name^="${inputName.split('_')[0]}"]`); // Cari berdasarkan name dasar
+                                let inputElement = $(form).find(`[name^="${inputName.split('_')[0]}"]`);
                                 if (key === 'bidang_keahlian' || key.startsWith('bidang_keahlian.')) {
-                                     inputElement = $(form).find(`[name="bidang_keahlian[]"]`).first(); // Targetkan elemen pertama dari grup checkbox
+                                     inputElement = $(form).find(`[name="bidang_keahlian[]"]`).first();
                                      let errorContainer = inputElement.closest('.col-md-12.mb-3').find('span.error-bidang_keahlian');
                                      errorContainer.html(messages[0]).show();
-                                     // Tandai semua checkbox di grup sebagai invalid untuk konsistensi visual
                                      inputElement.closest('.col-md-12.mb-3').find('input[name="bidang_keahlian[]"]').addClass('is-invalid');
+                                } else if (key === 'hadiah' || key.startsWith('hadiah.')) {
+                                    let errorContainer = $('#hadiahInputsContainerEdit').closest('.col-sm-9').find('span.error-hadiah');
+                                    errorContainer.html(messages[0]).show();
+                                    $('#hadiahInputsContainerEdit').find('input[name="hadiah[]"]').addClass('is-invalid');
                                 } else if (inputElement.length) {
                                     inputElement.addClass('is-invalid');
                                     let errorContainer = inputElement.closest('.col-sm-9').find('.invalid-feedback.error-' + inputName);
                                     if (errorContainer.length) {
                                         errorContainer.text(messages[0]).show();
-                                    } else { // Fallback jika tidak ada span .error-FIELDNAME
+                                    } else {
                                         inputElement.after('<span class="invalid-feedback d-block">' + messages[0] + '</span>');
                                     }
                                 }
@@ -386,6 +410,27 @@ $(document).ready(function () {
                     submitButton.prop('disabled', false).html(originalButtonText);
                 }
             });
+        }
+    });
+
+    // Logika untuk menambah/menghapus input hadiah di form EDIT
+    $('#addHadiahBtnEdit').on('click', function() {
+        const newHadiahInput = `
+            <div class="input-group mb-2 hadiah-input-group">
+                <input type="text" name="hadiah[]" class="form-control form-control-sm" placeholder="Deskripsi hadiah lainnya...">
+                <button type="button" class="btn btn-sm btn-danger remove-hadiah-btn-edit"><i class="fas fa-trash"></i></button>
+            </div>
+        `;
+        $('#hadiahInputsContainerEdit').append(newHadiahInput);
+    });
+
+    $('#hadiahInputsContainerEdit').on('click', '.remove-hadiah-btn-edit', function() {
+        // Selalu biarkan minimal satu input, tapi bisa dikosongkan
+        if ($('#hadiahInputsContainerEdit .hadiah-input-group').length > 1) {
+            $(this).closest('.hadiah-input-group').remove();
+        } else {
+            $(this).closest('.hadiah-input-group').find('input[name="hadiah[]"]').val('');
+            // Swal.fire('Info', 'Minimal harus ada satu field untuk hadiah. Anda bisa mengosongkannya jika tidak ada hadiah.', 'info');
         }
     });
 });
