@@ -1,7 +1,7 @@
 {{-- Simpan sebagai resources/views/user/import_excel_ajax.blade.php (atau nama yang telah disesuaikan) --}}
 {{-- Ini adalah KONTEN MODAL, untuk dimasukkan ke dalam <div class="modal-content"> --}}
 
-<form action="{{ url('/user/import-excel-ajax') }}" method="POST" id="form-import-user" enctype="multipart/form-data">
+<form action="{{ url('/user/import_ajax') }}" method="POST" id="form-import-user" enctype="multipart/form-data">
     @csrf
     {{-- Struktur modal-dialog dan modal-content biasanya ada di view utama yang memanggil modal ini --}}
     {{-- Jika file ini adalah modal penuh, uncomment bagian di bawah dan hapus dari pemanggil --}}

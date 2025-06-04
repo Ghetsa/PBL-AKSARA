@@ -46,6 +46,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/user/export/pdf', [App\Http\Controllers\UserController::class, 'export_pdf'])->name('user.export.pdf');
 
     Route::get('/user/import', [App\Http\Controllers\UserController::class, 'import'])->name('user.import');
+    Route::post('user/import_ajax', [UserController::class, 'import_ajax']); // ajax import excel
 
     // For Prodi
     Route::get('/prodi/export/excel', [App\Http\Controllers\ProdiController::class, 'export_excel'])->name('prodi.export.excel');
@@ -309,7 +310,6 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/{id}/verify-process-ajax', [BimbinganController::class, 'processVerification'])->name('verify_process');
             Route::get('/{id}/show-ajax', [BimbinganController::class, 'showAjax'])->name('show_ajax');
         });
-
     });
 
 
