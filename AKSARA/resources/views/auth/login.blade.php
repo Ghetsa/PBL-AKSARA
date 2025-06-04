@@ -47,13 +47,6 @@
                 <label class="form-label">Password</label>
                 <input type="password" name="password" class="form-control" placeholder="Masukkan Password" required>
               </div>
-              <div class="d-flex mt-1 justify-content-between">
-                <div class="form-check">
-                  <input class="form-check-input input-primary" type="checkbox" id="customCheckc1">
-                  <label class="form-check-label text-muted" for="customCheckc1">Keep me signed in</label>
-                </div>
-                <h5 class="text-secondary f-w-400">Lupa Password?</h5>
-              </div>
               <div class="d-grid mt-4">
                 <button type="submit" class="btn btn-primary" id="btnLogin">Login</button>
               </div>
@@ -94,9 +87,7 @@
           </div>
           <div class="col-auto my-1">
             <ul class="list-inline footer-link mb-0">
-              <li class="list-inline-item"><a href="#">Home</a></li>
-              <li class="list-inline-item"><a href="#">Privacy Policy</a></li>
-              <li class="list-inline-item"><a href="#">Contact us</a></li>
+              <li class="list-inline-item"><a href="{{ url('/') }}">Kembali</a></li>
             </ul>
           </div>
         </div>
