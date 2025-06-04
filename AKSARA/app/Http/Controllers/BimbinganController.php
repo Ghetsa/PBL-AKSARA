@@ -49,9 +49,9 @@ class BimbinganController extends Controller
         };
       })
       ->addColumn('aksi', function ($item) {
-        $verifyUrl = route('bimbingan.verify_form', $item->prestasi_id);
-        return '<button type="button" class="btn btn-sm btn-info" onclick="modalAction(\'' . $verifyUrl . '\')">
-                        <i class="fas fa-search-plus"></i> Verifikasi
+        $detailbtn = route('bimbingan.verify_form', $item->prestasi_id);
+        return '<button type="button" class="btn btn-sm btn-info me-1" onclick="modalAction(\'' . $detailbtn . '\')">
+                        <i class="fas fa-eye"></i> Detail
                     </button>';
       })
       ->rawColumns(['status_verifikasi', 'aksi'])
