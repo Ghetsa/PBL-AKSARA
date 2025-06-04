@@ -99,6 +99,8 @@ class AuthController extends Controller
                 'nim' => 'required|string|max:20|unique:mahasiswa,nim',
                 'prodi_id' => 'required|exists:program_studi,prodi_id',
                 'periode_id' => 'required|exists:periode,periode_id',
+                'no_telepon' => 'required|string|max:15', 
+                'alamat' => 'required|string|max:100', 
             ]);
 
             if ($validator->fails()) {
@@ -116,6 +118,8 @@ class AuthController extends Controller
                 'password' => Hash::make($request->password),
                 'role' => 'mahasiswa',
                 'status' => 'aktif',
+                'no_telepon' => $request->no_telepon,  
+                'alamat' => $request->alamat,  
             ]);
 
             // Simpan ke tabel mahasiswa
