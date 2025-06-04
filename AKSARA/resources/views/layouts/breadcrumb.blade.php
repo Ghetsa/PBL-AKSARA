@@ -30,7 +30,22 @@
                     <h5 class="m-b-10">@yield($breadcrumb->title)</h5>
                 </div>
                 <ul class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ url('/user') }}">Home</a></li>
+                    @if (Auth::check())
+                        @if (Auth::user()->role == 'admin')
+                            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Home</a></li>
+                        @elseif (Auth::user()->role == 'dosen')
+                            <li class="breadcrumb-item"><a href="{{ route('dashboardDSN') }}">Home</a></li>
+                        @elseif (Auth::user()->role == 'mahasiswa')
+                            <li class="breadcrumb-item"><a href="{{ route('dashboard.mahasiswa') }}">Home</a></li>
+                        @else
+                            {{-- Default Home link if role is not recognized or user is not any of the above --}}
+                            <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
+                        @endif
+                    @else
+                        {{-- Default Home link for guests or if Auth is not checked --}}
+                        <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
+                    @endif
+                    {{-- <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li> --}}
                         @foreach($breadcrumb->list as $key => $value)
                             @if($key == count($breadcrumb->list) - 1)
                                 <li class="breadcrumb-item active">{{ $value }}</li>
