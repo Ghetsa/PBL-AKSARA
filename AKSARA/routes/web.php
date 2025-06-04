@@ -266,11 +266,11 @@ Route::middleware(['auth'])->group(function () {
             // Route::get('/{id}/detail-ajax', [LombaController::class, 'showAjaxLombaDosen'])->name('show_ajax'); // Detail modal
             Route::get('/histori-pengajuan', [LombaController::class, 'historiPengajuanLombaDsn'])->name('histori.index');
             Route::get('/histori-pengajuan/list', [LombaController::class, 'listHistoriPengajuanLombaDsn'])->name('histori.list');
-            Route::get('/ajukan-lomba', [LombaController::class, 'createPengajuanLombaMhs'])->name('create_form');
-            Route::post('/simpan-lomba', [LombaController::class, 'storeLombaMhs'])->name('store');
-            Route::get('/show-lomba-dsn/{id}', [LombaController::class, 'showLombaMhs'])->name('show_form');
-            Route::get('/edit-lomba-dsn/{id}', [LombaController::class, 'editLombaMhs'])->name('edit_form');
-            Route::put('/update-lomba-dsn/{id}', [LombaController::class, 'updateLombaMhs'])->name('update_form');
+            Route::get('/ajukan-lomba', [LombaController::class, 'createPengajuanLombaDsn'])->name('create_form');
+            Route::post('/simpan-lomba', [LombaController::class, 'storeLombaDsn'])->name('store');
+            Route::get('/show-lomba-dsn/{id}', [LombaController::class, 'showLombaDsn'])->name('show_form');
+            Route::get('/edit-lomba-dsn/{id}', [LombaController::class, 'editLombaDsn'])->name('edit_form');
+            Route::put('/update-lomba-dsn/{id}', [LombaController::class, 'updateLombaDsn'])->name('update_form');
         });
 
         // ---------- Prestasi Dosen ----------

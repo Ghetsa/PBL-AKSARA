@@ -60,6 +60,7 @@
 
 @push('js')
 <script>
+    var historiTable
     // Fungsi modalActionLomba bisa Anda pindahkan ke file JS global jika digunakan di banyak tempat
     // Pastikan modalId dikirim dengan benar
     function modalActionLomba(url, title = 'Form', modalId = 'modalFormLombaUser') { // Default ke modal form
@@ -81,7 +82,7 @@
     }
 
     $(document).ready(function () {
-        var historiTable = $('#dataHistoriLombaUser').DataTable({
+        historiTable = $('#dataHistoriLombaUser').DataTable({
             processing: true, serverSide: true, responsive: true,
             ajax: "{{ route('lomba.dosen.histori.list') }}", // Route baru untuk data histori
             columns: [

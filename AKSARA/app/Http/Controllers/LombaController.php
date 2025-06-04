@@ -1779,6 +1779,208 @@ class LombaController extends Controller
         return abort(403);
     }
 
+    public function createPengajuanLombaDsn()
+    {
+        $bidangList = BidangModel::orderBy('bidang_nama')->get();
+        return view('lomba.dosen.create_lomba', compact('bidangList'));
+    }
+
+    public function storeLombaDsn(Request $request) // Atau storePengajuanLombaUmum
+    {
+        $user = Auth::user();
+
+        $validator = Validator::make($request->all(), [
+            'nama_lomba' => 'required|string|max:255',
+            'pembukaan_pendaftaran' => 'required|date',
+            'batas_pendaftaran' => 'required|date|after_or_equal:pembukaan_pendaftaran',
+            'kategori' => 'required|in:individu,kelompok',
+            'penyelenggara' => 'required|string|max:255',
+            'tingkat' => 'required|in:lokal,nasional,internasional',
+            'bidang_keahlian' => 'required|array|min:1',
+            'bidang_keahlian.*' => 'exists:bidang,bidang_id', // Validasi setiap item dalam array
+            'biaya' => 'nullable|integer|min:0',
+            'link_pendaftaran' => 'nullable|url|max:255',
+            'link_penyelenggara' => 'nullable|url|max:255',
+            'poster' => 'nullable|image|mimes:jpg,jpeg,png,pdf|max:2048', // Tambahkan pdf jika diizinkan
+            'hadiah' => 'nullable|array',
+            'hadiah.*' => 'nullable|string|max:255',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validasi gagal. Periksa kembali data yang Anda masukkan.',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $posterPath = null;
+        if ($request->hasFile('poster')) {
+            $posterPath = $request->file('poster')->store('lomba_poster', 'public');
+        }
+
+        $lomba = LombaModel::create([
+            'nama_lomba' => $request->nama_lomba,
+            'pembukaan_pendaftaran' => $request->pembukaan_pendaftaran,
+            'batas_pendaftaran' => $request->batas_pendaftaran,
+            'kategori' => $request->kategori,
+            'penyelenggara' => $request->penyelenggara,
+            'tingkat' => $request->tingkat,
+            'biaya' => $request->biaya ?? 0,
+            'link_pendaftaran' => $request->link_pendaftaran,
+            'link_penyelenggara' => $request->link_penyelenggara,
+            'status_verifikasi' => 'pending', // Pengajuan dari user defaultnya pending
+            'diinput_oleh' => $user->user_id,
+            'poster' => $posterPath,
+        ]);
+
+        // Simpan bidang keahlian
+        if ($request->has('bidang_keahlian') && is_array($request->bidang_keahlian)) {
+            foreach ($request->bidang_keahlian as $bidangId) {
+                LombaDetailModel::create([
+                    'lomba_id' => $lomba->lomba_id,
+                    'bidang_id' => $bidangId
+                ]);
+            }
+        }
+
+        // Simpan hadiah
+        if ($request->has('hadiah') && is_array($request->hadiah)) {
+            foreach ($request->hadiah as $itemHadiah) {
+                if (!empty(trim($itemHadiah))) {
+                    LombaHadiahModel::create([
+                        'lomba_id' => $lomba->lomba_id,
+                        'hadiah' => $itemHadiah
+                    ]);
+                }
+            }
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Pengajuan info lomba berhasil dikirim dan akan diverifikasi oleh Admin.'
+        ]);
+    }
+
+    public function editLombaDsn($id) // Atau editPengajuanLombaUmum
+    {
+        $user = Auth::user();
+        $lomba = LombaModel::where('lomba_id', $id)
+            // Pastikan hanya pemilik atau admin yang bisa edit (kebijakan bisa beda)
+            // ->where('diinput_oleh', $user->user_id) 
+            ->with(['bidangKeahlian.bidang', 'daftarHadiah'])
+            ->firstOrFail();
+
+        // Hanya boleh edit jika statusnya 'pending' atau 'ditolak'
+        if (!in_array($lomba->status_verifikasi, ['pending', 'ditolak'])) {
+            // return redirect()->route('lomba.mhs.histori.index')->with('error', 'Pengajuan lomba ini tidak dapat diedit lagi.');
+            // Jika ini adalah modal AJAX, kembalikan response error
+            return response()->json(['status' => false, 'message' => 'Pengajuan lomba ini tidak dapat diedit lagi karena sudah diproses.'], 403);
+        }
+
+        $bidangList = BidangModel::orderBy('bidang_nama')->get();
+        // Jika view Anda adalah 'lomba.edit' yang diunggah
+        return view('lomba.dosen.edit', compact('lomba', 'bidangList'));
+    }
+
+    public function updateLombaDsn(Request $request, $id) // Atau updatePengajuanLombaUmum
+    {
+        $user = Auth::user();
+        $lomba = LombaModel::where('lomba_id', $id)
+            // ->where('diinput_oleh', $user->user_id) // Pastikan user adalah pemilik
+            ->firstOrFail();
+
+        if (!in_array($lomba->status_verifikasi, ['pending', 'ditolak'])) {
+            return response()->json(['status' => false, 'message' => 'Pengajuan lomba ini tidak dapat diupdate lagi karena sudah diproses.'], 403);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'nama_lomba' => 'required|string|max:255',
+            'pembukaan_pendaftaran' => 'required|date',
+            'batas_pendaftaran' => 'required|date|after_or_equal:pembukaan_pendaftaran',
+            'kategori' => 'required|in:individu,kelompok',
+            'penyelenggara' => 'required|string|max:255',
+            'tingkat' => 'required|in:lokal,nasional,internasional',
+            'bidang_keahlian' => 'required|array|min:1',
+            'bidang_keahlian.*' => 'exists:bidang,bidang_id',
+            'biaya' => 'nullable|integer|min:0',
+            'link_pendaftaran' => 'nullable|url|max:255',
+            'link_penyelenggara' => 'nullable|url|max:255',
+            'poster' => 'nullable|image|mimes:jpg,jpeg,png,pdf|max:2048',
+            'hadiah' => 'nullable|array',
+            'hadiah.*' => 'nullable|string|max:255',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validasi gagal. Periksa kembali data yang Anda masukkan.',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $validatedData = $validator->validated();
+
+        if ($request->hasFile('poster')) {
+            if ($lomba->poster && Storage::disk('public')->exists($lomba->poster)) {
+                Storage::disk('public')->delete($lomba->poster);
+            }
+            $validatedData['poster'] = $request->file('poster')->store('lomba_poster', 'public');
+        } else {
+            // Jika tidak ada file poster baru, jangan sertakan 'poster' dalam update data utama
+            // agar nilai poster lama tidak terhapus jika tidak ada file baru.
+            // Namun, jika ingin menghapus poster, perlu logika terpisah (misal checkbox "hapus poster")
+            unset($validatedData['poster']);
+        }
+
+        // Set status kembali ke pending jika ada perubahan, agar admin mereview ulang
+        $validatedData['status_verifikasi'] = 'pending';
+        $validatedData['catatan_verifikasi'] = null; // Hapus catatan lama jika ada
+
+        $lomba->update(collect($validatedData)->except(['bidang_keahlian', 'hadiah'])->toArray());
+
+        // Update bidang keahlian
+        if ($request->has('bidang_keahlian') && is_array($request->bidang_keahlian)) {
+            $lomba->bidangKeahlian()->delete(); // Hapus yang lama
+            foreach ($request->bidang_keahlian as $bidangId) {
+                LombaDetailModel::create([
+                    'lomba_id' => $lomba->lomba_id,
+                    'bidang_id' => $bidangId
+                ]);
+            }
+        }
+
+        // Update hadiah
+        $lomba->daftarHadiah()->delete(); // Hapus hadiah lama
+        if ($request->has('hadiah') && is_array($request->hadiah)) {
+            foreach ($request->hadiah as $itemHadiah) {
+                if (!empty(trim($itemHadiah))) {
+                    LombaHadiahModel::create([
+                        'lomba_id' => $lomba->lomba_id,
+                        'hadiah' => $itemHadiah
+                    ]);
+                }
+            }
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Pengajuan info lomba berhasil diperbarui dan akan diverifikasi ulang oleh Admin.'
+        ]);
+    }
+
+    public function showLombaDsn($id) // Atau showPengajuanLombaUmum
+    {
+        $user = Auth::user();
+        $lomba = LombaModel::where('lomba_id', $id)
+            // ->where('diinput_oleh', $user->user_id) // Opsional, jika hanya pemilik yang boleh lihat detail pengajuannya
+            ->with(['inputBy', 'bidangKeahlian.bidang', 'daftarHadiah'])
+            ->firstOrFail();
+
+        // Jika view Anda adalah 'lomba.show' yang diunggah
+        return view('lomba.dosen.show', compact('lomba'));
+    }
+
     /**
      * Menampilkan form AJAX untuk mahasiswa/dosen mengajukan lomba.
      */

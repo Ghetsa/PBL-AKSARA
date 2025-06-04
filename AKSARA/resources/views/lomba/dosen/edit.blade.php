@@ -1,6 +1,6 @@
 {{-- Form untuk Edit Pengajuan Lomba oleh Mahasiswa/Dosen (dimuat di modal) --}}
 {{-- Pastikan variabel $lomba dan $bidangList sudah di-pass ke view ini dari controller --}}
-<form id="formUserEditLomba" action="{{ route('lomba.mhs.update_form', $lomba->lomba_id) }}" {{-- Sesuaikan route jika untuk dosen juga --}}
+<form id="formUserEditLomba" action="{{ route('lomba.dosen.update_form', $lomba->lomba_id) }}" {{-- Sesuaikan route jika untuk dosen juga --}}
     method="POST" enctype="multipart/form-data">
     @csrf
     @method('PUT')
