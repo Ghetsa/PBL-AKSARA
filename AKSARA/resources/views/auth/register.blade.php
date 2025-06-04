@@ -68,8 +68,16 @@
                 <input type="text" name="nim" class="form-control" placeholder="NIM">
               </div>
               <div class="form-group mb-3">
-                <label class="form-label">Alamat Email*</label>
-                <input type="email" name="email" class="form-control" placeholder="Alamat Email">
+                <label class="form-label">Email</label>
+                <input type="email" name="email" class="form-control" placeholder="Email">
+              </div>
+              <div class="form-group mb-3">
+                <label class="form-label">Nomor Telepon</label>
+                <input type="no_telepon" name="no_telepon" class="form-control" placeholder="Nomor Telepon">
+              </div>
+              <div class="form-group mb-3">
+                <label class="form-label">Alamat</label>
+                <input type="alamat" name="alamat" class="form-control" placeholder="Alamat">
               </div>
               <div class="form-group mb-3">
                 <label class="form-label">Password</label>
@@ -91,7 +99,7 @@
                 </div> --}}
               </div>
               <div class="form-group mb-3">
-                <label for="periode_id" class="form-label">Semester</label>
+                <label for="periode_id" class="form-label">Periode</label>
                 {{-- <div class="form-control"> --}}
                   <select class="form-select" id="periode_id" name="periode_id">
                     <option value="">- Pilih Semester -</option>
