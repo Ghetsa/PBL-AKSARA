@@ -633,28 +633,27 @@ class UserController extends Controller
 
             // Ekspektasi header (sesuaikan dengan template Anda, case insensitive)
             // Ini hanya untuk referensi, validasi akan berdasarkan indeks kolom
-            // $expectedHeaders = ['username', 'nama lengkap', 'email', 'password', 'role', 'nip/nim', 'no telepon', 'alamat', 'kode prodi', 'tahun angkatan'];
+            // $expectedHeaders = ['nama lengkap', 'email', 'password', 'role', 'nip/nim', 'no telepon', 'alamat', 'kode prodi', 'tahun angkatan'];
 
             DB::beginTransaction();
 
             foreach ($rows as $rowIndex => $row) {
-                // Kolom Excel: A=Username, B=Nama, C=Email, D=Password, E=Role,
-                // F=NIP/NIM, G=No Telepon, H=Alamat, I=Kode Prodi, J=Tahun Angkatan
-                $username       = trim($row['A'] ?? '');
-                $nama           = trim($row['B'] ?? '');
-                $email          = trim($row['C'] ?? '');
-                $password       = trim($row['D'] ?? '');
-                $role           = strtolower(trim($row['E'] ?? ''));
-                $nip_nim        = trim($row['F'] ?? '');
-                $no_telepon     = trim($row['G'] ?? null);
-                $alamat         = trim($row['H'] ?? null);
-                $kode_prodi     = trim($row['I'] ?? null);
-                $tahun_angkatan = trim($row['J'] ?? null);
+                // Kolom Excel: A=Nama, B=Email, C=Password, D=Role, E=NIP/NIM,
+                // F=No Telepon, G=Alamat, H=Kode Prodi, I=Tahun Angkatan
+                $nama = trim($row['A'] ?? '');
+                $email = trim($row['B'] ?? '');
+                $password = trim($row['C'] ?? '');
+                $role = strtolower(trim($row['D'] ?? ''));
+                $nip_nim = trim($row['E'] ?? '');
+                $no_telepon = trim($row['F'] ?? null);
+                $alamat = trim($row['G'] ?? null);
+                $kode_prodi = trim($row['H'] ?? null);
+                $tahun_angkatan = trim($row['I'] ?? null);
 
                 // Minimal data yang harus ada
-                if (empty($username) || empty($nama) || empty($email) || empty($password) || empty($role)) {
+                if (empty($nama) || empty($email) || empty($password) || empty($role)) {
                     $errorCount++;
-                    $errorsDetail[] = "Baris " . $rowIndex . ": Data tidak lengkap (Username, Nama, Email, Password, Role wajib diisi). Lewati baris ini.";
+                    $errorsDetail[] = "Baris " . $rowIndex . ": Data tidak lengkap (Nama, Email, Password, Role wajib diisi). Lewati baris ini.";
                     continue;
                 }
 
@@ -672,12 +671,7 @@ class UserController extends Controller
                     continue;
                 }
 
-                // Cek duplikasi Username dan Email
-                if (UserModel::where('username', $username)->exists()) {
-                    $errorCount++;
-                    $errorsDetail[] = "Baris " . $rowIndex . ": Username '$username' sudah terdaftar. Lewati baris ini.";
-                    continue;
-                }
+                // Cek duplikasi Email
                 if (UserModel::where('email', $email)->exists()) {
                     $errorCount++;
                     $errorsDetail[] = "Baris " . $rowIndex . ": Email '$email' sudah terdaftar. Lewati baris ini.";
@@ -686,7 +680,7 @@ class UserController extends Controller
 
                 $prodi_id = null;
                 if (!empty($kode_prodi) && in_array($role, ['dosen', 'mahasiswa'])) {
-                    $prodi = ProdiModel::where('prodi_kode', $kode_prodi)->first(); // Menggunakan prodi_kode dari SQL
+                    $prodi = ProdiModel::where('kode', $kode_prodi)->first(); // Menggunakan prodi_kode dari SQL
                     if (!$prodi) {
                         $errorCount++;
                         $errorsDetail[] = "Baris " . $rowIndex . ": Kode Prodi '$kode_prodi' tidak ditemukan. Lewati baris ini.";
@@ -709,7 +703,7 @@ class UserController extends Controller
                     }
                     // Cari periode Ganjil untuk tahun angkatan tersebut
                     $periode = PeriodeModel::where('semester', 'Ganjil')
-                        ->where('tahun_ajaran', $tahun_angkatan . '/' . ($tahun_angkatan + 1))
+                        ->where('tahun_akademik', $tahun_angkatan . '/' . ($tahun_angkatan + 1))
                         ->first();
                     if (!$periode) {
                         // Jika tidak ada, coba buat periode baru atau tandai error
@@ -728,14 +722,13 @@ class UserController extends Controller
 
                 // Buat User
                 $newUser = UserModel::create([
-                    'username'    => $username,
-                    'nama'        => $nama,
-                    'email'       => $email,
-                    'password'    => Hash::make($password),
-                    'role'        => $role,
-                    'no_telepon'  => $no_telepon,
-                    'alamat'      => $alamat,
-                    'status'      => 'aktif', // Default status
+                    'nama' => $nama,
+                    'email' => $email,
+                    'password' => Hash::make($password),
+                    'role' => $role,
+                    'no_telepon' => $no_telepon,
+                    'alamat' => $alamat,
+                    'status' => 'aktif', // Default status
                     // 'level_id' => $level_id, // Jika Anda punya logika untuk ini
                 ]);
 
@@ -743,22 +736,22 @@ class UserController extends Controller
                 if ($role === 'admin') {
                     AdminModel::create([
                         'user_id' => $newUser->user_id,
-                        'nip'     => $nip_nim,
+                        'nip' => $nip_nim,
                     ]);
                 } elseif ($role === 'dosen') {
                     DosenModel::create([
-                        'user_id'  => $newUser->user_id,
-                        'nip'      => $nip_nim,
+                        'user_id' => $newUser->user_id,
+                        'nip' => $nip_nim,
                         'prodi_id' => $prodi_id,
                         // 'keahlian_id' => null, // Jika ada default atau diisi nanti
                     ]);
                 } elseif ($role === 'mahasiswa') {
                     MahasiswaModel::create([
-                        'user_id'           => $newUser->user_id,
-                        'nim'               => $nip_nim,
-                        'prodi_id'          => $prodi_id,
-                        'periode_id'        => $periode_id, // Periode masuk/angkatan
-                        'mahasiswa_angkatan' => $tahun_angkatan,
+                        'user_id' => $newUser->user_id,
+                        'nim' => $nip_nim,
+                        'prodi_id' => $prodi_id,
+                        'periode_id' => $periode_id, // Periode masuk/angkatan
+                        // 'mahasiswa_angkatan' => $tahun_angkatan,
                     ]);
                 }
                 $importedCount++;
