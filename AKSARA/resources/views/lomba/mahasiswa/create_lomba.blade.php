@@ -1,4 +1,6 @@
-<form id="formUserLomba" action="{{ route('lomba.mhs.store') }}" method="POST" enctype="multipart/form-data">
+<form id="formUserLomba"
+    action="{{ auth()->user()->role == 'mahasiswa' ? route('lomba.mhs.store') : route('lomba.dosen.store') }}"
+    method="POST" enctype="multipart/form-data">
     @csrf
     @if (isset($lomba))
         @method('PUT')

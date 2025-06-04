@@ -23,7 +23,7 @@
                                 <tr>
                                     <th class="text-center" style="width: 5%;">No.</th>
                                     <th>Nama Lomba</th>
-                                    <th>Bidang Lomba</th>
+                                    {{-- <th>Bidang Lomba</th> --}}
                                     <th>Penyelenggara</th>
                                     <th>Tingkat</th>
                                     <th>Batas Pendaftaran</th>
@@ -87,7 +87,7 @@
             columns: [
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', className: 'text-center', orderable: false, searchable: false },
                 { data: 'nama_lomba', name: 'nama_lomba' },
-                { data: 'bidang_lomba', name: 'bidang_lomba' },
+                // { data: 'bidang_lomba', name: 'bidang_lomba' },
                 { data: 'penyelenggara', name: 'penyelenggara' },
                 { data: 'tingkat', name: 'tingkat' },
                 { data: 'batas_pendaftaran', name: 'batas_pendaftaran' },
