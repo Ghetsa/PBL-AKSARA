@@ -9,7 +9,7 @@
     <div class="modal-body" style="max-height: 68vh; overflow-y: auto;">
         {{-- Baris Nama Lomba --}}
         <div class="form-group row mb-3">
-            <label for="crud_c_nama_lomba" class="col-sm-3 col-form-label">Nama Lomba <span class="text-danger">*</span></label>
+            <label for="crud_c_nama_lomba" class="col-sm-3 col-form-label">Nama Lomba</label>
             <div class="col-sm-9">
                 <input type="text" name="nama_lomba" id="crud_c_nama_lomba" class="form-control">
                 <span class="invalid-feedback error-nama_lomba"></span>
@@ -25,7 +25,7 @@
             </div>
         </div>
         <div class="form-group row mb-3">
-            <label for="crud_c_batas_pendaftaran" class="col-sm-3 col-form-label">Batas Pendaftaran <span class="text-danger">*</span></label>
+            <label for="crud_c_batas_pendaftaran" class="col-sm-3 col-form-label">Batas Pendaftaran</label>
             <div class="col-sm-9">
                 <input type="date" name="batas_pendaftaran" id="crud_c_batas_pendaftaran" class="form-control">
                 <span class="invalid-feedback error-batas_pendaftaran"></span>
@@ -34,7 +34,7 @@
 
         {{-- Baris Kategori & Tingkat --}}
         <div class="form-group row mb-3">
-            <label for="crud_c_kategori" class="col-sm-3 col-form-label">Kategori Peserta <span class="text-danger">*</span></label>
+            <label for="crud_c_kategori" class="col-sm-3 col-form-label">Kategori Peserta</label>
             <div class="col-sm-3">
                 <select name="kategori" id="crud_c_kategori" class="form-select">
                     <option value="">-- Pilih --</option>
@@ -43,7 +43,7 @@
                 </select>
                 <span class="invalid-feedback error-kategori"></span>
             </div>
-            <label for="crud_c_tingkat" class="col-sm-2 col-form-label ps-0">Tingkat <span class="text-danger">*</span></label>
+            <label for="crud_c_tingkat" class="col-sm-2 col-form-label ps-0">Tingkat</label>
             <div class="col-sm-4">
                 <select name="tingkat" id="crud_c_tingkat" class="form-select">
                     <option value="">-- Pilih --</option>
@@ -57,7 +57,7 @@
 
         {{-- Penyelenggara --}}
         <div class="form-group row mb-3">
-            <label for="crud_c_penyelenggara" class="col-sm-3 col-form-label">Penyelenggara <span class="text-danger">*</span></label>
+            <label for="crud_c_penyelenggara" class="col-sm-3 col-form-label">Penyelenggara</label>
             <div class="col-sm-9">
                 <input type="text" name="penyelenggara" id="crud_c_penyelenggara" class="form-control">
                 <span class="invalid-feedback error-penyelenggara"></span>
@@ -66,7 +66,7 @@
 
         {{-- Bidang Keahlian --}}
         <div class="col-md-12 mb-3 px-0"> 
-            <label class="form-label d-block mb-2 text">Bidang Keahlian Lomba <span class="text-danger">*</span></label>
+            <label class="form-label d-block mb-2 text">Bidang Keahlian Lomba</label>
             <div class="row ps-2">
                 @if(isset($bidangList) && $bidangList->count() > 0)
                     @foreach ($bidangList as $bidang)

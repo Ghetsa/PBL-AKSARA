@@ -15,15 +15,14 @@
         {{-- Pastikan value diisi jika $lomba ada (untuk mode edit) --}}
         <div class="row">
             <div class="col-md-12 mb-3">
-                <label for="user_nama_lomba" class="form-label">Nama Lomba <span class="text-danger">*</span></label>
+                <label for="user_nama_lomba" class="form-label">Nama Lomba</label>
                 <input type="text" name="nama_lomba" id="user_nama_lomba" class="form-control"
                     value="{{ old('nama_lomba', $lomba->nama_lomba ?? '') }}" required>
                 <span class="invalid-feedback error-nama_lomba"></span>
             </div>
 
             <div class="col-md-6 mb-3">
-                <label for="user_pembukaan_pendaftaran" class="form-label">Pembukaan Pendaftaran <span
-                        class="text-danger">*</span></label>
+                <label for="user_pembukaan_pendaftaran" class="form-label">Pembukaan Pendaftaran</label>
                 <input type="date" name="pembukaan_pendaftaran" id="user_pembukaan_pendaftaran" class="form-control"
                     value="{{ old('pembukaan_pendaftaran', isset($lomba->pembukaan_pendaftaran) ? $lomba->pembukaan_pendaftaran->format('Y-m-d') : '') }}"
                     required>
@@ -31,8 +30,7 @@
             </div>
 
             <div class="col-md-6 mb-3">
-                <label for="user_batas_pendaftaran" class="form-label">Batas Pendaftaran <span
-                        class="text-danger">*</span></label>
+                <label for="user_batas_pendaftaran" class="form-label">Batas Pendaftaran</label>
                 <input type="date" name="batas_pendaftaran" id="user_batas_pendaftaran" class="form-control"
                     value="{{ old('batas_pendaftaran', isset($lomba->batas_pendaftaran) ? $lomba->batas_pendaftaran->format('Y-m-d') : '') }}"
                     required>
@@ -40,7 +38,7 @@
             </div>
 
             <div class="col-md-6 mb-3">
-                <label for="user_kategori" class="form-label">Kategori Lomba <span class="text-danger">*</span></label>
+                <label for="user_kategori" class="form-label">Kategori Lomba</label>
                 <select name="kategori" id="user_kategori" class="form-select" required>
                     <option value="individu"
                         {{ old('kategori', $lomba->kategori ?? '') == 'individu' ? 'selected' : '' }}>Individu</option>
@@ -51,7 +49,7 @@
             </div>
 
             <div class="col-md-6 mb-3">
-                <label for="user_tingkat" class="form-label">Tingkat Lomba <span class="text-danger">*</span></label>
+                <label for="user_tingkat" class="form-label">Tingkat Lomba</label>
                 <select name="tingkat" id="user_tingkat" class="form-select" required>
                     <option value="lokal" {{ old('tingkat', $lomba->tingkat ?? '') == 'lokal' ? 'selected' : '' }}>
                         Lokal/Daerah</option>
@@ -65,16 +63,14 @@
             </div>
 
             <div class="col-md-12 mb-3">
-                <label for="user_penyelenggara" class="form-label">Penyelenggara <span
-                        class="text-danger">*</span></label>
+                <label for="user_penyelenggara" class="form-label">Penyelenggara</label>
                 <input type="text" name="penyelenggara" id="user_penyelenggara" class="form-control"
                     value="{{ old('penyelenggara', $lomba->penyelenggara ?? '') }}" required>
                 <span class="invalid-feedback error-penyelenggara"></span>
             </div>
 
             <div class="col-md-12 mb-3">
-                <label class="form-label d-block mb-2 text-sm-start">Bidang Keahlian Relevan <span
-                        class="text-danger">*</span></label>
+                <label class="form-label d-block mb-2 text-sm-start">Bidang Keahlian Relevan</label>
                 <div class="row ps-2">
                     @if (isset($bidangList) && $bidangList->count() > 0)
                         @foreach ($bidangList as $bidang)

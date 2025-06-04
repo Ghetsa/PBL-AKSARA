@@ -1719,9 +1719,20 @@ class LombaController extends Controller
         return abort(403);
     }
 
+    // public function adminShowVerifyFormAjax($id)
+    // {
+    //     $lomba = LombaModel::with('inputBy')->findOrFail($id);
+    //     return view('lomba.admin.verifikasi.verifikasi_lomba', compact('lomba'));
+    // }
+
     public function adminShowVerifyFormAjax($id)
     {
-        $lomba = LombaModel::with('inputBy')->findOrFail($id);
+        $lomba = LombaModel::with([
+            'inputBy',
+            'bidangKeahlian.bidang', // Eager load bidang
+            'daftarHadiah'         // Eager load hadiah
+        ])
+            ->findOrFail($id);
         return view('lomba.admin.verifikasi.verifikasi_lomba', compact('lomba'));
     }
 

@@ -14,7 +14,7 @@ class LandingPageController extends Controller
         // Ambil lomba yang sudah disetujui, punya poster, dan urutkan
         $lombas = LombaModel::where('status_verifikasi', 'disetujui')
             ->whereNotNull('poster')
-            ->orderBy('batas_pendaftaran', 'asc') // Tampilkan yang deadline-nya paling dekat
+            ->orderBy('created_at', 'desc') // Tampilkan yang terbaru
             ->take(6) // Ambil misalnya 6 lomba
             ->get();
 
