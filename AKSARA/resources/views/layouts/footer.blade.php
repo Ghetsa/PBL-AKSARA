@@ -23,7 +23,19 @@
           </div>
           <div class="col-auto my-1">
               <ul class="list-inline footer-link mb-0">
-                  <li class="list-inline-item"><a href="{{ url('/') }}">Home</a></li>
+                   @if (Auth::check())
+                      @if (Auth::user()->role == 'admin')
+                          <li class="list-inline-item"><a href="{{ route('dashboard') }}">Home</a></li>
+                      @elseif (Auth::user()->role == 'dosen')
+                          <li class="list-inline-item"><a href="{{ route('dashboardDSN') }}">Home</a></li>
+                      @elseif (Auth::user()->role == 'mahasiswa')
+                          <li class="list-inline-item"><a href="{{ route('dashboard.mahasiswa') }}">Home</a></li>
+                      @else
+                          <li class="list-inline-item"><a href="{{ url('/') }}">Home</a></li>
+                      @endif
+                  @else
+                      <li class="list-inline-item"><a href="{{ url('/') }}">Home</a></li>
+                  @endif
               </ul>
           </div>
       </div>
