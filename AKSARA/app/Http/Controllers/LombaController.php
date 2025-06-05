@@ -573,27 +573,47 @@ class LombaController extends Controller
      * Akan dipanggil ketika tombol "btn-detail-hitungan" ditekan.
      */
     public function detailMoora(Request $request)
-    {
-        $lombaId = $request->input('lomba_id');
-        $userId = Auth::id();
+{
+    $lombaId = $request->input('lomba_id');
+    $userId = Auth::id();
 
-        // Hitung MOORA sekali lagi agar mudah menampilkan detail di modal
-        $mooraResults = $this->calculateMooraScores($userId);
-        $detail = [];
-        foreach ($mooraResults as $item) {
-            if ($item['lomba']->lomba_id == $lombaId) {
-                $detail = $item;
-                break;
-            }
+    // Ambil custom weights jika dikirim
+    $customWeightsInput = $request->input('weights', []);
+    $criteriaKeys = ['minat', 'keahlian', 'tingkat', 'hadiah', 'penutupan', 'biaya'];
+    $customWeights = [];
+    $totalInputWeight = 0;
+
+    foreach ($criteriaKeys as $key) {
+        if (isset($customWeightsInput[$key]) && is_numeric($customWeightsInput[$key])) {
+            $customWeights[$key] = (float) $customWeightsInput[$key];
+            $totalInputWeight += $customWeights[$key];
         }
-
-        if (empty($detail)) {
-            return response()->json(['error' => 'Data perhitungan tidak ditemukan.'], 404);
-        }
-
-        // Kembalikan view partial (modal content) dengan data detail perhitungan
-        return view('lomba.partial_detail_perhitungan', compact('detail'));
     }
+
+    // Normalisasi jika perlu
+    if ($totalInputWeight > 0 && abs($totalInputWeight - 1.0) > 0.001) {
+        foreach ($customWeights as $key => $val) {
+            $customWeights[$key] = $val / $totalInputWeight;
+        }
+    }
+
+    $mooraResults = $this->calculateMooraScores($userId, $customWeights);
+
+    $detail = [];
+    foreach ($mooraResults as $item) {
+        if ($item['lomba']->lomba_id == $lombaId) {
+            $detail = $item;
+            break;
+        }
+    }
+
+    if (empty($detail)) {
+        return response()->json(['error' => 'Data perhitungan tidak ditemukan.'], 404);
+    }
+
+    return view('lomba.partial_detail_perhitungan', compact('detail'));
+}
+
 
     // Fungsi ini akan dipanggil oleh DataTables di view lomba/index.blade.php
     public function getList(Request $request)
@@ -721,7 +741,9 @@ class LombaController extends Controller
             })
             ->addColumn('aksi', function ($lomba) {
                 $btnDetail = '<button onclick="modalActionLomba(\'' . route('lomba.publik.show_ajax', $lomba->lomba_id) . '\', \'Detail Lomba\', \'modalDetailLombaPublik\')" class="btn btn-sm btn-outline-primary"><i class="fas fa-eye me-1"></i>Detail</button>';
-                return '<div class="text-center">' . $btnDetail . '</div>';
+                $btnHitung = '<button class="btn btn-sm btn-outline-secondary btn-detail-hitungan" data-lomba-id="' . $lomba->lomba_id . '"><i class="fas fa-calculator me-1"></i>Hitungan</button>';
+
+                return '<div class="text-center">' . $btnDetail . $btnHitung . '</div>';
             })
             ->rawColumns(['status_display', 'aksi', 'biaya_display'])
             ->make(true);
@@ -729,13 +751,13 @@ class LombaController extends Controller
 
     private function calculateMooraScores($userId, $customWeights = [])
     {
-        $user = UserModel::with(['minatBidang', 'keahlianBidang'])->find($userId);
+        $user = UserModel::with(['minat', 'keahlian'])->find($userId);
         if (!$user) {
             return [];
         }
 
-        $userMinatIds = $user->minatBidang->pluck('bidang_id')->toArray();
-        $userKeahlianIds = $user->keahlianBidang->pluck('bidang_id')->toArray();
+        $userMinatIds = $user->minat->pluck('bidang_id')->toArray();
+        $userKeahlianIds = $user->keahlian->pluck('bidang_id')->toArray();
 
         $lombas = LombaModel::with(['bidangKeahlian.bidang', 'daftarHadiah'])
             ->where('status_verifikasi', 'disetujui')
@@ -770,12 +792,18 @@ class LombaController extends Controller
 
             if ($lomba->batas_pendaftaran) {
                 $sisaHari = Carbon::now()->diffInDays(Carbon::parse($lomba->batas_pendaftaran), false);
-                if ($sisaHari < 0) $row['penutupan'] = 0;      // Sudah tutup
-                elseif ($sisaHari == 0) $row['penutupan'] = 1; // Tutup hari ini
-                elseif ($sisaHari <= 7) $row['penutupan'] = 2;  // <= 1 minggu
-                elseif ($sisaHari <= 14) $row['penutupan'] = 3; // <= 2 minggu
-                elseif ($sisaHari <= 30) $row['penutupan'] = 4; // <= 1 bulan
-                else $row['penutupan'] = 5;                     // > 1 bulan
+                if ($sisaHari < 0)
+                    $row['penutupan'] = 0;      // Sudah tutup
+                elseif ($sisaHari == 0)
+                    $row['penutupan'] = 1; // Tutup hari ini
+                elseif ($sisaHari <= 7)
+                    $row['penutupan'] = 2;  // <= 1 minggu
+                elseif ($sisaHari <= 14)
+                    $row['penutupan'] = 3; // <= 2 minggu
+                elseif ($sisaHari <= 30)
+                    $row['penutupan'] = 4; // <= 1 bulan
+                else
+                    $row['penutupan'] = 5;                     // > 1 bulan
             } else {
                 $row['penutupan'] = 5; // Tanpa batas, dianggap paling fleksibel
             }
@@ -818,6 +846,7 @@ class LombaController extends Controller
             return [];
         }
 
+        // Hitung pembagi untuk normalisasi
         $divisors = [];
         foreach ($criteria as $c) {
             $sumOfSquares = array_sum(array_map(fn($data) => pow($data['values'][$c], 2), $dataMatrix));
@@ -826,28 +855,35 @@ class LombaController extends Controller
 
         $results = [];
         foreach ($dataMatrix as $item) {
-            $normalizedValues = [];
+            $original = $item['values'];
+            $normalized = [];
+
             foreach ($criteria as $c) {
-                $normalizedValues[$c] = $divisors[$c] != 0 ? $item['values'][$c] / $divisors[$c] : 0;
+                $normalized[$c] = $divisors[$c] != 0 ? $original[$c] / $divisors[$c] : 0;
             }
 
-            $optimasiScore = 0;
+            $score = 0;
             foreach ($benefitCriteria as $c) {
-                $optimasiScore += ($normalizedValues[$c] * $weights[$c]);
+                $score += ($normalized[$c] * $weights[$c]);
             }
             foreach ($costCriteria as $c) {
-                $optimasiScore -= ($normalizedValues[$c] * $weights[$c]);
+                $score -= ($normalized[$c] * $weights[$c]);
             }
 
             $results[] = [
                 'lomba' => $item['lomba'],
-                'score' => round($optimasiScore, 4),
+                'score' => round($score, 4),
+                'original_values' => $original,
+                'normalized_values' => $normalized,
+                'weights' => $weights,
+                'divisors' => $divisors
             ];
         }
 
         usort($results, fn($a, $b) => $b['score'] <=> $a['score']);
         return $results;
     }
+
 
 
     // Method untuk menampilkan halaman utama daftar lomba mahasiswa
