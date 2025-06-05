@@ -88,12 +88,12 @@
                     <li class="pc-item">
                         <a href="{{ route('admin.lomba.verifikasi.index') }}"
                             class="pc-link {{ $activeMenu == 'rekomendasi' ? 'active' : '' }}">
-                            <span class="pc-micon"><i class="ti ti-file-check"></i></span>
+                            <span class="pc-micon"><i class="ti ti-file-certificate"></i></span>
                             <span class="pc-mtext">Verifikasi Lomba</span>
                         </a>
                     </li>
                     <li class="pc-item pc-caption">
-                        <label>Prestasi</label>
+                        <label>Prestasi Mahasiswa</label>
                         <i class="ti ti-brand-chrome"></i>
                     </li>
                     <li class="pc-item">
@@ -110,7 +110,7 @@
                         </a>
                     </li>
                     <li class="pc-item pc-caption">
-                        <label>Data Keahlian</label>
+                        <label>Keahlian Mahasiswa</label>
                         <i class="ti ti-brand-chrome"></i>
                     </li>
                     <li class="pc-item">
@@ -119,6 +119,19 @@
                             <span class="pc-micon"><i class="ti ti-certificate"></i></span>
                             <span class="pc-mtext">Verifikasi Keahlian</span>
                         </a>
+                    </li>
+                    <li class="pc-item pc-caption">
+                        <label>Keluar</label>
+                        <i class="ti ti-brand-chrome"></i>
+                    </li>
+                    <li class="pc-item">
+                        <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="pc-link dropdown-item">
+                            <span class="pc-micon"><i class="ti ti-logout"></i></span>
+                            <span class="pc-mtext">Logout</span>
+                        </a>
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                        @csrf
+                        </form>
                     </li>
                     {{-- <li class="pc-item pc-hasmenu">
                         <a href="#!" class="pc-link">
@@ -175,13 +188,13 @@
                         </a>
                     </li>
                     <li class="pc-item pc-caption">
-                        <label>Data Lomba</label>
+                        <label>Info Lomba</label>
                         <i class="ti ti-brand-chrome"></i>
                     </li>
                     <li class="pc-item">
                         <a href="{{ route('lomba.mhs.histori.index') }}"
                             class="pc-link {{ $activeMenu == 'verifikasi' ? 'active' : '' }}">
-                            <span class="pc-micon"><i class="ti ti-file-check"></i></span>
+                            <span class="pc-micon"><i class="ti ti-file-certificate"></i></span>
                             <span class="pc-mtext">Upload Info Lomba</span>
                         </a>
                     </li>
@@ -214,6 +227,19 @@
                             <span class="pc-mtext">Keahlian & Sertifikasi</span>
                         </a>
                     </li>
+                    <li class="pc-item pc-caption">
+                        <label>Keluar</label>
+                        <i class="ti ti-brand-chrome"></i>
+                    </li>
+                    <li class="pc-item">
+                        <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="pc-link dropdown-item">
+                            <span class="pc-micon"><i class="ti ti-logout"></i></span>
+                            <span class="pc-mtext">Logout</span>
+                        </a>
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                        @csrf
+                        </form>
+                    </li>
                 </ul>
             </div>
         @elseif (Auth::user()->role == 'dosen')
@@ -232,7 +258,7 @@
                     </li>
                     <li class="pc-item">
                         <a href="{{ url('/bimbingan') }}" class="pc-link {{ $activeMenu == 'bimbingan' ? 'active' : '' }}">
-                            <span class="pc-micon"><i class="ti ti-file-check"></i></span>
+                            <span class="pc-micon"><i class="ti ti-report"></i></span>
                             <span class="pc-mtext">Mahasiswa Bimbingan</span>
                         </a>
                     </li>
@@ -244,7 +270,7 @@
                         </a>
                     </li>
                     <li class="pc-item pc-caption">
-                        <label>Data Lomba</label>
+                        <label>Info Lomba</label>
                         <i class="ti ti-brand-chrome"></i>
                     </li>
                     <li class="pc-item">
@@ -257,11 +283,23 @@
                     <li class="pc-item">
                         <a href="{{ route('lomba.dosen.histori.index') }}"
                             class="pc-link {{ $activeMenu == 'verifikasi' ? 'active' : '' }}">
-                            <span class="pc-micon"><i class="ti ti-file-check"></i></span>
+                            <span class="pc-micon"><i class="ti ti-file-certificate"></i></span>
                             <span class="pc-mtext">Upload Info Lomba</span>
                         </a>
                     </li>
-
+                    <li class="pc-item pc-caption">
+                        <label>Keluar</label>
+                        <i class="ti ti-brand-chrome"></i>
+                    </li>
+                    <li class="pc-item">
+                        <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="pc-link dropdown-item">
+                            <span class="pc-micon"><i class="ti ti-logout"></i></span>
+                            <span class="pc-mtext">Logout</span>
+                        </a>
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                        @csrf
+                        </form>
+                    </li>
                 </ul>
             </div>
         @endif

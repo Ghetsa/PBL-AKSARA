@@ -21,7 +21,7 @@ class ProdiController extends Controller
         $data = ProdiModel::all();
         $breadcrumb = (object) [
             'title' => 'Data Program Studi',
-            'list' => ['Prodi']
+            'list' => ['Akademik', 'Program Studi']
         ];
         $activeMenu = 'prodi';
 

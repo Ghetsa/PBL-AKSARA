@@ -16,7 +16,7 @@ class KeahlianUserController extends Controller
     {
         $breadcrumb = (object) [
             'title' => 'Keahlian Saya',
-            'list' => ['Keahlian']
+            'list' => ['Keahlian & Sertifikasi']
         ];
         $activeMenu = 'keahlian_user';
 
@@ -187,7 +187,7 @@ class KeahlianUserController extends Controller
     {
         $breadcrumb = (object) [
             'title' => 'Verifikasi Keahlian Pengguna',
-            'list' => ['Admin', 'Verifikasi Keahlian']
+            'list' => ['Keahlian Mahasiswa', 'Verifikasi Keahlian']
         ];
         $activeMenu = 'verifikasi_keahlian';
 

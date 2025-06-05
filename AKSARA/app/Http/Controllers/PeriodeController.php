@@ -22,7 +22,7 @@ class PeriodeController extends Controller
             ::all();
         $breadcrumb = (object) [
             'title' => 'Data periode semester',
-            'list' => ['Periode']
+            'list' => ['Akademik', 'Periode Semester']
         ];
         $activeMenu = 'periode';
 

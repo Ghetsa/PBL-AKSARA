@@ -16,7 +16,7 @@ class LaporanController extends Controller
 {
     public function index()
     {
-        $breadcrumb = (object) ['title' => 'Laporan & Analisis', 'list' => ['Admin', 'Laporan']];
+        $breadcrumb = (object) ['title' => 'Laporan & Analisis', 'list' => ['Prestasi Mahasiswa', 'Laporan & Analisis']];
         $activeMenu = 'laporan_analisis';
 
         // Data untuk filter
