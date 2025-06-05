@@ -138,7 +138,7 @@ class UserController extends Controller
             ]);
         } elseif ($request->role == 'mahasiswa') {
             $request->validate([
-                'nim' => 'required|string|max:10|unique:mahasiswa,nim',
+                'nim' => 'required|string|max:12|unique:mahasiswa,nim',
                 'prodi_id' => 'required|exists:program_studi,prodi_id',
                 'periode_id' => 'required|exists:periode,periode_id'
             ]);
@@ -218,7 +218,7 @@ class UserController extends Controller
             ]);
         } elseif ($request->role == 'mahasiswa') {
             $request->validate([
-                'nim' => 'required|string|max:10|unique:mahasiswa,nim,' . $id . ',user_id',
+                'nim' => 'required|string|max:12|unique:mahasiswa,nim,' . $id . ',user_id',
                 'prodi_id' => 'required|exists:program_studi,prodi_id',
                 'periode_id' => 'required|exists:periode,periode_id',
             ]);

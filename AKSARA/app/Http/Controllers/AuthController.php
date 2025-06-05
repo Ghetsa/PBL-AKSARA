@@ -96,7 +96,7 @@ class AuthController extends Controller
                 'nama' => 'required|string|max:50',
                 'email' => 'required|email|max:50|unique:users,email',
                 'password' => 'required|string|min:5|max:100',
-                'nim' => 'required|string|max:10|unique:mahasiswa,nim',
+                'nim' => 'required|string|max:12|unique:mahasiswa,nim',
                 'prodi_id' => 'required|exists:program_studi,prodi_id',
                 'periode_id' => 'required|exists:periode,periode_id',
                 'no_telepon' => 'required|string|max:15', 
