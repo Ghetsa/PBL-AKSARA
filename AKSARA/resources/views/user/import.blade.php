@@ -59,7 +59,7 @@
     <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
         <button type="submit" class="btn btn-primary" id="btn-submit-import">
-            <i class="fas fa-upload me-1"></i> Upload & Proses
+            <i class="ti ti-upload me-1"></i> Upload & Proses
         </button>
     </div>
     {{-- </div> --}}
@@ -114,7 +114,7 @@ $(document).ready(function() {
                 var errorsDisplay = $('#import-errors-display');
                 
                 // Pastikan ID modal ini benar-benar ada di DOM sebagai ID dari elemen modal utama
-                var modalElement = $('#importUserModal'); 
+                var modalElement = $('#myModal'); 
 
                 submitButton.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Mengunggah...');
                 progressContainer.show();
@@ -153,16 +153,30 @@ $(document).ready(function() {
                             progressBar.removeClass('bg-info').addClass('bg-success');
                             statusText.text('Impor berhasil!');
                             // Menunggu sebentar sebelum menutup modal dan menampilkan swal
-                            setTimeout(function() {
-                                if (modalElement.length && typeof bootstrap !== 'undefined') {
-                                    var modalInstance = bootstrap.Modal.getInstance(modalElement[0]);
-                                    if (modalInstance) {
-                                        modalInstance.hide();
+                            // setTimeout(function() {
+                                // if (modalElement.length && typeof bootstrap !== 'undefined') {
+                                //     var modalInstance = bootstrap.Modal.getInstance(modalElement[0]);
+                                //     if (modalInstance) {
+                                //         modalInstance.hide();
+                                //     } else {
+                                //         // Fallback jika instance tidak ditemukan (kurang ideal)
+                                //         modalElement.modal('hide');
+                                //     }
+                                // }
+                                console.log("Mencoba menutup modal:", modalElement); // Debug modalElement
+                                    if (modalElement.length && typeof bootstrap !== 'undefined') {
+                                        var modalInstance = bootstrap.Modal.getInstance(modalElement[0]);
+                                        console.log("Instance modal Bootstrap:", modalInstance); // Debug instance
+                                        if (modalInstance) {
+                                            modalInstance.hide();
+                                        } else {
+                                            console.warn('Instance modal Bootstrap tidak ditemukan. Mencoba fallback jQuery.');
+                                            modalElement.modal('hide'); // Fallback
+                                        }
                                     } else {
-                                        // Fallback jika instance tidak ditemukan (kurang ideal)
-                                        modalElement.modal('hide');
+                                        if (!modalElement.length) console.error('#myModal tidak ditemukan di DOM.');
+                                        if (typeof bootstrap === 'undefined') console.error('Variabel global bootstrap tidak terdefinisi.');
                                     }
-                                }
                                 Swal.fire({
                                     icon: 'success',
                                     title: 'Berhasil!',
@@ -177,7 +191,7 @@ $(document).ready(function() {
                                 } else {
                                     // location.reload(); // Opsi terakhir jika tidak ada datatable
                                 }
-                            }, 1000); // Delay 1 detik
+                            // }, 1000); // Delay 1 detik
 
                         } else {
                             progressBar.removeClass('bg-info').addClass('bg-danger');
@@ -207,16 +221,54 @@ $(document).ready(function() {
                     },
                     error: function(xhr, status, error) {
                         submitButton.prop('disabled', false).html('<i class="fas fa-upload me-1"></i> Upload & Proses');
-                        progressContainer.show(); // Tetap tampilkan progress bar dengan status error
-                        progressBar.removeClass('bg-info bg-success').addClass('bg-danger').css('width', '100%').text('Error');
-                        statusText.text('Error koneksi atau server.');
-                        
-                        let errorMsg = 'Gagal menghubungi server. Silakan coba lagi.';
-                        // ... (error handling lainnya tetap sama) ...
+                        progressBar.removeClass('bg-info bg-success').addClass('bg-danger').css('width', '100%').text('Gagal'); // Ubah teks progress bar
+                        statusText.text('Impor gagal. Terjadi kesalahan validasi atau server.'); // Perjelas status teks
+
+                        var responseJSON = null;
+                        try {
+                            responseJSON = JSON.parse(xhr.responseText); // Coba parse respons error dari server
+                        } catch (e) {
+                            // Biarkan responseJSON null jika bukan JSON
+                        }
+
+                        let errorTitle = 'Gagal Impor!';
+                        let errorHtml = '<p>Proses impor tidak berhasil.</p>';
+
+                        if (responseJSON && responseJSON.message) {
+                            errorHtml = '<p>' + responseJSON.message + '</p>'; // Ambil pesan utama dari server
+                            if (responseJSON.errors_detail && Array.isArray(responseJSON.errors_detail) && responseJSON.errors_detail.length > 0) {
+                                errorHtml += '<p class="mb-1 mt-2"><strong>Detail Kesalahan:</strong></p><ul class="list-unstyled text-start mb-0" style="max-height: 150px; overflow-y: auto; font-size: 0.875em;">';
+                                responseJSON.errors_detail.forEach(function(err) {
+                                    errorHtml += '<li>' + err + '</li>';
+                                });
+                                errorHtml += '</ul>';
+                            }
+                        } else {
+                            // Fallback jika respons bukan JSON atau tidak ada pesan spesifik
+                            errorHtml = '<p>Gagal menghubungi server atau terjadi kesalahan tidak terduga.</p>';
+                            errorHtml += '<p><small>Status: ' + status + ', Error: ' + error + '</small></p>';
+                            errorTitle = 'Error Server';
+                        }
+
+                        // Logika untuk menutup modal (pastikan modalElement sudah didefinisikan di scope yang benar)
+                        // var modalElement = $('#myModal'); // Jika belum didefinisikan atau untuk memastikan
+                        setTimeout(function() {
+                            // modalElement diambil dari scope submitHandler, seharusnya masih bisa diakses
+                            if (modalElement.length && typeof bootstrap !== 'undefined') {
+                                var modalInstance = bootstrap.Modal.getInstance(modalElement[0]);
+                                if (modalInstance) {
+                                    modalInstance.hide();
+                                } else {
+                                    // Fallback jika instance tidak ditemukan
+                                    modalElement.modal('hide');
+                                }
+                            }
+                        }, 1000); // Beri jeda sedikit agar pengguna sempat melihat status di modal jika perlu
+
                         Swal.fire({
                             icon: 'error',
-                            title: 'Error Server',
-                            html: '<p>' + errorMsg + '</p><p><small>Status: ' + status + ', Error: ' + error + '</small></p>',
+                            title: errorTitle,
+                            html: errorHtml,
                             confirmButtonText: 'Tutup'
                         });
                         console.error("AJAX error: ", status, error, xhr.responseText);

@@ -573,46 +573,46 @@ class LombaController extends Controller
      * Akan dipanggil ketika tombol "btn-detail-hitungan" ditekan.
      */
     public function detailMoora(Request $request)
-{
-    $lombaId = $request->input('lomba_id');
-    $userId = Auth::id();
+    {
+        $lombaId = $request->input('lomba_id');
+        $userId = Auth::id();
 
-    // Ambil custom weights jika dikirim
-    $customWeightsInput = $request->input('weights', []);
-    $criteriaKeys = ['minat', 'keahlian', 'tingkat', 'hadiah', 'penutupan', 'biaya'];
-    $customWeights = [];
-    $totalInputWeight = 0;
+        // Ambil custom weights jika dikirim
+        $customWeightsInput = $request->input('weights', []);
+        $criteriaKeys = ['minat', 'keahlian', 'tingkat', 'hadiah', 'penutupan', 'biaya'];
+        $customWeights = [];
+        $totalInputWeight = 0;
 
-    foreach ($criteriaKeys as $key) {
-        if (isset($customWeightsInput[$key]) && is_numeric($customWeightsInput[$key])) {
-            $customWeights[$key] = (float) $customWeightsInput[$key];
-            $totalInputWeight += $customWeights[$key];
+        foreach ($criteriaKeys as $key) {
+            if (isset($customWeightsInput[$key]) && is_numeric($customWeightsInput[$key])) {
+                $customWeights[$key] = (float) $customWeightsInput[$key];
+                $totalInputWeight += $customWeights[$key];
+            }
         }
-    }
 
-    // Normalisasi jika perlu
-    if ($totalInputWeight > 0 && abs($totalInputWeight - 1.0) > 0.001) {
-        foreach ($customWeights as $key => $val) {
-            $customWeights[$key] = $val / $totalInputWeight;
+        // Normalisasi jika perlu
+        if ($totalInputWeight > 0 && abs($totalInputWeight - 1.0) > 0.001) {
+            foreach ($customWeights as $key => $val) {
+                $customWeights[$key] = $val / $totalInputWeight;
+            }
         }
-    }
 
-    $mooraResults = $this->calculateMooraScores($userId, $customWeights);
+        $mooraResults = $this->calculateMooraScores($userId, $customWeights);
 
-    $detail = [];
-    foreach ($mooraResults as $item) {
-        if ($item['lomba']->lomba_id == $lombaId) {
-            $detail = $item;
-            break;
+        $detail = [];
+        foreach ($mooraResults as $item) {
+            if ($item['lomba']->lomba_id == $lombaId) {
+                $detail = $item;
+                break;
+            }
         }
-    }
 
-    if (empty($detail)) {
-        return response()->json(['error' => 'Data perhitungan tidak ditemukan.'], 404);
-    }
+        if (empty($detail)) {
+            return response()->json(['error' => 'Data perhitungan tidak ditemukan.'], 404);
+        }
 
-    return view('lomba.partial_detail_perhitungan', compact('detail'));
-}
+        return view('lomba.partial_detail_perhitungan', compact('detail'));
+    }
 
 
     // Fungsi ini akan dipanggil oleh DataTables di view lomba/index.blade.php
