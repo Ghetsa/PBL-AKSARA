@@ -855,7 +855,7 @@ class LombaController extends Controller
     {
         $userRole = Auth::user()->role;
         // $breadcrumb diatur sesuai kebutuhan, atau bisa dihilangkan jika tidak dipakai di view ini
-        $breadcrumb = (object) ['title' => 'Informasi & Rekomendasi Lomba', 'list' => ['Lomba']];
+        $breadcrumb = (object) ['title' => 'Informasi & Rekomendasi Lomba', 'list' => ['Info Lomba', 'Rekomendasi Lomba']];
         $activeMenu = 'info_lomba'; // Atau 'lomba_mahasiswa'
 
         // Nama-nama kriteria yang akan digunakan di view untuk slider bobot
@@ -1240,7 +1240,7 @@ class LombaController extends Controller
     public function indexLombaPublik()
     {
         $userRole = Auth::user()->role;
-        $breadcrumb = (object) ['title' => 'Informasi Lomba Terkini', 'list' => ['Beranda', 'Info Lomba']];
+        $breadcrumb = (object) ['title' => 'Informasi Lomba Terkini', 'list' => ['Info Lomba', 'Daftar Lomba']];
         $activeMenu = 'info_lomba_publik'; // Sesuaikan nama activeMenu
         return view('lomba.publik.index', compact('breadcrumb', 'activeMenu', 'userRole'));
     }
@@ -1296,7 +1296,7 @@ class LombaController extends Controller
     public function indexLombaDosen()
     {
         $userRole = Auth::user()->role;
-        $breadcrumb = (object) ['title' => 'Informasi Lomba Terkini', 'list' => ['Beranda', 'Info Lomba']];
+        $breadcrumb = (object) ['title' => 'Informasi Lomba Terkini', 'list' => ['Info Lomba', 'Daftar Lomba']];
         $activeMenu = 'info_lomba_publik'; // Sesuaikan nama activeMenu
         return view('lomba.dosen.index', compact('breadcrumb', 'activeMenu', 'userRole'));
     }
@@ -1334,16 +1334,6 @@ class LombaController extends Controller
         return abort(403);
     }
 
-    // public function showAjaxLombaDosen($id)
-    // {
-    //     $lomba = LombaModel::where('status_verifikasi', 'disetujui')
-    //         ->with([
-    //             'inputBy',
-    //             'bidangKeahlian.bidang' // Eager load LombaDetailModel dan relasi bidang di dalamnya
-    //         ])
-    //         ->findOrFail($id);
-    //     return view('lomba.dosen.show_ajax', compact('lomba'));
-    // }
     /**
      * Menampilkan halaman histori pengajuan lomba untuk user yang login.
      */
@@ -2061,7 +2051,7 @@ class LombaController extends Controller
     // =======================================================================
     public function adminIndexVerifikasiLomba()
     {
-        $breadcrumb = (object) ['title' => 'Verifikasi Pengajuan Lomba', 'list' => ['Admin', 'Verifikasi Lomba']];
+        $breadcrumb = (object) ['title' => 'Verifikasi Pengajuan Lomba', 'list' => ['Lomba', 'Verifikasi Lomba']];
         $activeMenu = 'admin_verifikasi_lomba';
         return view('lomba.admin.verifikasi.index', compact('breadcrumb', 'activeMenu'));
     }
@@ -2168,7 +2158,7 @@ class LombaController extends Controller
     // =======================================================================
     public function adminIndexCrudLomba()
     {
-        $breadcrumb = (object) ['title' => 'Manajemen Data Lomba', 'list' => ['Admin', 'Kelola Lomba']];
+        $breadcrumb = (object) ['title' => 'Manajemen Data Lomba', 'list' => ['Lomba', 'Data Lomba']];
         $activeMenu = 'admin_crud_lomba';
         return view('lomba.admin.crud.index', compact('breadcrumb', 'activeMenu'));
     }
