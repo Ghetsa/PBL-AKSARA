@@ -26,11 +26,11 @@ Route::get('/', [LandingPageController::class, 'index']);
 
 // ===================== AUTH =====================
 Route::get('/login', [AuthController::class, 'login'])->name('login');
-Route::post('/postlogin', [AuthController::class, 'postlogin']);
+Route::post('/postlogin', [AuthController::class, 'postlogin'])->name('postLogin');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::get('/register', [AuthController::class, 'register'])->name('register');
-Route::post('/register', [AuthController::class, 'postregister'])->name('register');
+Route::post('/register', [AuthController::class, 'postregister'])->name('postRegister');
 
 
 // ===================== AUTHENTICATED ROUTES =====================

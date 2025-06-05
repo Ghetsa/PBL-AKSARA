@@ -15,6 +15,17 @@
   <link rel="stylesheet" href="{{ asset('mantis/dist/assets/fonts/material.css') }}">
   <link rel="stylesheet" href="{{ asset('mantis/dist/assets/css/style.css') }}">
   <link rel="stylesheet" href="{{ asset('mantis/dist/assets/css/style-preset.css') }}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <style>
+    .error {
+      color: red;
+      font-size: 0.875em;
+      margin-top: 0.25rem;
+    }
+    .form-control.error {
+      border-color: red;
+    }
+  </style>
 </head>
 <body>
   <div class="loader-bg">
@@ -104,8 +115,105 @@
   <script src="{{ asset('mantis/dist/assets/js/pcoded.js') }}"></script>
   <script src="{{ asset('mantis/dist/assets/js/plugins/feather.min.js') }}"></script>
 
-  <!-- AJAX Login Script -->
-  <script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/additional-methods.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+   <script>
+    $(document).ready(function() {
+
+      // Membuat Mixin untuk Toast Success
+      const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end', // Posisi di pojok kanan atas
+        showConfirmButton: false,
+        timer: 1000, // Durasi 1 detik
+        didOpen: (toast) => {
+          toast.onmouseenter = Swal.stopTimer;
+          toast.onmouseleave = Swal.resumeTimer;
+        }
+      });
+
+      $("#loginForm").validate({
+        rules: {
+          username: {
+            required: true,
+          },
+          password: {
+            required: true,
+          }
+        },
+        messages: {
+          username: {
+            required: "NIM/NIP tidak boleh kosong",
+          },
+          password: {
+            required: "Password tidak boleh kosong",
+          }
+        },
+        errorPlacement: function(error, element) {
+          error.addClass('invalid-feedback');
+          element.closest('.mb-3').append(error);
+        },
+        highlight: function(element, errorClass, validClass) {
+          $(element).addClass('is-invalid').removeClass('is-valid');
+        },
+        unhighlight: function(element, errorClass, validClass) {
+          $(element).removeClass('is-invalid').addClass('is-valid');
+        },
+        submitHandler: function(form) {
+          const formData = new FormData(form);
+          
+          fetch(form.action, {
+            method: 'POST',
+            headers: {
+              'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+              'Accept': 'application/json'
+            },
+            body: formData
+          }).then(response => response.json())
+            .then(res => {
+              if (res.status) {
+                // Gunakan Mixin Toast yang sudah dibuat
+                Toast.fire({
+                  icon: 'success',
+                  title: res.message || 'Signed in successfully'
+                }).then(() => {
+                    window.location.href = res.redirect;
+                });
+
+              } else {
+                // Menampilkan error umum dari server menggunakan SweetAlert biasa
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Login Gagal',
+                  text: res.message || 'Terjadi kesalahan. Periksa kembali NIM/NIP dan password Anda.',
+                });
+              }
+            }).catch(error => {
+              console.error('Error:', error);
+              Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Terjadi kesalahan koneksi. Silakan coba lagi.',
+              });
+            });
+        }
+      });
+      
+      // Menampilkan pesan dari session jika ada (misal setelah registrasi sukses)
+      @if (session('success_swal'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil',
+            text: "{{ session('success_swal') }}",
+        });
+      @endif
+
+    });
+  </script>
+  {{-- <script>
     document.getElementById('loginForm').addEventListener('submit', function (e) {
       e.preventDefault();
       const form = e.target;
@@ -129,7 +237,7 @@
           alert('Terjadi kesalahan saat login.');
         });
     });
-  </script>
+  </script> --}}
 
 </body>
 </html>
