@@ -1217,12 +1217,12 @@ class LombaController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nama_lomba' => 'required|string|max:255',
+            'nama_lomba' => 'required|string|max:50',
             'pembukaan_pendaftaran' => 'required|date',
             'kategori' => 'required|in:akademik,non-akademik,lainnya',
-            'penyelenggara' => 'required|string|max:255',
+            'penyelenggara' => 'required|string|max:50',
             'tingkat' => 'required|in:lokal,nasional,internasional',
-            'link_pendaftaran' => 'nullable|string|max:255',
+            'link_pendaftaran' => 'nullable|string|max:150',
             'batas_pendaftaran' => 'required|date',
             'status_verifikasi' => 'required|in:pending,disetujui,ditolak',
             'diinput_oleh' => 'required|integer'
@@ -1256,12 +1256,12 @@ class LombaController extends Controller
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-            'nama_lomba' => 'required|string|max:255',
+            'nama_lomba' => 'required|string|max:50',
             'pembukaan_pendaftaran' => 'required|date',
             'kategori' => 'required|in:akademik,non-akademik,lainnya',
-            'penyelenggara' => 'required|string|max:255',
+            'penyelenggara' => 'required|string|max:50',
             'tingkat' => 'required|in:lokal,nasional,internasional',
-            'link_pendaftaran' => 'nullable|string|max:255',
+            'link_pendaftaran' => 'nullable|string|max:150',
             'batas_pendaftaran' => 'required|date',
             'status_verifikasi' => 'required|in:pending,disetujui,ditolak',
             'diinput_oleh' => 'required|integer'
@@ -1498,20 +1498,20 @@ class LombaController extends Controller
         $user = Auth::user();
 
         $validator = Validator::make($request->all(), [
-            'nama_lomba' => 'required|string|max:255',
+            'nama_lomba' => 'required|string|max:50',
             'pembukaan_pendaftaran' => 'required|date',
             'batas_pendaftaran' => 'required|date|after_or_equal:pembukaan_pendaftaran',
             'kategori' => 'required|in:individu,kelompok',
-            'penyelenggara' => 'required|string|max:255',
+            'penyelenggara' => 'required|string|max:50',
             'tingkat' => 'required|in:lokal,nasional,internasional',
             'bidang_keahlian' => 'required|array|min:1',
             'bidang_keahlian.*' => 'exists:bidang,bidang_id', // Validasi setiap item dalam array
             'biaya' => 'nullable|integer|min:0',
-            'link_pendaftaran' => 'nullable|url|max:255',
-            'link_penyelenggara' => 'nullable|url|max:255',
+            'link_pendaftaran' => 'nullable|url|max:150',
+            'link_penyelenggara' => 'nullable|url|max:150',
             'poster' => 'nullable|image|mimes:jpg,jpeg,png,pdf|max:2048', // Tambahkan pdf jika diizinkan
             'hadiah' => 'nullable|array',
-            'hadiah.*' => 'nullable|string|max:255',
+            'hadiah.*' => 'nullable|string|max:20',
         ]);
 
         if ($validator->fails()) {
@@ -1665,20 +1665,20 @@ class LombaController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'nama_lomba' => 'required|string|max:255',
+            'nama_lomba' => 'required|string|max:50',
             'pembukaan_pendaftaran' => 'required|date',
             'batas_pendaftaran' => 'required|date|after_or_equal:pembukaan_pendaftaran',
             'kategori' => 'required|in:individu,kelompok',
-            'penyelenggara' => 'required|string|max:255',
+            'penyelenggara' => 'required|string|max:50',
             'tingkat' => 'required|in:lokal,nasional,internasional',
             'bidang_keahlian' => 'required|array|min:1',
             'bidang_keahlian.*' => 'exists:bidang,bidang_id',
             'biaya' => 'nullable|integer|min:0',
-            'link_pendaftaran' => 'nullable|url|max:255',
-            'link_penyelenggara' => 'nullable|url|max:255',
+            'link_pendaftaran' => 'nullable|url|max:150',
+            'link_penyelenggara' => 'nullable|url|max:150',
             'poster' => 'nullable|image|mimes:jpg,jpeg,png,pdf|max:2048',
             'hadiah' => 'nullable|array',
-            'hadiah.*' => 'nullable|string|max:255',
+            'hadiah.*' => 'nullable|string|max:20',
         ]);
 
         if ($validator->fails()) {
@@ -1816,20 +1816,20 @@ class LombaController extends Controller
         $user = Auth::user();
 
         $validator = Validator::make($request->all(), [
-            'nama_lomba' => 'required|string|max:255',
+            'nama_lomba' => 'required|string|max:50',
             'pembukaan_pendaftaran' => 'required|date',
             'batas_pendaftaran' => 'required|date|after_or_equal:pembukaan_pendaftaran',
             'kategori' => 'required|in:individu,kelompok',
-            'penyelenggara' => 'required|string|max:255',
+            'penyelenggara' => 'required|string|max:50',
             'tingkat' => 'required|in:lokal,nasional,internasional',
             'bidang_keahlian' => 'required|array|min:1',
             'bidang_keahlian.*' => 'exists:bidang,bidang_id', // Validasi setiap item dalam array
             'biaya' => 'nullable|integer|min:0',
-            'link_pendaftaran' => 'nullable|url|max:255',
-            'link_penyelenggara' => 'nullable|url|max:255',
+            'link_pendaftaran' => 'nullable|url|max:150',
+            'link_penyelenggara' => 'nullable|url|max:150',
             'poster' => 'nullable|image|mimes:jpg,jpeg,png,pdf|max:2048', // Tambahkan pdf jika diizinkan
             'hadiah' => 'nullable|array',
-            'hadiah.*' => 'nullable|string|max:255',
+            'hadiah.*' => 'nullable|string|max:20',
         ]);
 
         if ($validator->fails()) {
@@ -1921,20 +1921,20 @@ class LombaController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'nama_lomba' => 'required|string|max:255',
+            'nama_lomba' => 'required|string|max:50',
             'pembukaan_pendaftaran' => 'required|date',
             'batas_pendaftaran' => 'required|date|after_or_equal:pembukaan_pendaftaran',
             'kategori' => 'required|in:individu,kelompok',
-            'penyelenggara' => 'required|string|max:255',
+            'penyelenggara' => 'required|string|max:50',
             'tingkat' => 'required|in:lokal,nasional,internasional',
             'bidang_keahlian' => 'required|array|min:1',
             'bidang_keahlian.*' => 'exists:bidang,bidang_id',
             'biaya' => 'nullable|integer|min:0',
-            'link_pendaftaran' => 'nullable|url|max:255',
-            'link_penyelenggara' => 'nullable|url|max:255',
+            'link_pendaftaran' => 'nullable|url|max:150',
+            'link_penyelenggara' => 'nullable|url|max:50',
             'poster' => 'nullable|image|mimes:jpg,jpeg,png,pdf|max:2048',
             'hadiah' => 'nullable|array',
-            'hadiah.*' => 'nullable|string|max:255',
+            'hadiah.*' => 'nullable|string|max:20',
         ]);
 
         if ($validator->fails()) {
@@ -2025,17 +2025,17 @@ class LombaController extends Controller
         $user = Auth::user();
 
         $validator = Validator::make($request->all(), [
-            'nama_lomba' => 'required|string|max:255',
+            'nama_lomba' => 'required|string|max:50',
             'pembukaan_pendaftaran' => 'required|date',
             'batas_pendaftaran' => 'required|date|after_or_equal:pembukaan_pendaftaran',
             'kategori' => 'required|in:individu,kelompok',
-            'penyelenggara' => 'required|string|max:255',
+            'penyelenggara' => 'required|string|max:50',
             'tingkat' => 'required|in:lokal,nasional,internasional',
             'bidang_keahlian' => 'required|array|min:1',
             'bidang_keahlian.*' => 'exists:bidang,bidang_id',
             'biaya' => 'nullable|integer|min:0',
-            'link_pendaftaran' => 'nullable|url|max:255',
-            'link_penyelenggara' => 'nullable|url|max:255',
+            'link_pendaftaran' => 'nullable|url|max:150',
+            'link_penyelenggara' => 'nullable|url|max:150',
             'poster' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
@@ -2322,20 +2322,20 @@ class LombaController extends Controller
         $user = Auth::user();
 
         $validator = Validator::make($request->all(), [
-            'nama_lomba' => 'required|string|max:255',
+            'nama_lomba' => 'required|string|max:50',
             'pembukaan_pendaftaran' => 'required|date',
             'batas_pendaftaran' => 'required|date|after_or_equal:pembukaan_pendaftaran',
             'kategori' => 'required|in:individu,kelompok',
-            'penyelenggara' => 'required|string|max:255',
+            'penyelenggara' => 'required|string|max:50',
             'tingkat' => 'required|in:lokal,nasional,internasional',
             'bidang_keahlian' => 'required|array|min:1',
             'bidang_keahlian.*' => 'exists:bidang,bidang_id',
             'biaya' => 'nullable|integer|min:0',
-            'link_pendaftaran' => 'nullable|url|max:255',
-            'link_penyelenggara' => 'nullable|url|max:255',
+            'link_pendaftaran' => 'nullable|url|max:150',
+            'link_penyelenggara' => 'nullable|url|max:150',
             'poster' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'hadiah' => 'nullable|array', // Tambahkan validasi untuk hadiah
-            'hadiah.*' => 'nullable|string|max:255', // Setiap item hadiah adalah string
+            'hadiah.*' => 'nullable|string|max:20', // Setiap item hadiah adalah string
         ]);
 
         if ($validator->fails()) {
@@ -2417,20 +2417,20 @@ class LombaController extends Controller
         $lomba = LombaModel::findOrFail($id);
 
         $rules = [
-            'nama_lomba' => 'required|string|max:255',
+            'nama_lomba' => 'required|string|max:50',
             'pembukaan_pendaftaran' => 'required|date',
             'batas_pendaftaran' => 'required|date|after_or_equal:pembukaan_pendaftaran',
             'kategori' => 'required|in:individu,kelompok',
-            'penyelenggara' => 'required|string|max:255',
+            'penyelenggara' => 'required|string|max:50',
             'tingkat' => 'required|in:lokal,nasional,internasional',
             'bidang_keahlian' => 'required|array|min:1',
             'bidang_keahlian.*' => 'exists:bidang,bidang_id',
             'biaya' => 'nullable|integer|min:0',
-            'link_pendaftaran' => 'nullable|url|max:255',
-            'link_penyelenggara' => 'nullable|url|max:255',
+            'link_pendaftaran' => 'nullable|url|max:150',
+            'link_penyelenggara' => 'nullable|url|max:150',
             'poster' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'hadiah' => 'nullable|array',
-            'hadiah.*' => 'nullable|string|max:255',
+            'hadiah.*' => 'nullable|string|max:20',
         ];
 
         // Tambahkan validasi status_verifikasi dan catatan_verifikasi jika request datang dari admin

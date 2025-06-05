@@ -109,7 +109,7 @@ class ProfilController extends Controller
     try {
         // Aturan validasi
         $validationRules = [
-            'nama' => 'sometimes|string|max:255',
+            'nama' => 'sometimes|string|max:50',
             'email' => [
                 'sometimes',
                 'email',

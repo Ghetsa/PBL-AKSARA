@@ -93,31 +93,6 @@ class ProdiController extends Controller
         return redirect('/');
     }
 
-    // public function edit($id)
-    // {
-    //     $data = ProdiModel::findOrFail($id);
-
-    //     $breadcrumb = (object) [
-    //         'title' => 'Edit Prodi',
-    //         'list' => ['Prodi', 'Edit']
-    //     ];
-
-    //     return view('prodi.edit', compact('breadcrumb', 'data'));
-    // }
-
-    // public function update(Request $request, $id)
-    // {
-    //     $validated = $request->validate([
-    //         'nama' => 'required|string|max:255',
-    //     ]);
-
-    //     $prodi = ProdiModel::findOrFail($id);
-    //     $prodi->update([
-    //         'nama' => $validated['nama']
-    //     ]);
-    //     return redirect()->route('prodi.index')->with('success', 'Data program studi berhasil diupdate');
-    // }
-
     public function edit($prodi_id)
     {
         // Pastikan request adalah AJAX
@@ -161,7 +136,7 @@ class ProdiController extends Controller
                 'max:10',
                 Rule::unique('program_studi', 'kode')->ignore($prodi->prodi_id, 'prodi_id')
             ],
-            'nama' => 'required|string|max:255'
+            'nama' => 'required|string|max50'
         ]);
 
         if ($validator->fails()) {

@@ -121,7 +121,7 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nama' => 'required|string|max:255',
+            'nama' => 'required|string|max:50',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6',
             'role' => 'required|in:admin,dosen,mahasiswa',
@@ -130,15 +130,15 @@ class UserController extends Controller
 
         if ($request->role == 'dosen') {
             $request->validate([
-                'nip' => 'required|string|max:50',
+                'nip' => 'required|string|max:10',
             ]);
         } elseif ($request->role == 'admin') {
             $request->validate([
-                'nip' => 'required|string|max:50',
+                'nip' => 'required|string|max:10',
             ]);
         } elseif ($request->role == 'mahasiswa') {
             $request->validate([
-                'nim' => 'required|string|max:50|unique:mahasiswa,nim',
+                'nim' => 'required|string|max:10|unique:mahasiswa,nim',
                 'prodi_id' => 'required|exists:program_studi,prodi_id',
                 'periode_id' => 'required|exists:periode,periode_id'
             ]);
@@ -202,7 +202,7 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-            'nama' => 'required|string|max:255',
+            'nama' => 'required|string|max:50',
             'email' => 'required|email|unique:users,email,' . $id . ',user_id',
             'role' => 'required|in:admin,dosen,mahasiswa',
             'status' => 'required|in:aktif,nonaktif',
@@ -210,15 +210,15 @@ class UserController extends Controller
 
         if ($request->role == 'dosen') {
             $request->validate([
-                'nip' => 'required|string|max:50',
+                'nip' => 'required|string|max:10',
             ]);
         } elseif ($request->role == 'admin') {
             $request->validate([
-                'nip' => 'required|string|max:50',
+                'nip' => 'required|string|max:10',
             ]);
         } elseif ($request->role == 'mahasiswa') {
             $request->validate([
-                'nim' => 'required|string|max:50|unique:mahasiswa,nim,' . $id . ',user_id',
+                'nim' => 'required|string|max:10|unique:mahasiswa,nim,' . $id . ',user_id',
                 'prodi_id' => 'required|exists:program_studi,prodi_id',
                 'periode_id' => 'required|exists:periode,periode_id',
             ]);
@@ -281,13 +281,13 @@ class UserController extends Controller
     {
         if ($request->ajax() || $request->wantsJson()) {
             $validator = Validator::make($request->all(), [
-                'nama' => 'required|string|max:255',
+                'nama' => 'required|string|max:50',
                 'email' => 'required|email|unique:users,email',
                 'password' => 'required|string|min:6',
                 'role' => 'required|in:admin,dosen,mahasiswa',
                 'status' => 'required|in:aktif,nonaktif',
                 'no_telepon' => 'nullable|string|max:15|regex:/^[0-9\-\+\(\)\s]*$/', // Validasi nomor telepon sederhana
-                'alamat' => 'nullable|string|max:255',
+                'alamat' => 'nullable|string|max:100',
                 'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             ]);
 
@@ -301,16 +301,16 @@ class UserController extends Controller
 
             if ($request->role == 'dosen') {
                 $dosenRules = [
-                    'nip' => 'required|string|max:50',
+                    'nip' => 'required|string|max:10',
                 ];
                 $request->validate($dosenRules);
             } elseif ($request->role == 'admin') {
                 $request->validate([
-                    'nip' => 'required|string|max:50',
+                    'nip' => 'required|string|max:10',
                 ]);
             } elseif ($request->role == 'mahasiswa') {
                 $request->validate([
-                    'nim' => 'required|string|max:50|unique:mahasiswa,nim',
+                    'nim' => 'required|string|max:10|unique:mahasiswa,nim',
                     'prodi_id' => 'required|exists:program_studi,prodi_id',
                     'periode_id' => 'required|exists:periode,periode_id',
                 ]);
@@ -413,7 +413,7 @@ class UserController extends Controller
             ],
             'password' => 'nullable|string|min:6', // Password opsional saat update
             'no_telepon' => 'nullable|string|max:15|regex:/^[0-9\-\+\(\)\s]*$/',
-            'alamat' => 'nullable|string|max:255',
+            'alamat' => 'nullable|string|max:100',
             'role' => 'required|in:admin,dosen,mahasiswa',
             'status' => 'required|in:aktif,nonaktif',
         ];

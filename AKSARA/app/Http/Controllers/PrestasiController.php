@@ -35,12 +35,12 @@ class PrestasiController extends Controller
     {
         $validated = $request->validate([
             'mahasiswa_id' => 'required|integer',
-            'nama_prestasi' => 'required|string|max:255',
+            'nama_prestasi' => 'required|string|max:100',
             'kategori' => 'required|in:akademik,non-akademik,lainnya',
-            'penyelenggara' => 'required|string|max:255',
+            'penyelenggara' => 'required|string|max:50',
             'tingkat' => 'required|in:lokal,nasional,internasional',
             'tahun' => 'required|digits:4|integer|min:2000|max:' . date('Y'),
-            'file_bukti' => 'nullable|string|max:255',
+            'file_bukti' => 'nullable|string|max:70',
             'status_verifikasi' => 'required|in:pending,disetujui,ditolak',
             'catatan_verifikasi' => 'nullable|string'
         ]);
@@ -60,12 +60,12 @@ class PrestasiController extends Controller
     {
         $validated = $request->validate([
             'mahasiswa_id' => 'required|integer',
-            'nama_prestasi' => 'required|string|max:255',
+            'nama_prestasi' => 'required|string|max:100',
             'kategori' => 'required|in:akademik,non-akademik,lainnya',
-            'penyelenggara' => 'required|string|max:255',
+            'penyelenggara' => 'required|string|max:50',
             'tingkat' => 'required|in:lokal,nasional,internasional',
             'tahun' => 'required|digits:4|integer|min:2000|max:' . date('Y'),
-            'file_bukti' => 'nullable|string|max:255',
+            'file_bukti' => 'nullable|string|max:70',
             'status_verifikasi' => 'required|in:pending,disetujui,ditolak',
             'catatan_verifikasi' => 'nullable|string'
         ]);
@@ -204,9 +204,9 @@ class PrestasiController extends Controller
         $mahasiswa_id = $user->mahasiswa->mahasiswa_id;
 
         $validator = Validator::make($request->all(), [
-            'nama_prestasi' => 'required|string|max:255',
+            'nama_prestasi' => 'required|string|max:100',
             'kategori' => ['required', Rule::in(['akademik', 'non-akademik'])],
-            'penyelenggara' => 'required|string|max:255',
+            'penyelenggara' => 'required|string|max:50',
             'tingkat' => ['required', Rule::in(['kota', 'provinsi', 'nasional', 'internasional'])],
             'tahun' => 'required|integer|digits:4|min:1900|max:' . (date('Y') + 1),
             'dosen_id' => 'nullable|integer|exists:dosen,dosen_id',
@@ -315,9 +315,9 @@ class PrestasiController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'nama_prestasi' => 'required|string|max:255',
+            'nama_prestasi' => 'required|string|max:100',
             'kategori' => ['required', Rule::in(['akademik', 'non-akademik'])],
-            'penyelenggara' => 'required|string|max:255',
+            'penyelenggara' => 'required|string|max:50',
             'tingkat' => ['required', Rule::in(['kota', 'provinsi', 'nasional', 'internasional'])],
             'tahun' => 'required|integer|digits:4|min:1900|max:' . (date('Y') + 1),
             'dosen_id' => 'nullable|integer|exists:dosen,dosen_id',

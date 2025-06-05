@@ -69,8 +69,8 @@ class PeriodeController extends Controller
     {
         if ($request->ajax() || $request->wantsJson()) {
             $validator = Validator::make($request->all(), [
-                'semester' => 'required|string|max:50',
-                'tahun_akademik' => 'required|string|max:50'
+                'semester' => 'required|string|max:10',
+                'tahun_akademik' => 'required|string|max:10'
             ]);
 
             if ($validator->fails()) {
