@@ -141,10 +141,23 @@ class UserModel extends Authenticatable implements JWTSubject
         return $this->hasMany(PengalamanModel::class, 'user_id', 'user_id');
     }
 
-    public function notifikasi()
+    public function notifikasiLomba()
     {
-        return $this->hasMany(NotifikasiModel::class, 'user_id', 'user_id');
+        return $this->hasMany(NotifikasiLombaModel::class, 'user_id');
     }
+
+    // Relasi ke Notifikasi Prestasi
+    public function notifikasiPrestasi()
+    {
+        return $this->hasMany(NotifikasiPrestasiModel::class, 'user_id');
+    }
+
+    // Relasi ke Notifikasi Keahlian
+    public function notifikasiKeahlian()
+    {
+        return $this->hasMany(NotifikasiKeahlianModel::class, 'user_id');
+    }
+
 
     public function lombaDiinput()
     {

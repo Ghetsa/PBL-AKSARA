@@ -106,7 +106,7 @@
             </div>
             <div class="dropdown-divider"></div>
             <div class="text-center py-2">
-              <a href="#!" class="link-primary">View all</a>
+              <a href="{{ route('notifikasi.index') }}" class="link-primary">View all</a>
             </div>
           </div>
         </li>

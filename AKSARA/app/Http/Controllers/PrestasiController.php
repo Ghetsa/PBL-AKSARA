@@ -6,6 +6,7 @@ use App\Models\PrestasiModel;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
+use App\Models\NotifikasiModel; 
 use Illuminate\Validation\Rule; // Untuk validasi unique ignore
 use Illuminate\Support\Facades\Log; // Untuk logging
 use Illuminate\Support\Facades\Storage;
@@ -40,7 +41,7 @@ class PrestasiController extends Controller
             'penyelenggara' => 'required|string|max:50',
             'tingkat' => 'required|in:lokal,nasional,internasional',
             'tahun' => 'required|digits:4|integer|min:2000|max:' . date('Y'),
-            'file_bukti' => 'nullable|string|max:70',
+            'file_bukti' => 'nullable|string|max:512',
             'status_verifikasi' => 'required|in:pending,disetujui,ditolak',
             'catatan_verifikasi' => 'nullable|string'
         ]);
@@ -65,7 +66,7 @@ class PrestasiController extends Controller
             'penyelenggara' => 'required|string|max:50',
             'tingkat' => 'required|in:lokal,nasional,internasional',
             'tahun' => 'required|digits:4|integer|min:2000|max:' . date('Y'),
-            'file_bukti' => 'nullable|string|max:70',
+            'file_bukti' => 'nullable|string|max:512',
             'status_verifikasi' => 'required|in:pending,disetujui,ditolak',
             'catatan_verifikasi' => 'nullable|string'
         ]);

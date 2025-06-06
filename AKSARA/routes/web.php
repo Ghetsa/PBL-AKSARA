@@ -6,7 +6,6 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfilController;
 use App\Http\Controllers\PrestasiController;
 use App\Http\Controllers\ProdiController;
-use App\Http\Controllers\NotifikasiController;
 use App\Http\Controllers\PeriodeController;
 use App\Http\Controllers\KeahlianUserController;
 use App\Http\Controllers\LandingPageController;
@@ -14,6 +13,11 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\LombaController; // Tambahkan ini
 use App\Http\Controllers\BimbinganController; // Tambahkan ini
+use App\Http\Controllers\NotifikasiLombaController;
+use App\Http\Controllers\NotifikasiPrestasiController;
+use App\Http\Controllers\NotifikasiKeahlianUserController;
+use App\Http\Controllers\NotifikasiController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -88,13 +92,16 @@ Route::middleware(['auth'])->group(function () {
     })->name('dashboardDSN');
 
     // ===================== NOTIFIAKSI =====================
-    Route::prefix('notifikasi')->middleware('auth')->group(function () {
-        Route::get('/', [NotifikasiController::class, 'index'])->name('notifikasi.index');
-        Route::get('/{id}', [NotifikasiController::class, 'show'])->name('notifikasi.show');
-        Route::post('/{id}/baca', [NotifikasiController::class, 'markAsRead'])->name('notifikasi.baca');
-        Route::post('/semua-baca', [NotifikasiController::class, 'markAllAsRead'])->name('notifikasi.semua.baca');
-        Route::delete('/{id}', [NotifikasiController::class, 'destroy'])->name('notifikasi.hapus');
+        Route::prefix('notifikasi')->name('notifikasi.')->middleware(['auth', 'role:mahasiswa'])->group(function () {
+        Route::get('/', [NotifikasiController::class, 'index'])->name('index'); // Halaman utama untuk melihat notifikasi
+        Route::get('/{id}/show_and_read/{model}', [NotifikasiController::class, 'showAndRead'])
+         ->name('show_and_read')
+         ->where('model', '.*'); // <-- TAMBAHKAN BARIS INI // Melihat detail notifikasi berdasarkan model
+        Route::post('/{id}/baca', [NotifikasiController::class, 'markAsRead'])->name('baca'); // Tandai sebagai dibaca
+        Route::post('/mark-all-as-read', [NotifikasiController::class, 'markAllAsRead'])->name('markAllAsRead'); // Tandai semua notifikasi sebagai dibaca
+        Route::delete('/{id}/destroy/{model}', [NotifikasiController::class, 'destroy'])->name('destroy'); // Menghapus notifikasi
     });
+
 
     // ===================== PROFILE =====================
     Route::get('/profile', [ProfilController::class, 'index'])->name('profile.index');
@@ -199,7 +206,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/edit/{id}', [KeahlianUserController::class, 'edit'])->name('edit');
             Route::put('/update/{id}', [KeahlianUserController::class, 'update'])->name('update');
             Route::delete('/delete/{id}', [KeahlianUserController::class, 'destroy'])->name('destroy');
-            Route::get('/{id}/show_ajax', [KeahlianUserController::class, 'show_ajax'])->name('show_ajax');
+            Route::get('/{id}/show', [KeahlianUserController::class, 'show_ajax'])->name('show_ajax');
             Route::get('/verifikasi/{id}', [KeahlianUserController::class, 'verifikasi'])->name('verifikasi');
             Route::post('/verifikasi/{id}', [KeahlianUserController::class, 'prosesVerifikasi'])->name('proses_verifikasi');
         });
@@ -336,3 +343,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{id}/detail-ajax', [LombaController::class, 'showAjaxLombaPublik'])->name('show_ajax'); // Detail modal
     });
 });
+
+
+

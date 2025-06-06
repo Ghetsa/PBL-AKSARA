@@ -3,65 +3,103 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\NotifikasiModel;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Pagination\LengthAwarePaginator;
+use App\Models\NotifikasiLombaModel;
+use App\Models\NotifikasiPrestasiModel;
+use App\Models\NotifikasiKeahlianModel;
 
 class NotifikasiController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $breadcrumb = (object) ['title' => 'Notifikasi', 'list' => ['Notifikasi']];
+        $activeMenu = 'notifikasi';
         $user = Auth::user();
-        $query = NotifikasiModel::query();
+        $filter = $request->query('filter', 'semua'); // Ambil filter dari URL
 
-        if ($user->role == 'admin') {
-            // Admin menerima semua notifikasi dari dosen/mahasiswa
-            $query->whereHas('user', function ($q) {
-                $q->whereIn('role', ['dosen', 'mahasiswa']);
-            });
-        } elseif ($user->role == 'dosen') {
-            // Dosen: notifikasi dari prestasi yang mencantumkan dia sebagai pembimbing
-            $query->whereHas('prestasi', function ($q) use ($user) {
-                $q->where('dosen_pembimbing', $user->user_id);
-            });
-        } elseif ($user->role == 'mahasiswa') {
-            // Mahasiswa: notifikasi dari prestasi/keahlian/lomba miliknya yang diverifikasi/ditolak
-            $query->where(function ($q) use ($user) {
-                $q->where('user_id', $user->user_id);
-            });
+        // Ambil semua notifikasi terlebih dahulu
+        $lombaNotifs = NotifikasiLombaModel::where('user_id', $user->user_id)->get();
+        $prestasiNotifs = NotifikasiPrestasiModel::where('user_id', $user->user_id)->get();
+        $keahlianNotifs = NotifikasiKeahlianModel::where('user_id', $user->user_id)->get();
+
+        $mergedNotifications = collect([])->merge($lombaNotifs)->merge($prestasiNotifs)->merge($keahlianNotifs);
+        $allNotificationsSorted = $mergedNotifications->sortByDesc('created_at');
+
+        $validNotifications = $allNotificationsSorted->filter(fn ($notif) => !empty($notif) && !empty($notif->id));
+        
+        // Hitung notifikasi belum dibaca SEBELUM di-filter
+        $unreadCount = $validNotifications->where('status_baca', 'belum_dibaca')->count();
+
+        // Terapkan filter status
+        $filteredNotifications = $validNotifications;
+        if ($filter === 'belum_dibaca') {
+            $filteredNotifications = $validNotifications->where('status_baca', 'belum_dibaca');
+        } elseif ($filter === 'sudah_dibaca') {
+            $filteredNotifications = $validNotifications->where('status_baca', 'dibaca');
         }
 
-        $notifikasi = $query->latest()->get();
+        // Buat Paginator dari data yang sudah difilter
+        $perPage = 10;
+        $currentPage = Paginator::resolveCurrentPage('page');
+        $currentPageItems = $filteredNotifications->slice(($currentPage - 1) * $perPage, $perPage)->values()->all();
+        $allNotifications = new LengthAwarePaginator($currentPageItems, $filteredNotifications->count(), $perPage, $currentPage, [
+            'path' => Paginator::resolveCurrentPath(),
+            'query' => $request->query(), // Penting agar filter tetap ada saat pindah halaman
+        ]);
 
-        return view('notifikasi.index', compact('notifikasi'));
+        return view('notifikasi.index', compact('breadcrumb', 'activeMenu', 'allNotifications', 'filter', 'unreadCount'));
     }
 
-    public function show($id)
+    public function showAndRead($id, $modelAlias)
     {
-        $notifikasi = NotifikasiModel::findOrFail($id);
-        return response()->json($notifikasi);
-    }
+        $breadcrumb = (object) ['title' => 'Detail Notifikasi', 'list' => ['Notifikasi', 'Detail']];
+        $activeMenu = 'notifikasi';
+        $notif = null;
 
-    public function markAsRead($id)
-    {
-        $notifikasi = NotifikasiModel::findOrFail($id);
-        $notifikasi->status_baca = 'dibaca';
-        $notifikasi->save();
+        if ($modelAlias === 'lomba') {
+            $notif = NotifikasiLombaModel::findOrFail($id);
+        } elseif ($modelAlias === 'prestasi') {
+            $notif = NotifikasiPrestasiModel::findOrFail($id);
+        } elseif ($modelAlias === 'keahlian') {
+            $notif = NotifikasiKeahlianModel::findOrFail($id);
+        } else {
+            abort(404);
+        }
 
-        return response()->json(['success' => true, 'message' => 'Notifikasi ditandai sebagai dibaca']);
+        // Tandai sebagai dibaca
+        $notif->update(['status_baca' => 'dibaca']);
+
+        // Tampilkan view detail
+        return view('notifikasi.show', compact('breadcrumb', 'activeMenu', 'notif'));
     }
 
     public function markAllAsRead()
     {
-        NotifikasiModel::where('user_id', Auth::id())->update(['status_baca' => 'dibaca']);
+        $userId = Auth::id();
+        NotifikasiLombaModel::where('user_id', $userId)->update(['status_baca' => 'dibaca']);
+        NotifikasiPrestasiModel::where('user_id', $userId)->update(['status_baca' => 'dibaca']);
+        NotifikasiKeahlianModel::where('user_id', $userId)->update(['status_baca' => 'dibaca']);
 
-        return response()->json(['success' => true, 'message' => 'Semua notifikasi ditandai dibaca']);
+        return redirect()->route('notifikasi.index')->with('success', 'Semua notifikasi telah ditandai sebagai dibaca.');
     }
 
-    public function destroy($id)
+    public function destroy($id, $modelAlias)
     {
-        $notifikasi = NotifikasiModel::findOrFail($id);
-        $notifikasi->delete();
+        $notif = null;
+        if ($modelAlias === 'lomba') {
+            $notif = NotifikasiLombaModel::findOrFail($id);
+        } elseif ($modelAlias === 'prestasi') {
+            $notif = NotifikasiPrestasiModel::findOrFail($id);
+        } elseif ($modelAlias === 'keahlian') {
+            $notif = NotifikasiKeahlianModel::findOrFail($id);
+        } else {
+            abort(404);
+        }
+        
+        $notif->delete();
 
-        return response()->json(['success' => true, 'message' => 'Notifikasi berhasil dihapus']);
+        return redirect()->route('notifikasi.index')->with('success', 'Notifikasi berhasil dihapus.');
     }
 }
