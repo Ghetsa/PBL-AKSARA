@@ -91,17 +91,6 @@ Route::middleware(['auth'])->group(function () {
         return view('dashboard.dosen', compact('breadcrumb', 'activeMenu'));
     })->name('dashboardDSN');
 
-    // ===================== NOTIFIAKSI =====================
-        Route::prefix('notifikasi')->name('notifikasi.')->middleware(['auth', 'role:mahasiswa'])->group(function () {
-        Route::get('/', [NotifikasiController::class, 'index'])->name('index'); // Halaman utama untuk melihat notifikasi
-        Route::get('/{id}/show_and_read/{model}', [NotifikasiController::class, 'showAndRead'])
-         ->name('show_and_read')
-         ->where('model', '.*'); // <-- TAMBAHKAN BARIS INI // Melihat detail notifikasi berdasarkan model
-        Route::post('/{id}/baca', [NotifikasiController::class, 'markAsRead'])->name('baca'); // Tandai sebagai dibaca
-        Route::post('/mark-all-as-read', [NotifikasiController::class, 'markAllAsRead'])->name('markAllAsRead'); // Tandai semua notifikasi sebagai dibaca
-        Route::delete('/{id}/destroy/{model}', [NotifikasiController::class, 'destroy'])->name('destroy'); // Menghapus notifikasi
-    });
-
 
     // ===================== PROFILE =====================
     Route::get('/profile', [ProfilController::class, 'index'])->name('profile.index');
@@ -210,6 +199,14 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/verifikasi/{id}', [KeahlianUserController::class, 'verifikasi'])->name('verifikasi');
             Route::post('/verifikasi/{id}', [KeahlianUserController::class, 'prosesVerifikasi'])->name('proses_verifikasi');
         });
+
+        // ===================== NOTIFIAKSI =====================
+        Route::prefix('notifikasi')->name('notifikasi.')->group(function () {
+        Route::get('/', [NotifikasiController::class, 'index'])->name('index');
+        Route::get('/{id}/show_and_read/{model}', [NotifikasiController::class, 'showAndRead'])->name('show_and_read');
+        Route::post('/mark-all-as-read', [NotifikasiController::class, 'markAllAsRead'])->name('markAllAsRead');
+        Route::delete('/{id}/destroy/{model}', [NotifikasiController::class, 'destroy'])->name('destroy');
+        });
     });
 
     // ===================== ADMIN =====================
@@ -260,6 +257,15 @@ Route::middleware(['auth'])->group(function () {
                 Route::delete('/{id}/destroy-ajax', [LombaController::class, 'adminDestroyLombaAjax'])->name('destroy_ajax');
             });
         });
+
+        // ===================== NOTIFIAKSI =====================
+        Route::prefix('admin/notifikasi')->name('admin.notifikasi.')->group(function () {
+        Route::get('/', [NotifikasiController::class, 'index'])->name('index');
+        Route::get('/{id}/show/{model}', [NotifikasiController::class, 'showAndRead'])->name('show_and_read');
+        Route::post('/mark-all-as-read', [NotifikasiController::class, 'markAllAsRead'])->name('markAllAsRead');
+        Route::delete('/{id}/destroy/{model}', [NotifikasiController::class, 'destroy'])->name('destroy');
+        });
+
     });
 
     // ===================== DOSEN =====================
@@ -316,6 +322,14 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{id}/verify-form-ajax', [BimbinganController::class, 'showVerifyForm'])->name('verify_form');
             Route::post('/{id}/verify-process-ajax', [BimbinganController::class, 'processVerification'])->name('verify_process');
             Route::get('/{id}/show-ajax', [BimbinganController::class, 'showAjax'])->name('show_ajax');
+        });
+
+        // ===================== NOTIFIAKSI =====================
+        Route::prefix('dosen/notifikasi')->name('dosen.notifikasi.')->group(function () {
+        Route::get('/', [NotifikasiController::class, 'index'])->name('index');
+        Route::get('/{id}/show_and_read/{model}', [NotifikasiController::class, 'showAndRead'])->name('show_and_read');
+        Route::post('/mark-all-as-read', [NotifikasiController::class, 'markAllAsRead'])->name('markAllAsRead');
+        Route::delete('/{id}/destroy/{model}', [NotifikasiController::class, 'destroy'])->name('destroy');
         });
     });
 

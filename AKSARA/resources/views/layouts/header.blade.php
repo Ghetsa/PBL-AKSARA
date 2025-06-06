@@ -106,7 +106,20 @@
             </div>
             <div class="dropdown-divider"></div>
             <div class="text-center py-2">
-              <a href="{{ route('notifikasi.index') }}" class="link-primary">View all</a>
+              @php
+                  $notificationRoute = '#'; // Fallback link jika role tidak dikenali
+                  $userRole = Auth::user()->role;
+
+                  if ($userRole === 'admin') {
+                      $notificationRoute = route('admin.notifikasi.index');
+                  } elseif ($userRole === 'dosen') {
+                      // Kita akan buat route ini di langkah berikutnya
+                      $notificationRoute = route('dosen.notifikasi.index'); 
+                  } elseif ($userRole === 'mahasiswa') {
+                      $notificationRoute = route('notifikasi.index');
+                  }
+              @endphp
+              <a href="{{ $notificationRoute }}" class="link-primary">View all</a>
             </div>
           </div>
         </li>

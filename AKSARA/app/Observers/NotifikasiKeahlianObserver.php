@@ -2,18 +2,33 @@
 
 namespace App\Observers;
 
-use App\Models\NotifikasiKeahlianModel;
 use App\Models\KeahlianUserModel;
+use App\Models\NotifikasiKeahlianModel;
+use App\Traits\NotifikasiUntukAdmin; // <-- Tambahkan ini
 
 class NotifikasiKeahlianObserver
 {
+    use NotifikasiUntukAdmin; // <-- Tambahkan ini
+
+    /**
+     * Handle the KeahlianUserModel "created" event.
+     */
+    public function created(KeahlianUserModel $model)
+    {
+        $namaPengaju = $model->user->nama ?? 'Mahasiswa';
+        self::kirimNotifikasiKeAdmin($model, 'Keahlian', $namaPengaju);
+    }
+
+    /**
+     * Handle the KeahlianUserModel "updated" event.
+     */
     public function updated(KeahlianUserModel $model)
     {
+        // ... (kode method updated Anda yang sudah ada, biarkan saja)
         if ($model->getOriginal('status_verifikasi') === $model->status_verifikasi) {
             return;
         }
 
-        // Tentukan judul dan pesan berdasarkan status
         $judul = '';
         $pesan = '';
 
@@ -30,14 +45,12 @@ class NotifikasiKeahlianObserver
                 return;
         }
 
-        // Kirim notifikasi
         NotifikasiKeahlianModel::create([
             'keahlian_user_id' => $model->keahlian_user_id,
             'user_id'      => $model->user_id,
             'judul'        => $judul,
             'isi'          => $pesan,
             'status_baca'  => 'belum_dibaca',
-            // 'link'         => route('keahlian.show', ['id' => $model->id]),
         ]);
     }
 }
