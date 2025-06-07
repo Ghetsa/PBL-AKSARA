@@ -132,6 +132,11 @@
         <div class="modal-content"></div>
     </div>
 </div>
+<div class="modal fade" id="modalDetailHitungan" tabindex="-1" aria-labelledby="modalDetailHitunganLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content" id="modalDetailHitunganContent"></div>
+    </div>
+</div>
 @endsection
 
 @push('js')
@@ -291,6 +296,92 @@
             // dtLomba.ajax.reload(); // Sudah dipanggil oleh draw()
         });
     });
+
+    console.log("JavaScript untuk halaman Lomba berhasil dimuat."); // Penanda 1
+    
+    $(document).on('click', '.btn-detail-hitungan', function() {
+    const lombaId = $(this).data('lomba-id');
+    const modalTarget = $('#modalDetailHitungan');
+    const modalContent = $('#modalDetailHitunganContent');
+
+    modalContent.html('<div class="modal-body text-center py-5"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Memuat perhitungan...</p></div>');
+    const bsModal = new bootstrap.Modal(document.getElementById('modalDetailHitungan'));
+    bsModal.show();
+
+    // Kumpulkan bobot dari slider
+    const weights = {};
+    $('.bobot-slider').each(function() {
+        const kriteriaKey = $(this).data('kriteria');
+        weights[kriteriaKey] = parseInt($(`#bobot_${kriteriaKey}`).val()) / 100;
+    });
+
+    const url = new URL("{{ route('lomba.mhs.getMooraDetailJson') }}");
+    url.searchParams.append('lomba_id', lombaId);
+    for (const key in weights) {
+        url.searchParams.append(`weights[${key}]`, weights[key]);
+    }
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            console.log("Data yang diterima:", data);
+
+            if (!data.lomba || !data.lomba.nama_lomba) {
+                console.error("Data lomba tidak valid:", data);
+                modalContent.html('<div class="modal-body"><p class="text-danger">Data lomba tidak ditemukan.</p></div>');
+                return;
+            }
+
+            let tableRows = '';
+            for (const key in data.weights) {
+                const type = ['biaya'].includes(key)
+                    ? `<span class="badge bg-light-danger text-danger">Cost</span>`
+                    : `<span class="badge bg-light-success text-success">Benefit</span>`;
+
+                tableRows += `
+                    <tr>
+                        <td class="text-capitalize">${key}</td>
+                        <td>${type}</td>
+                        <td>${Number(data.weights[key]).toFixed(2)}</td>
+                        <td>${data.original_values[key]}</td>
+                        <td>${Number(data.divisors[key]).toFixed(4)}</td>
+                        <td>${Number(data.normalized_values[key]).toFixed(4)}</td>
+                    </tr>
+                `;
+            }
+
+            const modalHtml = `
+                <div class="modal-header">
+                    <h5 class="modal-title">Detail Perhitungan MOORA</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h6>Lomba: <span class="fw-bold">${data.lomba.nama_lomba}</span></h6>
+                    <h5 class="mt-2">Skor Akhir (Y_i): <span class="badge bg-primary">${Number(data.score).toFixed(4)}</span></h5>
+                    <p class="mt-3 text-muted">Berikut rincian perhitungan berdasarkan preferensi Anda:</p>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped table-sm">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Kriteria</th><th>Tipe</th><th>Bobot (Wj)</th><th>Nilai Awal (Xij)</th><th>Pembagi (√)</th><th>Nilai Ternormalisasi (X*ij)</th>
+                                </tr>
+                            </thead>
+                            <tbody>${tableRows}</tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                </div>
+            `;
+
+            modalContent.html(modalHtml);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            modalContent.html(`<div class="modal-header"><h5 class="modal-title">Error</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div><div class="modal-body"><p class="text-danger">${error.message}</p></div>`);
+        });
+});
 </script>
 @endpush
 

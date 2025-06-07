@@ -170,6 +170,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/show-lomba-mhs/{id}', [LombaController::class, 'showLombaMhs'])->name('show_form');
             Route::get('/edit-lomba-mhs/{id}', [LombaController::class, 'editLombaMhs'])->name('edit_form');
             Route::put('/update-lomba-mhs/{id}', [LombaController::class, 'updateLombaMhs'])->name('update_form');
+            Route::get('/get-moora-detail', [LombaController::class, 'getMooraCalculationDetailJson'])->name('getMooraDetailJson');
         });
 
         Route::get('/dashboard-mahasiswa', [DashboardController::class, 'mahasiswaDashboard'])->name('dashboard.mahasiswa');
