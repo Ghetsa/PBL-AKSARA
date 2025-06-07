@@ -202,10 +202,10 @@ Route::middleware(['auth'])->group(function () {
 
         // ===================== NOTIFIAKSI =====================
         Route::prefix('notifikasi')->name('notifikasi.')->group(function () {
-        Route::get('/', [NotifikasiController::class, 'index'])->name('index');
-        Route::get('/{id}/show_and_read/{model}', [NotifikasiController::class, 'showAndRead'])->name('show_and_read');
-        Route::post('/mark-all-as-read', [NotifikasiController::class, 'markAllAsRead'])->name('markAllAsRead');
-        Route::delete('/{id}/destroy/{model}', [NotifikasiController::class, 'destroy'])->name('destroy');
+            Route::get('/', [NotifikasiController::class, 'index'])->name('index');
+            Route::get('/{id}/show_and_read/{model}', [NotifikasiController::class, 'showAndRead'])->name('show_and_read');
+            Route::post('/mark-all-as-read', [NotifikasiController::class, 'markAllAsRead'])->name('markAllAsRead');
+            Route::delete('/{id}/destroy/{model}', [NotifikasiController::class, 'destroy'])->name('destroy');
         });
     });
 
@@ -260,12 +260,11 @@ Route::middleware(['auth'])->group(function () {
 
         // ===================== NOTIFIAKSI =====================
         Route::prefix('admin/notifikasi')->name('admin.notifikasi.')->group(function () {
-        Route::get('/', [NotifikasiController::class, 'index'])->name('index');
-        Route::get('/{id}/show/{model}', [NotifikasiController::class, 'showAndRead'])->name('show_and_read');
-        Route::post('/mark-all-as-read', [NotifikasiController::class, 'markAllAsRead'])->name('markAllAsRead');
-        Route::delete('/{id}/destroy/{model}', [NotifikasiController::class, 'destroy'])->name('destroy');
+            Route::get('/', [NotifikasiController::class, 'index'])->name('index');
+            Route::get('/{id}/show/{model}', [NotifikasiController::class, 'showAndRead'])->name('show_and_read');
+            Route::post('/mark-all-as-read', [NotifikasiController::class, 'markAllAsRead'])->name('markAllAsRead');
+            Route::delete('/{id}/destroy/{model}', [NotifikasiController::class, 'destroy'])->name('destroy');
         });
-
     });
 
     // ===================== DOSEN =====================
@@ -317,19 +316,19 @@ Route::middleware(['auth'])->group(function () {
 
         // ---------- Bimbingan Dosen ----------
         Route::prefix('bimbingan')->name('bimbingan.')->group(function () {
-            Route::get('/', [BimbinganController::class, 'index'])->name('index');
-            Route::get('/list', [BimbinganController::class, 'list'])->name('list');
-            Route::get('/{id}/verify-form-ajax', [BimbinganController::class, 'showVerifyForm'])->name('verify_form');
-            Route::post('/{id}/verify-process-ajax', [BimbinganController::class, 'processVerification'])->name('verify_process');
-            Route::get('/{id}/show-ajax', [BimbinganController::class, 'showAjax'])->name('show_ajax');
+            Route::get('/', [PrestasiController::class, 'indexDosBim'])->name('index');
+            Route::get('/list', [PrestasiController::class, 'listDosBim'])->name('list');
+            Route::get('/{prestasi}/verify-form-ajax', [BimbinganController::class, 'showVerifyForm'])->name('verify_form');
+            Route::post('/{prestasi}/verify-process-ajax', [PrestasiController::class, 'processVerificationAjaxDosen'])->name('verify_process');
+            Route::get('/{prestasi}/show-ajax', [PrestasiController::class, 'showDosen'])->name('show');
         });
 
         // ===================== NOTIFIAKSI =====================
         Route::prefix('dosen/notifikasi')->name('dosen.notifikasi.')->group(function () {
-        Route::get('/', [NotifikasiController::class, 'index'])->name('index');
-        Route::get('/{id}/show_and_read/{model}', [NotifikasiController::class, 'showAndRead'])->name('show_and_read');
-        Route::post('/mark-all-as-read', [NotifikasiController::class, 'markAllAsRead'])->name('markAllAsRead');
-        Route::delete('/{id}/destroy/{model}', [NotifikasiController::class, 'destroy'])->name('destroy');
+            Route::get('/', [NotifikasiController::class, 'index'])->name('index');
+            Route::get('/{id}/show_and_read/{model}', [NotifikasiController::class, 'showAndRead'])->name('show_and_read');
+            Route::post('/mark-all-as-read', [NotifikasiController::class, 'markAllAsRead'])->name('markAllAsRead');
+            Route::delete('/{id}/destroy/{model}', [NotifikasiController::class, 'destroy'])->name('destroy');
         });
     });
 
@@ -357,6 +356,3 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{id}/detail-ajax', [LombaController::class, 'showAjaxLombaPublik'])->name('show_ajax'); // Detail modal
     });
 });
-
-
-
