@@ -83,7 +83,7 @@
 
             @if($allNotifications->isEmpty())
                 <div class="alert alert-info text-center mt-3">
-                    Tidak ada notifikasi untuk ditampilkan pada kategori ini.
+                    Tidak ada notifikasi.
                 </div>
             @else
                 <div class="mt-3">

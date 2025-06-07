@@ -47,7 +47,7 @@
                     @if($lomba->poster && Storage::disk('public')->exists($lomba->poster))
                         <img src="{{ asset('storage/'.$lomba->poster) }}" class="card-img-top" alt="Poster {{ $lomba->nama_lomba }}">
                     @else
-                        <img src="{{ asset('path/to/default-lomba.jpg') }}" class="card-img-top" alt="Poster Default"> {{-- Ganti dengan path default poster lomba --}}
+                        <img src="{{ asset('default/5.png') }}" class="card-img-top" alt="Poster Default" width="100%"> {{-- Ganti dengan path default poster lomba --}}
                     @endif
                     <div class="card-body">
                         <div class="row no-gutters align-items-center mb-2">
@@ -84,7 +84,7 @@
                      @if($prestasi->bukti_prestasi && Storage::disk('public')->exists($prestasi->bukti_prestasi))
                         <img src="{{ asset('storage/'.$prestasi->bukti_prestasi) }}" class="card-img-top" alt="Bukti {{ $prestasi->nama_prestasi }}">
                     @else
-                        <img src="{{ asset('path/to/default-prestasi.jpg') }}" class="card-img-top" alt="Tidak Ada Bukti"> {{-- Ganti path default --}}
+                        <img src="{{ asset('default/8.png') }}" class="card-img-top" alt="Tidak Ada Bukti"> {{-- Ganti path default --}}
                     @endif
                     <div class="card-body">
                         <h5 class="card-title text-info font-weight-bold text-uppercase mb-1" style="font-size: 1.1rem;">{{ Str::limit($prestasi->nama_prestasi, 45) }}</h5>
@@ -114,7 +114,7 @@
                      @if($prestasi->bukti_prestasi && Storage::disk('public')->exists($prestasi->bukti_prestasi))
                         <img src="{{ asset('storage/'.$prestasi->bukti_prestasi) }}" class="card-img-top" alt="Bukti {{ $prestasi->nama_prestasi }}">
                     @else
-                        <img src="{{ asset('path/to/default-prestasi.jpg') }}" class="card-img-top" alt="Tidak Ada Bukti">
+                        <img src="{{ asset('default/7.png') }}" class="card-img-top" alt="Tidak Ada Bukti">
                     @endif
                     <div class="card-body">
                         <h5 class="card-title text-secondary font-weight-bold text-uppercase mb-1" style="font-size: 1.1rem;">{{ Str::limit($prestasi->nama_prestasi, 45) }}</h5>
@@ -144,7 +144,7 @@
                     @if($lomba->poster && Storage::disk('public')->exists($lomba->poster))
                         <img src="{{ asset('storage/'.$lomba->poster) }}" class="card-img-top" alt="Poster {{ $lomba->nama_lomba }}">
                     @else
-                        <img src="{{ asset('path/to/default-lomba.jpg') }}" class="card-img-top" alt="Poster Default">
+                        <img src="{{ asset('default/6.png') }}" class="card-img-top" alt="Poster Default">
                     @endif
                     <div class="card-body">
                         <h5 class="card-title text-primary font-weight-bold text-uppercase mb-1" style="font-size: 1.1rem;">{{ Str::limit($lomba->nama_lomba, 45) }}</h5>
