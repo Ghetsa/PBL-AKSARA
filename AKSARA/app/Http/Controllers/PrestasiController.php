@@ -13,6 +13,10 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use App\Models\DosenModel;
 use App\Models\BidangModel;
+use Barryvdh\DomPDF\Facade\Pdf;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class PrestasiController extends Controller
 {
@@ -904,5 +908,85 @@ class PrestasiController extends Controller
                 ->make(true);
         }
         return abort(403);
+    }
+    public function export_excel()
+    {
+        $prestasi = PrestasiModel::with(['mahasiswa.user', 'bidang']) // eager load relasi
+            ->orderBy('tahun', 'desc')
+            ->get();
+
+        // Load library excel
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Set header kolom
+        $sheet->setCellValue('A1', 'No');
+        $sheet->setCellValue('B1', 'Nama Mahasiswa');
+        $sheet->setCellValue('C1', 'Nama Prestasi');
+        $sheet->setCellValue('D1', 'Kategori');
+        $sheet->setCellValue('E1', 'Bidang');
+        $sheet->setCellValue('F1', 'Penyelenggara');
+        $sheet->setCellValue('G1', 'Tingkat');
+        $sheet->setCellValue('H1', 'Tahun');
+        $sheet->setCellValue('I1', 'Dosen Pembimbing');
+        $sheet->setCellValue('J1', 'Status Verifikasi');
+
+        // Set style bold untuk header
+        $sheet->getStyle('A1:J1')->getFont()->setBold(true);
+
+        $no = 1;
+        $baris = 2;
+        foreach ($prestasi as $item) {
+            $sheet->setCellValue('A' . $baris, $no);
+            $sheet->setCellValue('B' . $baris, $item->mahasiswa->user->nama ?? '-');
+            $sheet->setCellValue('C' . $baris, $item->nama_prestasi);
+            $sheet->setCellValue('D' . $baris, ucfirst($item->kategori));
+            $sheet->setCellValue('E' . $baris, $item->bidang->bidang_nama ?? '-');
+            $sheet->setCellValue('F' . $baris, $item->penyelenggara);
+            $sheet->setCellValue('G' . $baris, ucfirst($item->tingkat));
+            $sheet->setCellValue('H' . $baris, $item->tahun);
+            $sheet->setCellValue('I' . $baris, $item->dosen->user->nama ?? '-');
+            $sheet->setCellValue('J' . $baris, ucfirst($item->status_verifikasi));
+
+            $baris++;
+            $no++;
+        }
+
+        // Auto size untuk kolom A sampai I
+        foreach (range('A', 'J') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        $sheet->setTitle('Data Prestasi');
+
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $filename = 'Data Prestasi ' . date('Y-m-d H_i_s') . '.xlsx';
+
+        // Output file excel
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+        header('Cache-Control: max-age=1');
+        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+        header('Cache-Control: cache, must-revalidate');
+        header('Pragma: public');
+
+        $writer->save('php://output');
+        exit;
+    }
+
+    public function export_pdf()
+    {
+        $prestasi = PrestasiModel::with(['mahasiswa.user', 'bidang'])
+            ->orderBy('tahun', 'desc')
+            ->get();
+
+        $pdf = Pdf::loadView('prestasi.export_pdf', ['prestasi' => $prestasi]);
+        $pdf->setPaper('a4', 'landscape');
+        $pdf->setOption('isRemoteEnabled', true);
+        $pdf->render();
+
+        return $pdf->stream('Data Prestasi ' . date('Y-m-d H:i:s') . '.pdf');
     }
 }
