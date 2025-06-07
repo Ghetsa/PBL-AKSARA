@@ -1,10 +1,9 @@
-{{-- resources/views/user/edit_ajax.blade.php --}}
 <form id="formEditUser" class="form-horizontal" method="POST" action="{{ route('user.update_ajax', $user->user_id) }}">
     @csrf
-    @method('PUT') {{-- Penting untuk method update --}}
+    @method('PUT') 
 
     <div class="modal-header">
-        <h5 class="modal-title" id="myModalLabel">Edit User: {{ $user->nama }}</h5>
+        <h5 class="modal-title" id="myModalLabel"><i class="fas fa-user-edit me-2"></i>Edit User: {{ $user->nama }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
 
@@ -73,7 +72,6 @@
             </div>
         </div>
 
-        {{-- === Field Tambahan (sesuaikan ID dan value) === --}}
         {{-- NIP (Untuk Admin & Dosen) --}}
         <div id="form-edit-nip-modal" style="display: none;">
             <div class="form-group row mb-3">
@@ -147,7 +145,7 @@
                 <span class="invalid-feedback error-text" id="error-edit-status"></span>
             </div>
         </div>
-    </div> {{-- Akhir modal-body --}}
+    </div> 
 
     <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
@@ -162,9 +160,7 @@
         function toggleEditAdditionalForms() {
             const role = $('#edit_role_modal').val();
 
-            // $('#form-edit-nip-modal, #form-edit-keahlian-modal, #form-edit-nim-modal, #form-edit-prodi_id-modal, #form-edit-periode_id-modal, #form-edit-bidang_minat-modal, #form-edit-keahlian_mahasiswa-modal').hide();
             $('#form-edit-nip-modal, #form-edit-nim-modal, #form-edit-prodi_id-modal, #form-edit-periode_id-modal, #form-edit-bidang_minat-modal, #form-edit-keahlian_mahasiswa-modal').hide();
-            // $('#edit_nip, #edit_bidang_keahlian, #edit_nim, #edit_prodi_id, #edit_periode_id, #edit_bidang_minat, #edit_keahlian_mahasiswa')
             $('#edit_nip, #edit_nim, #edit_prodi_id, #edit_periode_id')
                 .prop('required', false)
                 .removeClass('is-invalid')
@@ -195,13 +191,26 @@
         formEditUser.validate({
             ignore: ":hidden",
             rules: {
-                nama: { required: true, minlength: 3 },
-                email: { required: true, email: true },
+                nama: { required: true, minlength: 3, maxlength:50 },
+                email: { required: true, email: true, maxlength:100 },
                 password: { minlength: 6 },
                 role: { required: true },
                 status: { required: true },
-                nip: { digits: true },
-                nim: { digits: true }
+                no_telepon: { required: true, digits: true, maxlength:15 },
+                alamat: { required: true, maxlength: 100 },
+                nip: { digits: true, maxlength: 10 },
+                nim: { digits: true, maxlength: 10 }
+            },
+            messages: {
+                nama: { required: "Nama tidak boleh kosong", minlength: "Nama minimal harus 3 karakter", maxlength: "Nama maksimal 50 karakter"},
+                email: { required: "Email tidak boleh kosong", email: "Format email tidak valid" },
+                password: { required: "Password tidak boleh kosong", minlength: "Password minimal harus 6 karakter", maxlength: "Password maksimal 100 karakter" },
+                role: "Silakan pilih role",
+                status: "Silakan pilih status",
+                no_telepon: { required: "Nomor telepon tidak boleh kosong", digits: "Nomor telepon hanya boleh berisi angka", maxlength: "Nomor telepon maksimal 15 karakter" },
+                alamat: { required: "Alamat tidak boleh kosong", maxlength: "Alamat maksimal 100 karakter" },
+                nip: { required: "NIP wajib diisi untuk role ini", digits: "NIP hanya boleh berisi angka", maxlength: "NIP maksimal 10 karakter" },
+                nim: { required: "NIM wajib diisi untuk role ini", digits: "NIM hanya boleh berisi angka", maxlength: "NIM maksimal 10 karakter" }
             },
             submitHandler: function (form, event) {
                 event.preventDefault();

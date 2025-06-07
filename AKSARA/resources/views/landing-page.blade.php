@@ -107,12 +107,12 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
+                    {{-- <li class="nav-item">
                         <a class="nav-link btn btn-primary ms-lg-3" href="#">Fitur</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link btn btn-primary ms-lg-3" href="#">Tentang</a>
-                    </li>
+                    </li> --}}
                     <li class="nav-item">
                         <a class="nav-link btn btn-primary ms-lg-3" href="{{ route('login') }}">Masuk</a>
                     </li>
