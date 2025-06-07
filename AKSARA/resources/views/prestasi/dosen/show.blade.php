@@ -7,7 +7,7 @@
     <input type="hidden" name="status_verifikasi" id="hidden_status_verifikasi" value="">
 
     <div class="modal-header">
-        <h5 class="modal-title">Mahasiswa Bimbingan: {{ Str::limit($prestasi->nama_prestasi, 50) }}</h5>
+        <h5 class="modal-title">Prestasi Mahasiswa: {{ Str::limit($prestasi->nama_prestasi, 50) }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
 
