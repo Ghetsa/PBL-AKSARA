@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Providers;
+use Illuminate\Support\Facades\View;
+use App\Http\View\Composers\NotificationComposer;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -11,7 +13,7 @@ use App\Observers\NotifikasiLombaObserver;
 use App\Observers\NotifikasiPrestasiObserver;
 use App\Observers\NotifikasiKeahlianObserver;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\View;
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -38,6 +40,7 @@ class AppServiceProvider extends ServiceProvider
             Log::info("SQL: {$query->sql}", $query->bindings);
         });
 
-        
+        View::composer('layouts.header', NotificationComposer::class);
+
     }
 }

@@ -201,7 +201,7 @@ Route::middleware(['auth'])->group(function () {
         });
 
         // ===================== NOTIFIAKSI =====================
-        Route::prefix('notifikasi')->name('notifikasi.')->group(function () {
+            Route::prefix('notifikasi')->name('mahasiswa.notifikasi.')->group(function () {
             Route::get('/', [NotifikasiController::class, 'index'])->name('index');
             Route::get('/{id}/show_and_read/{model}', [NotifikasiController::class, 'showAndRead'])->name('show_and_read');
             Route::post('/mark-all-as-read', [NotifikasiController::class, 'markAllAsRead'])->name('markAllAsRead');
