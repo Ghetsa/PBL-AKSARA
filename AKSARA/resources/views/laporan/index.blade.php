@@ -75,8 +75,11 @@
     <div class="card shadow mb-4">
         <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
             <h4 class="m-0 font-weight-bold text-primary">Laporan Data Prestasi Mahasiswa (Disetujui)</h4>
-            <a href="{{ route('admin.laporan.prestasi.export') }}" id="exportPrestasiBtn" class="btn btn-success shadow"><i class="fas fa-download fa-sm text-white-50"></i> Export Excel/PDF</a>
-        </div>
+            <div class="export">
+                <a href="{{ route('prestasi.export.excel') }}" class="btn btn-success shadow"><i class="ph-duotone ph-microsoft-excel-logo text-white-50"></i> Export Excel</a>
+                <a href="{{ route('prestasi.export.pdf') }}" class="btn btn-warning shadow"><i class="ph-duotone ph-file-pdf text-white-50"></i> Export PDF</a>
+            </div>
+            </div>
         <div class="card-body">
             <div class="row mb-3">
                 <div class="col-md-4">
