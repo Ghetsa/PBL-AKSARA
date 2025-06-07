@@ -1,3 +1,17 @@
+@push('styles')
+<style>
+    /* Style untuk notifikasi yang belum dibaca di dropdown */
+    .list-group-item.unread-dropdown {
+        background-color: #f0f3ff !important; /* Latar belakang biru sangat muda */
+    }
+
+    /* (Opsional) Style tambahan jika diperlukan */
+    .dropdown-notification .list-group-item .fw-bold {
+        color: #333; /* Membuat teks tebal lebih jelas */
+    }
+</style>
+@endpush
+
 <!-- [ Sidebar Menu ] end --> <!-- [ Header Topbar ] start -->
 <header class="pc-header">
   <div class="header-wrapper"> <!-- [Mobile Media Block] start -->
@@ -39,90 +53,94 @@
     <!-- [Mobile Media Block end] -->
     <div class="ms-auto">
       <ul class="list-unstyled">
-        <li class="dropdown pc-h-item">
-          <a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#" role="button"
-            aria-haspopup="false" aria-expanded="false">
-            <i class="ti ti-bell"></i>
-            <span class="badge bg-success pc-h-badge">3</span>
-          </a>
-          <div class="dropdown-menu dropdown-notification dropdown-menu-end pc-h-dropdown">
-            <div class="dropdown-header d-flex align-items-center justify-content-between">
-              <h5 class="m-0">Notification</h5>
-              <a href="#!" class="pc-head-link bg-transparent"><i class="ti ti-circle-check text-success"></i></a>
-            </div>
-            <div class="dropdown-divider"></div>
-            <div class="dropdown-header px-0 text-wrap header-notification-scroll position-relative"
-              style="max-height: calc(100vh - 215px)">
-              <div class="list-group list-group-flush w-100">
-                <a class="list-group-item list-group-item-action">
-                  <div class="d-flex">
-                    <div class="flex-shrink-0">
-                      <div class="user-avtar bg-light-success"><i class="ti ti-gift"></i></div>
-                    </div>
-                    <div class="flex-grow-1 ms-1">
-                      <span class="float-end text-muted">3:00 AM</span>
-                      <p class="text-body mb-1">It's <b>Cristina danny's</b> birthday today.</p>
-                      <span class="text-muted">2 min ago</span>
-                    </div>
-                  </div>
-                </a>
-                <a class="list-group-item list-group-item-action">
-                  <div class="d-flex">
-                    <div class="flex-shrink-0">
-                      <div class="user-avtar bg-light-primary"><i class="ti ti-message-circle"></i></div>
-                    </div>
-                    <div class="flex-grow-1 ms-1">
-                      <span class="float-end text-muted">6:00 PM</span>
-                      <p class="text-body mb-1"><b>Aida Burg</b> commented your post.</p>
-                      <span class="text-muted">5 August</span>
-                    </div>
-                  </div>
-                </a>
-                <a class="list-group-item list-group-item-action">
-                  <div class="d-flex">
-                    <div class="flex-shrink-0">
-                      <div class="user-avtar bg-light-danger"><i class="ti ti-settings"></i></div>
-                    </div>
-                    <div class="flex-grow-1 ms-1">
-                      <span class="float-end text-muted">2:45 PM</span>
-                      <p class="text-body mb-1">Your Profile is Complete &nbsp;<b>60%</b></p>
-                      <span class="text-muted">7 hours ago</span>
-                    </div>
-                  </div>
-                </a>
-                <a class="list-group-item list-group-item-action">
-                  <div class="d-flex">
-                    <div class="flex-shrink-0">
-                      <div class="user-avtar bg-light-primary"><i class="ti ti-headset"></i></div>
-                    </div>
-                    <div class="flex-grow-1 ms-1">
-                      <span class="float-end text-muted">9:10 PM</span>
-                      <p class="text-body mb-1"><b>Cristina Danny </b> invited to join <b> Meeting.</b></p>
-                      <span class="text-muted">Daily scrum meeting time</span>
-                    </div>
-                  </div>
-                </a>
-              </div>
-            </div>
-            <div class="dropdown-divider"></div>
-            <div class="text-center py-2">
-              @php
-                  $notificationRoute = '#'; // Fallback link jika role tidak dikenali
-                  $userRole = Auth::user()->role;
+<li class="dropdown pc-h-item">
+    <a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#" role="button"
+        aria-haspopup="false" aria-expanded="false">
+        <i class="ti ti-bell"></i>
+        @if(isset($unreadNotificationCount) && $unreadNotificationCount > 0)
+            <span class="badge bg-danger pc-h-badge">{{ $unreadNotificationCount }}</span>
+        @endif
+    </a>
+    <div class="dropdown-menu dropdown-notification dropdown-menu-end pc-h-dropdown">
+        <div class="dropdown-header d-flex align-items-center justify-content-between">
+            <h5 class="m-0">Notifikasi</h5>
+            @if(isset($unreadNotificationCount) && $unreadNotificationCount > 0)
+                {{-- Form untuk menandai semua sebagai terbaca --}}
+                <form action="{{ route(Auth::user()->role . '.notifikasi.markAllAsRead') }}" method="POST" id="mark-all-form" class="d-inline">
+                    @csrf
+                    <a href="#" onclick="event.preventDefault(); document.getElementById('mark-all-form').submit();" 
+                       class="pc-head-link bg-transparent" title="Tandai semua dibaca">
+                       <i class="ti ti-circle-check text-success"></i>
+                    </a>
+                </form>
+            @endif
+        </div>
+        <div class="dropdown-divider"></div>
 
-                  if ($userRole === 'admin') {
-                      $notificationRoute = route('admin.notifikasi.index');
-                  } elseif ($userRole === 'dosen') {
-                      // Kita akan buat route ini di langkah berikutnya
-                      $notificationRoute = route('dosen.notifikasi.index'); 
-                  } elseif ($userRole === 'mahasiswa') {
-                      $notificationRoute = route('notifikasi.index');
-                  }
-              @endphp
-              <a href="{{ $notificationRoute }}" class="link-primary">View all</a>
+        <div class="dropdown-header px-0 text-wrap header-notification-scroll position-relative" style="max-height: calc(100vh - 215px)">
+            <div class="list-group list-group-flush w-100">
+                
+                {{-- ======================================================= --}}
+                {{-- PERBAIKAN UTAMA ADA DI DALAM @forelse INI --}}
+                {{-- ======================================================= --}}
+                @forelse ($recentNotifications as $notif)
+    @php
+        // Menentukan route detail berdasarkan role (sekarang sudah konsisten)
+        $detailRoute = '#';
+        try {
+            $routeName = Auth::user()->role . '.notifikasi.show_and_read';
+            if (Route::has($routeName)) {
+                $detailRoute = route($routeName, ['id' => $notif->id, 'model' => $notif->type]);
+            }
+        } catch (\Exception $e) {
+            // Biarkan fallback ke '#' jika route tidak ditemukan
+        }
+    @endphp
+
+    <a href="{{ $detailRoute }}" 
+       class="list-group-item list-group-item-action @if($notif->status_baca == 'belum_dibaca') unread-dropdown @endif">
+        <div class="d-flex align-items-center">
+            <div class="flex-shrink-0">
+                
+                {{-- ======================================================= --}}
+                {{-- PERBAIKAN WARNA DAN SIMBOL IKON ADA DI SINI --}}
+                {{-- ======================================================= --}}
+                <div class="user-avtar @if($notif->status_baca == 'dibaca') bg-light-success @else bg-light-primary @endif">
+                    <i class="ti @if($notif->status_baca == 'dibaca') ti-circle-check @else ti-info-circle @endif"></i>
+                </div>
+                {{-- ======================================================= --}}
+
             </div>
-          </div>
-        </li>
+            <div class="flex-grow-1 ms-3">
+                <h6 class="mb-0 @if($notif->status_baca == 'belum_dibaca') fw-bold @endif">
+                    {{ $notif->judul }}
+                </h6>
+                <p class="text-muted mb-0" style="font-size: 0.85em;">{{ Str::limit($notif->isi, 40) }}</p>
+                <small class="text-muted">{{ optional($notif->created_at)->diffForHumans() }}</small>
+            </div>
+        </div>
+    </a>
+@empty
+    <div class="list-group-item">
+        <p class="text-center text-muted my-2">Tidak ada notifikasi baru.</p>
+    </div>
+@endforelse
+
+                {{-- ======================================================= --}}
+                {{-- AKHIR DARI PERBAIKAN --}}
+                {{-- ======================================================= --}}
+
+            </div>
+        </div>
+        <div class="dropdown-divider"></div>
+        <div class="text-center py-2">
+            @php
+                $roleBasedRoute = route(Auth::user()->role . '.notifikasi.index');
+            @endphp
+            <a href="{{ $roleBasedRoute }}" class="link-primary">Lihat Semua Notifikasi</a>
+        </div>
+    </div>
+</li>
         @php
       $user = Auth::user();
       $role = $user->role;

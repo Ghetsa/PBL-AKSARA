@@ -58,7 +58,7 @@ class UserController extends Controller
         return DataTables::of($users)
             ->addIndexColumn()
             ->addColumn('nama_dan_detail', function ($user) {
-                $avatar = '<img src="' . $user->foto_url . '" alt="' . e($user->nama) . '" class="img-thumbnail rounded-circle me-2" width="40" height="40" style="object-fit: cover; vertical-align: middle;">';
+                $avatar = '<img src="' . $user->foto_url . '" alt="' . e($user->nama) . '" class="img-thumbnail rounded-circle me-2" width="40" height="40" style="object-fit: cover; aspect-ratio: 1/1; vertical-align: middle;">';
                 $namaText = e($user->nama);
                 $detailText = '';
 
@@ -161,7 +161,6 @@ class UserController extends Controller
             DosenModel::create([
                 'user_id' => $user->user_id,
                 'nip' => $request->nip,
-                // 'bidang_keahlian' => $request->bidang_keahlian
             ]);
         } elseif ($validated['role'] == 'mahasiswa') {
             MahasiswaModel::create([
@@ -242,7 +241,6 @@ class UserController extends Controller
                 ['user_id' => $user->user_id],
                 [
                     'nip' => $request->nip,
-                    // 'bidang_keahlian' => $request->bidang_keahlian
                 ]
             );
         } elseif ($validated['role'] == 'mahasiswa') {
@@ -372,26 +370,6 @@ class UserController extends Controller
 
         return view('user.edit_ajax', compact('user', 'roles', 'prodi', 'periode'));
     }
-
-    // public function edit_ajax($user_id)
-    // {
-    //     $user = UserModel::with(['admin', 'dosen', 'mahasiswa.prodi', 'mahasiswa.periode'])
-    //         ->find($user_id);
-
-    //     if (!$user) {
-    //         if (request()->ajax() || request()->wantsJson()) {
-    //             return response()->json(['status' => false, 'message' => 'User tidak ditemukan.'], 404);
-    //         }
-    //         return abort(404, 'User tidak ditemukan.');
-    //     }
-
-    //     $roles = ['admin', 'dosen', 'mahasiswa'];
-    //     $keahlian = KeahlianModel::all();
-    //     $prodi = ProdiModel::select('prodi_id', 'kode', 'nama')->get();
-    //     $periode = PeriodeModel::select('periode_id', 'semester', 'tahun_akademik')->get();
-
-    //     return view('user.edit_ajax', compact('user', 'roles', 'prodi', 'periode', 'keahlian'));
-    // }
 
     public function update_ajax(Request $request, $user_id)
     {

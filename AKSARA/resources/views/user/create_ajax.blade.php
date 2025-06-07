@@ -63,7 +63,7 @@
             </div>
         </div>
 
-        {{-- Field tambahan (pastikan ID wrapper dan field name/ID unik) --}}
+        {{-- Field tambahan --}}
         <div id="form-nip-modal" style="display: none;">
             <div class="form-group row mb-3">
                 <label for="nip" class="col-sm-2 col-form-label">NIP</label>
@@ -129,7 +129,7 @@
             </div>
         </div>
 
-    </div> {{-- Akhir dari modal-body --}}
+    </div> 
 
     <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
@@ -153,7 +153,7 @@
             const formProdi_id = $('#form-prodi_id-modal');
             const formPeriode = $('#form-periode_id-modal');
 
-            // Sembunyikan semua field tambahan dulu
+            // Sembunyikan semua field tambahan terlebih dahulu
             formNip.hide();
             formNim.hide();
             formProdi_id.hide();
@@ -182,7 +182,6 @@
                 $('#periode_id').prop('required', true);
             }
 
-            // Setelah mengubah required, perbarui aturan validasi jQuery Validate jika perlu
             // Pastikan ignore hidden fields diaktifkan
             formCreate.validate().settings.ignore = ":hidden";
             // Pemicu validasi untuk field yang mungkin berubah required-nya
@@ -197,28 +196,31 @@
         $('#role_modal').on('change', toggleAdditionalFormsModal);
 
         // Inisialisasi jQuery Validation untuk FORM DI DALAM MODAL
-        // Pastikan ignore hidden fields diaktifkan saat inisialisasi
         formCreate.validate({
             ignore: ":hidden", // Abaikan field yang disembunyikan
             rules: {
-                nama: { required: true, minlength: 3 },
+                nama: { required: true, minlength: 3, maxlength:50 },
                 email: { required: true, email: true },
-                password: { required: true, minlength: 6 },
+                password: { required: true, minlength: 6, maxlength: 100 },
                 role: { required: true },
                 status: { required: true },
-                nip: { digits: true }, // required diatur dinamis
-                nim: { digits: true }, // required diatur dinamis
+                no_telepon: { required: true, digits: true, maxlength:15 },
+                alamat: {required: true, maxlength: 100},
+                nip: { digits: true, maxlength: 10}, // required diatur dinamis
+                nim: { digits: true, maxlength: 10}, // required diatur dinamis
                 prodi_id: {}, // required diatur dinamis
                 periode_id: {}, // required diatur dinamis
             },
             messages: {
-                nama: { required: "Nama tidak boleh kosong", minlength: "Nama minimal harus 3 karakter" },
+                nama: { required: "Nama tidak boleh kosong", minlength: "Nama minimal harus 3 karakter", maxlength: "Nama maksimal 50 karakter"},
                 email: { required: "Email tidak boleh kosong", email: "Format email tidak valid" },
-                password: { required: "Password tidak boleh kosong", minlength: "Password minimal harus 6 karakter" },
+                password: { required: "Password tidak boleh kosong", minlength: "Password minimal harus 6 karakter", maxlength: "Password maksimal 100 karakter" },
                 role: "Silakan pilih role",
                 status: "Silakan pilih status",
-                nip: { required: "NIP wajib diisi untuk role ini", digits: "NIP hanya boleh berisi angka" },
-                nim: { required: "NIM wajib diisi untuk role ini", digits: "NIM hanya boleh berisi angka" },
+                no_telepon: { required: "Nomor telepon tidak boleh kosong", digits: "Nomor telepon hanya boleh berisi angka", maxlength: "Nomor telepon maksimal 15 karakter" },
+                alamat: { required: "Alamat tidak boleh kosong", maxlength: "Alamat maksimal 100 karakter" },
+                nip: { required: "NIP wajib diisi untuk role ini", digits: "NIP hanya boleh berisi angka", maxlength: "NIP maksimal 10 karakter" },
+                nim: { required: "NIM wajib diisi untuk role ini", digits: "NIM hanya boleh berisi angka", maxlength: "NIM maksimal 10 karakter" },
                 prodi_id: { required: "Prodi wajib diisi untuk Mahasiswa" },
                 periode_id: { required: "Periode wajib diisi untuk Mahasiswa" },
             },
@@ -238,49 +240,48 @@
                         $(form).find('button[type="submit"]').prop('disabled', true).text('Menyimpan...');
                     },
                     success: function (response) {
-    // Cek apakah status = true dari backend
-    if (response.status === true) {
-        $("#myModal").modal('hide');
+                        // Cek apakah status = true dari backend
+                        if (response.status === true) {
+                            $("#myModal").modal('hide');
 
-        Swal.fire({
-            icon: 'success',
-            title: 'Berhasil!',
-            text: response.message,
-        });
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil!',
+                                text: response.message,
+                            });
 
-        if (typeof dataUser !== 'undefined' && dataUser.ajax) {
-            dataUser.ajax.reload();
-        } else {
-            window.location.reload();
-        }
+                            if (typeof dataUser !== 'undefined' && dataUser.ajax) {
+                                dataUser.ajax.reload();
+                            } else {
+                                window.location.reload();
+                            }
 
-        form.reset();
-        formCreate.validate().resetForm();
-        formCreate.find('.is-invalid, .is-valid').removeClass('is-invalid is-valid');
-        toggleAdditionalFormsModal();
-    } else {
-        // Jika status false, anggap validasi gagal → tampilkan pesan error
-        if (typeof Swal !== 'undefined') {
-            Swal.fire({
-                icon: 'error',
-                title: 'Validasi Gagal',
-                text: response.message || 'Silakan periksa input Anda.',
-            });
-        }
+                            form.reset();
+                            formCreate.validate().resetForm();
+                            formCreate.find('.is-invalid, .is-valid').removeClass('is-invalid is-valid');
+                            toggleAdditionalFormsModal();
+                        } else {
+                            // Jika status false, anggap validasi gagal → tampilkan pesan error
+                            if (typeof Swal !== 'undefined') {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Validasi Gagal',
+                                    text: response.message || 'Silakan periksa input Anda.',
+                                });
+                            }
 
-        // Jika ada errors di response, tampilkan di field terkait
-        if (response.errors) {
-            $.each(response.errors, function (key, value) {
-                $('#error-' + key).text(value[0]).show();
-                $('#' + key).addClass('is-invalid');
-            });
-        }
-    }
+                            // Jika ada errors di response, tampilkan di field terkait
+                            if (response.errors) {
+                                $.each(response.errors, function (key, value) {
+                                    $('#error-' + key).text(value[0]).show();
+                                    $('#' + key).addClass('is-invalid');
+                                });
+                            }
+                        }
 
-    // Aktifkan kembali tombol submit
-    $(form).find('button[type="submit"]').prop('disabled', false).text('Simpan');
-}
-,
+                        // Aktifkan kembali tombol submit
+                        $(form).find('button[type="submit"]').prop('disabled', false).text('Simpan');
+                    },
                     error: function (xhr, status, error) {
                         // Aktifkan kembali tombol submit
                         $(form).find('button[type="submit"]').prop('disabled', false).text('Simpan');
@@ -324,7 +325,6 @@
                                 console.warn("General message alongside validation errors:", xhr.responseJSON.message);
                                 // Opsional: tampilkan pesan umum di atas form atau di SweetAlert terpisah
                             }
-                            // Biarkan pesan validasi di field terlihat oleh user
                         }
                     }
                 });
@@ -362,5 +362,5 @@
             }
         });
         toggleAdditionalFormsModal();
-    }); // End document ready
+    }); 
 </script>
