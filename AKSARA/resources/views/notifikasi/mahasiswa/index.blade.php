@@ -65,13 +65,13 @@
             {{-- Navigasi Filter --}}
             <ul class="nav nav-tabs">
                 <li class="nav-item">
-                    <a class="nav-link @if($filter === 'semua') active @endif" href="{{ route('notifikasi.index', ['filter' => 'semua']) }}">Semua</a>
+                    <a class="nav-link @if($filter === 'semua') active @endif" href="{{ route('mahasiswa.notifikasi.index', ['filter' => 'semua']) }}">Semua</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link @if($filter === 'belum_dibaca') active @endif" href="{{ route('notifikasi.index', ['filter' => 'belum_dibaca']) }}">Belum Dibaca</a>
+                    <a class="nav-link @if($filter === 'belum_dibaca') active @endif" href="{{ route('mahasiswa.notifikasi.index', ['filter' => 'belum_dibaca']) }}">Belum Dibaca</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link @if($filter === 'sudah_dibaca') active @endif" href="{{ route('notifikasi.index', ['filter' => 'sudah_dibaca']) }}">Sudah Dibaca</a>
+                    <a class="nav-link @if($filter === 'sudah_dibaca') active @endif" href="{{ route('mahasiswa.notifikasi.index', ['filter' => 'sudah_dibaca']) }}">Sudah Dibaca</a>
                 </li>
             </ul>
         </div>
@@ -105,13 +105,13 @@
                                 </small>
                             </div>
                             <div class="actions d-flex">
-                                <a href="{{ route('notifikasi.show_and_read', ['id' => $notif->id, 'model' => $notif->type]) }}" class="btn btn-sm btn-outline-primary">Detail</a>
+                                <a href="{{ route('mahasiswa.notifikasi.show_and_read', ['id' => $notif->id, 'model' => $notif->type]) }}" class="btn btn-sm btn-outline-primary">Detail</a>
                                 
                                 @if($notif->status_baca == 'belum_dibaca')
-                                <a href="{{ route('notifikasi.show_and_read', ['id' => $notif->id, 'model' => $notif->type]) }}" class="btn btn-sm btn-outline-success" title="Tandai Dibaca">Tandai Dibaca</a>
+                                <a href="{{ route('mahasiswa.notifikasi.show_and_read', ['id' => $notif->id, 'model' => $notif->type]) }}" class="btn btn-sm btn-outline-success" title="Tandai Dibaca">Tandai Dibaca</a>
                                 @endif
                                 
-                                <form action="{{ route('notifikasi.destroy', ['id' => $notif->id, 'model' => $notif->type]) }}" method="POST" class="form-hapus">
+                                <form action="{{ route('mahasiswa.notifikasi.destroy', ['id' => $notif->id, 'model' => $notif->type]) }}" method="POST" class="form-hapus">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>
