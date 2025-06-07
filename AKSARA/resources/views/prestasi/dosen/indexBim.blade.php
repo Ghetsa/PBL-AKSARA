@@ -7,7 +7,7 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Daftar Prestasi Mahasiswa</h3>
+                        <h3 class="card-title">Daftar Pengajuan Prestasi Mahasiswa</h3>
                     </div>
                     <div class="card-body">
                         {{-- Flash messages akan ditampilkan oleh SweetAlert --}}
@@ -17,7 +17,7 @@
                                     name="search_nama" placeholder="Cari Nama Prestasi/Mahasiswa/NIM..."
                                     value="{{ request('search_nama') }}">
                             </div>
-                            {{-- <div class="col-md-3">
+                            <div class="col-md-3">
                                 <select class="form-select form-select-sm" id="filter_status_dosen" name="filter_status">
                                     <option value="">-- Semua Status --</option>
                                     <option value="pending" {{ request('filter_status') == 'pending' ? 'selected' : '' }}>
@@ -34,7 +34,7 @@
                             <div class="col-md-2">
                                 <a href="{{ route('prestasi.dosen.index') }}"
                                     class="btn btn-secondary btn-sm w-100">Reset</a>
-                            </div> --}}
+                            </div>
                         </form>
 
                         <div class="table-responsive">
@@ -45,10 +45,12 @@
                                         <th class="text-center">No.</th>
                                         <th>Nama Mahasiswa</th>
                                         <th>NIM</th>
-                                        <th>Prestasi</th>
+                                        <th>Nama Prestasi</th>
                                         <th>Kategori</th>
                                         <th>Tingkat</th>
                                         <th>Tahun</th>
+                                        <th>Dosen Pembimbing</th>
+                                        <th class="text-center">Status</th>
                                         <th class="text-center">Aksi</th>
                                     </tr>
                                 </thead>
@@ -107,7 +109,7 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: "{{ route('prestasi.dosen.list') }}",
+                    url: "{{ route('bimbingan.list') }}",
                     data: function(d) { // Mengirim data filter
                         d.search_nama = $('#search_nama_dosen').val();
                         d.filter_status = $('#filter_status_dosen').val();
@@ -143,6 +145,15 @@
                     {
                         data: 'tahun',
                         name: 'tahun'
+                    },
+                    {
+                        data: 'dosen',
+                        name: 'dosen'
+                    },
+                    {
+                        data: 'status_verifikasi',
+                        name: 'status_verifikasi',
+                        className: 'text-center'
                     },
                     {
                         data: 'aksi',
