@@ -51,7 +51,7 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h4 class="mb-0">Notifikasi Anda</h4>
         @if ($unreadCount > 0)
-            <form action="{{ route('notifikasi.markAllAsRead') }}" method="POST" onsubmit="return confirm('Anda yakin ingin menandai semua notifikasi sebagai telah dibaca?');">
+            <form action="{{ route('mahasiswa.notifikasi.markAllAsRead') }}" method="POST" onsubmit="return confirm('Anda yakin ingin menandai semua notifikasi sebagai telah dibaca?');">
                 @csrf
                 <button type="submit" class="btn btn-outline-success btn-sm">
                     <i class='bx bx-check-double'></i> Tandai Semua Dibaca
@@ -86,7 +86,7 @@
 
             @if($allNotifications->isEmpty())
                 <div class="alert alert-info text-center mt-3">
-                    Tidak ada notifikasi untuk ditampilkan pada kategori ini.
+                    Tidak ada notifikasi.
                 </div>
             @else
                 <div class="mt-3">
