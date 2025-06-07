@@ -12,11 +12,36 @@
         <div class="card-body">
             <p>{{ $notif->isi }}</p>
         </div>
-        <div class="card-footer">
-            {{-- PERUBAHAN: Mengarahkan kembali ke route notifikasi admin --}}
+        <div class="card-footer d-flex justify-content-between">
             <a href="{{ route('admin.notifikasi.index') }}" class="btn btn-secondary">
-                <i class="bx bx-arrow-back"></i> Kembali ke Daftar Notifikasi
+                <i class="bx bx-arrow-back"></i> Kembali
             </a>
+
+            {{-- ============================================= --}}
+            {{-- TAMBAHAN: Tombol Cek Verifikasi untuk Admin --}}
+            {{-- ============================================= --}}
+            @php
+                $verifikasiRoute = null;
+                // Tentukan route tujuan berdasarkan tipe notifikasi
+                switch ($notif->type) {
+                    case 'lomba':
+                        $verifikasiRoute = route('admin.lomba.verifikasi.index');
+                        break;
+                    case 'prestasi':
+                        $verifikasiRoute = route('prestasi.admin.index');
+                        break;
+                    case 'keahlian':
+                        $verifikasiRoute = route('keahlian_user.admin.index');
+                        break;
+                }
+            @endphp
+
+            {{-- Tampilkan tombol hanya jika notifikasi adalah tentang pengajuan baru --}}
+            @if (Str::contains($notif->judul, 'Baru') && $verifikasiRoute)
+                <a href="{{ $verifikasiRoute }}" class="btn btn-primary">
+                    <i class="bx bx-shield-quarter"></i> Cek Halaman Verifikasi
+                </a>
+            @endif
         </div>
     </div>
 </div>

@@ -12,10 +12,44 @@
         <div class="card-body">
             <p>{{ $notif->isi }}</p>
         </div>
-        <div class="card-footer">
-            <a href="{{ route('notifikasi.index') }}" class="btn btn-secondary">
-                <i class="bx bx-arrow-back"></i> Kembali ke Daftar Notifikasi
+        <div class="card-footer d-flex justify-content-between">
+            <a href="{{ route('mahasiswa.notifikasi.index') }}" class="btn btn-secondary">
+                <i class="bx bx-arrow-back"></i> Kembali
             </a>
+
+            {{-- ================================================= --}}
+            {{-- TAMBAHAN: Tombol Lihat Pengajuan untuk Mahasiswa --}}
+            {{-- ================================================= --}}
+            @php
+                $detailRoute = null;
+                $detailParams = [];
+                // Tentukan route tujuan berdasarkan tipe notifikasi
+                switch ($notif->type) {
+                    case 'lomba':
+                        $detailRoute = 'lomba.mhs.show_form';
+                        $detailParams = ['id' => $notif->lomba->lomba_id]; // Mengambil ID dari relasi
+                        break;
+                    case 'prestasi':
+                        // Asumsi Anda punya route untuk detail prestasi mahasiswa
+                        // Jika tidak ada, bisa diarahkan ke halaman list
+                        if (Route::has('prestasi.mahasiswa.show_ajax')) {
+                             // Anda bisa membuat logic untuk membuka modal dari sini jika mau
+                        }
+                        break;
+                    case 'keahlian':
+                        // Asumsi Anda punya route untuk detail keahlian
+                        if (Route::has('keahlian_user.show_ajax')) {
+                            // Anda bisa membuat logic untuk membuka modal dari sini jika mau
+                        }
+                        break;
+                }
+            @endphp
+
+            @if ($detailRoute && !empty($detailParams))
+                <a href="{{ route($detailRoute, $detailParams) }}" class="btn btn-info">
+                    <i class="bx bx-file"></i> Lihat Detail Pengajuan
+                </a>
+            @endif
         </div>
     </div>
 </div>

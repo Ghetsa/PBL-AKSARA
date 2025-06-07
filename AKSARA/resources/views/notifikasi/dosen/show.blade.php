@@ -12,11 +12,19 @@
         <div class="card-body">
             <p>{{ $notif->isi }}</p>
         </div>
-        <div class="card-footer">
-            {{-- Mengarahkan kembali ke route notifikasi dosen --}}
+        <div class="card-footer d-flex justify-content-between">
             <a href="{{ route('dosen.notifikasi.index') }}" class="btn btn-secondary">
-                <i class="bx bx-arrow-back"></i> Kembali ke Daftar Notifikasi
+                <i class="bx bx-arrow-back"></i> Kembali
             </a>
+
+            {{-- ============================================= --}}
+            {{-- TAMBAHAN: Tombol Cek Bimbingan untuk Dosen --}}
+            {{-- ============================================= --}}
+            @if ($notif->type === 'prestasi' && Str::contains($notif->judul, 'Bimbingan'))
+                <a href="{{ route('bimbingan.index') }}" class="btn btn-info">
+                    <i class="bx bx-user-check"></i> Lihat Daftar Bimbingan
+                </a>
+            @endif
         </div>
     </div>
 </div>
