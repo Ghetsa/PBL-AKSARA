@@ -16,48 +16,32 @@
                 </div>
             @endif
 
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h3 class="card-title">Data Periode Semester</h3>
-                    <div class="card-tools">
+            <div class="card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
+                    <h3 class="card-title mb-0">Data Periode Semester</h3>
+                    <div class="card-tools d-flex flex-wrap gap-1 mt-2 mt-md-0">
                         {{-- <a href="{{ route('periode.create') }}" class="btn btn-success btn-sm">Tambah</a> --}}
                         <a href="{{ route('periode.export.pdf') }}" class="btn btn-sm btn-warning"><i class="fa fa-file-pdf"></i> Export Periode (PDF)</a>
                         <a href="{{ route('periode.export.excel') }}" class="btn btn-sm btn-success"><i class="fa fa-file-excel"></i> Export Periode</a>
-                        <button type="button" class="btn btn-primary btn-sm"
-                                onclick="modalAction('{{ route('periode.create') }}')">
-                                <i class="fas fa-plus-circle"></i> Tambah</button>
+                        <button type="button" class="btn btn-primary btn-sm" onclick="modalAction('{{ route('periode.create') }}')"><i class="fas fa-plus-circle"></i> Tambah</button>
                     </div>
                 </div>
 
                 <div class="card-body">
-                    {{-- <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group row">
-                                <label class="col-1 control-label col-form-label">Filter Status:</label>
-                                <div class="col-3">
-                                    <select class="form-control" id="status" name="status" required>
-                                        <option value="">- Semua -</option>
-                                        <option value="aktif">Aktif</option>
-                                        <option value="nonaktif">Nonaktif</option>
-                                    </select>
-                                    <small class="form-text text-muted">Status Pengguna</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>     --}}
-                    <table class="table table-bordered table-hover" id="table_periode">
-                        <thead>
-                            <tr>
-                                <th class="text-center">ID</th>
-                                <th class="text-center">Semester</th>
-                                <th class="text-center">Tahun Akademik</th>
-                                <th class="text-center">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {{-- DataTables akan mengisi tbody --}}
-                        </tbody>
-                    </table>
+                    <div class="dt-responsive table-responsive">
+                        <table class="table table-bordered table-hover dt-responsive nowrap" id="table_periode" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>No.</th>
+                                    <th>Semester</th>
+                                    <th>Tahun Akademik</th>
+                                    <th style="width:15%;">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -119,6 +103,8 @@
             // Inisialisasi DataTables
             dataPeriode = $('#table_periode').DataTable({
                 serverSide: true, // Menggunakan server-side processing
+                processing: true,
+                responsive: true,
                 ajax: {
                     "url": "{{ url('periode/list') }}", // URL untuk mengambil data
                     "dataType": "json",
@@ -133,19 +119,16 @@
                     },
                     {
                         data: "semester",
-                        className: "text-center",
                         orderable: true,
                         searchable: true
                     },
                     {
                         data: "tahun_akademik",
-                        className: "text-center",
                         orderable: true,
                         searchable: true
                     },
                     {
                         data: "aksi", // Kolom aksi berisi tombol-tombol
-                        className: "text-center",
                         orderable: false,
                         searchable: false
                     }

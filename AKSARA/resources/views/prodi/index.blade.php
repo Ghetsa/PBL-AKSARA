@@ -16,42 +16,24 @@
                 </div>
             @endif
 
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h3 class="card-title">Data Program Studi</h3>
-                    <div class="card-tools">
-                        {{-- <a href="{{ route('prodi.create') }}" class="btn btn-success btn-sm">Tambah</a> --}}
+            <div class="card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
+                    <h3 class="card-title mb-0">Data Program Studi</h3>
+                    <div class="card-tools d-flex flex-wrap gap-1 mt-2 mt-md-0">
                         <a href="{{ route('prodi.export.pdf') }}" class="btn btn-sm btn-warning"><i class="fa fa-file-pdf"></i> Export Prodi (PDF)</a>
                         <a href="{{ route('prodi.export.excel') }}" class="btn btn-sm btn-success"><i class="fa fa-file-excel"></i> Export Prodi</a>
-                        <button type="button" class="btn btn-primary btn-sm"
-                                onclick="modalAction('{{ route('prodi.create') }}')">
-                                <i class="fas fa-plus-circle"></i> Tambah</button>
+                        <button type="button" class="btn btn-primary btn-sm" onclick="modalAction('{{ route('prodi.create') }}')"><i class="fas fa-plus-circle"></i> Tambah</button>
                     </div>
                 </div>
 
                 <div class="card-body">
-                    {{-- <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group row">
-                                <label class="col-1 control-label col-form-label">Filter Status:</label>
-                                <div class="col-3">
-                                    <select class="form-control" id="status" name="status" required>
-                                        <option value="">- Semua -</option>
-                                        <option value="aktif">Aktif</option>
-                                        <option value="nonaktif">Nonaktif</option>
-                                    </select>
-                                    <small class="form-text text-muted">Status Pengguna</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>     --}}
-                    <table class="table table-bordered table-hover" id="table_prodi">
+                    <table class="table table-bordered table-hover dt-responsive nowrap" id="table_prodi" style="width:100%">
                         <thead>
                             <tr>
-                                <th class="text-center">ID</th>
-                                <th class="text-center">Kode Prodi</th>
-                                <th class="text-center">Nama Prodi</th>
-                                <th class="text-center">Aksi</th>
+                                <th style="width:10%;">No.</th>
+                                <th>Kode Prodi</th>
+                                <th>Nama Prodi</th>
+                                <th style="width:15%;">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -119,6 +101,8 @@
             // Inisialisasi DataTables
             dataProdi = $('#table_prodi').DataTable({
                 serverSide: true, // Menggunakan server-side processing
+                processing: true,
+                responsive: true,
                 ajax: {
                     "url": "{{ url('prodi/list') }}", // URL untuk mengambil data
                     "dataType": "json",
@@ -145,7 +129,7 @@
                     },
                     {
                         data: "aksi", // Kolom aksi berisi tombol-tombol
-                        className: "text-center",
+                        className: "",
                         orderable: false,
                         searchable: false
                     }

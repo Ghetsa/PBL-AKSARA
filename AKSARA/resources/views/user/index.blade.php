@@ -18,17 +18,15 @@
             @endif
 
             <div class="card shadow-sm">
-                <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
                     <h3 class="card-title mb-0">Data User</h3>
-                    <div class="card-tools">
+                    <div class="card-tools d-flex flex-wrap gap-1 mt-2 mt-md-0">
                         {{-- <a href="{{ route('user.create') }}" class="btn btn-success btn-sm"><i class="fas fa-plus"></i>
                             Tambah (Non-AJAX)</a> --}}
-                                        <button type="button" class="btn btn-info btn-sm" onclick="modalAction('{{ route('user.import') }}')"> <i class="fas fa-file-excel"></i> Impor User</button>
-                                <a href="{{ route('user.export.pdf') }}" class="btn btn-sm btn-warning"><i class="fa fa-file-pdf"></i> Export User (PDF)</a>
-                                <a href="{{ route('user.export.excel') }}" class="btn btn-sm btn-success"><i class="fa fa-file-excel"></i> Export User</a>
-                        <button type="button" class="btn btn-primary btn-sm"
-                            onclick="modalAction('{{ route('user.create_ajax') }}')">
-                            <i class="fas fa-plus-circle"></i> Tambah User</button> 
+                        <button type="button" class="btn btn-info btn-sm" onclick="modalAction('{{ route('user.import') }}')"> <i class="fas fa-file-excel"></i> Impor User</button>
+                        <a href="{{ route('user.export.pdf') }}" class="btn btn-sm btn-warning"><i class="fa fa-file-pdf"></i> Export User (PDF)</a>
+                        <a href="{{ route('user.export.excel') }}" class="btn btn-sm btn-success"><i class="fa fa-file-excel"></i> Export User</a>
+                        <button type="button" class="btn btn-primary btn-sm" onclick="modalAction('{{ route('user.create_ajax') }}')"><i class="fas fa-plus-circle"></i> Tambah User</button> 
                     </div>
                 </div>
 
@@ -53,7 +51,7 @@
                         </div>
                     </div>
 
-                    <table class="table table-bordered table-hover dt-responsive nowrap" id="table_user" style="width:100%">
+                    <table class="table table-bordered table-hover dt-responsive wrap" id="table_user" style="width:100%">
                         <thead>
                             <tr>
                                 <th class="text-center" style="width:5%;">No.</th>
@@ -63,9 +61,9 @@
                                 <th>No. Telepon</th>
                                 {{-- Kolom alamat bisa ditambahkan jika diperlukan, atau tampilkan di detail --}}
                                 {{-- <th>Alamat</th> --}}
-                                <th class="text-center">Role</th>
-                                <th class="text-center">Status</th>
-                                <th class="text-center" style="width:15%;">Aksi</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th style="width:15%;">Aksi</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -142,9 +140,9 @@
                     { data: "email", name: "email", orderable: true, searchable: true },
                     { data: "no_telepon", name: "no_telepon", orderable: false, searchable: true },
                     // { data: "alamat", name: "alamat", orderable: false, searchable: true }, // Uncomment jika ingin menampilkan alamat
-                    { data: "role", name: "role", className: "text-center", orderable: true, searchable: true },
-                    { data: "status", name: "status", className: "text-center", orderable: true, searchable: true },
-                    { data: "aksi", className: "text-center", orderable: false, searchable: false }
+                    { data: "role", name: "role", orderable: true, searchable: true },
+                    { data: "status", name: "status", orderable: true, searchable: true },
+                    { data: "aksi", orderable: false, searchable: false }
                 ]
             });
 

@@ -35,11 +35,6 @@ class PeriodeController extends Controller
         $periodes = PeriodeModel
             ::select('periode_id', 'semester', 'tahun_akademik');
 
-        // Filter data periode berdasarkan role
-        // if ($request->role) {
-        //     $periodes->where('role', $request->role);
-        // }
-
         return DataTables::of($periodes)
             // menambahkan kolom index / no urut (default nama kolom: DT_Rowindex)
             ->addIndexColumn()
@@ -51,9 +46,9 @@ class PeriodeController extends Controller
                 //     . csrf_field() . method_field('DELETE') .
                 //     '<button type="submit" class="btn btn-danger btn-sm" onclick="return confirm(\'Apakah Anda yakin menghapus data ini?\');">Hapus</button></form>';
                 // Tombol Hapus tetap menggunakan deleteConfirmAjax yang sudah memanggil modalAction
-                $btn = '<button onclick="modalAction(\'' . e(route('periode.show', $periode->periode_id)) . '\')" class="btn btn-info btn-sm"><i class="fas fa-eye"></i> Detail</button> ';
-                $btn .= '<button onclick="modalAction(\'' . e(route('periode.edit', $periode->periode_id)) . '\')" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> Edit</button> ';
-                $btn .= '<button onclick="deleteConfirmAjax(' . e($periode->periode_id) . ')" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> Hapus</button>';
+                $btn = '<button onclick="modalAction(\'' . e(route('periode.show', $periode->periode_id)) . '\')" class="btn btn-info btn-sm"><i class="fas fa-eye"></i></button> ';
+                $btn .= '<button onclick="modalAction(\'' . e(route('periode.edit', $periode->periode_id)) . '\')" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></button> ';
+                $btn .= '<button onclick="deleteConfirmAjax(' . e($periode->periode_id) . ')" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>';
                 return $btn;
             })
             ->rawColumns(['aksi']) // memberitahu bahwa kolom aksi adalah html
@@ -75,7 +70,7 @@ class PeriodeController extends Controller
 
             if ($validator->fails()) {
                 return response()->json([
-                    '' => false,
+                    'status' => false,
                     'message' => 'Validasi gagal.',
                     'msgField' => $validator->errors()
                 ]);
@@ -88,7 +83,7 @@ class PeriodeController extends Controller
                 ]);
 
             return response()->json([
-                '' => true,
+                'status' => true,
                 'message' => 'Data periode semester berhasil ditambahkan'
             ]);
         }
@@ -124,19 +119,19 @@ class PeriodeController extends Controller
 
         if (!$periode) {
             return response()->json([
-                '' => false,
+                'status' => false,
                 'message' => 'Data periode semester tidak ditemukan.'
             ], 404);
         }
 
         $validator = Validator::make($request->all(), [
-            'semester' => 'required|string|max:50',
-            'tahun_akademik' => 'required|string|max:50'
+            'semester' => 'required|string|max:10',
+            'tahun_akademik' => 'required|string|max:10'
         ]);
 
         if ($validator->fails()) {
             return response()->json([
-                '' => false,
+                'status' => false,
                 'message' => 'Validasi gagal.',
                 'errors' => $validator->errors()
             ], 422);
@@ -148,7 +143,7 @@ class PeriodeController extends Controller
             $periode->save();
 
             return response()->json([
-                '' => true,
+                'status' => true,
                 'message' => 'Data periode semester berhasil diperbarui',
                 'data' => $periode // Opsional: kirim data yang diupdate
             ], 200); //  200 untuk OK
@@ -156,7 +151,7 @@ class PeriodeController extends Controller
         } catch (Exception $e) {
             Log::error("Error updating periode ID {$periode_id}: " . $e->getMessage());
             return response()->json([
-                '' => false,
+                'status' => false,
                 'message' => 'Gagal memperbarui data periode semester. Terjadi kesalahan server.'
             ], 500);
         }
@@ -196,18 +191,18 @@ class PeriodeController extends Controller
                     $periode->delete(); // Hapus data periode 
 
                     return response()->json([
-                        '' => true,
+                        'status' => true,
                         'message' => 'Data berhasil dihapus'
                     ]);
                 } catch (\Exception $e) {
                     return response()->json([
-                        '' => false,
+                        'status' => false,
                         'message' => 'Gagal menghapus data: ' . $e->getMessage()
                     ], 500);
                 }
             } else {
                 return response()->json([
-                    '' => false,
+                    'status' => false,
                     'message' => 'Data tidak ditemukan'
                 ], 404); // Kembalikan 404 jika periode tidak ditemukan
             }

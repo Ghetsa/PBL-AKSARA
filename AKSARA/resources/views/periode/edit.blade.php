@@ -4,7 +4,7 @@
     @method('PUT') 
 
     <div class="modal-header">
-        <h5 class="modal-title" id="myModalLabel">Edit Periode Semester</h5>
+        <h5 class="modal-title" id="myModalLabel"><i class="ti ti-edit-circle me-2"></i>Edit Periode Semester</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
 
@@ -40,17 +40,19 @@ $(document).ready(function () {
 
     formEdit.validate({
         rules: {
-            semester: { required: true, minlength: 3 }, // Sesuaikan dengan validasi controller
-            tahun_akademik: { required: true, minlength: 5 }  // Sesuaikan dengan validasi controller
+            semester: { required: true, minlength: 5, maxlength: 10 }, // Sesuaikan dengan validasi controller
+            tahun_akademik: { required: true, minlength: 4, maxlength: 10 }  // Sesuaikan dengan validasi controller
         },
         messages: {
             semester: {
-                required: "Semester program studi tidak boleh kosong",
-                minlength: "Semester program studi minimal 3 karakter" 
+                required: "Semester tidak boleh kosong", 
+                minlength: "Semester minimal 5 karakter", 
+                maxlength: "Semester maksimal 10 karakter"
             },
             tahun_akademik: {
-                required: "Tahun Akademik program studi tidak boleh kosong",
-                minlength: "Tahun Akademik program studi minimal 5 karakter" 
+                required: "Tahun akademik tidak boleh kosong", 
+                minlength: "Tahun akademik minimal 4 karakter", 
+                maxlength: "Tahun akademik maksimal 10 karakter"
             }
         },
         submitHandler: function (form) {

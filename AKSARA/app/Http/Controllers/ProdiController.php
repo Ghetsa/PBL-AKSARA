@@ -49,9 +49,9 @@ class ProdiController extends Controller
                 //     . csrf_field() . method_field('DELETE') .
                 //     '<button type="submit" class="btn btn-danger btn-sm" onclick="return confirm(\'Apakah Anda yakin menghapus data ini?\');">Hapus</button></form>';
                 // Tombol Hapus tetap menggunakan deleteConfirmAjax yang sudah memanggil modalAction
-                $btn = '<button onclick="modalAction(\'' . e(route('prodi.show', $prodi->prodi_id)) . '\')" class="btn btn-info btn-sm"><i class="fas fa-eye"></i> Detail</button> ';
-                $btn .= '<button onclick="modalAction(\'' . e(route('prodi.edit', $prodi->prodi_id)) . '\')" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> Edit</button> ';
-                $btn .= '<button onclick="deleteConfirmAjax(' . e($prodi->prodi_id) . ')" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> Hapus</button>';
+                $btn = '<button onclick="modalAction(\'' . e(route('prodi.show', $prodi->prodi_id)) . '\')" class="btn btn-info btn-sm"><i class="fas fa-eye"></i></button> ';
+                $btn .= '<button onclick="modalAction(\'' . e(route('prodi.edit', $prodi->prodi_id)) . '\')" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></button> ';
+                $btn .= '<button onclick="deleteConfirmAjax(' . e($prodi->prodi_id) . ')" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>';
                 return $btn;
             })
             ->rawColumns(['aksi']) // memberitahu bahwa kolom aksi adalah html
@@ -68,7 +68,7 @@ class ProdiController extends Controller
         if ($request->ajax() || $request->wantsJson()) {
             $validator = Validator::make($request->all(), [
                 'kode' => 'required|string|max:10|unique:program_studi,kode',
-                'nama' => 'required|string|max:255'
+                'nama' => 'required|string|max:50'
             ]);
 
             if ($validator->fails()) {
@@ -136,7 +136,7 @@ class ProdiController extends Controller
                 'max:10',
                 Rule::unique('program_studi', 'kode')->ignore($prodi->prodi_id, 'prodi_id')
             ],
-            'nama' => 'required|string|max50'
+            'nama' => 'required|string|max:50'
         ]);
 
         if ($validator->fails()) {

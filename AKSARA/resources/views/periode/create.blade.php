@@ -42,12 +42,12 @@
         // Pastikan ignore hidden fields diaktifkan saat inisialisasi
         formCreate.validate({
             rules: {
-                semester: { required: true, minlength: 3 },
-                tahun_akademik: { required: true, minlength: 4 }
+                semester: { required: true, minlength: 5, maxlength: 10 },
+                tahun_akademik: { required: true, minlength: 4, maxlength: 10 }
             },
             messages: {
-                semester: { required: "semester program studi tidak boleh kosong", minlength: "semester program studi minimal 5 karakter" },
-                tahun_akademik: { required: "tahun_akademik program studi tidak boleh kosong", minlength: "tahun_akademik program studi minimal harus 3 karakter" }
+                semester: { required: "Semester tidak boleh kosong", minlength: "Semester minimal 5 karakter", maxlength: "Semester maksimal 10 karakter" },
+                tahun_akademik: { required: "Tahun akademik tidak boleh kosong", minlength: "Tahun akademik minimal 4 karakter", maxlength: "Tahun akademik maksimal 10 karakter" }
             },
 
             // --- AJAX Submission ---

@@ -9,6 +9,19 @@
     .dropdown-notification .list-group-item .fw-bold {
         color: #333; /* Membuat teks tebal lebih jelas */
     }
+  .avatar-wrapper {
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+  }
+
+  .avatar-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
+  }
 </style>
 @endpush
 
@@ -170,10 +183,10 @@
         <li class="dropdown pc-h-item header-user-profile">
           <a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#" role="button"
             aria-haspopup="false" data-bs-auto-close="outside" aria-expanded="false">
-            <img src="{{ $avatar }}" alt="user-image" class="user-avtar rounded-circle img-fluid"
-              style="width: 30px; height: 30px; object-fit: cover;"> {{-- GANTI DI SINI --}}
-            <span>{{ Auth::user()->nama }}</span>
-          </a>
+              {{-- <img src="{{ $avatar }}" alt="user-image" class="user-avtar rounded-circle img-fluid" style="width: 30px; height: 30px; object-fit: cover; aspect-ratio: 1 / 1;"> --}}
+              <img src="{{ $avatar }}" alt="user-image" class="user-avtar" style="width: 30px; height: 30px; object-fit: cover; aspect-ratio: 1 / 1;">
+              <span>{{ Auth::user()->nama }}</span>
+            </a>
 
           <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown" style="min-width: 200px;">
             <div class="dropdown-header">

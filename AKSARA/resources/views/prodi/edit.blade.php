@@ -1,10 +1,9 @@
-{{-- resources/views/prodi/edit_ajax_form.blade.php --}}
 <form id="formEditProdi" class="form-horizontal" method="POST" action="{{ route('prodi.update', $prodi->prodi_id) }}"> 
     @csrf
-    @method('PUT') {{-- Penting untuk method update --}}
+    @method('PUT') 
 
     <div class="modal-header">
-        <h5 class="modal-title" id="myModalLabel">Edit Program Studi</h5>
+        <h5 class="modal-title" id="myModalLabel"><i class="ti ti-edit-circle me-2"></i> Program Studi</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
 
@@ -25,7 +24,7 @@
                 <span class="invalid-feedback error-text" id="error-edit-nama"></span>
             </div>
         </div>
-    </div> {{-- Akhir dari modal-body --}}
+    </div> 
 
     <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
@@ -40,17 +39,19 @@ $(document).ready(function () {
 
     formEdit.validate({
         rules: {
-            kode: { required: true, minlength: 3 }, // Sesuaikan dengan validasi controller
-            nama: { required: true, minlength: 5 }  // Sesuaikan dengan validasi controller
+            kode: { required: true, minlength: 3, maxlength: 10 }, 
+            nama: { required: true, minlength: 5, maxlength: 50 }  
         },
         messages: {
             kode: {
                 required: "Kode program studi tidak boleh kosong",
-                minlength: "Kode program studi minimal 3 karakter" // Sesuaikan
+                minlength: "Kode program studi minimal 3 karakter",
+                maxlength: "Kode program studi maksimal 10 karakter"
             },
             nama: {
                 required: "Nama program studi tidak boleh kosong",
-                minlength: "Nama program studi minimal 5 karakter" // Sesuaikan
+                minlength: "Nama program studi minimal 5 karakter",
+                maxlength: "Nama program studi maksimal 50 karakter" 
             }
         },
         submitHandler: function (form) {
@@ -67,7 +68,7 @@ $(document).ready(function () {
                 },
                 success: function (response) {
                     if (response.status) {
-                        $("#myModal").modal('hide'); // Tutup modal utama
+                        $("#myModal").modal('hide'); 
 
                         if (typeof Swal !== 'undefined') {
                             Swal.fire({

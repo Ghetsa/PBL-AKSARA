@@ -23,7 +23,7 @@
                 <span class="invalid-feedback error-text" id="error-nama"></span> 
             </div>
         </div>
-    </div> {{-- Akhir dari modal-body --}}
+    </div> 
 
     <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
@@ -38,16 +38,14 @@
         // Ambil form dengan ID yang benar
         const formCreate = $('#formCreateProdi');
 
-        // Inisialisasi jQuery Validation untuk FORM DI DALAM MODAL
-        // Pastikan ignore hidden fields diaktifkan saat inisialisasi
         formCreate.validate({
             rules: {
-                kode: { required: true, minlength: 3 },
-                nama: { required: true, minlength: 5 }
+                kode: { required: true, minlength: 3, maxlength: 10 },
+                nama: { required: true, minlength: 5, maxlength: 50 }
             },
             messages: {
-                kode: { required: "Kode program studi tidak boleh kosong", minlength: "Kode program studi minimal 5 karakter" },
-                nama: { required: "Nama program studi tidak boleh kosong", minlength: "Nama program studi minimal harus 3 karakter" }
+                kode: { required: "Kode program studi tidak boleh kosong", minlength: "Kode program studi minimal 3 karakter", maxlength: "Kode program studi maksimal 10 karakter" },
+                nama: { required: "Nama program studi tidak boleh kosong", minlength: "Nama program studi minimal 5 karakter", maxlength: "Nama program studi maksimal 50 karakter" }
             },
 
             // --- AJAX Submission ---

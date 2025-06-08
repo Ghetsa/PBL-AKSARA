@@ -1,50 +1,71 @@
 @empty($periode)
-    {{-- Konten jika periode tidak ditemukan, akan dimuat ke dalam modal body --}}
+    {{-- Tampilan Error jika periode tidak ditemukan --}}
     <div class="modal-header">
-        <h5 class="modal-title">Kesalahan</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
+        <h5 class="modal-title text-danger">
+            <i class="fas fa-exclamation-triangle me-2"></i>Terjadi Kesalahan
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
     </div>
-    <div class="modal-body">
-        <div class="alert alert-danger">
-            <h5><i class="icon fas fa-ban"></i> Kesalahan!!!</h5>
-            Data yang anda cari tidak ditemukan
+    <div class="modal-body text-center py-4">
+        <div class="alert alert-danger d-inline-block">
+            <h5 class="alert-heading"><i class="icon fas fa-ban"></i> Gagal Memuat Data!</h5>
+            Data periode semester yang Anda cari tidak dapat ditemukan.
         </div>
     </div>
     <div class="modal-footer">
-        <button type="button" data-dismiss="modal" class="btn btn-secondary">Tutup</button>
-        {{-- Link "Kembali" mungkin tidak relevan di dalam modal, bisa diubah jadi tombol tutup --}}
-        {{-- <a href="{{ url('/periode') }}" class="btn btn-warning">Kembali</a> --}}
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
     </div>
 @else
-    {{-- Konten konfirmasi hapus jika periode ditemukan, akan dimuat ke dalam modal body --}}
-    {{-- Form akan berada di dalam modal body --}}
-    <form action="{{ route('periode.delete_ajax', $periode->periode_id) }}" method="POST" id="form-delete-ajax"> 
+    {{-- Form Konfirmasi Hapus --}}
+    <form action="{{ route('periode.delete_ajax', $periode->periode_id) }}" method="POST" id="form-delete-ajax">
         @csrf
         @method('DELETE')
 
-        <div class="modal-header">
-            <h5 class="modal-title">Hapus Data periode</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
+        <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title" id="ajaxModalLabel">
+                <i class="fas fa-trash-alt me-2"></i>Hapus Data Periode Semester
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
         </div>
-        <div class="modal-body">
-            <div class="alert alert-warning">
-                <h5><i class="icon fas fa-exclamation-triangle"></i> Konfirmasi !!!</h5> {{-- Ubah ikon warning --}}
-                Apakah Anda yakin ingin menghapus data program studi ini?
+
+        <div class="modal-body text-center py-4">
+            {{-- Ikon Peringatan --}}
+            <i class="fas fa-exclamation-triangle fa-4x text-danger mb-3"></i>
+
+            {{-- Pesan Konfirmasi --}}
+            <h4 class="mb-3">Anda Yakin?</h4>
+            <p class="text-muted mb-3">Anda akan menghapus data periode semester berikut:</p>
+            {{-- <p class="text-muted mb-3">Anda akan menghapus data periode semester berikut. Menghapus data ini dapat mempengaruhi data mahasiswa terkait.</p> --}}
+
+            {{-- Card Detail periode --}}
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-12 col-sm-10 col-md-8 col-lg-6">
+                        <div class="card bg-light border-danger text-start p-3">
+                            <div class="card-body py-2 px-3">
+                                <div class="row">
+                                    <div class="col-6 fw-bold">Semester</div>
+                                    <div class="col-6 text-end text-break">{{ $periode->semester }}</div>
+                                </div>
+                                <hr class="my-1">
+                                <div class="row">
+                                    <div class="col-6 fw-bold">Tahun Akademik</div>
+                                    <div class="col-6 text-end text-break">{{ $periode->tahun_akademik }}</div>
+                                </div>
+                                <hr class="my-1">
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            {{-- Tampilkan detail periode yang akan dihapus --}}
-            <p>Detail periode semester:</p>
-            <ul>
-                <li><strong>Semester:</strong> {{ $periode->semester }}</li>
-                <li><strong>Tahun Akademik:</strong> {{ $periode->tahun_akademik }}</li>
-            </ul>
+
+            <div class="text-danger fw-bold mt-3">Tindakan ini tidak dapat dibatalkan!</div>
+            {{-- <div class="text-danger fw-bold mt-4">Menghapus data ini dapat mempengaruhi data mahasiswa terkait!</div> --}}
         </div>
+
         <div class="modal-footer">
-            <button type="button" data-dismiss="modal" class="btn btn-secondary">Batal</button> {{-- Ubah jadi secondary --}}
-            <button type="submit" class="btn btn-danger">Ya, Hapus</button> {{-- Ubah jadi danger --}}
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+            <button type="submit" class="btn btn-danger" id="confirm-delete-btn">Ya, Hapus Data</button>
         </div>
     </form>
 @endempty

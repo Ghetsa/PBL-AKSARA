@@ -99,46 +99,53 @@
             <h4 class="mb-3">Anda Yakin?</h4>
             <p class="text-muted mb-3">Anda akan menghapus data user berikut secara permanen:</p>
 
-            <div class="card bg-light border-danger text-start d-inline-block p-3" style="min-width: 300px;">
-                <div class="card-body py-2 px-3">
-                    <div class="row">
-                        <div class="col-4 fw-bold">Nama</div>
-                        <div class="col-8 text-end">{{ $user->nama }}</div>
-                    </div>
-                    <hr class="my-1">
-                    <div class="row">
-                        <div class="col-4 fw-bold">Role</div>
-                        <div class="col-8 text-end">{{ ucfirst($user->role) }}</div>
-                    </div>
-                    <hr class="my-1">
-                    
-                    {{-- Menampilkan NIP atau NIM berdasarkan Role --}}
-                    @if ($user->role == 'admin' && $user->admin)
-                    <div class="row">
-                        <div class="col-4 fw-bold">NIP</div>
-                        <div class="col-8 text-end">{{ $user->admin->nip ?: '-' }}</div>
-                    </div>
-                    <hr class="my-1">
-                    @elseif ($user->role == 'dosen' && $user->dosen)
-                    <div class="row">
-                        <div class="col-4 fw-bold">NIP</div>
-                        <div class="col-8 text-end">{{ $user->dosen->nip ?: '-' }}</div>
-                    </div>
-                    <hr class="my-1">
-                    @elseif($user->role == 'mahasiswa' && $user->mahasiswa)
-                    <div class="row">
-                        <div class="col-4 fw-bold">NIM</div>
-                        <div class="col-8 text-end">{{ $user->mahasiswa->nim ?: '-' }}</div>
-                    </div>
-                    <hr class="my-1">
-                    @endif
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-12 col-sm-10 col-md-8 col-lg-7">
+                        <div class="card bg-light border-danger text-start p-3">
+                            <div class="card-body py-2 px-3">
+                                <div class="row">
+                                    <div class="col-5 fw-bold">Nama</div>
+                                    <div class="col-7 text-end text-break">{{ $user->nama }}</div>
+                                </div>
+                                <hr class="my-1">
+                                <div class="row">
+                                    <div class="col-5 fw-bold">Role</div>
+                                    <div class="col-7 text-end text-break">{{ ucfirst($user->role) }}</div>
+                                </div>
+                                <hr class="my-1">
 
-                    <div class="row">
-                        <div class="col-4 fw-bold">Email</div>
-                        <div class="col-8 text-end text-break">{{ $user->email }}</div>
+                                {{-- Menampilkan NIP atau NIM berdasarkan Role --}}
+                                @if ($user->role == 'admin' && $user->admin)
+                                <div class="row">
+                                    <div class="col-5 fw-bold">NIP</div>
+                                    <div class="col-7 text-end text-break">{{ $user->admin->nip ?: '-' }}</div>
+                                </div>
+                                <hr class="my-1">
+                                @elseif ($user->role == 'dosen' && $user->dosen)
+                                <div class="row">
+                                    <div class="col-5 fw-bold">NIP</div>
+                                    <div class="col-7 text-end text-break">{{ $user->dosen->nip ?: '-' }}</div>
+                                </div>
+                                <hr class="my-1">
+                                @elseif($user->role == 'mahasiswa' && $user->mahasiswa)
+                                <div class="row">
+                                    <div class="col-5 fw-bold">NIM</div>
+                                    <div class="col-7 text-end text-break">{{ $user->mahasiswa->nim ?: '-' }}</div>
+                                </div>
+                                <hr class="my-1">
+                                @endif
+
+                                <div class="row">
+                                    <div class="col-5 fw-bold">Email</div>
+                                    <div class="col-7 text-end text-break">{{ $user->email }}</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
+
             <div class="text-danger fw-bold mt-4">Tindakan ini tidak dapat dibatalkan!</div>
         </div>
 
