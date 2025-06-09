@@ -116,7 +116,7 @@
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', className: 'text-center', orderable: false, searchable: false },
                 { data: 'nama_lomba_display', name: 'nama_lomba' }, // Menggunakan kolom gabungan
                 { data: 'diajukan_oleh', name: 'inputBy.nama', orderable: false, searchable: true }, // 'penginput.nama' untuk server-side search
-                { data: 'tingkat', name: 'tingkat' }, // Menggunakan kolom gabungan
+                { data: 'tingkat', name: 'tingkat', render: function(data, type, row) { return data.charAt(0).toUpperCase() + data.slice(1); } }, // Menggunakan kolom gabungan
                 { data: 'status_verifikasi', name: 'status_verifikasi' },
                 { data: 'aksi', name: 'aksi', orderable: false, searchable: false }
             ],

@@ -87,19 +87,19 @@
             
             {{-- Input Hadiah Dinamis --}}
             <div class="col-md-12 mb-3">
-                <label class="form-label d-block mb-2">Hadiah Lomba (Opsional)</label>
+                <label class="form-label d-block mb-2">Hadiah Lomba</label>
                 <div id="hadiahInputsContainerUser">
                     @if(isset($lomba) && $lomba->daftarHadiah && $lomba->daftarHadiah->count() > 0)
                         @foreach($lomba->daftarHadiah as $itemHadiah)
                         <div class="input-group input-group-sm mb-2 hadiah-input-group-user">
                             <input type="text" name="hadiah[]" class="form-control" placeholder="Contoh: Uang Tunai Rp 1.000.000" value="{{ old('hadiah[]', $itemHadiah->hadiah) }}">
-                            <button type="button" class="btn btn-danger remove-hadiah-btn-user"><i class="fas fa-trash"></i></button>
+                            <button type="button" class="btn btn-danger remove-hadiah-btn-user"><i class="ti ti-trash"></i></button>
                         </div>
                         @endforeach
                     @else
                     <div class="input-group input-group-sm mb-2 hadiah-input-group-user">
                         <input type="text" name="hadiah[]" class="form-control" placeholder="Contoh: Uang Tunai Rp 1.000.000">
-                        <button type="button" class="btn btn-danger remove-hadiah-btn-user"><i class="fas fa-trash"></i></button>
+                        <button type="button" class="btn btn-danger remove-hadiah-btn-user"><i class="ti ti-trash"></i></button>
                     </div>
                     @endif
                 </div>
@@ -109,19 +109,19 @@
 
 
             <div class="col-md-12 mb-3">
-                <label for="user_biaya" class="form-label">Biaya Pendaftaran (Kosongkan jika gratis)</label>
-                <input type="number" name="biaya" id="user_biaya" class="form-control form-control-sm" value="{{ old('biaya', $lomba->biaya ?? '') }}" min="0" placeholder="Cth: 50000">
+                <label for="user_biaya" class="form-label">Biaya Pendaftaran (Rp)</label>
+                <input type="number" name="biaya" id="user_biaya" class="form-control form-control-sm" value="{{ old('biaya', $lomba->biaya ?? '') }}" min="0" placeholder="Kosongkan jika gratis">
                 <span class="invalid-feedback error-biaya"></span>
             </div>
 
             <div class="col-md-6 mb-3">
-                <label for="user_link_pendaftaran" class="form-label">Link Pendaftaran (Opsional)</label>
+                <label for="user_link_pendaftaran" class="form-label">Link Pendaftaran</label>
                 <input type="url" name="link_pendaftaran" id="user_link_pendaftaran" class="form-control form-control-sm" value="{{ old('link_pendaftaran', $lomba->link_pendaftaran ?? '') }}" placeholder="https://contoh.com/daftar">
                 <span class="invalid-feedback error-link_pendaftaran"></span>
             </div>
 
             <div class="col-md-6 mb-3">
-                <label for="user_link_penyelenggara" class="form-label">Link Website Penyelenggara (Opsional)</label>
+                <label for="user_link_penyelenggara" class="form-label">Link Website Penyelenggara</label>
                 <input type="url" name="link_penyelenggara" id="user_link_penyelenggara" class="form-control form-control-sm" value="{{ old('link_penyelenggara', $lomba->link_penyelenggara ?? '') }}" placeholder="https://penyelenggara.com">
                 <span class="invalid-feedback error-link_penyelenggara"></span>
             </div>
@@ -164,29 +164,32 @@ $(document).ready(function() {
 
     formUserLomba.validate({
         rules: {
-            nama_lomba: { required: true, maxlength: 255 },
+            nama_lomba: { required: true, maxlength: 50, minlength: 5 },
             pembukaan_pendaftaran: { required: true, dateISO: true },
-            batas_pendaftaran: { required: true, dateISO: true, afterDate: '#user_pembukaan_pendaftaran' },
+            batas_pendaftaran: { required: true, dateISO: true, afterDate: '#crud_c_pembukaan_pendaftaran' },
             kategori: { required: true },
-            penyelenggara: { required: true, maxlength: 255 },
+            penyelenggara: { required: true, maxlength: 50, minlength: 2 },
             tingkat: { required: true },
             'bidang_keahlian[]': { required: true, minlength: 1 },
             biaya: { number: true, min: 0 },
-            link_pendaftaran: { nullableUrl: true, maxlength: 255 },
-            link_penyelenggara: { nullableUrl: true, maxlength: 255 },
-            poster: { extension: "jpg|jpeg|png|pdf", filesize: 2097152 },
-            'hadiah[]': { maxlength: 255 }
+            link_pendaftaran: { nullableUrl: true, maxlength: 150 },
+            link_penyelenggara: { nullableUrl: true, maxlength: 150 },
+            poster: { extension: "jpg|jpeg|png", filesize: 2097152 },
+            'hadiah[]': { maxlength: 20 } // Validasi untuk setiap item hadiah
         },
         messages: {
-            nama_lomba: { required: "Nama Lomba wajib diisi." },
-            pembukaan_pendaftaran: { required: "Tanggal pembukaan wajib diisi." },
-            batas_pendaftaran: { required: "Batas pendaftaran wajib diisi.", afterDate: "Batas pendaftaran harus setelah atau sama dengan tanggal pembukaan." },
+            nama_lomba: { required: "Nama lomba wajib diisi.", maxlength: "Nama lomba maksimal 50 karakter.", minlength: "Nama lomba minimal 5 karakter." },
+            pembukaan_pendaftaran: { required: "Tanggal pembukaan wajib diisi.", dateISO: "Format tanggal tidak valid." },
+            batas_pendaftaran: { required: "Batas pendaftaran wajib diisi.", dateISO: "Format tanggal tidak valid.", afterDate: "Batas pendaftaran harus setelah atau sama dengan tanggal pembukaan." },
             kategori: { required: "Kategori peserta wajib dipilih." },
-            penyelenggara: { required: "Penyelenggara wajib diisi." },
+            penyelenggara: { required: "Penyelenggara wajib diisi.", maxlength: "Penyelenggara maksimal 50 karakter.", minlength: "Penyelenggara minimal 2 karakter." },
             tingkat: { required: "Tingkat lomba wajib dipilih." },
-            'bidang_keahlian[]': { required: "Pilih minimal satu bidang keahlian." },
-            poster: { extension: "Format poster tidak valid (JPG, JPEG, PNG, PDF).", filesize: "Ukuran poster maksimal 2MB." },
-            'hadiah[]': { maxlength: "Deskripsi hadiah maksimal 255 karakter."}
+            'bidang_keahlian[]': { required: "Pilih minimal satu bidang keahlian.", minlength: "Pilih minimal satu bidang keahlian." },
+            biaya: { number: "Biaya harus berupa angka.", min: "Biaya tidak boleh negatif." },
+            link_pendaftaran: { nullableUrl: "Format URL pendaftaran tidak valid.", maxlength: "Link pendaftaran maksimal 150 karakter." },
+            link_penyelenggara: { nullableUrl: "Format URL penyelenggara tidak valid.", maxlength: "Link penyelenggara maksimal 150 karakter." },
+            poster: { extension: "Format file poster tidak valid (hanya JPG, JPEG, PNG).", filesize: "Ukuran file poster maksimal 2MB." },
+            'hadiah[]': { maxlength: "Deskripsi hadiah maksimal 20 karakter."}
         },
         errorElement: 'span',
         errorPlacement: function (error, element) {
@@ -319,7 +322,7 @@ $(document).ready(function() {
         const newHadiahInput = `
             <div class="input-group input-group-sm mb-2 hadiah-input-group-user">
                 <input type="text" name="hadiah[]" class="form-control" placeholder="Deskripsi hadiah lainnya...">
-                <button type="button" class="btn btn-danger remove-hadiah-btn-user"><i class="fas fa-trash"></i></button>
+                <button type="button" class="btn btn-danger remove-hadiah-btn-user"><i class="ti ti-trash"></i></button>
             </div>
         `;
         $('#hadiahInputsContainerUser').append(newHadiahInput);

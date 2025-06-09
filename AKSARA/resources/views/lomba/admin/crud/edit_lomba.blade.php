@@ -115,14 +115,14 @@
                         @foreach($lomba->daftarHadiah as $index => $itemHadiah)
                         <div class="input-group mb-2 hadiah-input-group">
                             <input type="text" name="hadiah[]" class="form-control form-control-sm" placeholder="Contoh: Uang Tunai Rp 1.000.000" value="{{ old('hadiah.'.$index, $itemHadiah->hadiah) }}">
-                            <button type="button" class="btn btn-sm btn-danger remove-hadiah-btn-edit"><i class="fas fa-trash"></i></button>
+                            <button type="button" class="btn btn-sm btn-danger remove-hadiah-btn-edit"><i class="ti ti-trash"></i></button>
                         </div>
                         @endforeach
                     @else
                         {{-- Sediakan minimal satu input jika tidak ada hadiah sebelumnya --}}
                         <div class="input-group mb-2 hadiah-input-group">
                             <input type="text" name="hadiah[]" class="form-control form-control-sm" placeholder="Contoh: Uang Tunai Rp 1.000.000">
-                            <button type="button" class="btn btn-sm btn-danger remove-hadiah-btn-edit"><i class="fas fa-trash"></i></button>
+                            <button type="button" class="btn btn-sm btn-danger remove-hadiah-btn-edit"><i class="ti ti-trash"></i></button>
                         </div>
                     @endif
                 </div>
@@ -363,7 +363,7 @@ $(document).ready(function () {
         const newHadiahInput = `
             <div class="input-group mb-2 hadiah-input-group">
                 <input type="text" name="hadiah[]" class="form-control form-control-sm" placeholder="Deskripsi hadiah lainnya...">
-                <button type="button" class="btn btn-sm btn-danger remove-hadiah-btn-edit"><i class="fas fa-trash"></i></button>
+                <button type="button" class="btn btn-sm btn-danger remove-hadiah-btn-edit"><i class="ti ti-trash"></i></button>
             </div>
         `;
         $('#hadiahInputsContainerEdit').append(newHadiahInput);

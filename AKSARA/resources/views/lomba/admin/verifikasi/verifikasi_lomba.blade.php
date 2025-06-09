@@ -4,7 +4,7 @@
     <input type="hidden" name="status_verifikasi" id="hidden_status_verifikasi_lomba" value="{{ $lomba->status_verifikasi }}">
 
     <div class="modal-header bg-light">
-        <h5 class="modal-title" id="modalVerifikasiLombaLabel"><i class="ti ti-file-certificate me-2"></i>Verifikasi Pengajuan Lomba: {{ Str::limit($lomba->nama_lomba, 45) }}</h5>
+        <h5 class="modal-title" id="modalVerifikasiLombaLabel"><i class="fas fa-award me-2"></i>Verifikasi Pengajuan Lomba: {{ Str::limit($lomba->nama_lomba, 45) }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
 

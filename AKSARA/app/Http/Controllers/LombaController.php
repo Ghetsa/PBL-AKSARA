@@ -953,6 +953,51 @@ class LombaController extends Controller
         return view('lomba.mahasiswa.index', compact('breadcrumb', 'activeMenu', 'userRole', 'kriteriaUntukBobot', 'defaultBobotView'));
     }
 
+    public function getMooraCalculationDetailJson(Request $request)
+    {
+        $lombaId = $request->input('lomba_id');
+        $weights = $request->input('weights', []);
+
+        // Ambil data lomba berdasarkan lomba_id
+        $lomba = LombaModel::find($lombaId);
+
+        if (!$lomba) {
+            return response()->json(['error' => 'Lomba tidak ditemukan.'], 404);
+        }
+
+        // Lakukan perhitungan MOORA
+        $mooraDetail = $this->calculateMooraScores(Auth::id(), $weights);
+
+        if (!$mooraDetail) {
+            return response()->json(['error' => 'Perhitungan tidak ditemukan.'], 404);
+        }
+
+        // Pastikan data lomba termasuk nama_lomba
+        return response()->json([
+            'lomba' => [
+                'nama_lomba' => $lomba->nama_lomba,
+                'score' => $mooraDetail['score'],
+                'weights' => $mooraDetail['weights'],
+                'original_values' => $mooraDetail['original_values'],
+                'divisors' => $mooraDetail['divisors'],
+                'normalized_values' => $mooraDetail['normalized_values']
+            ]
+        ]);
+    }
+
+    private function getMooraDetailByLombaId($lombaId, $weights)
+    {
+        // Ambil lomba berdasarkan ID
+        $lomba = LombaModel::with('bidangKeahlian')->find($lombaId);
+
+        if (!$lomba) {
+            return null;
+        }
+
+        // Lakukan perhitungan MOORA dengan bobot yang diterima
+        return $this->calculateMooraScores(Auth::id(), $weights);
+    }
+
     // private const BOBOT_POSISI_PRIORITAS = [
     //     1 => 0.30, // Prioritas 1
     //     2 => 0.25, // Prioritas 2

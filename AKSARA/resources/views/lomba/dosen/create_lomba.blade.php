@@ -1,6 +1,3 @@
-{{-- Form untuk Pengajuan Lomba oleh Mahasiswa/Dosen (dimuat di modal) --}}
-{{-- Pastikan variabel $bidangList sudah di-pass ke view ini dari controller --}}
-{{-- Variabel $lomba akan null saat create, dan berisi data saat edit --}}
 <form id="formUserLomba" 
     action="{{ route('lomba.dosen.store') }}" 
     method="POST" enctype="multipart/form-data">

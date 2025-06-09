@@ -138,8 +138,8 @@
                 { data: 'nama_lomba', name: 'nama_lomba' },
                 { data: 'penyelenggara', name: 'penyelenggara' },
                 { data: 'batas_pendaftaran', name: 'batas_pendaftaran' },
-                { data: 'tingkat', name: 'tingkat' },
-                { data: 'kategori', name: 'kategori' },
+                { data: 'tingkat', name: 'tingkat', render: function(data, type, row) { return data.charAt(0).toUpperCase() + data.slice(1); } },
+                { data: 'kategori', name: 'kategori', render: function(data, type, row) { return data.charAt(0).toUpperCase() + data.slice(1); } },
                 { data: 'aksi', name: 'aksi', orderable: false, searchable: false }
             ],
             order: [[ 4, "desc" ]] // Default order by batas_pendaftaran (atau created_at jika lebih sesuai)

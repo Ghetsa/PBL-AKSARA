@@ -18,7 +18,14 @@ class AuthController extends Controller
     public function login()
     {
         if (Auth::check()) {
-            return redirect()->route('user.index'); // ATAU redirect()->route('dashboard');
+            $role = Auth::user()->role;
+            if ($role === 'mahasiswa') {
+                return redirect()->route('dashboard.mahasiswa');
+            } elseif ($role === 'dosen') {
+                return redirect()->route('dashboardDSN');
+            } elseif ($role === 'admin') {
+                return redirect()->route('dashboard');
+            }
         }
         return view('auth.login');
     }
@@ -99,8 +106,8 @@ class AuthController extends Controller
                 'nim' => 'required|string|max:12|unique:mahasiswa,nim',
                 'prodi_id' => 'required|exists:program_studi,prodi_id',
                 'periode_id' => 'required|exists:periode,periode_id',
-                'no_telepon' => 'required|string|max:15', 
-                'alamat' => 'required|string|max:100', 
+                'no_telepon' => 'required|string|max:15',
+                'alamat' => 'required|string|max:100',
             ]);
 
             if ($validator->fails()) {
@@ -118,8 +125,8 @@ class AuthController extends Controller
                 'password' => Hash::make($request->password),
                 'role' => 'mahasiswa',
                 'status' => 'aktif',
-                'no_telepon' => $request->no_telepon,  
-                'alamat' => $request->alamat,  
+                'no_telepon' => $request->no_telepon,
+                'alamat' => $request->alamat,
             ]);
 
             // Simpan ke tabel mahasiswa

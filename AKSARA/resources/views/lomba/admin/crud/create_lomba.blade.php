@@ -101,7 +101,7 @@
                     {{-- Input hadiah pertama --}}
                     <div class="input-group mb-2 hadiah-input-group">
                         <input type="text" name="hadiah[]" class="form-control form-control-sm" placeholder="Contoh: Uang Tunai Rp 1.000.000">
-                        <button type="button" class="btn btn-sm btn-danger remove-hadiah-btn-create"><i class="fas fa-trash"></i></button>
+                        <button type="button" class="btn btn-sm btn-danger remove-hadiah-btn-create"><i class="ti ti-trash"></i></button>
                     </div>
                 </div>
                 <button type="button" id="addHadiahBtnCreate" class="btn btn-sm btn-outline-success mt-1"><i class="fas fa-plus"></i> Tambah Hadiah</button>
@@ -328,7 +328,7 @@ $(document).ready(function() {
         const newHadiahInput = `
             <div class="input-group mb-2 hadiah-input-group">
                 <input type="text" name="hadiah[]" class="form-control form-control-sm" placeholder="Deskripsi hadiah lainnya...">
-                <button type="button" class="btn btn-sm btn-danger remove-hadiah-btn-create"><i class="fas fa-trash"></i></button>
+                <button type="button" class="btn btn-sm btn-danger remove-hadiah-btn-create"><i class="ti ti-trash"></i></button>
             </div>
         `;
         $('#hadiahInputsContainerCreate').append(newHadiahInput);
