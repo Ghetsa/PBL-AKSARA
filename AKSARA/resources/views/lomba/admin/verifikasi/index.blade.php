@@ -17,7 +17,7 @@
                                 <label for="status_verifikasi_filter" class="form-label small">Filter Status:</label>
                                 <select class="form-select form-select-sm" id="status_verifikasi_filter">
                                     <option value="">- Semua Status -</option>
-                                    <option value="pending" selected>Pending</option> {{-- Default ke Pending --}}
+                                    <option value="pending" selected>Pending</option> 
                                     <option value="disetujui">Disetujui</option>
                                     <option value="ditolak">Ditolak</option>
                                 </select>
@@ -47,15 +47,15 @@
                     </div>
 
                     <div class="table-responsive">
-                        <table class="table table-bordered table-hover dt-responsive nowrap" id="tableVerifikasiLombaAdmin" style="width:100%;">
+                        <table class="table table-bordered table-hover dt-responsive wrap" id="tableVerifikasiLombaAdmin" style="width:100%;">
                             <thead>
                                 <tr>
                                     <th class="text-center" style="width:5%;">No.</th>
                                     <th>Nama Lomba</th>
-                                    <th>Tingkat</th>
                                     <th>Diajukan Oleh</th>
-                                    <th class="text-center">Status</th>
-                                    <th class="text-center">Aksi</th>
+                                    <th>Tingkat</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -69,7 +69,7 @@
 
 {{-- Modal untuk Form Verifikasi Lomba oleh Admin --}}
 <div class="modal fade" id="modalVerifikasiLombaAdmin" tabindex="-1" aria-labelledby="modalVerifikasiLombaAdminLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             {{-- Konten AJAX form verifikasi lomba dimuat di sini --}}
         </div>
@@ -115,10 +115,10 @@
             columns: [
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', className: 'text-center', orderable: false, searchable: false },
                 { data: 'nama_lomba_display', name: 'nama_lomba' }, // Menggunakan kolom gabungan
-                { data: 'tingkat', name: 'tingkat' }, // Menggunakan kolom gabungan
                 { data: 'diajukan_oleh', name: 'inputBy.nama', orderable: false, searchable: true }, // 'penginput.nama' untuk server-side search
-                { data: 'status_verifikasi', name: 'status_verifikasi', className: 'text-center' },
-                { data: 'aksi', name: 'aksi', className: 'text-center', orderable: false, searchable: false }
+                { data: 'tingkat', name: 'tingkat' }, // Menggunakan kolom gabungan
+                { data: 'status_verifikasi', name: 'status_verifikasi' },
+                { data: 'aksi', name: 'aksi', orderable: false, searchable: false }
             ],
             order: [[ 3, "desc" ]] // Default order by tanggal pengajuan (created_at)
         });

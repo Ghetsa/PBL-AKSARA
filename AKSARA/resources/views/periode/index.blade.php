@@ -119,11 +119,13 @@
                     },
                     {
                         data: "semester",
+                        className: "text-wrap",
                         orderable: true,
                         searchable: true
                     },
                     {
                         data: "tahun_akademik",
+                        className: "text-wrap",
                         orderable: true,
                         searchable: true
                     },

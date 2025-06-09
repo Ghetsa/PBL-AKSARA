@@ -1,18 +1,16 @@
-{{-- Form untuk Edit Lomba oleh Admin (dimuat di modal) --}}
-{{-- Pastikan variabel $lomba dan $bidangList sudah di-pass ke view ini dari controller --}}
 <form id="formAdminEditLomba" action="{{ route('admin.lomba.crud.update_ajax', $lomba->lomba_id) }}" method="POST" enctype="multipart/form-data">
     @csrf
     @method('PUT')
 
     <div class="modal-header">
-        <h5 class="modal-title">Edit Informasi Lomba</h5>
+        <h5 class="modal-title"><i class="ti ti-edit-circle me-2"></i>Edit Informasi Lomba: {{ Str::limit($lomba->nama_lomba, 45) }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
 
-    <div class="modal-body" style="max-height: 68vh; overflow-y: auto;">
+    <div class="modal-body" style="max-height: 65vh; overflow-y: auto;">
         {{-- Nama Lomba --}}
         <div class="form-group row mb-3">
-            <label for="crud_e_nama_lomba" class="col-sm-3 col-form-label">Nama Lomba <span class="text-danger">*</span></label>
+            <label for="crud_e_nama_lomba" class="col-sm-3 col-form-label">Nama Lomba</label>
             <div class="col-sm-9">
                 <input type="text" name="nama_lomba" id="crud_e_nama_lomba" class="form-control" value="{{ old('nama_lomba', $lomba->nama_lomba) }}">
                 <span class="invalid-feedback error-nama_lomba"></span>
@@ -29,7 +27,7 @@
         </div>
 
         <div class="form-group row mb-3">
-            <label for="crud_e_batas_pendaftaran" class="col-sm-3 col-form-label">Batas Pendaftaran <span class="text-danger">*</span></label>
+            <label for="crud_e_batas_pendaftaran" class="col-sm-3 col-form-label">Batas Pendaftaran</label>
             <div class="col-sm-9">
                 <input type="date" name="batas_pendaftaran" id="crud_e_batas_pendaftaran" class="form-control" value="{{ old('batas_pendaftaran', optional($lomba->batas_pendaftaran)->format('Y-m-d')) }}">
                 <span class="invalid-feedback error-batas_pendaftaran"></span>
@@ -38,7 +36,7 @@
 
         {{-- Kategori & Tingkat --}}
         <div class="form-group row mb-3">
-            <label for="crud_e_kategori" class="col-sm-3 col-form-label">Kategori Peserta <span class="text-danger">*</span></label>
+            <label for="crud_e_kategori" class="col-sm-3 col-form-label">Kategori Peserta</label>
             <div class="col-sm-3">
                 <select name="kategori" id="crud_e_kategori" class="form-select">
                     <option value="">-- Pilih --</option>
@@ -48,10 +46,10 @@
                 <span class="invalid-feedback error-kategori"></span>
             </div>
 
-            <label for="crud_e_tingkat" class="col-sm-2 col-form-label ps-0">Tingkat <span class="text-danger">*</span></label>
+            <label for="crud_e_tingkat" class="col-sm-2 col-form-label text-sm-end mt-3 mt-sm-0">Tingkat</label>
             <div class="col-sm-4">
                 <select name="tingkat" id="crud_e_tingkat" class="form-select">
-                     <option value="">-- Pilih --</option>
+                    <option value="">-- Pilih --</option>
                     <option value="lokal" {{ old('tingkat', $lomba->tingkat) == 'lokal' ? 'selected' : '' }}>Lokal/Daerah</option>
                     <option value="nasional" {{ old('tingkat', $lomba->tingkat) == 'nasional' ? 'selected' : '' }}>Nasional</option>
                     <option value="internasional" {{ old('tingkat', $lomba->tingkat) == 'internasional' ? 'selected' : '' }}>Internasional</option>
@@ -62,7 +60,7 @@
 
         {{-- Penyelenggara --}}
         <div class="form-group row mb-3">
-            <label for="crud_e_penyelenggara" class="col-sm-3 col-form-label">Penyelenggara <span class="text-danger">*</span></label>
+            <label for="crud_e_penyelenggara" class="col-sm-3 col-form-label">Penyelenggara</label>
             <div class="col-sm-9">
                 <input type="text" name="penyelenggara" id="crud_e_penyelenggara" class="form-control" value="{{ old('penyelenggara', $lomba->penyelenggara) }}">
                 <span class="invalid-feedback error-penyelenggara"></span>
@@ -71,7 +69,7 @@
 
         {{-- Bidang Keahlian --}}
         <div class="col-md-12 mb-3 px-0">
-            <label class="form-label d-block mb-2 text-sm-start">Bidang Keahlian Lomba <span class="text-danger">*</span></label>
+            <label class="form-label d-block mb-2 text-sm-start">Bidang Keahlian Lomba</label>
             <div class="row ps-2">
                 @php
                     $bidangLombaIds = old('bidang_keahlian', $lomba->bidangKeahlian->pluck('bidang_id')->toArray() ?? []);
@@ -164,31 +162,6 @@
                 <span class="invalid-feedback error-poster"></span>
             </div>
         </div>
-         {{-- Status Verifikasi & Catatan (jika admin) --}}
-        @if(isset($isAdmin) && $isAdmin)
-            <div class="form-group row mb-3">
-                <label for="crud_edit_status_verifikasi" class="col-sm-3 col-form-label">Status Verifikasi <span class="text-danger">*</span></label>
-                <div class="col-sm-9">
-                    <select name="status_verifikasi" id="crud_edit_status_verifikasi" class="form-select">
-                        <option value="pending" {{ old('status_verifikasi', $lomba->status_verifikasi) == 'pending' ? 'selected' : '' }}>Pending</option>
-                        <option value="disetujui" {{ old('status_verifikasi', $lomba->status_verifikasi) == 'disetujui' ? 'selected' : '' }}>Disetujui</option>
-                        <option value="ditolak" {{ old('status_verifikasi', $lomba->status_verifikasi) == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
-                    </select>
-                    <span class="invalid-feedback error-status_verifikasi"></span>
-                </div>
-            </div>
-            <div class="form-group row mb-3" id="crud_edit_catatan_verifikasi_wrapper" style="{{ (old('status_verifikasi', $lomba->status_verifikasi) == 'ditolak') ? '' : 'display:none;' }}">
-                <label for="crud_edit_catatan_verifikasi" class="col-sm-3 col-form-label">Catatan Verifikasi</label>
-                <div class="col-sm-9">
-                    <textarea name="catatan_verifikasi" id="crud_edit_catatan_verifikasi" class="form-control" rows="2">{{ old('catatan_verifikasi', $lomba->catatan_verifikasi) }}</textarea>
-                    <small class="form-text text-muted">Wajib diisi jika status "Ditolak".</small>
-                    <span class="invalid-feedback error-catatan_verifikasi"></span>
-                </div>
-            </div>
-        @else 
-            {{-- Jika form ini diakses oleh user biasa untuk edit pengajuan mereka, status tidak bisa diubah --}}
-            <input type="hidden" name="status_verifikasi" value="{{ $lomba->status_verifikasi }}">
-        @endif
     </div>
 
     <div class="modal-footer">
@@ -201,20 +174,6 @@
 $(document).ready(function () {
     const formEditLomba = $('#formAdminEditLomba');
     
-    // Logika untuk toggle catatan verifikasi (jika form admin)
-    if ($('#crud_edit_status_verifikasi').length) { 
-        function toggleCatatanEdit() {
-            if ($('#crud_edit_status_verifikasi').val() === 'ditolak') {
-                $('#crud_edit_catatan_verifikasi_wrapper').slideDown();
-            } else {
-                $('#crud_edit_catatan_verifikasi_wrapper').slideUp();
-                $('#crud_edit_catatan_verifikasi').removeClass('is-invalid').next('.invalid-feedback.error-catatan_verifikasi').empty().hide();
-            }
-        }
-        $('#crud_edit_status_verifikasi').on('change', toggleCatatanEdit);
-        toggleCatatanEdit(); // Panggil saat load
-    }
-
     $.validator.addMethod("afterDate", function(value, element, params) {
         if (!value || !$(params).val()) { return true; }
         return new Date(value) >= new Date($(params).val());
@@ -230,49 +189,35 @@ $(document).ready(function () {
     }, "Format URL tidak valid.");
 
     let validationRulesEdit = {
-        nama_lomba: { required: true, maxlength: 255 },
+        nama_lomba: { required: true, maxlength: 50, minlength: 5 },
         pembukaan_pendaftaran: { required: true, dateISO: true },
         batas_pendaftaran: { required: true, dateISO: true, afterDate: '#crud_e_pembukaan_pendaftaran' },
         kategori: { required: true },
-        penyelenggara: { required: true, maxlength: 255 },
+        penyelenggara: { required: true, maxlength: 50, minlength: 2 },
         tingkat: { required: true },
         'bidang_keahlian[]': { required: true, minlength: 1 },
         biaya: { number: true, min: 0 },
-        link_pendaftaran: { nullableUrl: true, maxlength: 255 },
-        link_penyelenggara: { nullableUrl: true, maxlength: 255 },
+        link_pendaftaran: { nullableUrl: true, maxlength: 150 },
+        link_penyelenggara: { nullableUrl: true, maxlength: 150 },
         poster: { extension: "jpg|jpeg|png", filesize: 2097152 },
-        'hadiah[]': { maxlength: 255 }
+        'hadiah[]': { maxlength: 20 }
     };
 
     let validationMessagesEdit = {
-        nama_lomba: { required: "Nama lomba wajib diisi.", maxlength: "Nama lomba maksimal 255 karakter." },
+        nama_lomba: { required: "Nama lomba wajib diisi.", maxlength: "Nama lomba maksimal 50 karakter.", minlength: "Nama lomba minimal 5 karakter." },
         pembukaan_pendaftaran: { required: "Tanggal pembukaan wajib diisi.", dateISO: "Format tanggal tidak valid." },
         batas_pendaftaran: { required: "Batas pendaftaran wajib diisi.", dateISO: "Format tanggal tidak valid.", afterDate: "Batas pendaftaran harus setelah atau sama dengan tanggal pembukaan." },
         kategori: { required: "Kategori peserta wajib dipilih." },
-        penyelenggara: { required: "Penyelenggara wajib diisi.", maxlength: "Penyelenggara maksimal 255 karakter." },
+        penyelenggara: { required: "Penyelenggara wajib diisi.", maxlength: "Penyelenggara maksimal 50 karakter.", minlength: "Penyelenggara minimal 2 karakter." },
         tingkat: { required: "Tingkat lomba wajib dipilih." },
         'bidang_keahlian[]': { required: "Pilih minimal satu bidang keahlian.", minlength: "Pilih minimal satu bidang keahlian." },
         biaya: { number: "Biaya harus berupa angka.", min: "Biaya tidak boleh negatif." },
-        link_pendaftaran: { nullableUrl: "Format URL pendaftaran tidak valid.", maxlength: "Link pendaftaran maksimal 255 karakter." },
-        link_penyelenggara: { nullableUrl: "Format URL penyelenggara tidak valid.", maxlength: "Link penyelenggara maksimal 255 karakter." },
+        link_pendaftaran: { nullableUrl: "Format URL pendaftaran tidak valid.", maxlength: "Link pendaftaran maksimal 150 karakter." },
+        link_penyelenggara: { nullableUrl: "Format URL penyelenggara tidak valid.", maxlength: "Link penyelenggara maksimal 150 karakter." },
         poster: { extension: "Format file poster tidak valid (hanya JPG, JPEG, PNG).", filesize: "Ukuran file poster maksimal 2MB." },
-        'hadiah[]': { maxlength: "Deskripsi hadiah maksimal 255 karakter."}
+        'hadiah[]': { maxlength: "Deskripsi hadiah maksimal 20 karakter."}
     };
     
-    // Tambahkan aturan validasi untuk status & catatan jika form admin
-    if ($('#crud_edit_status_verifikasi').length) {
-        validationRulesEdit.status_verifikasi = { required: true };
-        validationRulesEdit.catatan_verifikasi = {
-            required: function() { return $('#crud_edit_status_verifikasi').val() === 'ditolak'; },
-            maxlength: 1000
-        };
-        validationMessagesEdit.status_verifikasi = { required: "Status verifikasi wajib dipilih." };
-        validationMessagesEdit.catatan_verifikasi = {
-            required: "Catatan verifikasi wajib diisi jika status ditolak.",
-            maxlength: "Catatan verifikasi maksimal 1000 karakter."
-        };
-    }
-
     formEditLomba.validate({
         rules: validationRulesEdit,
         messages: validationMessagesEdit,

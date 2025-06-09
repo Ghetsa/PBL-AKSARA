@@ -21,11 +21,11 @@
         @csrf
         @method('DELETE')
 
-        <div class="modal-header bg-danger text-white">
+        <div class="modal-header">
             <h5 class="modal-title" id="ajaxModalLabel">
                 <i class="fas fa-trash-alt me-2"></i>Hapus Data Program Studi
             </h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
         </div>
 
         <div class="modal-body text-center py-4">
@@ -59,8 +59,7 @@
                 </div>
             </div>
 
-            <div class="text-danger fw-bold mt-3">Tindakan ini tidak dapat dibatalkan!</div>
-            {{-- <div class="text-danger fw-bold mt-4">Menghapus data ini dapat mempengaruhi data mahasiswa terkait!</div> --}}
+            <div class="text-danger fw-bold mt-4"><i class="fas fa-exclamation-circle flex-shrink-0 me-2"></i>Data program studi yang dihapus tidak dapat dipulihkan!</div>
         </div>
 
         <div class="modal-footer">
@@ -70,7 +69,6 @@
     </form>
 @endempty
 
-{{-- Script ini akan dieksekusi setelah konten dimuat ke dalam modal --}}
 <script>
     $(document).ready(function () {
         // Gunakan ID form yang baru dan spesifik

@@ -123,8 +123,8 @@
                         <td>{{ $l->penyelenggara }}</td>
                         <td>{{ $l->tingkat }}</td>
                         <td>{{ $l->biaya }}</td>
-                        <td>{{ $l->pembukaan_pendaftaran }}</td>
-                        <td>{{ $l->batas_pendaftaran }}</td>
+                        <td>{{ $l->pembukaan_pendaftaran->isoFormat('D MMMM YYYY') }}</td>
+                        <td>{{ $l->batas_pendaftaran->isoFormat('D MMMM YYYY') }}</td>
                     </tr>
                 @endforeach
             </tbody>

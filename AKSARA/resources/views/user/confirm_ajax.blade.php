@@ -146,7 +146,7 @@
                 </div>
             </div>
 
-            <div class="text-danger fw-bold mt-4">Tindakan ini tidak dapat dibatalkan!</div>
+            <div class="text-danger fw-bold mt-4"><i class="fas fa-exclamation-circle flex-shrink-0 me-2"></i>Data user yang dihapus tidak dapat dipulihkan!</div>
         </div>
 
         <div class="modal-footer">
@@ -156,7 +156,6 @@
     </form>
 @endempty
 
-{{-- Script ini akan dieksekusi setelah konten dimuat ke dalam modal --}}
 <script>
     $(document).ready(function() {
         // Gunakan ID form yang baru dan spesifik

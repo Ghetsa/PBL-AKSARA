@@ -1,12 +1,10 @@
-{{-- Form untuk Tambah Lomba oleh Admin (dimuat di modal) --}}
-{{-- Pastikan variabel $bidangList sudah di-pass ke view ini dari controller adminCreateLombaFormAjax --}}
 <form id="formAdminCreateLomba" action="{{ route('admin.lomba.crud.store_ajax') }}" method="POST" enctype="multipart/form-data">
     @csrf
     <div class="modal-header">
         <h5 class="modal-title">Tambah Info Lomba Baru</h5>
         <button type="button" class="btn-close btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
-    <div class="modal-body" style="max-height: 68vh; overflow-y: auto;">
+    <div class="modal-body" style="max-height: 65vh; overflow-y: auto;">
         {{-- Baris Nama Lomba --}}
         <div class="form-group row mb-3">
             <label for="crud_c_nama_lomba" class="col-sm-3 col-form-label">Nama Lomba</label>
@@ -43,7 +41,7 @@
                 </select>
                 <span class="invalid-feedback error-kategori"></span>
             </div>
-            <label for="crud_c_tingkat" class="col-sm-2 col-form-label ps-0">Tingkat</label>
+            <label for="crud_c_tingkat" class="col-sm-2 col-form-label text-sm-end mt-3 mt-sm-0">Tingkat</label>
             <div class="col-sm-4">
                 <select name="tingkat" id="crud_c_tingkat" class="form-select">
                     <option value="">-- Pilih --</option>
@@ -163,32 +161,32 @@ $(document).ready(function() {
 
     formAdminCreateLomba.validate({
         rules: {
-            nama_lomba: { required: true, maxlength: 255 },
+            nama_lomba: { required: true, maxlength: 50, minlength: 5 },
             pembukaan_pendaftaran: { required: true, dateISO: true },
             batas_pendaftaran: { required: true, dateISO: true, afterDate: '#crud_c_pembukaan_pendaftaran' },
             kategori: { required: true },
-            penyelenggara: { required: true, maxlength: 255 },
+            penyelenggara: { required: true, maxlength: 50, minlength: 2 },
             tingkat: { required: true },
             'bidang_keahlian[]': { required: true, minlength: 1 },
             biaya: { number: true, min: 0 },
-            link_pendaftaran: { nullableUrl: true, maxlength: 255 },
-            link_penyelenggara: { nullableUrl: true, maxlength: 255 },
+            link_pendaftaran: { nullableUrl: true, maxlength: 150 },
+            link_penyelenggara: { nullableUrl: true, maxlength: 150 },
             poster: { extension: "jpg|jpeg|png", filesize: 2097152 },
-            'hadiah[]': { maxlength: 255 } // Validasi untuk setiap item hadiah
+            'hadiah[]': { maxlength: 20 } // Validasi untuk setiap item hadiah
         },
         messages: {
-            nama_lomba: { required: "Nama lomba wajib diisi.", maxlength: "Nama lomba maksimal 255 karakter." },
+            nama_lomba: { required: "Nama lomba wajib diisi.", maxlength: "Nama lomba maksimal 50 karakter.", minlength: "Nama lomba minimal 5 karakter." },
             pembukaan_pendaftaran: { required: "Tanggal pembukaan wajib diisi.", dateISO: "Format tanggal tidak valid." },
             batas_pendaftaran: { required: "Batas pendaftaran wajib diisi.", dateISO: "Format tanggal tidak valid.", afterDate: "Batas pendaftaran harus setelah atau sama dengan tanggal pembukaan." },
             kategori: { required: "Kategori peserta wajib dipilih." },
-            penyelenggara: { required: "Penyelenggara wajib diisi.", maxlength: "Penyelenggara maksimal 255 karakter." },
+            penyelenggara: { required: "Penyelenggara wajib diisi.", maxlength: "Penyelenggara maksimal 50 karakter.", minlength: "Penyelenggara minimal 2 karakter." },
             tingkat: { required: "Tingkat lomba wajib dipilih." },
             'bidang_keahlian[]': { required: "Pilih minimal satu bidang keahlian.", minlength: "Pilih minimal satu bidang keahlian." },
             biaya: { number: "Biaya harus berupa angka.", min: "Biaya tidak boleh negatif." },
-            link_pendaftaran: { nullableUrl: "Format URL pendaftaran tidak valid.", maxlength: "Link pendaftaran maksimal 255 karakter." },
-            link_penyelenggara: { nullableUrl: "Format URL penyelenggara tidak valid.", maxlength: "Link penyelenggara maksimal 255 karakter." },
+            link_pendaftaran: { nullableUrl: "Format URL pendaftaran tidak valid.", maxlength: "Link pendaftaran maksimal 150 karakter." },
+            link_penyelenggara: { nullableUrl: "Format URL penyelenggara tidak valid.", maxlength: "Link penyelenggara maksimal 150 karakter." },
             poster: { extension: "Format file poster tidak valid (hanya JPG, JPEG, PNG).", filesize: "Ukuran file poster maksimal 2MB." },
-            'hadiah[]': { maxlength: "Deskripsi hadiah maksimal 255 karakter."}
+            'hadiah[]': { maxlength: "Deskripsi hadiah maksimal 20 karakter."}
         },
         errorElement: 'span',
         errorPlacement: function (error, element) {

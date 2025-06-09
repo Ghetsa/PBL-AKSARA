@@ -6,10 +6,12 @@
     <div class="row">
         <div class="col-12">
             <div class="card shadow-sm">
-                <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
                     <h3 class="card-title mb-0">{{ $breadcrumb->title ?? 'Manajemen Data Lomba' }}</h3>
-                    <div class="menu">
-                        <a href="{{ route('lomba.export.pdf') }}" class="btn btn-sm btn-warning"><i class="fa fa-file-pdf"></i> Export Lomba (PDF)</a>
+                    <div class="card-tools d-flex flex-wrap gap-1 mt-2 mt-md-0">
+                        {{-- <a href="{{ route('user.create') }}" class="btn btn-success btn-sm"><i class="fas fa-plus"></i>
+                            Tambah (Non-AJAX)</a> --}}
+                       <a href="{{ route('lomba.export.pdf') }}" class="btn btn-sm btn-warning"><i class="fa fa-file-pdf"></i> Export Lomba (PDF)</a>
                         <a href="{{ route('lomba.export.excel') }}" class="btn btn-sm btn-success"><i class="fa fa-file-excel"></i> Export Lomba</a>
                         <button class="btn btn-sm btn-primary" onclick="modalActionLombaAdminCrud('{{ route('admin.lomba.crud.create_form_ajax') }}', 'Tambah Info Lomba Baru', 'modalFormLombaAdminCrud')">
                             <i class="fas fa-plus-circle me-1"></i> Tambah Lomba
@@ -19,34 +21,38 @@
                 <div class="card-body">
                     <div class="row mb-4">
                         <div class="col-md-4">
-                            <label for="tingkat_filter_crud" class="form-label">Filter Tingkat Lomba:</label>
-                            <select class="form-select form-select-sm" id="tingkat_filter_crud">
-                                <option value="">- Semua Tingkat -</option>
-                                <option value="lokal">Lokal</option>
-                                <option value="nasional">Nasional</option>
-                                <option value="internasional">Internasional</option>
-                            </select>
+                            <div class="form-group">
+                                <label for="tingkat_filter_crud" class="form-label">Filter Tingkat Lomba:</label>
+                                <select class="form-select form-select-sm" id="tingkat_filter_crud">
+                                    <option value="">- Semua Tingkat -</option>
+                                    <option value="lokal">Lokal</option>
+                                    <option value="nasional">Nasional</option>
+                                    <option value="internasional">Internasional</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="col-md-4">
-                            <label for="kategori_filter_crud" class="form-label">Filter Kategori Lomba:</label>
-                            <select class="form-select form-select-sm" id="kategori_filter_crud">
-                                <option value="">- Semua Kategori -</option>
-                                <option value="individu">Individu</option>
-                                <option value="kelompok">Kelompok</option>
-                            </select>
+                            <div class="form-group">
+                                <label for="kategori_filter_crud" class="form-label">Filter Kategori Lomba:</label>
+                                <select class="form-select form-select-sm" id="kategori_filter_crud">
+                                    <option value="">- Semua Kategori -</option>
+                                    <option value="individu">Individu</option>
+                                    <option value="kelompok">Kelompok</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
 
-                    <table class="table table-bordered table-hover dt-responsive nowrap" id="dataTableLombaCrudAdmin" style="width:100%;">
+                    <table class="table table-bordered table-hover dt-responsive wrap" id="dataTableLombaCrudAdmin" style="width:100%;">
                         <thead>
                             <tr>
                                 <th class="text-center" style="width:5%;">No.</th>
                                 <th>Nama Lomba</th>
                                 <th>Penyelenggara</th>
-                                <th>Tingkat</th>
                                 <th>Batas Daftar</th>
-                                <th class="text-center">Kategori</th>
-                                <th class="text-center" style="width:18%;">Aksi</th> {{-- Lebar disesuaikan untuk 3 tombol --}}
+                                <th>Tingkat</th>
+                                <th>Kategori</th>
+                                <th style="width:15%;">Aksi</th> {{-- Lebar disesuaikan untuk 3 tombol --}}
                             </tr>
                         </thead>
                     </table>
@@ -58,10 +64,15 @@
 
 {{-- Modal untuk Form Tambah/Edit Lomba --}}
 <div class="modal fade" role="dialog" id="modalFormLombaAdminCrud" tabindex="-1" aria-labelledby="modalFormLombaAdminCrudLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content"></div>
     </div>
 </div>
+    {{-- <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document" id="modal-master">
+            <div class="modal-content"></div>
+        </div>
+    </div> --}}
 
 {{-- Modal untuk Detail Lomba (menggunakan modal ID yang berbeda agar tidak konflik) --}}
 <div class="modal fade" id="modalDetailLombaAdminCrud" tabindex="-1" aria-labelledby="modalDetailLombaAdminCrudLabel" aria-hidden="true">
@@ -72,7 +83,7 @@
 
 {{-- Modal untuk Konfirmasi Hapus Lomba --}}
 <div class="modal fade" id="modalConfirmDeleteLombaAdminCrud" tabindex="-1" aria-labelledby="modalConfirmDeleteLombaAdminCrudLabel" aria-hidden="true">
-    <div class="modal-dialog modal-md modal-dialog-centered">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content"></div>
     </div>
 </div>
@@ -126,10 +137,10 @@
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', className: 'text-center', orderable: false, searchable: false },
                 { data: 'nama_lomba', name: 'nama_lomba' },
                 { data: 'penyelenggara', name: 'penyelenggara' },
-                { data: 'tingkat', name: 'tingkat', className: 'text-center' },
-                { data: 'batas_pendaftaran', name: 'batas_pendaftaran', className: 'text-center' },
-                { data: 'kategori', name: 'kategori', className: 'text-center' },
-                { data: 'aksi', name: 'aksi', className: 'text-center', orderable: false, searchable: false }
+                { data: 'batas_pendaftaran', name: 'batas_pendaftaran' },
+                { data: 'tingkat', name: 'tingkat' },
+                { data: 'kategori', name: 'kategori' },
+                { data: 'aksi', name: 'aksi', orderable: false, searchable: false }
             ],
             order: [[ 4, "desc" ]] // Default order by batas_pendaftaran (atau created_at jika lebih sesuai)
         });

@@ -742,7 +742,7 @@ class LombaController extends Controller
             ->addColumn('aksi', function ($lomba) {
                 $btnDetail = '<button onclick="modalActionLomba(\'' . route('lomba.publik.show_ajax', $lomba->lomba_id) . '\', \'Detail Lomba\', \'modalDetailLombaPublik\')" class="btn btn-sm btn-outline-primary"><i class="fas fa-eye me-1"></i>Detail</button>';
                 $btnHitung = '<button class="btn btn-sm btn-outline-secondary btn-detail-hitungan" data-lomba-id="' . $lomba->lomba_id . '"><i class="fas fa-calculator me-1"></i>Hitungan</button>';
-                
+
                 return '<div class="text-center">' . $btnDetail . $btnHitung . '</div>';
             })
             ->rawColumns(['status_display', 'aksi', 'biaya_display'])
@@ -915,38 +915,38 @@ class LombaController extends Controller
 
         return view('lomba.mahasiswa.index', compact('breadcrumb', 'activeMenu', 'userRole', 'kriteriaUntukBobot', 'defaultBobotView'));
     }
-    
+
     public function getMooraCalculationDetailJson(Request $request)
-{
-    $lombaId = $request->input('lomba_id');
-    $weights = $request->input('weights', []);
+    {
+        $lombaId = $request->input('lomba_id');
+        $weights = $request->input('weights', []);
 
-    // Ambil data lomba berdasarkan lomba_id
-    $lomba = LombaModel::find($lombaId);
+        // Ambil data lomba berdasarkan lomba_id
+        $lomba = LombaModel::find($lombaId);
 
-    if (!$lomba) {
-        return response()->json(['error' => 'Lomba tidak ditemukan.'], 404);
+        if (!$lomba) {
+            return response()->json(['error' => 'Lomba tidak ditemukan.'], 404);
+        }
+
+        // Lakukan perhitungan MOORA
+        $mooraDetail = $this->calculateMooraScores(Auth::id(), $weights);
+
+        if (!$mooraDetail) {
+            return response()->json(['error' => 'Perhitungan tidak ditemukan.'], 404);
+        }
+
+        // Pastikan data lomba termasuk nama_lomba
+        return response()->json([
+            'lomba' => [
+                'nama_lomba' => $lomba->nama_lomba,
+                'score' => $mooraDetail['score'],
+                'weights' => $mooraDetail['weights'],
+                'original_values' => $mooraDetail['original_values'],
+                'divisors' => $mooraDetail['divisors'],
+                'normalized_values' => $mooraDetail['normalized_values']
+            ]
+        ]);
     }
-
-    // Lakukan perhitungan MOORA
-    $mooraDetail = $this->calculateMooraScores(Auth::id(), $weights);
-
-    if (!$mooraDetail) {
-        return response()->json(['error' => 'Perhitungan tidak ditemukan.'], 404);
-    }
-
-    // Pastikan data lomba termasuk nama_lomba
-    return response()->json([
-        'lomba' => [
-            'nama_lomba' => $lomba->nama_lomba,
-            'score' => $mooraDetail['score'],
-            'weights' => $mooraDetail['weights'],
-            'original_values' => $mooraDetail['original_values'],
-            'divisors' => $mooraDetail['divisors'],
-            'normalized_values' => $mooraDetail['normalized_values']
-        ]
-    ]);
-}
 
     private function getMooraDetailByLombaId($lombaId, $weights)
     {
@@ -2476,14 +2476,6 @@ class LombaController extends Controller
             'hadiah.*' => 'nullable|string|max:20',
         ];
 
-        // Tambahkan validasi status_verifikasi dan catatan_verifikasi jika request datang dari admin
-        // (Anda bisa menambahkan parameter $isAdmin ke request atau cek role di sini)
-        if (Auth::user()->role === 'admin') {
-            $rules['status_verifikasi'] = 'required|in:pending,disetujui,ditolak';
-            $rules['catatan_verifikasi'] = 'nullable|string|max:1000';
-        }
-
-
         $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
@@ -2493,16 +2485,6 @@ class LombaController extends Controller
                 'errors' => $validator->errors()
             ], 422);
         }
-
-        // Validasi tambahan untuk catatan jika ditolak (jika form dikirim oleh admin)
-        if (Auth::user()->role === 'admin' && $request->status_verifikasi == 'ditolak' && empty(trim($request->catatan_verifikasi ?? ''))) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Catatan verifikasi wajib diisi jika status ditolak.',
-                'errors' => ['catatan_verifikasi' => ['Catatan verifikasi wajib diisi jika status ditolak.']]
-            ], 422);
-        }
-
 
         $validatedData = $validator->validated(); // Ambil data yang sudah divalidasi
 
@@ -2613,8 +2595,8 @@ class LombaController extends Controller
             $sheet->setCellValue('C' . $baris, $lomba->penyelenggara);
             $sheet->setCellValue('D' . $baris, $lomba->tingkat);
             $sheet->setCellValue('E' . $baris, $lomba->biaya);
-            $sheet->setCellValue('F' . $baris, $lomba->pembukaan_pendaftaran);
-            $sheet->setCellValue('G' . $baris, $lomba->batas_pendaftaran);
+            $sheet->setCellValue('F' . $baris, $lomba->pembukaan_pendaftaran->isoFormat('D MMMM YYYY'));
+            $sheet->setCellValue('G' . $baris, $lomba->batas_pendaftaran->isoFormat('D MMMM YYYY'));
 
             $baris++;
             $no++;

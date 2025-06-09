@@ -117,13 +117,13 @@
                     },
                     {
                         data: "kode",
-                        className: "",
+                        className: "text-wrap",
                         orderable: true,
                         searchable: true
                     },
                     {
                         data: "nama",
-                        className: "",
+                        className: "text-wrap",
                         orderable: true,
                         searchable: true
                     },

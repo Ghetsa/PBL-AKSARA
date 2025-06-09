@@ -2,7 +2,7 @@
     @csrf
 
     <div class="modal-header">
-        <h5 class="modal-title" id="myModalLabel">Tambah Program Studi Baru</h5>
+        <h5 class="modal-title" id="myModalLabel">Tambah Periode Semester Baru</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
 

@@ -33,21 +33,25 @@
                 <div class="card-body">
                     <div class="row mb-3">
                         <div class="col-md-4">
-                            <label for="role_filter" class="form-label">Filter Role:</label>
-                            <select class="form-select form-select-sm" id="role_filter" name="role_filter">
-                                <option value="">- Semua Role -</option>
-                                <option value="admin">Admin</option>
-                                <option value="dosen">Dosen</option>
-                                <option value="mahasiswa">Mahasiswa</option>
-                            </select>
+                            <div class="form-group">
+                                <label for="role_filter" class="form-label">Filter Role:</label>
+                                <select class="form-select form-select-sm" id="role_filter" name="role_filter">
+                                    <option value="">- Semua Role -</option>
+                                    <option value="admin">Admin</option>
+                                    <option value="dosen">Dosen</option>
+                                    <option value="mahasiswa">Mahasiswa</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="col-md-4">
-                            <label for="status_filter" class="form-label">Filter Status:</label>
-                            <select class="form-select form-select-sm" id="status_filter" name="status_filter">
-                                <option value="">- Semua Status -</option>
-                                <option value="aktif">Aktif</option>
-                                <option value="nonaktif">Nonaktif</option>
-                            </select>
+                            <div class="form-group">
+                                <label for="status_filter" class="form-label">Filter Status:</label>
+                                <select class="form-select form-select-sm" id="status_filter" name="status_filter">
+                                    <option value="">- Semua Status -</option>
+                                    <option value="aktif">Aktif</option>
+                                    <option value="nonaktif">Nonaktif</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
 
@@ -75,7 +79,7 @@
 
     {{-- Modal utama --}}
     <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document" id="modal-master">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document" id="modal-master">
             <div class="modal-content"></div>
         </div>
     </div>

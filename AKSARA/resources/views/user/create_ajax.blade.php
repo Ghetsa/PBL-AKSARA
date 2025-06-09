@@ -6,7 +6,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
 
-    <div class="modal-body">
+    <div class="modal-body" style="max-height: 68vh; overflow-y: auto;">
         <div class="form-group row mb-3">
             <label for="role_modal" class="col-sm-2 col-form-label">Role</label>
             <div class="col-sm-10">

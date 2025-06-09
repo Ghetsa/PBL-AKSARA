@@ -7,7 +7,7 @@
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 </div>
 
-<div class="modal-body">
+<div class="modal-body" style="max-height: 68vh; overflow-y: auto;">
     <div class="container-fluid">
         <div class="row">
             <div class="col-12 text-center mb-4">
@@ -103,103 +103,8 @@
     </div>
 </div>
 
-{{-- <div class="modal-body">
-    <div class="container-fluid">
-        <div class="row justify-content-center">
-            <div class="col-12 text-center mb-4">
-                @php
-                    if ($user->foto && Storage::disk('public')->exists($user->foto)) {
-                        $avatar = asset('storage/' . $user->foto);
-                    } else {
-                        switch ($user->role) {
-                            case 'mahasiswa':
-                                $avatar = asset('mantis/dist/assets/images/user/1.jpg');
-                                break;
-                            case 'admin':
-                                $avatar = asset('mantis/dist/assets/images/user/2.jpg');
-                                break;
-                            case 'dosen':
-                                $avatar = asset('mantis/dist/assets/images/user/3.jpg');
-                                break;
-                            default:
-                                $avatar = asset('mantis/dist/assets/images/user/avatar-2.jpg');
-                                break;
-                        }
-                    }
-                @endphp
-
-                <div class="mx-auto rounded-circle overflow-hidden" style="width: 120px; height: 120px;">
-                    <img src="{{ $avatar }}" alt="Foto Profil" class="w-100 h-100" style="object-fit: cover;">
-                </div>
-
-                <h4 class="mt-3 mb-1">{{ $user->nama }}</h4>
-                <p class="text-muted mb-1">{{ ucfirst($user->role) }}</p>
-
-                @if($user->status == 'aktif')
-                    <span class="badge bg-success-soft text-success">
-                        <i class="fas fa-check-circle me-1"></i> Aktif
-                    </span>
-                @else
-                    <span class="badge bg-danger-soft text-danger">
-                        <i class="fas fa-times-circle me-1"></i> Nonaktif
-                    </span>
-                @endif
-            </div>
-
-            <div class="col-12">
-                <hr>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item d-flex flex-column flex-sm-row justify-content-between align-items-sm-center px-0">
-                        <span><i class="fas fa-envelope me-2 text-primary"></i>Email</span>
-                        <span>{{ $user->email }}</span>
-                    </li>
-                    <li class="list-group-item d-flex flex-column flex-sm-row justify-content-between align-items-sm-center px-0">
-                        <span><i class="fas fa-phone me-2 text-primary"></i>No. Telepon</span>
-                        <span class="text-end">{{ $user->no_telepon ?: '-' }}</span>
-                    </li>
-                    <li class="list-group-item d-flex flex-column flex-sm-row justify-content-between align-items-sm-center px-0">
-                        <span><i class="fas fa-map-marker-alt me-2 text-primary"></i>Alamat</span>
-                        <span class="text-end">{{ $user->alamat ?: '-' }}</span>
-                    </li>
-
-                    @if($user->role == 'admin' && $user->admin)
-                        <li class="list-group-item d-flex flex-column flex-sm-row justify-content-between align-items-sm-center px-0">
-                            <span><i class="fas fa-id-card me-2 text-primary"></i>NIP Admin</span>
-                            <span class="text-end">{{ $user->admin->nip ?: '-' }}</span>
-                        </li>
-                    @elseif($user->role == 'dosen' && $user->dosen)
-                        <li class="list-group-item d-flex flex-column flex-sm-row justify-content-between align-items-sm-center px-0">
-                            <span><i class="fas fa-id-card me-2 text-primary"></i>NIP Dosen</span>
-                            <span class="text-end">{{ $user->dosen->nip ?: '-' }}</span>
-                        </li>
-                    @elseif($user->role == 'mahasiswa' && $user->mahasiswa)
-                        <li class="list-group-item d-flex flex-column flex-sm-row justify-content-between align-items-sm-center px-0">
-                            <span><i class="fas fa-id-card me-2 text-primary"></i>NIM</span>
-                            <span class="text-end">{{ $user->mahasiswa->nim ?: '-' }}</span>
-                        </li>
-                        <li class="list-group-item d-flex flex-column flex-sm-row justify-content-between align-items-sm-center px-0">
-                            <span><i class="fas fa-graduation-cap me-2 text-primary"></i>Program Studi</span>
-                            <span class="text-end">{{ $user->mahasiswa->prodi ? $user->mahasiswa->prodi->nama : '-' }}</span>
-                        </li>
-                        <li class="list-group-item d-flex flex-column flex-sm-row justify-content-between align-items-sm-center px-0">
-                            <span><i class="fas fa-calendar-alt me-2 text-primary"></i>Periode Semester</span>
-                            <span class="text-end">
-                                @if($user->mahasiswa->periode)
-                                    {{ $user->mahasiswa->periode->tahun_akademik }} / {{ $user->mahasiswa->periode->semester }}
-                                @else
-                                    -
-                                @endif
-                            </span>
-                        </li>
-                    @endif
-                </ul>
-            </div>
-        </div>
-    </div>
-</div> --}}
-
 <div class="modal-footer">
-    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Tutup</button>
 </div>
 
 {{-- CSS untuk efek soft-badge jika belum ada --}}
@@ -211,84 +116,3 @@
         background-color: rgba(220, 53, 69, 0.15);
     }
 </style>
-
-{{-- <div class="modal-header">
-    <h5 class="modal-title" id="myModalLabel">Detail User: {{ $user->nama }}</h5>
-    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-</div>
-
-<div class="modal-body">
-    <table class="table table-bordered table-striped">
-        <tbody>
-            <tr>
-                <th style="width: 30%;">ID User</th>
-                <td>{{ $user->user_id }}</td>
-            </tr>
-            <tr>
-                <th>Nama Lengkap</th>
-                <td>{{ $user->nama }}</td>
-            </tr>
-            <tr>
-                <th>Email</th>
-                <td>{{ $user->email }}</td>
-            </tr>
-            <tr>
-                <th>No. Telepon</th>
-                <td>{{ $user->no_telepon ?: '-' }}</td>
-            </tr>
-            <tr>
-                <th>Alamat</th>
-                <td>{{ $user->alamat ?: '-' }}</td>
-            </tr>
-            <tr>
-                <th>Role</th>
-                <td>{{ ucfirst($user->role) }}</td>
-            </tr>
-            <tr>
-                <th>Status</th>
-                <td>
-                    @if($user->status == 'aktif')
-                        <span class="badge bg-success">Aktif</span>
-                    @else
-                        <span class="badge bg-danger">Nonaktif</span>
-                    @endif
-                </td>
-            </tr>
-
-            @if($user->role == 'admin' && $user->admin)
-                <tr>
-                    <th>NIP Admin</th>
-                    <td>{{ $user->admin->nip ?: '-' }}</td>
-                </tr>
-            @elseif($user->role == 'dosen' && $user->dosen)
-                <tr>
-                    <th>NIP Dosen</th>
-                    <td>{{ $user->dosen->nip ?: '-' }}</td>
-                </tr>
-            @elseif($user->role == 'mahasiswa' && $user->mahasiswa)
-                <tr>
-                    <th>NIM</th>
-                    <td>{{ $user->mahasiswa->nim ?: '-' }}</td>
-                </tr>
-                <tr>
-                    <th>Program Studi</th>
-                    <td>{{ $user->mahasiswa->prodi ? $user->mahasiswa->prodi->nama : '-' }}</td>
-                </tr>
-                <tr>
-                    <th>Periode Masuk</th>
-                    <td>
-                        @if($user->mahasiswa->periode)
-                            {{ $user->mahasiswa->periode->tahun_akademik }} / {{ $user->mahasiswa->periode->semester }}
-                        @else
-                            -
-                        @endif
-                    </td>
-                </tr>
-            @endif
-        </tbody>
-    </table>
-</div> 
-
-<div class="modal-footer">
-    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-</div> --}}
