@@ -96,9 +96,9 @@ class UserController extends Controller
                 return $user->status == 'aktif' ? '<span class="badge bg-success">Aktif</span>' : '<span class="badge bg-danger">Nonaktif</span>';
             })
             ->addColumn('aksi', function ($user) {
-                $btnDetail = '<button onclick="modalAction(\'' . route('user.show_ajax', $user->user_id) . '\')" class="btn btn-info btn-sm me-1" title="Detail"><i class="fas fa-eye"></i></button>';
-                $btnEdit = '<button onclick="modalAction(\'' . route('user.edit_ajax', $user->user_id) . '\')" class="btn btn-warning btn-sm me-1" title="Edit"><i class="fas fa-edit"></i></button>';
-                $btnDelete = '<button onclick="deleteConfirmAjax(' . $user->user_id . ')" class="btn btn-danger btn-sm" title="Hapus"><i class="fas fa-trash"></i></button>';
+                $btnDetail = '<button onclick="modalAction(\'' . route('user.show_ajax', $user->user_id) . '\')" class="btn btn-outline-info btn-sm me-1" title="Detail"><i class="fas fa-eye"></i></button>';
+                $btnEdit = '<button onclick="modalAction(\'' . route('user.edit_ajax', $user->user_id) . '\')" class="btn btn-outline-warning btn-sm me-1" title="Edit"><i class="fas fa-edit"></i></button>';
+                $btnDelete = '<button onclick="deleteConfirmAjax(' . $user->user_id . ')" class="btn btn-outline-danger btn-sm" title="Hapus"><i class="fas fa-trash"></i></button>';
                 return '<div class="btn-group">' . $btnDetail . $btnEdit . $btnDelete . '</div>';
             })
             ->rawColumns(['nama_dan_detail', 'role', 'status', 'aksi'])

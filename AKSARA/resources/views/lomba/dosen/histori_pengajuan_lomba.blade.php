@@ -6,12 +6,14 @@
     <div class="row">
         <div class="col-12">
             <div class="card shadow-sm">
-                <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
                     <h3 class="card-title mb-0">{{ $breadcrumb->title ?? 'Histori Pengajuan Lomba Saya' }}</h3>
                     {{-- Tombol "Ajukan Info Lomba" bisa juga diletakkan di halaman utama lomba.index --}}
-                    <button class="btn btn-sm btn-success" onclick="modalActionLomba('{{ route('lomba.dosen.create_form') }}', 'Ajukan Info Lomba Baru', 'modalFormLombaUser')">
-                        <i class="fas fa-plus-circle me-1"></i> Ajukan Info Lomba Baru
-                    </button>
+                    <div class="card-tools d-flex flex-wrap gap-1 mt-2 mt-md-0">
+                        <button class="btn btn-sm btn-success" onclick="modalActionLomba('{{ route('lomba.dosen.create_form') }}', 'Ajukan Info Lomba Baru', 'modalFormLombaUser')">
+                            <i class="fas fa-plus-circle me-1"></i> Ajukan Info Lomba Baru
+                        </button>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="alert alert-light-info bg-light-info text-info border-0" role="alert">
@@ -23,13 +25,12 @@
                                 <tr>
                                     <th class="text-center" style="width: 5%;">No.</th>
                                     <th>Nama Lomba</th>
-                                    {{-- <th>Bidang Lomba</th> --}}
                                     <th>Penyelenggara</th>
                                     <th>Tingkat</th>
                                     <th>Batas Pendaftaran</th>
                                     <th>Tanggal Pengajuan</th>
-                                    <th class="text-center">Status Verifikasi</th>
-                                    <th class="text-center">Catatan/Aksi</th>
+                                    <th>Status Verifikasi</th>
+                                    <th>Catatan/Aksi</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -43,7 +44,7 @@
 
 {{-- Modal untuk Form Pengajuan/Edit Lomba oleh Mahasiswa/Dosen (jika ada edit) --}}
 <div class="modal fade" id="modalFormLombaUser" tabindex="-1" aria-labelledby="modalFormLombaUserLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             {{-- Konten AJAX form pengajuan/edit lomba dimuat di sini --}}
         </div>
@@ -90,11 +91,11 @@
                 { data: 'nama_lomba', name: 'nama_lomba' },
                 // { data: 'bidang_lomba', name: 'bidang_lomba' },
                 { data: 'penyelenggara', name: 'penyelenggara' },
-                { data: 'tingkat', name: 'tingkat' },
+                { data: 'tingkat', name: 'tingkat', render: function(data, type, row) { return data.charAt(0).toUpperCase() + data.slice(1); } },
                 { data: 'batas_pendaftaran', name: 'batas_pendaftaran' },
                 { data: 'created_at', name: 'created_at' }, // Tanggal pengajuan
-                { data: 'status_verifikasi', name: 'status_verifikasi', className: 'text-center' },
-                { data: 'aksi', name: 'aksi', className: 'text-center', orderable: false, searchable: false }
+                { data: 'status_verifikasi', name: 'status_verifikasi' },
+                { data: 'aksi', name: 'aksi', orderable: false, searchable: false }
             ],
             language: { url: "//cdn.datatables.net/plug-ins/1.13.7/i18n/id.json" }
         });
