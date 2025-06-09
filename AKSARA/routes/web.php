@@ -170,7 +170,9 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/show-lomba-mhs/{id}', [LombaController::class, 'showLombaMhs'])->name('show_form');
             Route::get('/edit-lomba-mhs/{id}', [LombaController::class, 'editLombaMhs'])->name('edit_form');
             Route::put('/update-lomba-mhs/{id}', [LombaController::class, 'updateLombaMhs'])->name('update_form');
-            Route::get('/get-moora-detail', [LombaController::class, 'getMooraCalculationDetailJson'])->name('getMooraDetailJson');
+            Route::get('/get-moora-detail/{id}', [LombaController::class, 'showMooraDetails'])->name('details');
+            Route::get('/get-moora-detail-all', [LombaController::class, 'showAllMooraDetails'])->name('details.all');
+            Route::get('/get-moora', [LombaController::class, 'getMooraDetailJson'])->name('getMooraDetailJson');
         });
 
         Route::get('/dashboard-mahasiswa', [DashboardController::class, 'mahasiswaDashboard'])->name('dashboard.mahasiswa');
@@ -202,7 +204,7 @@ Route::middleware(['auth'])->group(function () {
         });
 
         // ===================== NOTIFIAKSI =====================
-            Route::prefix('notifikasi')->name('mahasiswa.notifikasi.')->group(function () {
+        Route::prefix('notifikasi')->name('mahasiswa.notifikasi.')->group(function () {
             Route::get('/', [NotifikasiController::class, 'index'])->name('index');
             Route::get('/{id}/show_and_read/{model}', [NotifikasiController::class, 'showAndRead'])->name('show_and_read');
             Route::post('/mark-all-as-read', [NotifikasiController::class, 'markAllAsRead'])->name('markAllAsRead');

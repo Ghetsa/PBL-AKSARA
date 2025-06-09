@@ -572,46 +572,83 @@ class LombaController extends Controller
      * Method AJAX untuk mengambil detail perhitungan MOORA satu lomba.
      * Akan dipanggil ketika tombol "btn-detail-hitungan" ditekan.
      */
-    public function detailMoora(Request $request)
+    public function showMooraDetails(Request $request, $id) // WAJIB ada $id
     {
-        $lombaId = $request->input('lomba_id');
         $userId = Auth::id();
 
-        // Ambil custom weights jika dikirim
-        $customWeightsInput = $request->input('weights', []);
-        $criteriaKeys = ['minat', 'keahlian', 'tingkat', 'hadiah', 'penutupan', 'biaya'];
-        $customWeights = [];
-        $totalInputWeight = 0;
+        // Ambil bobot kustom dari request, jika tidak ada, gunakan array kosong
+        $customWeights = $request->input('weights', []);
 
-        foreach ($criteriaKeys as $key) {
-            if (isset($customWeightsInput[$key]) && is_numeric($customWeightsInput[$key])) {
-                $customWeights[$key] = (float) $customWeightsInput[$key];
-                $totalInputWeight += $customWeights[$key];
-            }
+        // Panggil fungsi utama calculateMooraScores untuk mendapatkan semua hasil.
+        // Kemudian filter untuk lomba spesifik ini.
+        $allMooraResults = $this->calculateMooraScores($userId, $customWeights);
+
+        // Filter hasil untuk lomba_id yang spesifik
+        $results = array_filter($allMooraResults, function ($result) use ($id) {
+            return $result['lomba']->lomba_id == $id;
+        });
+
+        // Pastikan array di-re-index setelah filtering
+        $results = array_values($results);
+
+        // Jika tidak ada hasil untuk lomba spesifik atau jika user tidak login
+        if (empty($results)) {
+            // Mengembalikan HTML untuk pesan kosong/error di modal
+            return '<div class="modal-header bg-warning text-white"><h5 class="modal-title">Detail Perhitungan MOORA</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button></div><div class="modal-body"><p class="text-warning">Detail perhitungan tidak ditemukan untuk lomba ini atau data tidak tersedia.</p></div>';
         }
 
-        // Normalisasi jika perlu
-        if ($totalInputWeight > 0 && abs($totalInputWeight - 1.0) > 0.001) {
-            foreach ($customWeights as $key => $val) {
-                $customWeights[$key] = $val / $totalInputWeight;
-            }
+        // Ekstrak data global dari hasil lomba yang pertama (yang seharusnya hanya ada satu sekarang)
+        $globalData = [
+            'weights' => $results[0]['weights'],
+            'divisors' => $results[0]['divisors'],
+            'criteria' => array_keys($results[0]['original_values']),
+            'benefit_criteria' => ['minat', 'keahlian', 'tingkat', 'hadiah', 'penutupan'],
+            'cost_criteria' => ['biaya'],
+        ];
+
+        // Siapkan data untuk view
+        $breadcrumb = (object) ['title' => 'Detail Perhitungan MOORA', 'list' => ['Info Lomba', 'Detail Perhitungan']];
+        $activeMenu = 'info_lomba';
+
+        // Mengembalikan view Blade yang berisi detail perhitungan untuk satu lomba
+        return view('lomba.mahasiswa.moora_details', compact('breadcrumb', 'activeMenu', 'results', 'globalData'));
+    }
+
+    /**
+     * Menampilkan detail perhitungan MOORA untuk SEMUA LOMBA di halaman baru.
+     * Dipanggil oleh tombol "Lihat Detail Lengkap".
+     */
+    public function showAllMooraDetails(Request $request)
+    {
+        $userId = Auth::id();
+
+        // Ambil bobot kustom dari request, jika tidak ada, gunakan array kosong
+        $customWeights = $request->input('weights', []);
+
+        // Panggil fungsi utama yang sudah ada untuk mendapatkan hasil perhitungan
+        $results = $this->calculateMooraScores($userId, $customWeights);
+
+        // Jika tidak ada hasil (misal, tidak ada lomba), tampilkan pesan
+        if (empty($results)) {
+            return view('lomba.mahasiswa.moora_details_empty')
+                ->with('breadcrumb', (object) ['title' => 'Detail Perhitungan MOORA', 'list' => ['Info Lomba', 'Detail Perhitungan']])
+                ->with('activeMenu', 'info_lomba');
         }
 
-        $mooraResults = $this->calculateMooraScores($userId, $customWeights);
+        // Ekstrak data global dari hasil pertama (karena sama untuk semua)
+        $globalData = [
+            'weights' => $results[0]['weights'],
+            'divisors' => $results[0]['divisors'],
+            'criteria' => array_keys($results[0]['original_values']),
+            'benefit_criteria' => ['minat', 'keahlian', 'tingkat', 'hadiah', 'penutupan'],
+            'cost_criteria' => ['biaya'],
+        ];
 
-        $detail = [];
-        foreach ($mooraResults as $item) {
-            if ($item['lomba']->lomba_id == $lombaId) {
-                $detail = $item;
-                break;
-            }
-        }
+        // Siapkan data untuk view
+        $breadcrumb = (object) ['title' => 'Detail Perhitungan MOORA', 'list' => ['Info Lomba', 'Detail Perhitungan']];
+        $activeMenu = 'info_lomba';
 
-        if (empty($detail)) {
-            return response()->json(['error' => 'Data perhitungan tidak ditemukan.'], 404);
-        }
-
-        return view('lomba.partial_detail_perhitungan', compact('detail'));
+        return view('lomba.mahasiswa.moora_details', compact('breadcrumb', 'activeMenu', 'results', 'globalData'));
     }
 
 
@@ -914,51 +951,6 @@ class LombaController extends Controller
 
 
         return view('lomba.mahasiswa.index', compact('breadcrumb', 'activeMenu', 'userRole', 'kriteriaUntukBobot', 'defaultBobotView'));
-    }
-
-    public function getMooraCalculationDetailJson(Request $request)
-    {
-        $lombaId = $request->input('lomba_id');
-        $weights = $request->input('weights', []);
-
-        // Ambil data lomba berdasarkan lomba_id
-        $lomba = LombaModel::find($lombaId);
-
-        if (!$lomba) {
-            return response()->json(['error' => 'Lomba tidak ditemukan.'], 404);
-        }
-
-        // Lakukan perhitungan MOORA
-        $mooraDetail = $this->calculateMooraScores(Auth::id(), $weights);
-
-        if (!$mooraDetail) {
-            return response()->json(['error' => 'Perhitungan tidak ditemukan.'], 404);
-        }
-
-        // Pastikan data lomba termasuk nama_lomba
-        return response()->json([
-            'lomba' => [
-                'nama_lomba' => $lomba->nama_lomba,
-                'score' => $mooraDetail['score'],
-                'weights' => $mooraDetail['weights'],
-                'original_values' => $mooraDetail['original_values'],
-                'divisors' => $mooraDetail['divisors'],
-                'normalized_values' => $mooraDetail['normalized_values']
-            ]
-        ]);
-    }
-
-    private function getMooraDetailByLombaId($lombaId, $weights)
-    {
-        // Ambil lomba berdasarkan ID
-        $lomba = LombaModel::with('bidangKeahlian')->find($lombaId);
-
-        if (!$lomba) {
-            return null;
-        }
-
-        // Lakukan perhitungan MOORA dengan bobot yang diterima
-        return $this->calculateMooraScores(Auth::id(), $weights);
     }
 
     // private const BOBOT_POSISI_PRIORITAS = [

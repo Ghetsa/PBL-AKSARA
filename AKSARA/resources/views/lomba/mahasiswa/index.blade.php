@@ -146,10 +146,11 @@
 
 <script>
     var dtLomba;
-    var isRekomendasiActive = false; 
+    var isRekomendasiActive = false;
     // Simpan bobot default dari Blade untuk reset
     const defaultBobotView = @json($defaultBobotView ?? []);
 
+    // Pastikan fungsi ini didefinisikan secara global atau di dalam scope yang benar
     if (typeof modalActionLomba === 'undefined') {
         function modalActionLomba(url, title = 'Detail Lomba', modalId = 'modalDetailLombaPublik') {
             const targetModal = $(`#${modalId}`);
@@ -158,16 +159,19 @@
             const modalInstance = bootstrap.Modal.getOrCreateInstance(document.getElementById(modalId));
             modalInstance.show();
             $.ajax({
-                url: url, type: 'GET',
-                success: function (response) { targetModalContent.html(response); },
-                error: function (xhr) { 
+                url: url,
+                type: 'GET',
+                success: function(response) {
+                    targetModalContent.html(response);
+                },
+                error: function(xhr) {
                     let msg = xhr.responseJSON?.message ?? 'Gagal memuat konten.';
                     targetModalContent.html(`<div class="modal-header bg-danger text-white"><h5 class="modal-title">${title}</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button></div><div class="modal-body"><p class="text-danger">${msg}</p></div>`);
                 }
             });
         }
     }
-    
+
     function updateTotalBobotDisplay() {
         let total = 0;
         $('.bobot-slider').each(function() {
@@ -178,10 +182,12 @@
             $('#totalBobotText').addClass('bobot-warning');
             $('#bobotWarningText').text('(Total harus 100)');
             $('#terapkanBobotBtn').prop('disabled', true);
+            $('#lihatDetailLengkapBtn').prop('disabled', true); // Nonaktifkan juga tombol detail
         } else {
             $('#totalBobotText').removeClass('bobot-warning');
             $('#bobotWarningText').text('');
             $('#terapkanBobotBtn').prop('disabled', false);
+            $('#lihatDetailLengkapBtn').prop('disabled', false); // Aktifkan juga tombol detail
         }
     }
 
@@ -194,18 +200,24 @@
 
         $('#resetBobotBtn').on('click', function() {
             $('.bobot-slider').each(function() {
-                 const kriteriaKey = $(this).data('kriteria');
-                 const defaultValue = defaultBobotView[kriteriaKey] !== undefined ? defaultBobotView[kriteriaKey] : 20;
-                 $(this).val(defaultValue);
+                const kriteriaKey = $(this).data('kriteria');
+                const defaultValue = defaultBobotView[kriteriaKey] !== undefined ? defaultBobotView[kriteriaKey] : 20; // Sesuaikan default jika tidak ada di defaultBobotView
+                $(this).val(defaultValue);
                 $('#value_' + kriteriaKey).text(defaultValue);
             });
             updateTotalBobotDisplay();
             if (isRekomendasiActive) {
                 isRekomendasiActive = false;
-                dtLomba.column('#kolomSkorRekomendasi').visible(false);
+                dtLomba.column('moora_score:name').visible(false); // Menggunakan nama kolom yang ditentukan di DataTables
                 $('#infoRekomendasi').addClass('d-none');
-                dtLomba.ajax.reload(); 
-                 Swal.fire({ icon: 'info', title: 'Mode Rekomendasi Dinonaktifkan', text: 'Menampilkan semua lomba.', timer: 2000, showConfirmButton: false });
+                dtLomba.ajax.reload();
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Mode Rekomendasi Dinonaktifkan',
+                    text: 'Menampilkan semua lomba.',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
             }
         });
 
@@ -216,8 +228,10 @@
             ajax: {
                 url: "{{ route('lomba.getList') }}",
                 type: "GET",
-                headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                data: function (d) {
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                data: function(d) {
                     d.search_nama = $('#search_nama').val();
                     d.filter_status = $('#filter_status').val();
                     d.rekomendasi = isRekomendasiActive ? '1' : '0';
@@ -229,37 +243,45 @@
                         });
                     }
                 },
-                error: function (xhr, error, thrown) {
+                error: function(xhr, error, thrown) {
                     console.error("DataTables AJAX error: ", xhr.responseText);
-                    Swal.fire({ icon: 'error', title: 'Oops...', text: 'Gagal memuat data lomba. Silakan coba lagi atau hubungi admin.' });
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Gagal memuat data lomba. Silakan coba lagi atau hubungi admin.'
+                    });
                 }
             },
             columns: [
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', className: 'text-center', orderable: false, searchable: false },
-                { data: 'nama_lomba', name: 'lomba.nama_lomba' }, // tambahkan prefix tabel jika join
+                { data: 'nama_lomba', name: 'lomba.nama_lomba' },
                 { data: 'penyelenggara', name: 'lomba.penyelenggara' },
                 { data: 'bidang_display', name: 'bidang_display', orderable: false, searchable: false },
                 { data: 'tingkat', name: 'lomba.tingkat', className: 'text-center' },
-                // { data: 'pembukaan_pendaftaran', name: 'lomba.pembukaan_pendaftaran', className: 'text-center' }, // Jika ingin sort by tanggal buka
                 { data: 'batas_pendaftaran', name: 'lomba.batas_pendaftaran', className: 'text-center' },
-                { data: 'biaya_display', name: 'lomba.biaya', className: 'text-center' }, // Sort by biaya asli
-                { data: 'status_display', name: 'status_display', className: 'text-center', orderable: false, searchable: false},
-                { data: 'moora_score', name: 'moora_score', className: 'text-center', visible: false, orderable: true }, // Default orderable, akan diorder jika kolom visible
+                { data: 'biaya_display', name: 'lomba.biaya', className: 'text-center' },
+                { data: 'status_display', name: 'status_display', className: 'text-center', orderable: false, searchable: false },
+                {
+                    data: 'moora_score',
+                    name: 'moora_score', // Penting: pastikan nama kolom ini sesuai dengan yang kamu definisikan di DataTables
+                    className: 'text-center',
+                    visible: false,
+                    orderable: true,
+                    render: function(data, type, row) {
+                        if (isRekomendasiActive && data !== null) {
+                            // Gunakan kelas 'btn-detail-hitungan' yang sama dengan tombol di kolom 'aksi'
+                            // Ini agar handler klik di bawah bisa menangkapnya
+                            return `<a href="#" class="detail-skor-link btn-detail-hitungan fw-bold" data-lomba-id="${row.lomba_id}">${parseFloat(data).toFixed(4)}</a>`;
+                        }
+                        return data;
+                    }
+                },
                 { data: 'aksi', name: 'aksi', className: 'text-center', orderable: false, searchable: false }
             ],
-            order: isRekomendasiActive ? [[9, 'desc']] : [[5, 'asc']], // Order by score jika rekomendasi, else by batas_pendaftaran
-            createdRow: function(row, data, dataIndex) {
-                if (isRekomendasiActive) {
-                    $(row).find('td:eq(9)').show(); // Tampilkan kolom skor jika mode rekomendasi
-                } else {
-                    $(row).find('td:eq(9)').hide(); // Sembunyikan jika tidak
-                }
-            },
-             fnDrawCallback: function (oSettings) {
-                if (isRekomendasiActive && oSettings.fnRecordsDisplay() > 0) {
-                    // No need for Swal here if table loads, it might be annoying on every sort/page change
-                } else if (isRekomendasiActive && oSettings.fnRecordsDisplay() == 0 && oSettings.aiDisplay.length === 0 && !oSettings.oAjaxData.sSearch ) { // Hanya tampilkan jika tidak ada hasil & bukan karena search global
-                     Swal.fire({
+            order: [[5, 'asc']], // Default order by batas_pendaftaran
+            fnDrawCallback: function (oSettings) {
+                if (isRekomendasiActive && oSettings.fnRecordsDisplay() == 0 && oSettings.aiDisplay.length === 0 && !oSettings.oAjaxData.sSearch) {
+                    Swal.fire({
                         icon: 'info',
                         title: 'Tidak Ada Rekomendasi',
                         text: 'Tidak ditemukan lomba yang sesuai dengan preferensi bobot Anda saat ini.',
@@ -276,112 +298,110 @@
                 return;
             }
             isRekomendasiActive = true;
-            dtLomba.column('#kolomSkorRekomendasi').visible(true);
-            dtLomba.order([dtLomba.column(':contains(Skor Rekomendasi)').index(), 'desc']).draw(); // Order by skor desc
             $('#infoRekomendasi').removeClass('d-none');
-            $('#filterFormLomba').trigger('reset'); // Reset filter pencarian biasa agar tidak bentrok
-            $('#search_nama').val(''); // Pastikan search box juga direset
+            $('#filterFormLomba').trigger('reset'); // Reset form filter lainnya
+            $('#search_nama').val('');
             $('#filter_status').val('');
-            // dtLomba.ajax.reload(); // Sudah dipanggil oleh draw() di atas
-            Swal.fire({ icon: 'info', title: 'Mode Rekomendasi Aktif', text: 'Mencari lomba berdasarkan prioritas Anda...', timer: 1500, showConfirmButton: false });
 
+            dtLomba.column('moora_score:name').visible(true); // Tampilkan kolom skor
+            dtLomba.order([dtLomba.column('moora_score:name').index(), 'desc']).draw(); // Order by skor desc
+            Swal.fire({
+                icon: 'info',
+                title: 'Mode Rekomendasi Aktif',
+                text: 'Mencari lomba berdasarkan prioritas Anda...',
+                timer: 1500,
+                showConfirmButton: false
+            });
         });
 
         $('#filterFormLomba').on('submit', function(e) {
             e.preventDefault();
-            isRekomendasiActive = false;
-            dtLomba.column('#kolomSkorRekomendasi').visible(false);
-            dtLomba.order([dtLomba.column(':contains(Batas Daftar)').index(), 'asc']).draw(); // Kembalikan order default
-            $('#infoRekomendasi').addClass('d-none');
-            // dtLomba.ajax.reload(); // Sudah dipanggil oleh draw()
+            if (isRekomendasiActive) {
+                isRekomendasiActive = false; // Nonaktifkan jika sedang mencari
+                $('#infoRekomendasi').addClass('d-none');
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Mode Rekomendasi Dinonaktifkan',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            }
+            dtLomba.column('moora_score:name').visible(false); // Sembunyikan kolom skor saat filter biasa
+            dtLomba.order([dtLomba.column('batas_pendaftaran:name').index(), 'asc']).draw(); // Kembalikan order default
         });
-    });
 
-    console.log("JavaScript untuk halaman Lomba berhasil dimuat."); // Penanda 1
-    
-    $(document).on('click', '.btn-detail-hitungan', function() {
-    const lombaId = $(this).data('lomba-id');
-    const modalTarget = $('#modalDetailHitungan');
-    const modalContent = $('#modalDetailHitunganContent');
+        // =========================================================================
+        // === SCRIPT UNTUK TOMBOL "LIHAT DETAIL LENGKAP" (MEMBUKA DI TAB BARU) ===
+        // =========================================================================
+        $('#lihatDetailLengkapBtn').on('click', function(e) {
+            e.preventDefault();
 
-    modalContent.html('<div class="modal-body text-center py-5"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Memuat perhitungan...</p></div>');
-    const bsModal = new bootstrap.Modal(document.getElementById('modalDetailHitungan'));
-    bsModal.show();
-
-    // Kumpulkan bobot dari slider
-    const weights = {};
-    $('.bobot-slider').each(function() {
-        const kriteriaKey = $(this).data('kriteria');
-        weights[kriteriaKey] = parseInt($(`#bobot_${kriteriaKey}`).val()) / 100;
-    });
-
-    const url = new URL("{{ route('lomba.mhs.getMooraDetailJson') }}");
-    url.searchParams.append('lomba_id', lombaId);
-    for (const key in weights) {
-        url.searchParams.append(`weights[${key}]`, weights[key]);
-    }
-
-    fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            console.log("Data yang diterima:", data);
-
-            if (!data.lomba || !data.lomba.nama_lomba) {
-                console.error("Data lomba tidak valid:", data);
-                modalContent.html('<div class="modal-body"><p class="text-danger">Data lomba tidak ditemukan.</p></div>');
+            if (parseInt($('#totalBobotText').text()) !== 100) {
+                Swal.fire('Peringatan', 'Total bobot kriteria harus 100.', 'warning');
                 return;
             }
 
-            let tableRows = '';
-            for (const key in data.weights) {
-                const type = ['biaya'].includes(key)
-                    ? `<span class="badge bg-light-danger text-danger">Cost</span>`
-                    : `<span class="badge bg-light-success text-success">Benefit</span>`;
+            const weights = {};
+            $('.bobot-slider').each(function() {
+                // Pastikan bobot dikirim sebagai desimal (nilai slider / 100)
+                weights[$(this).data('kriteria')] = parseInt($(this).val()) / 100;
+            });
 
-                tableRows += `
-                    <tr>
-                        <td class="text-capitalize">${key}</td>
-                        <td>${type}</td>
-                        <td>${Number(data.weights[key]).toFixed(2)}</td>
-                        <td>${data.original_values[key]}</td>
-                        <td>${Number(data.divisors[key]).toFixed(4)}</td>
-                        <td>${Number(data.normalized_values[key]).toFixed(4)}</td>
-                    </tr>
-                `;
+            const params = new URLSearchParams();
+            for (const key in weights) {
+                params.append(`weights[${key}]`, weights[key]);
             }
 
-            const modalHtml = `
-                <div class="modal-header">
-                    <h5 class="modal-title">Detail Perhitungan MOORA</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <h6>Lomba: <span class="fw-bold">${data.lomba.nama_lomba}</span></h6>
-                    <h5 class="mt-2">Skor Akhir (Y_i): <span class="badge bg-primary">${Number(data.score).toFixed(4)}</span></h5>
-                    <p class="mt-3 text-muted">Berikut rincian perhitungan berdasarkan preferensi Anda:</p>
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-striped table-sm">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Kriteria</th><th>Tipe</th><th>Bobot (Wj)</th><th>Nilai Awal (Xij)</th><th>Pembagi (√)</th><th>Nilai Ternormalisasi (X*ij)</th>
-                                </tr>
-                            </thead>
-                            <tbody>${tableRows}</tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                </div>
-            `;
-
-            modalContent.html(modalHtml);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            modalContent.html(`<div class="modal-header"><h5 class="modal-title">Error</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div><div class="modal-body"><p class="text-danger">${error.message}</p></div>`);
+            // Memanggil rute yang baru (details.all) yang tidak butuh ID
+            const url = `{{ route('lomba.mhs.details.all') }}?${params.toString()}`;
+            window.open(url, '_blank'); // Membuka di tab baru
         });
-});
+
+
+        // =========================================================================
+        // === SCRIPT YANG DIPERBAIKI UNTUK TOMBOL "HITUNGAN" DI SETIAP BARIS ===
+        // === (MEMBUKA DETAIL DI MODAL) ===
+        // =========================================================================
+        $('#dataTableLomba tbody').on('click', '.btn-detail-hitungan', function(e) {
+            e.preventDefault();
+            const lombaId = $(this).data('lomba-id');
+            const modalContent = $('#modalDetailHitunganContent'); // Pastikan ini ID dari div di dalam modal-dialog
+            const modalTitle = 'Detail Perhitungan MOORA Lomba'; // Judul modal
+
+            modalContent.html('<div class="modal-body text-center py-5"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Memuat detail perhitungan...</p></div>');
+            const bsModal = new bootstrap.Modal(document.getElementById('modalDetailHitungan')); // Pastikan ini ID dari modal div utama
+            bsModal.show();
+
+            // Ambil bobot kustom dari slider/input di halaman utama
+            const weights = {};
+            $('.bobot-slider').each(function() {
+                // Kirim bobot sebagai desimal (nilai slider / 100)
+                weights[$(this).data('kriteria')] = parseInt($(this).val()) / 100;
+            });
+            const params = new URLSearchParams();
+            for (const key in weights) {
+                params.append(`weights[${key}]`, weights[key]);
+            }
+
+            // Panggil rute showMooraDetails dengan lombaId dan bobot kustom
+            $.ajax({
+                // Gunakan route() helper dengan parameter ID
+                url: `{{ route('lomba.mhs.details', ['id' => 'TEMP_ID']) }}`.replace('TEMP_ID', lombaId) + `?${params.toString()}`,
+                method: 'GET',
+                success: function(response) {
+                    // Asumsi response adalah HTML dari view moora_details
+                    modalContent.html(response);
+                    // Jika kamu ingin mengubah judul modal setelah loading
+                    $('#modalDetailHitungan .modal-title').text(modalTitle);
+                },
+                error: function(xhr, status, error) {
+                    console.error("Terjadi kesalahan:", xhr.responseText);
+                    let errorMessage = xhr.responseJSON?.message ?? 'Gagal memuat detail perhitungan. Silakan coba lagi.';
+                    modalContent.html(`<div class="modal-header bg-danger text-white"><h5 class="modal-title">${modalTitle}</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button></div><div class="modal-body"><p class="text-danger">${errorMessage}</p></div>`);
+                }
+            });
+        });
+    });
 </script>
 @endpush
 
