@@ -14,7 +14,7 @@
                     <div class="row mb-3">
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label for="status_verifikasi_filter" class="form-label small">Filter Status:</label>
+                                <label for="status_verifikasi_filter" class="form-label small">Filter Status Verifikasi:</label>
                                 <select class="form-select form-select-sm" id="status_verifikasi_filter">
                                     <option value="">- Semua Status -</option>
                                     <option value="pending" selected>Pending</option> 

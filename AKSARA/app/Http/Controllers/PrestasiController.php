@@ -143,39 +143,40 @@ class PrestasiController extends Controller
                 ->addColumn('dosen_pembimbing', function ($row) {
                     return $row->dosenPembimbing->user->nama ?? ($row->dosenPembimbing->nama ?? '-');
                 })
-                ->addColumn('status_verifikasi_badge', function ($row) { // Ganti nama kolom dari 'status_verifikasi'
-                    $badgeClass = 'bg-secondary';
-                    $label = ucfirst($row->status_verifikasi);
+                ->editColumn('status_verifikasi', fn($row) => $row->status_verifikasi_badge)
+                // ->addColumn('status_verifikasi_badge', function ($row) { // Ganti nama kolom dari 'status_verifikasi'
+                //     $badgeClass = 'bg-secondary';
+                //     $label = ucfirst($row->status_verifikasi);
 
-                    switch (strtolower($row->status_verifikasi)) {
-                        case 'disetujui':
-                            $badgeClass = 'bg-success';
-                            $label = 'Terverifikasi';
-                            break;
-                        case 'pending':
-                            $badgeClass = 'bg-warning';
-                            $label = 'Menunggu';
-                            break;
-                        case 'ditolak':
-                            $badgeClass = 'bg-danger';
-                            $label = 'Ditolak';
-                            break;
-                    }
+                //     switch (strtolower($row->status_verifikasi)) {
+                //         case 'disetujui':
+                //             $badgeClass = 'bg-success';
+                //             $label = 'Terverifikasi';
+                //             break;
+                //         case 'pending':
+                //             $badgeClass = 'bg-warning';
+                //             $label = 'Menunggu';
+                //             break;
+                //         case 'ditolak':
+                //             $badgeClass = 'bg-danger';
+                //             $label = 'Ditolak';
+                //             break;
+                //     }
 
-                    return '<span class="badge ' . $badgeClass . '">' . $label . '</span>';
-                })
+                //     return '<span class="badge ' . $badgeClass . '">' . $label . '</span>';
+                // })
                 ->addColumn('aksi', function ($row) {
-                    $btnDetail = '<button type="button" class="btn btn-xs btn-info btn-sm me-1" onclick="modalAction(\'' . route('prestasi.mahasiswa.show_ajax', $row->prestasi_id) . '\', \'Detail Prestasi\')"><i class="ti ti-eye f-18"></i></button>';
+                    $btnDetail = '<button type="button" class="btn btn-info btn-sm me-1" onclick="modalAction(\'' . route('prestasi.mahasiswa.show_ajax', $row->prestasi_id) . '\', \'Detail Prestasi\')"><i class="fas fa-eye"></i></button>';
                     $btnEdit = '';
                     $btnDelete = '';
 
                     if (in_array($row->status_verifikasi, ['pending', 'ditolak'])) {
-                        $btnEdit = '<button type="button" class="btn btn-xs btn-warning btn-sm me-1" onclick="modalAction(\'' . route('prestasi.mahasiswa.edit_ajax', $row->prestasi_id) . '\', \'Edit Prestasi\')"><i class="ti ti-edit-circle f-18"></i></button>';
+                        $btnEdit = '<button type="button" class="btn btn-warning btn-sm me-1" onclick="modalAction(\'' . route('prestasi.mahasiswa.edit_ajax', $row->prestasi_id) . '\', \'Edit Prestasi\')"><i class="fas fa-edit"></i></button>';
                     }
 
-                    return $btnDetail . $btnEdit . $btnDelete;
+                    return '<div class="btn-group">' . $btnDetail . $btnEdit . $btnDelete . '</div>';
                 })
-                ->rawColumns(['status_verifikasi_badge', 'aksi']) // Tambahkan 'aksi' ke rawColumns
+                ->rawColumns(['status_verifikasi', 'aksi']) // Tambahkan 'aksi' ke rawColumns
                 ->make(true);
         }
         return abort(403, "Akses ditolak.");
@@ -215,7 +216,7 @@ class PrestasiController extends Controller
             'tingkat' => ['required', Rule::in(['kota', 'provinsi', 'nasional', 'internasional'])],
             'tahun' => 'required|integer|digits:4|min:1900|max:' . (date('Y') + 1),
             'dosen_id' => 'nullable|integer|exists:dosen,dosen_id',
-            'bidang_id' => 'nullable|integer|exists:bidang,bidang_id',
+            'bidang_id' => 'required|integer|exists:bidang,bidang_id',
             'file_bukti' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048', // Max 2MB
         ]);
 
@@ -550,6 +551,14 @@ class PrestasiController extends Controller
             if (!empty($request->status_verifikasi)) {
                 $data->where('status_verifikasi', $request->status_verifikasi);
             }
+            // Filter data user berdasarkan tingkat
+            if (!empty($request->tingkat)) {
+                $data->where('tingkat', $request->tingkat);
+            }
+            // Filter data user berdasarkan kategori
+            if (!empty($request->kategori)) {
+                $data->where('kategori', $request->kategori);
+            }
 
             // if ($request->filled('filter_status') && in_array($request->filter_status, ['pending', 'disetujui', 'ditolak'])) {
             //     $data->where('status_verifikasi', $request->filter_status);
@@ -570,19 +579,20 @@ class PrestasiController extends Controller
                 ->editColumn('tingkat', function ($row) {
                     return ucfirst($row->tingkat);
                 })
-                ->editColumn('status_verifikasi', function ($row) {
-                    if ($row->status_verifikasi == 'pending') {
-                        return '<span class="badge bg-warning text-dark">Pending</span>';
-                    } elseif ($row->status_verifikasi == 'disetujui') {
-                        return '<span class="badge bg-success">Disetujui</span>';
-                    } elseif ($row->status_verifikasi == 'ditolak') {
-                        return '<span class="badge bg-danger">Ditolak</span>';
-                    }
-                    return '<span class="badge bg-secondary">' . ucfirst($row->status_verifikasi) . '</span>';
-                })
+                ->editColumn('status_verifikasi', fn($row) => $row->status_verifikasi_badge)
+                // ->editColumn('status_verifikasi', function ($row) {
+                //     if ($row->status_verifikasi == 'pending') {
+                //         return '<span class="badge bg-warning text-dark">Pending</span>';
+                //     } elseif ($row->status_verifikasi == 'disetujui') {
+                //         return '<span class="badge bg-success">Disetujui</span>';
+                //     } elseif ($row->status_verifikasi == 'ditolak') {
+                //         return '<span class="badge bg-danger">Ditolak</span>';
+                //     }
+                //     return '<span class="badge bg-secondary">' . ucfirst($row->status_verifikasi) . '</span>';
+                // })
                 ->addColumn('aksi', function ($row) {
                     $verifyUrl = route('prestasi.admin.verify_form_ajax', $row->prestasi_id);
-                    return '<button type="button" class="btn btn-info btn-sm" onclick="modalAction(\'' . $verifyUrl . '\')"><i class="fas fa-search-plus"></i> Verifikasi</button>';
+                    return '<button type="button" class="btn btn-outline-primary btn-sm" onclick="modalAction(\'' . $verifyUrl . '\')"><i class="fas fa-clipboard-check"></i> Verifikasi</button>';
                 })
                 ->rawColumns(['status_verifikasi', 'aksi'])
                 ->make(true);

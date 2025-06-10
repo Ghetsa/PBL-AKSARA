@@ -58,7 +58,7 @@
         {{-- KARTU DETAIL LOMBA --}}
         <div class="card mb-4">
             <div class="card-header bg-white">
-                <h6 class="mb-0 fw-semibold"><i class="fas fa-medal me-2"></i>Detail Informasi Lomba</h6>
+                <h6 class="mb-0 fw-semibold"><i class="fas fa-medal me-2 text-primary"></i>Detail Informasi Lomba</h6>
             </div>
             <div class="card-body">
                 <div class="row">
@@ -71,19 +71,19 @@
                         <div class="col-md-12">
                     @endif
                         <dl class="row">
-                            <dt class="col-sm-5 text-muted">Nama Lomba</dt>
+                            <dt class="col-sm-5 text-muted"><i class="fas fa-award fa-fw me-1 text-muted"></i>Nama Lomba</dt>
                             <dd class="col-sm-7">{{ $lomba->nama_lomba }}</dd>
 
-                            <dt class="col-sm-5 text-muted">Penyelenggara</dt>
+                            <dt class="col-sm-5 text-muted"><i class="fas fa-university fa-fw me-1 text-muted"></i>Penyelenggara</dt>
                             <dd class="col-sm-7">{{ $lomba->penyelenggara }}</dd>
 
-                            <dt class="col-sm-5 text-muted">Tingkat</dt>
+                            <dt class="col-sm-5 text-muted"><i class="fas fa-signal fa-fw me-1 text-muted"></i>Tingkat</dt>
                             <dd class="col-sm-7">{{ ucfirst($lomba->tingkat) }}</dd>
 
-                            <dt class="col-sm-5 text-muted">Kategori</dt>
+                            <dt class="col-sm-5 text-muted"><i class="fas fa-users fa-fw me-1 text-muted"></i>Kategori</dt>
                             <dd class="col-sm-7">{{ ucfirst($lomba->kategori) }}</dd>
                             
-                            <dt class="col-sm-5 text-muted">Bidang</dt>
+                            <dt class="col-sm-5 text-muted"><i class="fas fa-tags fa-fw me-1 text-muted"></i>Bidang</dt>
                             <dd class="col-sm-7">
                                 @forelse($lomba->bidangKeahlian as $detail)
                                     @if($detail->bidang)
@@ -94,7 +94,7 @@
                                 @endforelse
                             </dd>
 
-                            <dt class="col-sm-5 text-muted">Hadiah</dt>
+                            <dt class="col-sm-5 text-muted"><i class="fas fa-gifts fa-fw me-1 text-muted"></i>Hadiah</dt>
                             <dd class="col-sm-7">
                                 @forelse($lomba->daftarHadiah as $itemHadiah)
                                     <i class="fas fa-gift text-warning me-1"></i>{{ e($itemHadiah->hadiah) }}<br>
@@ -111,11 +111,11 @@
         {{-- KARTU JADWAL & TAUTAN --}}
         <div class="card">
             <div class="card-header bg-white">
-                <h6 class="mb-0 fw-semibold"><i class="fas fa-calendar-alt me-2"></i>Jadwal & Tautan</h6>
+                <h6 class="mb-0 fw-semibold"><i class="fas fa-calendar-alt me-2 text-primary"></i>Jadwal & Tautan</h6>
             </div>
             <div class="card-body">
                 <dl class="row">
-                    <dt class="col-sm-5 text-muted">Biaya Pendaftaran</dt>
+                    <dt class="col-sm-5 text-muted"><i class="fas fa-calendar-plus fa-fw me-1 text-muted"></i>Biaya Pendaftaran</dt>
                     <dd class="col-sm-7">
                         @if($lomba->biaya > 0)
                             Rp {{ number_format($lomba->biaya, 0, ',', '.') }}
@@ -124,10 +124,10 @@
                         @endif
                     </dd>
 
-                    <dt class="col-sm-5 text-muted">Pendaftaran Dibuka</dt>
+                    <dt class="col-sm-5 text-muted"><i class="fas fa-calendar-times fa-fw me-1 text-muted"></i>Pendaftaran Dibuka</dt>
                     <dd class="col-sm-7">{{ $lomba->pembukaan_pendaftaran ? $lomba->pembukaan_pendaftaran->isoFormat('D MMMM YYYY') : '-' }}</dd>
 
-                    <dt class="col-sm-5 text-muted">Batas Pendaftaran</dt>
+                    <dt class="col-sm-5 text-muted"><i class="fas fa-money-bill-wave fa-fw me-1 text-muted"></i>Batas Pendaftaran</dt>
                     <dd class="col-sm-7">{{ $lomba->batas_pendaftaran ? $lomba->batas_pendaftaran->isoFormat('D MMMM YYYY') : '-' }}</dd>
                 </dl>
                 @if($lomba->link_pendaftaran || $lomba->link_penyelenggara)

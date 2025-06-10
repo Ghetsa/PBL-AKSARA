@@ -58,4 +58,27 @@ class PrestasiModel extends Model
         'status_verifikasi' => 'string',
         'tahun' => 'integer',
     ];
+
+    public function getStatusVerifikasiBadgeAttribute(): string
+    {
+        $status = strtolower($this->status_verifikasi);
+        $badgeClass = 'bg-light-secondary text-secondary ';
+        $label = ucfirst($status ?: 'Belum Diajukan');
+
+        switch ($status) {
+            case 'disetujui':
+                $badgeClass = 'bg-light-success text-success';
+                $label = 'Disetujui';
+                break;
+            case 'pending':
+                $badgeClass = 'bg-light-warning text-warning';
+                $label = 'Menunggu';
+                break;
+            case 'ditolak':
+                $badgeClass = 'bg-light-danger text-danger';
+                $label = 'Ditolak';
+                break;
+        }
+        return '<span class="badge ' . $badgeClass . ' px-2 py-1 fs-6">' . $label . '</span>';
+    }
 }

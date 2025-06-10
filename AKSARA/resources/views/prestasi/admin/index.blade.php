@@ -10,15 +10,49 @@
                     <h3 class="card-title">Daftar Pengajuan Prestasi Mahasiswa</h3>
                 </div>
                 <div class="card-body">
-                    <div class="row mb-3"> 
-                        {{-- Filter Status Verifikasi --}}
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="status" class="form-label small">Filter Status Verifikasi:</label>
+                                <select class="form-select form-select-sm" id="status" name="status">
+                                    <option value="">- Pilih Status -</option>
+                                    <option value="pending" selected>Pending</option>
+                                    <option value="disetujui">Disetujui</option>
+                                    <option value="ditolak">Ditolak</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="tingkat" class="form-label small">Filter Tingkat Lomba:</label>
+                                <select class="form-select form-select-sm" id="tingkat" name="tingkat">
+                                    <option value="">- Semua Tingkat -</option>
+                                    <option value="kota">Kota/Kabupaten</option>
+                                    <option value="provinsi">Provinsi</option>
+                                    <option value="nasional">Nasional</option>
+                                    <option value="internasional">Internasional</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="kategori" class="form-label small">Filter Kategori Prestasi:</label>
+                                <select class="form-select form-select-sm" id="kategori" name="kategori">
+                                    <option value="">- Semua Kategori -</option>
+                                    <option value="akademik">Akademik</option>
+                                    <option value="non-akademik">Non-akademik</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    {{-- <div class="row mb-3"> 
                         <div class="col-md-6">
                             <div class="form-group row">
                                 <label class="col-sm-4 col-form-label">Filter Status:</label>
                                 <div class="col-sm-8">
                                     <select class="form-control" id="status" name="status">
                                         <option value="">- Pilih Status -</option>
-                                        <option value="pending">Pending</option>
+                                        <option value="pending" selected>Pending</option>
                                         <option value="disetujui">Disetujui</option>
                                         <option value="ditolak">Ditolak</option>
                                     </select>
@@ -26,10 +60,10 @@
                                 </div>
                             </div>
                         </div>
-                    </div> 
+                    </div>  --}}
 
                     <div class="table-responsive">
-                        <table class="table table-bordered table-hover" id="dataDaftarPrestasiAdmin" style="width:100%;">
+                        <table class="table table-bordered table-hover dt-responsive wrap" id="dataDaftarPrestasiAdmin" style="width:100%;">
                             <thead>
                                 <tr>
                                     <th class="text-center">No.</th>
@@ -39,8 +73,8 @@
                                     <th>Kategori</th>
                                     <th>Tingkat</th>
                                     <th>Tahun</th>
-                                    <th class="text-center">Status</th>
-                                    <th class="text-center">Aksi</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -88,10 +122,13 @@
         dataDaftarPrestasiAdmin = $('#dataDaftarPrestasiAdmin').DataTable({
             processing: true,
             serverSide: true,
+            responsive: true,
             ajax: {
                 url: "{{ route('prestasi.admin.list') }}",
                 data: function (d) {
                     d.status_verifikasi = $('#status').val();
+                    d.tingkat = $('#tingkat').val();
+                    d.kategori = $('#kategori').val();
                 }
             },
             columns: [
@@ -102,14 +139,13 @@
                 { data: 'kategori', name: 'kategori' },
                 { data: 'tingkat', name: 'tingkat' },
                 { data: 'tahun', name: 'tahun' },
-                { data: 'status_verifikasi', name: 'status_verifikasi', className: 'text-center' },
-                { data: 'aksi', name: 'aksi', className: 'text-center', orderable: false, searchable: false }
+                { data: 'status_verifikasi', name: 'status_verifikasi' },
+                { data: 'aksi', name: 'aksi', orderable: false, searchable: false }
             ],
-            language: { url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/id.json" }
         });
 
         // Trigger reload DataTables saat filter Status berubah
-        $('#status').on('change', function () {
+        $('#status, #tingkat, #kategori').on('change', function () {
             dataDaftarPrestasiAdmin.ajax.reload();
         });
     });

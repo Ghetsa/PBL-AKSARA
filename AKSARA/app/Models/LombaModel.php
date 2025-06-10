@@ -154,6 +154,6 @@ class LombaModel extends Model
                 $label = 'Ditolak';
                 break;
         }
-        return '<span class="badge ' . $badgeClass . ' px-2 py-1">' . $label . '</span>';
+        return '<span class="badge ' . $badgeClass . ' px-2 py-1 fs-6">' . $label . '</span>';
     }
 }

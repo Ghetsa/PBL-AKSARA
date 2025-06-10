@@ -6,16 +6,19 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h3 class="card-title">Histori Prestasi Saya</h3>
-                    <button type="button" class="btn btn-primary btn-sm"
-                            onclick="modalAction('{{ route('prestasi.mahasiswa.create_ajax') }}', 'Upload Prestasi Baru')">
-                        <i class="fas fa-plus-circle"></i> Upload Prestasi Baru
-                    </button>
+                <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
+                    <h3 class="card-title mb-0">Histori Prestasi Saya</h3>
+                    {{-- Tombol "Ajukan Info Lomba" bisa juga diletakkan di halaman utama lomba.index --}}
+                    <div class="card-tools d-flex flex-wrap gap-1 mt-2 mt-md-0">
+                        <button type="button" class="btn btn-primary btn-sm"
+                                onclick="modalAction('{{ route('prestasi.mahasiswa.create_ajax') }}', 'Upload Prestasi Baru')">
+                            <i class="fas fa-plus-circle"></i> Upload Prestasi Baru
+                        </button>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-bordered table-hover" id="dataPrestasiMahasiswa" style="width:100%;">
+                        <table class="table table-bordered table-hover dt-responsive wrap" id="dataPrestasiMahasiswa" style="width:100%;">
                             <thead>
                                 <tr>
                                     <th class="text-center" style="width: 5%;">No.</th>
@@ -25,8 +28,8 @@
                                     <th>Tingkat</th>
                                     <th>Tahun</th>
                                     <th>Dosen Pembimbing</th> {{-- Kolom Baru --}}
-                                    <th class="text-center">Status</th>
-                                    <th class="text-center" style="width: 15%;">Aksi</th> {{-- Lebar disesuaikan --}}
+                                    <th>Status</th>
+                                    <th style="width: 15%;">Aksi</th> {{-- Lebar disesuaikan --}}
                                 </tr>
                             </thead>
                             <tbody>
@@ -89,8 +92,8 @@
                 { data: 'tingkat', name: 'tingkat' },
                 { data: 'tahun', name: 'tahun' },
                 { data: 'dosen_pembimbing', name: 'dosen_pembimbing.nama', orderable: false, searchable: false }, 
-                { data: 'status_verifikasi_badge', name: 'status_verifikasi', className: 'text-center' }, // Akan berisi HTML badge
-                { data: 'aksi', name: 'aksi', className: 'text-center', orderable: false, searchable: false }
+                { data: 'status_verifikasi', name: 'status_verifikasi' }, // Akan berisi HTML badge
+                { data: 'aksi', name: 'aksi', orderable: false, searchable: false }
             ],
         });
 

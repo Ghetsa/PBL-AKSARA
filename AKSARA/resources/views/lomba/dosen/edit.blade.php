@@ -136,8 +136,9 @@
 
             {{-- Poster --}}
             <div class="col-md-12 mb-3">
-                <label for="user_edit_poster" class="form-label">Poster Lomba (Opsional, Max 2MB: JPG, PNG, PDF)</label>
+                <label for="user_edit_poster" class="form-label">Poster Lomba</label>
                 <input type="file" name="poster" id="user_edit_poster" class="form-control form-control-sm" accept="image/jpeg,image/png,image/jpg,application/pdf">
+                <small class="form-text text-muted">Format: JPG, JPEG, PNG. Max: 2MB.</small>
                 @if($lomba->poster && Storage::disk('public')->exists($lomba->poster))
                     <small class="form-text text-muted mt-1 d-block">
                         Poster saat ini: <a href="{{ asset('storage/' . $lomba->poster) }}" target="_blank">Lihat Poster</a>. Kosongkan jika tidak ingin mengubah.
@@ -193,7 +194,7 @@ $(document).ready(function() {
             tingkat: { required: true },
             'bidang_keahlian[]': { required: true, minlength: 1 },
             biaya: { number: true, min: 0 },
-            link_pendaftaran: { nullableUrl: true, maxlength: 150 },
+            link_pendaftaran: { required:true, nullableUrl: true, maxlength: 150 },
             link_penyelenggara: { nullableUrl: true, maxlength: 150 },
             poster: { extension: "jpg|jpeg|png", filesize: 2097152 },
             'hadiah[]': { maxlength: 20 } // Validasi untuk setiap item hadiah
@@ -207,7 +208,7 @@ $(document).ready(function() {
             tingkat: { required: "Tingkat lomba wajib dipilih." },
             'bidang_keahlian[]': { required: "Pilih minimal satu bidang keahlian.", minlength: "Pilih minimal satu bidang keahlian." },
             biaya: { number: "Biaya harus berupa angka.", min: "Biaya tidak boleh negatif." },
-            link_pendaftaran: { nullableUrl: "Format URL pendaftaran tidak valid.", maxlength: "Link pendaftaran maksimal 150 karakter." },
+            link_pendaftaran: { required: "Link pendaftaran wajib diisi.", nullableUrl: "Format URL pendaftaran tidak valid.", maxlength: "Link pendaftaran maksimal 150 karakter." },
             link_penyelenggara: { nullableUrl: "Format URL penyelenggara tidak valid.", maxlength: "Link penyelenggara maksimal 150 karakter." },
             poster: { extension: "Format file poster tidak valid (hanya JPG, JPEG, PNG).", filesize: "Ukuran file poster maksimal 2MB." },
             'hadiah[]': { maxlength: "Deskripsi hadiah maksimal 20 karakter."}
