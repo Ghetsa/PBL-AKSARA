@@ -16,9 +16,9 @@
                             <div class="form-group row">
                                 <label class="col-sm-4 col-form-label" for="status_filter_keahlian">Filter Status:</label>
                                 <div class="col-sm-8">
-                                    <select class="form-select" id="status_filter_keahlian" name="status_filter_keahlian">
+                                    <select class="form-select form-select-sm" id="status_filter_keahlian" name="status_filter_keahlian">
                                         <option value="">- Semua Status -</option>
-                                        <option value="pending">Pending</option>
+                                        <option value="pending" selected>Pending</option>
                                         <option value="disetujui">Disetujui</option>
                                         <option value="ditolak">Ditolak</option>
                                     </select>

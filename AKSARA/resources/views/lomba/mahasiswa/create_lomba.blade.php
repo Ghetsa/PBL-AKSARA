@@ -1,6 +1,3 @@
-{{-- Form untuk Pengajuan Lomba oleh Mahasiswa/Dosen (dimuat di modal) --}}
-{{-- Pastikan variabel $bidangList sudah di-pass ke view ini dari controller --}}
-{{-- Variabel $lomba akan null saat create, dan berisi data saat edit --}}
 <form id="formUserLomba" 
     action="{{ isset($lomba) ? route('lomba.mhs.update_form', $lomba->lomba_id) : (auth()->user()->role == 'mahasiswa' ? route('lomba.mhs.store') : route('lomba.dosen.store')) }}" 
     method="POST" enctype="multipart/form-data">

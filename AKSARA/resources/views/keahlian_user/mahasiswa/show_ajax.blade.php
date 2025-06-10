@@ -1,15 +1,3 @@
-{{--
-IMPROVED MAHASISWA KEAHLIAN DETAIL VIEW (show_ajax.blade.php)
-------------------------------------------------------------------
-Perbaikan oleh Front-End Developer Anda.
-Perubahan:
-- Mengganti total layout tabel menjadi desain berbasis Card yang modern dan responsif.
-- Fokus utama pada kartu "Status Pengajuan" dengan aksen warna dan tombol aksi yang kontekstual.
-- Menambahkan kartu "Detail Sertifikasi" yang terpisah untuk kejelasan informasi.
-- Menambahkan fitur preview gambar untuk file bukti, dengan fallback tombol unduh untuk file non-gambar.
-- Meningkatkan UI/UX secara keseluruhan agar konsisten dengan halaman detail lainnya.
---}}
-
 @php
     // Logika untuk menentukan warna aksen kartu berdasarkan status
     $statusClass = '';
@@ -88,7 +76,7 @@ Perubahan:
                     <dt class="col-sm-5 text-muted">Tanggal Perolehan</dt>
                     <dd class="col-sm-7">{{ $keahlianUser->tanggal_perolehan_sertifikat ? \Carbon\Carbon::parse($keahlianUser->tanggal_perolehan_sertifikat)->isoFormat('D MMMM YYYY') : '-' }}</dd>
 
-                    <dt class="col-sm-5 text-muted">Tanggal Kadaluwarsa</dt>
+                    <dt class="col-sm-5 text-muted">Tanggal Kedaluwarsa</dt>
                     <dd class="col-sm-7">{{ $keahlianUser->tanggal_kadaluarsa_sertifikat ? \Carbon\Carbon::parse($keahlianUser->tanggal_kadaluarsa_sertifikat)->isoFormat('D MMMM YYYY') : 'Tidak Ada' }}</dd>
                 </dl>
             </div>
@@ -100,9 +88,9 @@ Perubahan:
                 <h6 class="mb-0 fw-semibold"><i class="fas fa-file-contract me-2"></i>Bukti Sertifikasi</h6>
             </div>
             <div class="card-body p-3 text-center">
-                @if($keahlianUser->sertifikat_path && Storage::disk('public')->exists($keahlianUser->sertifikat_path))
+                @if($keahlianUser->sertifikasi && Storage::disk('public')->exists($keahlianUser->sertifikasi))
                     @php
-                        $filePath = $keahlianUser->sertifikat_path;
+                        $filePath = $keahlianUser->sertifikasi;
                         $fileUrl = asset('storage/' . $filePath);
                         $fileExtension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
                         $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
@@ -129,7 +117,7 @@ Perubahan:
 </div>
 
 <div class="modal-footer">
-    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Tutup</button>
 </div>
 
 {{-- <div class="modal-header">

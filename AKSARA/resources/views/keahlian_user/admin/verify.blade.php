@@ -1,28 +1,18 @@
-{{--
-ENHANCED KEAHLIAN VERIFICATION MODAL (verify.blade.php)
-------------------------------------------------------------------
-Perbaikan oleh Front-End Developer Anda.
-Perubahan:
-- [FITUR BARU] Menambahkan Card "Detail Sertifikasi" untuk menampilkan informasi sertifikat secara terpisah dan rapi.
-- Menambahkan ikon yang relevan untuk setiap detail sertifikasi.
-- Mempertahankan desain 2 kolom yang efisien, preview bukti, dan panel aksi yang sudah ada.
---}}
-
 <form id="formVerifikasiKeahlianAdmin" method="POST" action="{{ route('keahlian_user.admin.process_verification_ajax', $keahlianUser->keahlian_user_id) }}">
     @csrf
     @method('PUT')
     <input type="hidden" name="status_verifikasi" id="hidden_status_verifikasi_keahlian" value="{{ $keahlianUser->status_verifikasi }}">
 
     <div class="modal-header bg-light">
-        <h5 class="modal-title"><i class="fas fa-user-check me-2"></i>Verifikasi Keahlian & Sertifikasi</h5>
+        <h5 class="modal-title"><i class="fas fa-user-check me-2"></i>Verifikasi Keahlian Mahasiswa: {{ Str::limit($keahlianUser->bidang->bidang_nama, 45) }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
 
-    <div class="modal-body p-lg-4" style="max-height: 75vh; overflow-y: auto;">
+    <div class="modal-body p-lg-4" style="max-height: 68vh; overflow-y: auto;">
         <div class="row">
             {{-- Kolom Kiri: Detail Pengajuan --}}
             <div class="col-12 col-lg-7 border-end-lg pe-lg-4">
-                <h5 class="fw-bold mb-3"><i class="fas fa-star me-2 text-warning"></i>{{ $keahlianUser->bidang->bidang_nama ?? 'Keahlian' }}</h5>
+                {{-- <h5 class="fw-bold mb-3"><i class="fas fa-star me-2 text-warning"></i>{{ $keahlianUser->bidang->bidang_nama ?? 'Keahlian' }}</h5> --}}
 
                 {{-- Card Informasi Pengguna --}}
                 <div class="card mb-3">
@@ -64,7 +54,7 @@ Perubahan:
                             <dt class="col-sm-5 text-muted"><i class="fas fa-calendar-check fa-fw me-2"></i>Tgl. Perolehan</dt>
                             <dd class="col-sm-7">{{ $keahlianUser->tanggal_perolehan_sertifikat ? \Carbon\Carbon::parse($keahlianUser->tanggal_perolehan_sertifikat)->isoFormat('D MMMM YYYY') : '-' }}</dd>
 
-                            <dt class="col-sm-5 text-muted"><i class="fas fa-calendar-times fa-fw me-2"></i>Tgl. Kadaluwarsa</dt>
+                            <dt class="col-sm-5 text-muted"><i class="fas fa-calendar-times fa-fw me-2"></i>Tgl. Kedaluwarsa</dt>
                             <dd class="col-sm-7">{{ $keahlianUser->tanggal_kadaluarsa_sertifikat ? \Carbon\Carbon::parse($keahlianUser->tanggal_kadaluarsa_sertifikat)->isoFormat('D MMMM YYYY') : 'Tidak ada' }}</dd>
                         </dl>
                     </div>
@@ -76,9 +66,9 @@ Perubahan:
                         <h6 class="mb-0 fw-semibold"><i class="fas fa-file-contract me-2 text-primary"></i>File Bukti</h6>
                     </div>
                     <div class="card-body p-3 text-center">
-                        @if($keahlianUser->sertifikat_path && Storage::disk('public')->exists($keahlianUser->sertifikat_path))
+                        @if($keahlianUser->sertifikasi && Storage::disk('public')->exists($keahlianUser->sertifikasi))
                             @php
-                                $filePath = $keahlianUser->sertifikat_path;
+                                $filePath = $keahlianUser->sertifikasi;
                                 $fileUrl = asset('storage/' . $filePath);
                                 $fileExtension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
                                 $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
@@ -186,14 +176,14 @@ $(document).ready(function() {
             },
             success: function(response) {
                 if (response.status === true) {
-                    $('#modalVerifikasiKeahlian').modal('hide');
+                    $('#modalAdminKeahlian').modal('hide');
                     Swal.fire({
                         icon: 'success',
                         title: 'Berhasil!',
                         text: response.message,
                     });
-                    if (typeof dataTableVerifikasiKeahlian !== 'undefined') {
-                        dataTableVerifikasiKeahlian.ajax.reload(null, false);
+                    if (typeof dataTableKeahlianAdmin !== 'undefined') {
+                        dataTableKeahlianAdmin.ajax.reload(null, false);
                     }
                 } else {
                     Swal.fire({ icon: 'error', title: 'Gagal!', text: response.message || 'Terjadi kesalahan.' });

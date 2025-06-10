@@ -60,11 +60,14 @@ class KeahlianUserController extends Controller
                 ->addColumn('aksi', function ($row) {
                     $editUrl = route('keahlian_user.edit', $row->keahlian_user_id);
                     $deleteUrl = route('keahlian_user.destroy', $row->keahlian_user_id);
-                    // Tombol Detail
                     $detailUrl = route('keahlian_user.show_ajax', $row->keahlian_user_id);
                     $btnDetail = '<button onclick="modalAction(\'' . $detailUrl . '\', \'Detail Keahlian\')" class="btn btn-info btn-sm me-1" title="Detail"><i class="fas fa-eye"></i></button>';
 
-                    $btnEdit = '<button onclick="modalAction(\'' . $editUrl . '\', \'Edit Keahlian\')" class="btn btn-warning btn-sm me-1" title="Edit"><i class="fas fa-edit"></i></button>';
+                    $btnEdit = '';
+                    if (in_array($row->status_verifikasi, ['pending', 'ditolak'])) {
+                        $btnEdit = '<button onclick="modalAction(\'' . $editUrl . '\', \'Edit Keahlian\')" class="btn btn-warning btn-sm me-1" title="Edit"><i class="fas fa-edit"></i></button>';
+                    }
+
                     $btnDelete = '<button class="btn btn-danger btn-sm btn-delete-keahlian" data-url="' . $deleteUrl . '" data-nama="' . e($row->bidang->bidang_nama ?? 'Keahlian Ini') . '" title="Hapus"><i class="fas fa-trash"></i></button>';
                     return $btnDetail . $btnEdit . $btnDelete;
                 })
@@ -98,11 +101,11 @@ class KeahlianUserController extends Controller
     {
         $request->validate([
             'bidang_id' => 'required|exists:bidang,bidang_id',
-            'nama_sertifikat' => 'nullable|string|max:50',
+            'nama_sertifikat' => 'required|string|max:50',
             'lembaga_sertifikasi' => 'nullable|string|max:50',
             'tanggal_perolehan_sertifikat' => 'nullable|date',
             'tanggal_kadaluarsa_sertifikat' => 'nullable|date|after_or_equal:tanggal_perolehan_sertifikat',
-            'sertifikasi' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048', // Max 2MB
+            'sertifikasi' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048', // Max 2MB
         ]);
 
         $filePath = null;
