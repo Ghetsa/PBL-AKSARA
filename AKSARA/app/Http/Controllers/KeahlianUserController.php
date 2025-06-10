@@ -172,14 +172,40 @@ class KeahlianUserController extends Controller
         ]);
     }
 
+    // public function destroy($id)
+    // {
+    //     $data = KeahlianUserModel::findOrFail($id);
+    //     if ($data->sertifikasi && Storage::exists($data->sertifikasi)) {
+    //         Storage::delete($data->sertifikasi);
+    //     }
+    //     $data->delete();
+    //     return redirect()->route('keahlian_user.index')->with('success', 'Data keahlian berhasil dihapus.');
+    // }
+
     public function destroy($id)
     {
-        $data = KeahlianUserModel::findOrFail($id);
-        if ($data->sertifikasi && Storage::exists($data->sertifikasi)) {
-            Storage::delete($data->sertifikasi);
+        try {
+            $keahlian = KeahlianUserModel::where('user_id', auth()->id())->findOrFail($id);
+
+            // Hapus file dari storage jika ada
+            if ($keahlian->sertifikat_path && Storage::disk('public')->exists($keahlian->sertifikat_path)) {
+                Storage::disk('public')->delete($keahlian->sertifikat_path);
+            }
+
+            $keahlian->delete();
+
+            // [PERBAIKAN] Kembalikan respons JSON untuk AJAX
+            return response()->json([
+                'status' => true,
+                'message' => 'Data keahlian berhasil dihapus.'
+            ]);
+        } catch (\Exception $e) {
+            // [PERBAIKAN] Kembalikan respons JSON jika terjadi error
+            return response()->json([
+                'status' => false,
+                'message' => 'Terjadi kesalahan saat menghapus data.'
+            ], 500); // Gunakan status code 500 untuk error server
         }
-        $data->delete();
-        return redirect()->route('keahlian_user.mahasiswa.index')->with('success', 'Data keahlian berhasil dihapus.');
     }
 
     // ================================================================

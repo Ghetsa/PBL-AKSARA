@@ -29,17 +29,16 @@ class NotifikasiController extends Controller
             $lombaNotifs = NotifikasiLombaModel::where('user_id', $user->user_id)->get();
             $prestasiNotifs = NotifikasiPrestasiModel::where('user_id', $user->user_id)->get();
             $keahlianNotifs = NotifikasiKeahlianModel::where('user_id', $user->user_id)->get();
-            
-            $mergedNotifications = collect([])->merge($lombaNotifs)->merge($prestasiNotifs)->merge($keahlianNotifs);
-            $validNotifications = $mergedNotifications->sortByDesc('created_at')->filter(fn ($notif) => !empty($notif) && !empty($notif->id));
 
+            $mergedNotifications = collect([])->merge($lombaNotifs)->merge($prestasiNotifs)->merge($keahlianNotifs);
+            $validNotifications = $mergedNotifications->sortByDesc('created_at')->filter(fn($notif) => !empty($notif) && !empty($notif->id));
         } elseif ($user->role === 'dosen') {
             // KHUSUS UNTUK DOSEN: Hanya ambil notifikasi prestasi
             $validNotifications = NotifikasiPrestasiModel::where('user_id', $user->user_id)
-                                    ->orderByDesc('created_at')
-                                    ->get();
+                ->orderByDesc('created_at')
+                ->get();
         }
-        
+
         // Logika filter dan paginasi (tetap sama untuk semua role)
         $unreadCount = $validNotifications->where('status_baca', 'belum_dibaca')->count();
         $filteredNotifications = $validNotifications;
@@ -55,7 +54,7 @@ class NotifikasiController extends Controller
             'path' => Paginator::resolveCurrentPath(),
             'query' => $request->query(),
         ]);
-        
+
         // Logika pemilihan view (sudah benar)
         $viewName = 'notifikasi.mahasiswa.index';
         if ($user->role === 'admin') {
@@ -63,7 +62,7 @@ class NotifikasiController extends Controller
         } elseif ($user->role === 'dosen') {
             $viewName = 'notifikasi.dosen.index';
         }
-        
+
         return view($viewName, compact('breadcrumb', 'activeMenu', 'allNotifications', 'filter', 'unreadCount'));
     }
 
@@ -100,6 +99,32 @@ class NotifikasiController extends Controller
         return view($viewName, compact('breadcrumb', 'activeMenu', 'notif'));
     }
 
+    public function markAsRead($id, $modelAlias)
+    {
+        $breadcrumb = (object) ['title' => 'Detail Notifikasi', 'list' => ['Notifikasi', 'Detail']];
+        $activeMenu = 'notifikasi';
+        $user = Auth::user();
+        $notif = null;
+
+        if ($modelAlias === 'lomba') {
+            $notif = NotifikasiLombaModel::findOrFail($id);
+        } elseif ($modelAlias === 'prestasi') {
+            $notif = NotifikasiPrestasiModel::findOrFail($id);
+        } elseif ($modelAlias === 'keahlian') {
+            $notif = NotifikasiKeahlianModel::findOrFail($id);
+        } else {
+            abort(404);
+        }
+
+        if ($notif->user_id !== $user->user_id) {
+            abort(403, 'Anda tidak memiliki akses ke notifikasi ini.');
+        }
+
+        $notif->update(['status_baca' => 'dibaca']);
+
+        return redirect()->back()->with('success', 'Notifikasi telah ditandai sebagai dibaca.');
+    }
+
     public function markAllAsRead()
     {
         $userId = Auth::id();
@@ -124,8 +149,8 @@ class NotifikasiController extends Controller
             abort(404);
         }
 
-        
-        
+
+
         $notif->delete();
 
         // Gunakan redirect()->back() agar kembali ke halaman yang benar sesuai role.

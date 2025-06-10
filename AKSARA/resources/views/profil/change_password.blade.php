@@ -60,8 +60,6 @@ $(document).ready(function() {
                         icon: 'success',
                         title: 'Sukses!',
                         text: response.message,
-                        timer: 2500,
-                        showConfirmButton: false
                     });
                 } else {
                     // Jika server mengembalikan success:false tapi status 200 OK
