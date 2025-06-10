@@ -207,29 +207,46 @@ class DashboardController extends Controller
         // Asumsikan DosenModel memiliki relasi bimbinganMahasiswa()
         // yang mengembalikan mahasiswa yang menjadi bimbingannya.
         // Dan MahasiswaModel memiliki relasi prestasi()
-        $bimbinganMahasiswaIds = $dosen->bimbinganMahasiswa()->pluck('mahasiswa.mahasiswa_id')->toArray(); // Sesuaikan dengan struktur relasi Anda
+        $bimbinganMahasiswaIds = $dosen->bimbinganMahasiswa()->pluck('mahasiswa_id')->toArray();
 
         $jumlahbimbinganMahasiswa = count($bimbinganMahasiswaIds);
 
         $prestasibimbinganMahasiswa = PrestasiModel::whereIn('mahasiswa_id', $bimbinganMahasiswaIds)
-            ->where('status_verifikasi_prestasi', 'disetujui_admin') // Hanya yang disetujui
-            ->orderBy('tanggal_pelaksanaan_prestasi', 'desc')
+            ->where('status_verifikasi', 'disetujui')
+            // ->orderBy('tanggal_pelaksanaan', 'desc') // Jika itu nama kolom yang benar
             ->take(5) // Ambil 5 terbaru
             ->get();
 
         $jumlahPrestasiBimbingan = PrestasiModel::whereIn('mahasiswa_id', $bimbinganMahasiswaIds)
-            ->where('status_verifikasi_prestasi', 'disetujui_admin')
+            ->where('status_verifikasi', 'disetujui')
             ->count();
 
         // Lomba yang diajukan oleh mahasiswa bimbingan (jika relevan)
         $lombaDiajukanBimbingan = LombaModel::whereIn('diinput_oleh', function ($query) use ($bimbinganMahasiswaIds) {
-            $query->select('user_id')->from('users')
+            $query->select('users.user_id')
+                ->from('users')
                 ->join('mahasiswa', 'users.user_id', '=', 'mahasiswa.user_id')
                 ->whereIn('mahasiswa.mahasiswa_id', $bimbinganMahasiswaIds);
         })
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();
+
+        // $lombaByTingkat = LombaModel::whereIn('diinput_oleh', function ($query) use ($bimbinganMahasiswaIds) {
+        //     $query->select('users.user_id')
+        //         ->from('users')
+        //         ->join('mahasiswa', 'users.user_id', '=', 'mahasiswa.user_id')
+        //         ->whereIn('mahasiswa.mahasiswa_id', $bimbinganMahasiswaIds);
+        // })
+        //     ->select('tingkat', DB::raw('count(*) as total'))
+        //     ->groupBy('tingkat')
+        //     ->pluck('total', 'tingkat'); // hasil: ['Nasional' => 3, 'Internasional' => 2]
+
+        // $prestasiByTingkat = PrestasiModel::whereIn('mahasiswa_id', $bimbinganMahasiswaIds)
+        //     ->where('status_verifikasi', 'disetujui')
+        //     ->select('tingkat', DB::raw('count(*) as total'))
+        //     ->groupBy('tingkat')
+        //     ->pluck('total', 'tingkat');
 
 
         return view('dashboard.dosen', compact(
