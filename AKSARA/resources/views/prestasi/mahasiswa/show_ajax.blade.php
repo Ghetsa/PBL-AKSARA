@@ -1,15 +1,3 @@
-{{-- resources/views/mahasiswa/prestasi/show_ajax.blade.php --}}
-{{--
-IMPROVED MAHASISWA PRESTASI DETAIL VIEW (show_ajax.blade.php)
-------------------------------------------------------------------
-Perbaikan oleh Front-End Developer Anda.
-Perubahan:
-- Mengganti layout tabel yang usang dengan desain berbasis Card yang modern dan responsif.
-- Fokus utama pada kartu "Status Pengajuan" di bagian atas dengan aksen warna dan aksi yang kontekstual.
-- Menambahkan fitur preview gambar untuk file bukti, dengan fallback tombol unduh untuk file non-gambar (misal: PDF).
-- Mengelompokkan informasi secara logis untuk meningkatkan keterbacaan.
---}}
-
 @php
     // Logika untuk menentukan warna aksen berdasarkan status
     $statusClass = '';
@@ -48,7 +36,7 @@ Perubahan:
                         <div>
                             {{-- Tombol Edit akan memanggil modalAction lagi dengan route edit --}}
                             <button type="button" class="btn btn-sm btn-outline-primary"
-                                    onclick="modalAction('{{ route('prestasi.mahasiswa.edit_ajax', $prestasi->prestasi_id) }}', 'Edit Prestasi')"
+                                    onclick="openModalFromModal('{{ route('prestasi.mahasiswa.edit_ajax', $prestasi->prestasi_id) }}', 'Edit Prestasi')"
                                     title="Edit Pengajuan">
                                 <i class="fas fa-edit me-1"></i> Edit
                             </button>
@@ -69,7 +57,7 @@ Perubahan:
         {{-- KARTU BUKTI PRESTASI (DENGAN PREVIEW GAMBAR) --}}
         <div class="card mb-4">
             <div class="card-header bg-white">
-                <h6 class="mb-0 fw-semibold"><i class="fas fa-file-image me-2 text-primary"></i>Bukti Prestasi</h6>
+                <h6 class="mb-0 fw-semibold"><i class="fas fa-file-contract me-2"></i>Bukti Prestasi</h6>
             </div>
             <div class="card-body p-3 text-center">
                 @if($prestasi->file_bukti && Storage::disk('public')->exists($prestasi->file_bukti))
@@ -102,29 +90,29 @@ Perubahan:
         {{-- KARTU DETAIL PRESTASI --}}
         <div class="card">
             <div class="card-header bg-white">
-                <h6 class="mb-0 fw-semibold"><i class="fas fa-trophy me-2 text-primary"></i>Detail Prestasi</h6>
+                <h6 class="mb-0 fw-semibold"><i class="fas fa-trophy me-2"></i>Detail Prestasi</h6>
             </div>
             <div class="card-body">
                 <dl class="row">
-                    <dt class="col-sm-5 text-muted"><i class="fas fa-award fa-fw me-2"></i>Nama Prestasi</dt>
+                    <dt class="col-sm-5 text-muted">Nama Prestasi</dt>
                     <dd class="col-sm-7">{{ $prestasi->nama_prestasi }}</dd>
 
-                    <dt class="col-sm-5 text-muted"><i class="fas fa-swatchbook fa-fw me-2"></i>Kategori</dt>
+                    <dt class="col-sm-5 text-muted">Kategori</dt>
                     <dd class="col-sm-7">{{ ucfirst($prestasi->kategori) }}</dd>
 
-                    <dt class="col-sm-5 text-muted"><i class="fas fa-tags fa-fw me-2"></i>Bidang</dt>
+                    <dt class="col-sm-5 text-muted">Bidang</dt>
                     <dd class="col-sm-7">{{ ucfirst($prestasi->bidang->bidang_nama) }}</dd>
 
-                    <dt class="col-sm-5 text-muted"><i class="fas fa-university fa-fw me-2"></i>Penyelenggara</dt>
+                    <dt class="col-sm-5 text-muted">Penyelenggara</dt>
                     <dd class="col-sm-7">{{ $prestasi->penyelenggara }}</dd>
 
-                    <dt class="col-sm-5 text-muted"><i class="fas fa-signal fa-fw me-2"></i>Tingkat</dt>
+                    <dt class="col-sm-5 text-muted">Tingkat</dt>
                     <dd class="col-sm-7">{{ ucfirst($prestasi->tingkat) }}</dd>
 
-                    <dt class="col-sm-5 text-muted"><i class="fas fa-calendar-alt fa-fw me-2"></i>Tahun</dt>
+                    <dt class="col-sm-5 text-muted">Tahun</dt>
                     <dd class="col-sm-7">{{ $prestasi->tahun }}</dd>
 
-                    <dt class="col-sm-5 text-muted"><i class="fas fa-chalkboard-teacher fa-fw me-2"></i>Dosen Pembina</dt>
+                    <dt class="col-sm-5 text-muted">Dosen Pembina</dt>
                     <dd class="col-sm-7">{{ $prestasi->dosenPembimbing->user->nama ?? ($prestasi->dosen_pembimbing ?? '-') }}</dd>
                 </dl>
             </div>

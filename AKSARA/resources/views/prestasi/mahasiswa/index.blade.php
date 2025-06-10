@@ -79,10 +79,26 @@
         });
     }
 
+    // [FUNGSI BARU] Fungsi "pintar" untuk menangani modal yang dibuka dari modal lain
+    function openModalFromModal(url, title) {
+        const primaryModal = $('#myModal');
+
+        // 1. Tambahkan event listener yang hanya berjalan SATU KALI
+        //    Event 'hidden.bs.modal' akan aktif setelah modal selesai ditutup.
+        primaryModal.one('hidden.bs.modal', function () {
+            // 3. Setelah modal pertama benar-benar tertutup, panggil modalAction untuk membuka modal kedua.
+            modalAction(url, title);
+        });
+
+        // 2. Minta modal pertama (modal detail) untuk menutup.
+        primaryModal.modal('hide');
+    }
+
     $(document).ready(function() {
         dataPrestasiMahasiswa = $('#dataPrestasiMahasiswa').DataTable({
             processing: true,
             serverSide: true,
+            responsive: true,
             ajax: "{{ route('prestasi.mahasiswa.list') }}", 
             columns: [
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', className: 'text-center', orderable: false, searchable: false },

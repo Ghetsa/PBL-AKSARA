@@ -1,7 +1,9 @@
-@extends('layouts.template') {{-- Sesuaikan dengan layout utama Anda --}}
+<div class="modal-header">
+    <h5 class="modal-title" id="mooraDetailsModalLabel"><i class="fas fa-calculator me-2"></i>Detail Perhitungan Metode MOORA</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
 
-@section('content')
-<div class="container-fluid">
+<div class="modal-body">
     <div class="row">
         <div class="col-12">
             <div class="card">
@@ -198,4 +200,7 @@
         </div>
     </div>
 </div>
-@endsection
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+</div>

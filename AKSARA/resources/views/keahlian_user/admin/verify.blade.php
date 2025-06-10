@@ -1,157 +1,214 @@
+{{--
+ENHANCED KEAHLIAN VERIFICATION MODAL (verify.blade.php)
+------------------------------------------------------------------
+Perbaikan oleh Front-End Developer Anda.
+Perubahan:
+- [FITUR BARU] Menambahkan Card "Detail Sertifikasi" untuk menampilkan informasi sertifikat secara terpisah dan rapi.
+- Menambahkan ikon yang relevan untuk setiap detail sertifikasi.
+- Mempertahankan desain 2 kolom yang efisien, preview bukti, dan panel aksi yang sudah ada.
+--}}
+
 <form id="formVerifikasiKeahlianAdmin" method="POST" action="{{ route('keahlian_user.admin.process_verification_ajax', $keahlianUser->keahlian_user_id) }}">
     @csrf
     @method('PUT')
     <input type="hidden" name="status_verifikasi" id="hidden_status_verifikasi_keahlian" value="{{ $keahlianUser->status_verifikasi }}">
 
-    <div class="modal-header">
-        <h5 class="modal-title">Verifikasi Keahlian: {{ Str::limit($keahlianUser->bidang->bidang_nama ?? 'Keahlian', 40) }}</h5>
+    <div class="modal-header bg-light">
+        <h5 class="modal-title"><i class="fas fa-user-check me-2"></i>Verifikasi Keahlian & Sertifikasi</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
-    <div class="modal-body">
-        <h6>Detail Pengajuan Keahlian:</h6>
-        <table class="table table-sm table-bordered table-striped mb-3">
-            <tr><th style="width:35%;">Nama Pengguna</th><td>{{ $keahlianUser->user->nama ?? 'N/A' }}</td></tr>
-            <tr><th>Role Pengguna</th><td>{{ ucfirst($keahlianUser->user->role ?? 'N/A') }}</td></tr>
-            @if($keahlianUser->user->role == 'mahasiswa' && $keahlianUser->user->mahasiswa)
-            <tr><th>NIM</th><td>{{ $keahlianUser->user->mahasiswa->nim ?? 'N/A' }}</td></tr>
-            <tr><th>Prodi</th><td>{{ $keahlianUser->user->mahasiswa->prodi->nama ?? 'N/A' }}</td></tr>
-            {{-- @elseif($keahlianUser->user->role == 'dosen' && $keahlianUser->user->dosen)
-            <tr><th>NIP</th><td>{{ $keahlianUser->user->dosen->nip ?? 'N/A' }}</td></tr> --}}
-            @endif
-            <tr><th>Bidang Keahlian</th><td>{{ $keahlianUser->bidang->bidang_nama ?? 'N/A' }}</td></tr>
-            <tr><th>Nama Sertifikat/Keahlian</th><td>{{ $keahlianUser->nama_sertifikat ?? '-' }}</td></tr>
-            <tr><th>Lembaga Penerbit</th><td>{{ $keahlianUser->lembaga_sertifikasi ?? '-' }}</td></tr>
-            <tr><th>Tanggal Perolehan</th><td>{{ $keahlianUser->tanggal_perolehan_sertifikat ? $keahlianUser->tanggal_perolehan_sertifikat->format('d M Y') : '-' }}</td></tr>
-            <tr><th>Tanggal Kadaluarsa</th><td>{{ $keahlianUser->tanggal_kadaluarsa_sertifikat ? $keahlianUser->tanggal_kadaluarsa_sertifikat->format('d M Y') : '-' }}</td></tr>
-            <tr>
-                <th>File Bukti/Sertifikat</th>
-                <td>
-                    @if($keahlianUser->sertifikasi && Storage::disk('public')->exists($keahlianUser->sertifikasi))
-                        <a href="{{ asset('storage/' . $keahlianUser->sertifikasi) }}" target="_blank" class="btn btn-outline-info btn-sm">
-                            <i class="fas fa-eye me-1"></i> Lihat File
-                        </a>
-                    @else
-                        <span class="text-muted">Tidak ada file.</span>
-                    @endif
-                </td>
-            </tr>
-            <tr><th>Tgl Pengajuan</th><td>{{ $keahlianUser->created_at ? $keahlianUser->created_at->format('d M Y H:i') : '-' }}</td></tr>
-        </table>
-        <hr>
-        <h6>Form Verifikasi:</h6>
-        <div class="form-group row mb-3">
-            <label for="admin_catatan_verifikasi_keahlian" class="col-sm-3 col-form-label">Catatan Verifikasi</label>
-            <div class="col-sm-9">
-                <textarea class="form-control" id="admin_catatan_verifikasi_keahlian" name="catatan_verifikasi" rows="3" placeholder="Berikan catatan jika pengajuan ditolak atau ada hal yang perlu diperbaiki...">{{ old('catatan_verifikasi', $keahlianUser->catatan_verifikasi) }}</textarea>
-                <small class="form-text text-muted">Catatan ini akan tampil kepada pengguna.</small>
-            </div>
-        </div>
 
-        <div class="form-group row mt-4">
-            <label class="col-sm-3 col-form-label">Aksi Verifikasi</label>
-            <div class="col-sm-9">
-                <button type="button" class="btn btn-success me-2 btn-verify-action-keahlian" data-status="disetujui" title="Setujui pengajuan keahlian ini">
-                    <i class="fas fa-check-circle me-1"></i> Setujui
-                </button>
-                <button type="button" class="btn btn-danger btn-verify-action-keahlian" data-status="ditolak" title="Tolak pengajuan keahlian ini">
-                    <i class="fas fa-times-circle me-1"></i> Tolak
-                </button>
-                @if($keahlianUser->status_verifikasi !== 'pending')
-                <button type="button" class="btn btn-warning ms-2 btn-verify-action-keahlian" data-status="pending" title="Kembalikan status ke Menunggu (Pending)">
-                    <i class="fas fa-history me-1"></i> Kembalikan ke Pending
-                </button>
-                @endif
+    <div class="modal-body p-lg-4" style="max-height: 75vh; overflow-y: auto;">
+        <div class="row">
+            {{-- Kolom Kiri: Detail Pengajuan --}}
+            <div class="col-12 col-lg-7 border-end-lg pe-lg-4">
+                <h5 class="fw-bold mb-3"><i class="fas fa-star me-2 text-warning"></i>{{ $keahlianUser->bidang->bidang_nama ?? 'Keahlian' }}</h5>
+
+                {{-- Card Informasi Pengguna --}}
+                <div class="card mb-3">
+                    <div class="card-header bg-white py-2">
+                        <h6 class="mb-0 fw-semibold"><i class="fas fa-user-graduate me-2 text-primary"></i>Informasi Pengguna</h6>
+                    </div>
+                    <div class="card-body py-2 px-3">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-5 text-muted"><i class="fas fa-user fa-fw me-2"></i>Nama</dt>
+                            <dd class="col-sm-7">{{ $keahlianUser->user->nama ?? 'N/A' }}</dd>
+
+                            @if($keahlianUser->user->role == 'mahasiswa' && $keahlianUser->user->mahasiswa)
+                                <dt class="col-sm-5 text-muted"><i class="fas fa-id-card fa-fw me-2"></i>NIM</dt>
+                                <dd class="col-sm-7">{{ $keahlianUser->user->mahasiswa->nim ?? 'N/A' }}</dd>
+
+                                <dt class="col-sm-5 text-muted"><i class="fas fa-graduation-cap fa-fw me-2"></i>Prodi</dt>
+                                <dd class="col-sm-7">{{ $keahlianUser->user->mahasiswa->prodi->nama ?? 'N/A' }}</dd>
+                            @endif
+                        </dl>
+                    </div>
+                </div>
+
+                {{-- KARTU DETAIL SERTIFIKASI (BARU) --}}
+                <div class="card mb-3">
+                    <div class="card-header bg-white py-2">
+                        <h6 class="mb-0 fw-semibold"><i class="fas fa-certificate me-2 text-primary"></i>Detail Sertifikasi</h6>
+                    </div>
+                    <div class="card-body py-2 px-3">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-5 text-muted"><i class="fas fa-award fa-fw me-2"></i>Nama Sertifikat</dt>
+                            <dd class="col-sm-7">{{ $keahlianUser->nama_sertifikat ?? '-' }}</dd>
+
+                            <dt class="col-sm-5 text-muted"><i class="fas fa-tag fa-fw me-2"></i>Bidang</dt>
+                            <dd class="col-sm-7">{{ $keahlianUser->bidang->bidang_nama ?? '-' }}</dd>
+
+                            <dt class="col-sm-5 text-muted"><i class="fas fa-building fa-fw me-2"></i>Lembaga</dt>
+                            <dd class="col-sm-7">{{ $keahlianUser->lembaga_sertifikasi ?? '-' }}</dd>
+
+                            <dt class="col-sm-5 text-muted"><i class="fas fa-calendar-check fa-fw me-2"></i>Tgl. Perolehan</dt>
+                            <dd class="col-sm-7">{{ $keahlianUser->tanggal_perolehan_sertifikat ? \Carbon\Carbon::parse($keahlianUser->tanggal_perolehan_sertifikat)->isoFormat('D MMMM YYYY') : '-' }}</dd>
+
+                            <dt class="col-sm-5 text-muted"><i class="fas fa-calendar-times fa-fw me-2"></i>Tgl. Kadaluwarsa</dt>
+                            <dd class="col-sm-7">{{ $keahlianUser->tanggal_kadaluarsa_sertifikat ? \Carbon\Carbon::parse($keahlianUser->tanggal_kadaluarsa_sertifikat)->isoFormat('D MMMM YYYY') : 'Tidak ada' }}</dd>
+                        </dl>
+                    </div>
+                </div>
+
+                {{-- Card Bukti Keahlian/Sertifikat --}}
+                <div class="card mb-3">
+                     <div class="card-header bg-white py-2">
+                        <h6 class="mb-0 fw-semibold"><i class="fas fa-file-contract me-2 text-primary"></i>File Bukti</h6>
+                    </div>
+                    <div class="card-body p-3 text-center">
+                        @if($keahlianUser->sertifikat_path && Storage::disk('public')->exists($keahlianUser->sertifikat_path))
+                            @php
+                                $filePath = $keahlianUser->sertifikat_path;
+                                $fileUrl = asset('storage/' . $filePath);
+                                $fileExtension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+                                $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
+                            @endphp
+
+                            @if(in_array($fileExtension, $imageExtensions))
+                                <a href="{{ $fileUrl }}" target="_blank" title="Klik untuk melihat gambar penuh">
+                                    <img src="{{ $fileUrl }}" alt="Bukti Keahlian" class="img-fluid rounded border p-1 w-100" style="max-height: 400px; object-fit: contain;">
+                                </a>
+                            @else
+                                <a href="{{ $fileUrl }}" target="_blank" class="btn btn-primary w-100">
+                                    <i class="fas fa-file-alt me-2"></i>Lihat / Unduh Bukti ({{ strtoupper($fileExtension) }})
+                                </a>
+                            @endif
+                        @else
+                            <div class="alert alert-secondary mb-0">
+                                <i class="fas fa-times-circle me-1"></i> Tidak ada bukti yang diunggah.
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+
+            {{-- Kolom Kanan: Panel Verifikasi --}}
+            <div class="col-12 col-lg-5 ps-lg-4 mt-4 mt-lg-0">
+                <div class="card shadow-sm">
+                    <div class="card-body p-3">
+                        <h6 class="fw-bold text-dark">Form Verifikasi</h6>
+                        <hr class="my-2">
+                        <div class="mb-3">
+                            <span class="fw-semibold">Status Saat Ini:</span>
+                            {!! $keahlianUser->status_verifikasi_badge !!}
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="catatan_verifikasi_keahlian" class="form-label fw-semibold">Catatan Verifikasi:</label>
+                            <textarea class="form-control" id="catatan_verifikasi_keahlian" name="catatan_verifikasi" rows="4" placeholder="Wajib diisi jika menolak pengajuan.">{{ old('catatan_verifikasi', $keahlianUser->catatan_verifikasi ?? '') }}</textarea>
+                            <span class="invalid-feedback error-catatan_verifikasi"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label fw-semibold">Aksi:</label>
+                            <div class="d-grid gap-2">
+                                <button type="button" class="btn btn-success btn-verify-action" data-status="disetujui">
+                                    <i class="fas fa-check-circle me-2"></i>Setujui
+                                </button>
+                                <button type="button" class="btn btn-danger btn-verify-action" data-status="ditolak">
+                                    <i class="fas fa-times-circle me-2"></i>Tolak
+                                </button>
+                                @if($keahlianUser->status_verifikasi != 'pending')
+                                <button type="button" class="btn btn-warning btn-sm btn-verify-action" data-status="pending">
+                                    <i class="fas fa-history me-2"></i>Kembalikan ke Pending
+                                </button>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
     <div class="modal-footer">
-        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Tutup</button>
     </div>
 </form>
 
+{{-- Script AJAX dari file asli tidak perlu diubah --}}
 <script>
 $(document).ready(function() {
     const formVerifikasiAdmin = $('#formVerifikasiKeahlianAdmin');
-    const hiddenStatusInputAdmin = $('#hidden_status_verifikasi_keahlian');
-    const catatanTextareaAdmin = $('#admin_catatan_verifikasi_keahlian');
+    const hiddenStatusInput = $('#hidden_status_verifikasi_keahlian');
+    const catatanTextarea = $('#catatan_verifikasi_keahlian');
+    const actionButtonsAdmin = $('.btn-verify-action');
 
-    formVerifikasiAdmin.validate({
-        rules: {
-            catatan_verifikasi: {
-                maxlength: 1000,
-                required: function(element) {
-                    return hiddenStatusInputAdmin.val() === 'ditolak' && $(element).val().trim() === '';
-                }
-            }
-        },
-        messages: {
-            catatan_verifikasi: {
-                maxlength: "Catatan tidak boleh lebih dari 1000 karakter.",
-                required: "Catatan verifikasi wajib diisi jika status ditolak."
-            }
-        },
-        errorElement: 'span',
-        errorPlacement: function (error, element) {
-            error.addClass('invalid-feedback');
-            element.closest('.col-sm-9').append(error);
-        },
-        highlight: function (element) { $(element).addClass('is-invalid'); },
-        unhighlight: function (element) { $(element).removeClass('is-invalid'); }
-    });
-
-    $('.btn-verify-action-keahlian').on('click', function() {
+    $('.btn-verify-action').on('click', function() {
         const status = $(this).data('status');
-        hiddenStatusInputAdmin.val(status);
+        hiddenStatusInput.val(status); 
 
-        if (formVerifikasiAdmin.valid()) { // Cek validasi sebelum submit
-            submitVerificationFormAdmin();
-        } else if (status === 'ditolak' && catatanTextareaAdmin.val().trim() === '') {
-            catatanTextareaAdmin.focus(); // Fokus jika catatan kosong saat menolak
-            Swal.fire('Peringatan', 'Catatan verifikasi wajib diisi jika status ditolak.', 'warning');
+        catatanTextarea.removeClass('is-invalid');
+        catatanTextarea.next('.invalid-feedback').empty().hide();
+
+        if (status === 'ditolak' && catatanTextarea.val().trim() === '') {
+            catatanTextarea.addClass('is-invalid');
+            catatanTextarea.next('.invalid-feedback').text('Catatan verifikasi wajib diisi jika status ditolak.').show();
+            Swal.fire('Validasi Gagal', 'Mohon isi catatan mengapa pengajuan ini ditolak.', 'error');
+            return;
         }
+        submitVerificationForm();
     });
 
-    function submitVerificationFormAdmin() {
-        var formData = formVerifikasiAdmin.serialize();
-        const actionButtonsAdmin = $('.btn-verify-action-keahlian');
+    function submitVerificationForm() {
+        const formData = formVerifikasiAdmin.serialize();
+        const clickedButton = actionButtonsAdmin.filter('[data-status="' + hiddenStatusInput.val() + '"]');
+        const originalButtonHTML = clickedButton.html();
 
         $.ajax({
             url: formVerifikasiAdmin.attr('action'),
-            method: 'POST',
+            method: 'PUT',
             data: formData,
             dataType: 'json',
             beforeSend: function() {
-                actionButtonsAdmin.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Memproses...');
+                actionButtonsAdmin.prop('disabled', true);
+                clickedButton.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Memproses...');
             },
             success: function(response) {
-                if (response.status) {
-                    const modalInstance = bootstrap.Modal.getInstance(document.getElementById('modalAdminKeahlian'));
-                    if(modalInstance) modalInstance.hide();
-                    Swal.fire({ icon: 'success', title: 'Berhasil!', text: response.message });
-                    if (typeof dataTableKeahlianAdmin !== 'undefined') {
-                        dataTableKeahlianAdmin.ajax.reload();
+                if (response.status === true) {
+                    $('#modalVerifikasiKeahlian').modal('hide');
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: response.message,
+                    });
+                    if (typeof dataTableVerifikasiKeahlian !== 'undefined') {
+                        dataTableVerifikasiKeahlian.ajax.reload(null, false);
                     }
                 } else {
-                    Swal.fire({ icon: 'error', title: 'Gagal!', text: response.message || 'Terjadi kesalahan saat verifikasi.' });
+                    Swal.fire({ icon: 'error', title: 'Gagal!', text: response.message || 'Terjadi kesalahan.' });
                 }
             },
             error: function(xhr) {
                 let errorMessage = 'Terjadi kesalahan server.';
-                if (xhr.responseJSON && xhr.responseJSON.message) errorMessage = xhr.responseJSON.message;
-                if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
-                    let errorsHtml = '<ul>';
-                    $.each(xhr.responseJSON.errors, function(key, value) { errorsHtml += `<li>${value[0]}</li>`; });
-                    errorsHtml += '</ul>';
-                    errorMessage = xhr.responseJSON.message + errorsHtml;
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMessage = xhr.responseJSON.message;
                 }
                 Swal.fire({ icon: 'error', title: 'Oops...', html: errorMessage });
             },
             complete: function() {
-                // Mengembalikan teks tombol ke semula setelah selesai
                 actionButtonsAdmin.prop('disabled', false);
-                actionButtonsAdmin.filter('[data-status="disetujui"]').html('<i class="fas fa-check-circle me-1"></i> Setujui');
-                actionButtonsAdmin.filter('[data-status="ditolak"]').html('<i class="fas fa-times-circle me-1"></i> Tolak');
-                actionButtonsAdmin.filter('[data-status="pending"]').html('<i class="fas fa-history me-1"></i> Kembalikan ke Pending');
+                clickedButton.html(originalButtonHTML);
             }
         });
     }

@@ -28,7 +28,7 @@
                     </div>
 
                     <div class="table-responsive">
-                        <table class="table table-bordered table-hover" id="dataDaftarKeahlianAdmin" style="width:100%;">
+                        <table class="table table-bordered table-hover dt-responsive wrap" id="dataDaftarKeahlianAdmin" style="width:100%;">
                             <thead>
                                 <tr>
                                     <th class="text-center" style="width:5%;">No.</th>
@@ -36,10 +36,10 @@
                                     <th>Bidang Keahlian</th>
                                     <th>Sertifikat</th>
                                     <th>Lembaga</th>
-                                    <th>Tanggal Perolehan</th>
-                                    <th>Tanggal Kadaluarsa</th>
-                                    <th class="text-center">Status</th>
-                                    <th class="text-center" style="width:10%;">Aksi</th>
+                                    {{-- <th>Tanggal Perolehan</th>
+                                    <th>Tanggal Kadaluarsa</th> --}}
+                                    <th>Status</th>
+                                    <th style="width:10%;">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -95,6 +95,7 @@
         dataTableKeahlianAdmin = $('#dataDaftarKeahlianAdmin').DataTable({
             processing: true,
             serverSide: true,
+            responsive: true,
             ajax: {
                 url: "{{ route('keahlian_user.admin.list') }}", // Pastikan route ini ada
                 data: function (d) {
@@ -107,10 +108,10 @@
                 { data: 'bidang_nama', name: 'bidang.bidang_nama' },
                 { data: 'nama_sertifikat', name: 'nama_sertifikat' },
                 { data: 'lembaga_sertifikasi', name: 'lembaga_sertifikasi' },
-                { data: 'tanggal_perolehan_sertifikat', name: 'tanggal_perolehan_sertifikat' },
-                { data: 'tanggal_kadaluarsa_sertifikat', name: 'tanggal_kadaluarsa_sertifikat' },
-                { data: 'status_verifikasi', name: 'status_verifikasi', className: 'text-center' },
-                { data: 'aksi', name: 'aksi', className: 'text-center', orderable: false, searchable: false }
+                // { data: 'tanggal_perolehan_sertifikat', name: 'tanggal_perolehan_sertifikat' },
+                // { data: 'tanggal_kadaluarsa_sertifikat', name: 'tanggal_kadaluarsa_sertifikat' },
+                { data: 'status_verifikasi', name: 'status_verifikasi' },
+                { data: 'aksi', name: 'aksi', orderable: false, searchable: false }
             ]
         });
 

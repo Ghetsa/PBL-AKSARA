@@ -46,15 +46,34 @@ class KeahlianUserModel extends Model
     // Accessor untuk badge status_verifikasi
     public function getStatusVerifikasiBadgeAttribute()
     {
-        switch ($this->status_verifikasi) {
+        // switch ($this->status_verifikasi) {
+        //     case 'disetujui':
+        //         return '<span class="badge bg-success">Disetujui</span>';
+        //     case 'ditolak':
+        //         return '<span class="badge bg-danger">Ditolak</span>';
+        //     case 'pending':
+        //     default:
+        //         return '<span class="badge bg-warning text-dark">Pending</span>';
+        // }
+        $status = strtolower($this->status_verifikasi);
+        $badgeClass = 'bg-light-secondary text-secondary'; // Default badge
+        $label = ucfirst($status ?: 'Belum Diajukan'); // Fallback label
+
+        switch ($status) {
             case 'disetujui':
-                return '<span class="badge bg-success">Disetujui</span>';
-            case 'ditolak':
-                return '<span class="badge bg-danger">Ditolak</span>';
+                $badgeClass = 'bg-light-success text-success';
+                $label = 'Disetujui';
+                break;
             case 'pending':
-            default:
-                return '<span class="badge bg-warning text-dark">Pending</span>';
+                $badgeClass = 'bg-light-warning text-warning';
+                $label = 'Menunggu';
+                break;
+            case 'ditolak':
+                $badgeClass = 'bg-light-danger text-danger';
+                $label = 'Ditolak';
+                break;
         }
+        return '<span class="badge ' . $badgeClass . ' px-2 py-1 fs-6">' . $label . '</span>';
     }
 
     // Accessor untuk link sertifikasi

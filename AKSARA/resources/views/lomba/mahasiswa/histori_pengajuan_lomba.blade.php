@@ -20,7 +20,7 @@
                         <i class="fas fa-history me-2"></i>Halaman ini menampilkan riwayat pengajuan informasi lomba yang telah Anda submit beserta status verifikasinya.
                     </div>
                     <div class="table-responsive">
-                        <table class="table table-bordered table-hover dt-responsive nowrap" id="dataHistoriLombaUser" style="width: 100%;">
+                        <table class="table table-bordered table-hover dt-responsive wrap" id="dataHistoriLombaUser" style="width: 100%;">
                             <thead>
                                 <tr>
                                     <th class="text-center" style="width: 5%;">No.</th>

@@ -41,6 +41,16 @@
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-primary">{{ $breadcrumb->title ?? 'Daftar Lomba' }}</h6>
                 </div>
+                <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
+                    <h4 class="card-title mb-0">Hasil Rekomendasi Lomba</h4>
+                    <div class="card-tools d-flex flex-wrap gap-1 mt-2 mt-md-0">
+                        {{-- [TOMBOL BARU] Tombol untuk membuka modal detail perhitungan MOORA --}}
+                        <button class="btn btn-sm btn-outline-info" 
+                                onclick="showMooraDetails('{{ route('lomba.mhs.details.all') }}')">
+                            <i class="fas fa-calculator me-1"></i> Lihat Detail Perhitungan
+                        </button>
+                    </div>
+                </div>
                 <div class="card-body">
                     {{-- Tombol Toggle untuk Form Bobot Kriteria --}}
                     <div class="mb-3 text-end">
@@ -104,19 +114,19 @@
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
 
-                    <table class="table table-bordered table-hover dt-responsive nowrap" id="dataTableLomba" style="width:100%;">
+                    <table class="table table-bordered table-hover dt-responsive wrap" id="dataTableLomba" style="width:100%;">
                         <thead>
                             <tr>
-                                <th class="text-center">No.</th>
+                                <th class="text-center" style="width: 5%">No.</th>
                                 <th>Nama Lomba</th>
                                 <th>Penyelenggara</th>
                                 <th>Bidang</th>
                                 <th>Tingkat</th>
                                 <th>Batas Daftar</th>
-                                <th class="text-center">Biaya</th>
-                                <th class="text-center">Status</th>
-                                <th class="text-center" id="kolomSkorRekomendasi" style="display:none;">Skor Rekomendasi</th>
-                                <th class="text-center">Aksi</th>
+                                <th>Biaya</th>
+                                <th>Status</th>
+                                <th id="kolomSkorRekomendasi" style="display:none; width: 10%">Skor Rekomendasi</th>
+                                <th>Aksi</th>
                             </tr>
                         </thead>
                     </table>
@@ -135,6 +145,14 @@
 <div class="modal fade" id="modalDetailHitungan" tabindex="-1" aria-labelledby="modalDetailHitunganLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content" id="modalDetailHitunganContent"></div>
+    </div>
+</div>
+{{-- [KONTAINER MODAL BARU] Tempat untuk memuat konten detail perhitungan --}}
+<div class="modal fade" id="mooraDetailsModal" tabindex="-1" role="dialog" aria-labelledby="mooraDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document"> {{-- Menggunakan modal-xl untuk konten yang lebar --}}
+        <div class="modal-content">
+            {{-- Konten dari moora_details.blade.php akan dimuat di sini --}}
+        </div>
     </div>
 </div>
 @endsection
@@ -257,10 +275,10 @@
                 { data: 'nama_lomba', name: 'lomba.nama_lomba' },
                 { data: 'penyelenggara', name: 'lomba.penyelenggara' },
                 { data: 'bidang_display', name: 'bidang_display', orderable: false, searchable: false },
-                { data: 'tingkat', name: 'lomba.tingkat', className: 'text-center' },
-                { data: 'batas_pendaftaran', name: 'lomba.batas_pendaftaran', className: 'text-center' },
-                { data: 'biaya_display', name: 'lomba.biaya', className: 'text-center' },
-                { data: 'status_display', name: 'status_display', className: 'text-center', orderable: false, searchable: false },
+                { data: 'tingkat', name: 'lomba.tingkat' },
+                { data: 'batas_pendaftaran', name: 'lomba.batas_pendaftaran' },
+                { data: 'biaya_display', name: 'lomba.biaya' },
+                { data: 'status_display', name: 'status_display', orderable: false, searchable: false },
                 {
                     data: 'moora_score',
                     name: 'moora_score', // Penting: pastikan nama kolom ini sesuai dengan yang kamu definisikan di DataTables
@@ -403,6 +421,40 @@
         });
     });
 </script>
+
+    {{-- [SKRIP BARU] Skrip untuk memuat dan menampilkan modal detail MOORA --}}
+    <script>
+        function showMooraDetails(url) {
+            const modal = $('#mooraDetailsModal');
+            
+            // Tampilkan loading spinner
+            modal.find('.modal-content').html(`
+                <div class="modal-body text-center p-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-3 mb-0">Memuat detail perhitungan...</p>
+                </div>
+            `);
+            modal.modal('show');
+
+            // Ambil konten via AJAX
+            $.get(url, function(res) {
+                modal.find('.modal-content').html(res);
+            }).fail(function() {
+                // Handle jika terjadi error
+                modal.find('.modal-content').html(`
+                    <div class="modal-header">
+                        <h5 class="modal-title text-danger">Terjadi Kesalahan</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Gagal memuat detail perhitungan. Silakan coba lagi nanti.</p>
+                    </div>
+                `);
+            });
+        }
+    </script>
 @endpush
 
 {{-- @extends('layouts.template')

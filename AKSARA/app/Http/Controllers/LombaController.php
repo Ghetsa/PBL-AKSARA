@@ -778,9 +778,10 @@ class LombaController extends Controller
             })
             ->addColumn('aksi', function ($lomba) {
                 $btnDetail = '<button onclick="modalActionLomba(\'' . route('lomba.publik.show_ajax', $lomba->lomba_id) . '\', \'Detail Lomba\', \'modalDetailLombaPublik\')" class="btn btn-sm btn-outline-primary"><i class="fas fa-eye me-1"></i>Detail</button>';
-                $btnHitung = '<button class="btn btn-sm btn-outline-secondary btn-detail-hitungan" data-lomba-id="' . $lomba->lomba_id . '"><i class="fas fa-calculator me-1"></i>Hitungan</button>';
+                $btnHitung = '<button onclick="modalActionLomba(\'' . route('lomba.mhs.details', $lomba->lomba_id) . '\', \'Detail Lomba\', \'modalDetailLombaPublik\')" class="btn btn-sm btn-outline-secondary"><i class="fas fa-calculator me-1"></i>Hitungan</button>';
+                // $btnHitung = '<button class="btn btn-sm btn-outline-secondary btn-detail-hitungan" data-lomba-id="' . $lomba->lomba_id . '"><i class="fas fa-calculator me-1"></i>Hitungan</button>';
 
-                return '<div class="text-center">' . $btnDetail . $btnHitung . '</div>';
+                return '<div class="btn-group">' . $btnDetail . $btnHitung . '</div>';
             })
             ->rawColumns(['status_display', 'aksi', 'biaya_display'])
             ->make(true);

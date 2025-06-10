@@ -220,7 +220,7 @@ class KeahlianUserController extends Controller
             ->editColumn('status_verifikasi', fn($row) => $row->status_verifikasi_badge) // Menggunakan accessor
             ->addColumn('aksi', function ($row) {
                 // Tombol untuk membuka modal verifikasi
-                $btnVerifikasi = '<button onclick="modalActionKeahlian(\'' . route('keahlian_user.admin.verify_form_ajax', $row->keahlian_user_id) . '\')" class="btn btn-primary btn-sm" title="Verifikasi Keahlian"><i class="fas fa-search-plus"></i> Verifikasi</button>';
+                $btnVerifikasi = '<button onclick="modalActionKeahlian(\'' . route('keahlian_user.admin.verify_form_ajax', $row->keahlian_user_id) . '\')" class="btn btn-primary btn-sm" title="Verifikasi Keahlian"><i class="fas fa-clipboard-check"></i> Verifikasi</button>';
                 return $btnVerifikasi;
             })
             ->rawColumns(['aksi', 'status_verifikasi'])
