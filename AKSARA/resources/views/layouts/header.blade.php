@@ -107,7 +107,28 @@
                               }
                           @endphp
 
-                          <a href="{{ $detailRoute }}" 
+                          <a href="javascript:void(0)" 
+                            onclick="showNotificationDetail('{{ route(Auth::user()->role . '.notifikasi.show_and_read', ['id' => $notif->id, 'model' => $notif->type]) }}')"
+                            class="list-group-item list-group-item-action {{ $notif->status_baca == 'belum_dibaca' ? 'unread-dropdown' : '' }}">
+                                <div class="d-flex align-items-center">
+                                  <div class="flex-shrink-0">
+                                      
+                                      <div class="user-avtar @if($notif->status_baca == 'dibaca') bg-light-success @else bg-light-primary @endif">
+                                          <i class="ti @if($notif->status_baca == 'dibaca') ti-circle-check @else ti-info-circle @endif"></i>
+                                      </div>
+
+                                  </div>
+                                  <div class="flex-grow-1 ms-3">
+                                      <h6 class="mb-0 @if($notif->status_baca == 'belum_dibaca') fw-bold @endif">
+                                          {{ $notif->judul }}
+                                      </h6>
+                                      <p class="text-muted mb-0" style="font-size: 0.85em;">{{ Str::limit($notif->isi, 40) }}</p>
+                                      <small class="text-muted">{{ optional($notif->created_at)->diffForHumans() }}</small>
+                                  </div>
+                              </div>
+                          </a>
+
+                          {{-- <a href="{{ $detailRoute }}" 
                             class="list-group-item list-group-item-action @if($notif->status_baca == 'belum_dibaca') unread-dropdown @endif">
                               <div class="d-flex align-items-center">
                                   <div class="flex-shrink-0">
@@ -125,7 +146,7 @@
                                       <small class="text-muted">{{ optional($notif->created_at)->diffForHumans() }}</small>
                                   </div>
                               </div>
-                          </a>
+                          </a> --}}
                       @empty
                           <div class="list-group-item">
                               <p class="text-center text-muted my-2">Tidak ada notifikasi baru.</p>

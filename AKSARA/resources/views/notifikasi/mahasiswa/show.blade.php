@@ -29,7 +29,7 @@
 <div class="modal-footer d-flex justify-content-end">
     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Tutup</button>
 
-    @php
+    {{-- @php
         $detailRoute = null;
         $detailParams = [];
         // Tentukan route tujuan berdasarkan tipe notifikasi
@@ -58,7 +58,7 @@
         <a href="{{ route($detailRoute, $detailParams) }}" class="btn btn-primary">
             <i class="fas fa-clipboard-check me-1"></i> Lihat Detail Pengajuan
         </a>
-    @endif
+    @endif --}}
     
     @php
         $verifikasiRoute = null;
@@ -76,9 +76,17 @@
         }
     @endphp
 
-    @if (Str::contains($notif->judul, ['Baru', 'pengajuan', 'Pengajuan', 'Keahlian']))
+    @if (Str::contains($notif->judul, ['Baru', 'pengajuan', 'Lomba']))
         <a href="{{ $verifikasiRoute ?? '#' }}" class="btn btn-primary">
-            <i class="fas fa-clipboard-check me-1"></i> Cek Halaman Verifikasi
+            <i class="fas fa-award me-1"></i> Cek Halaman Pengajuan
+        </a>
+    @elseif (Str::contains($notif->judul, ['Prestasi', 'pengajuan', 'prestasi']))
+        <a href="{{ $verifikasiRoute ?? '#' }}" class="btn btn-primary">
+            <i class="fas fa-trophy me-1"></i> Cek Halaman Pengajuan
+        </a>
+    @elseif (Str::contains($notif->judul, ['Keahlian', 'pengajuan', 'keahlian']))
+        <a href="{{ $verifikasiRoute ?? '#' }}" class="btn btn-primary">
+            <i class="fas fa-certificate me-1"></i> Cek Halaman Pengajuan
         </a>
     @endif
 </div>

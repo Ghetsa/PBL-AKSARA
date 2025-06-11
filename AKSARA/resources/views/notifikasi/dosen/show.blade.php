@@ -34,20 +34,24 @@
         // Tentukan route tujuan berdasarkan tipe notifikasi
         switch ($notif->type) {
             case 'lomba':
-                $verifikasiRoute = route('admin.lomba.verifikasi.index');
+                $verifikasiRoute = route('lomba.dsn.histori.index');
                 break;
             case 'prestasi':
-                $verifikasiRoute = route('prestasi.admin.index');
+                $verifikasiRoute = route('bimbingan.index');
                 break;
-            case 'keahlian':
-                $verifikasiRoute = route('keahlian_user.admin.index');
-                break;
+            // case 'keahlian':
+            //     $verifikasiRoute = route('keahlian_user.admin.index');
+            //     break;
         }
     @endphp
 
-    @if (Str::contains($notif->judul, ['Baru', 'pengajuan']))
+    @if (Str::contains($notif->judul, ['Baru', 'pengajuan', 'Prestasi']))
         <a href="{{ $verifikasiRoute ?? '#' }}" class="btn btn-primary">
             <i class="fas fa-clipboard-check me-1"></i> Cek Halaman Verifikasi
+        </a>
+    @elseif (Str::contains($notif->judul, ['Lomba', 'lomba']))
+        <a href="{{ $verifikasiRoute ?? '#' }}" class="btn btn-primary">
+            <i class="fas fa-award me-1"></i> Cek Pengajuan Lomba
         </a>
     @endif
 

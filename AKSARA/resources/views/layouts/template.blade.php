@@ -64,6 +64,14 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="notificationDetailModal" tabindex="-1" role="dialog" aria-labelledby="notificationDetailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                {{-- Konten dari show.blade.php akan dimuat di sini --}}
+            </div>
+        </div>
+    </div>
     
     <!-- jQuery -->
     {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}} 
@@ -193,6 +201,31 @@
                 }
             });
         }
+
+    function showNotificationDetail(url) {
+        const modal = $('#notificationDetailModal');
+        
+        // Tampilkan loading spinner
+        modal.find('.modal-content').html(`
+            <div class="modal-body text-center p-5">
+                <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>
+            </div>
+        `);
+        modal.modal('show');
+
+        // Ambil konten via AJAX
+        $.get(url, function(res) {
+            modal.find('.modal-content').html(res);
+        }).fail(function() {
+            modal.find('.modal-content').html(`
+                <div class="modal-header">
+                    <h5 class="modal-title text-danger">Error</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body"><p>Gagal memuat detail notifikasi.</p></div>
+            `);
+        });
+    }
     </script>
     
     @yield('page-js')
