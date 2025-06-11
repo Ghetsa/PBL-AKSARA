@@ -61,7 +61,7 @@
                                 @endif
                             </div>
                         </div>
-                         <a href="{{-- route('lomba.show', $lomba->lomba_id) --}}" onclick="modalActionLombaAdminCrud('{{ route('lomba.publik.show_ajax', $lomba->lomba_id) }}', 'Detail Lomba', 'modalDetailLombaAdminCrud')" class="btn btn-success btn-sm mt-2">Lihat Detail</a>
+                        <a href="#" onclick="modalActionLomba('{{ route('lomba.mhs.show_form', $lomba->lomba_id) }}', 'Detail Lomba', 'modalDetailLomba')" class="btn btn-success btn-sm mt-2">Lihat Detail</a>
                     </div>
                 </div>
             </div>
@@ -150,7 +150,7 @@
                         <h5 class="card-title text-primary font-weight-bold text-uppercase mb-1" style="font-size: 1.1rem;">{{ Str::limit($lomba->nama_lomba, 45) }}</h5>
                         <div class="text-xs mb-1">Penyelenggara: {{ $lomba->penyelenggara }}</div>
                         <div class="text-xs mb-2">Batas Daftar: <span class="font-weight-bold">{{ $lomba->batas_pendaftaran ? $lomba->batas_pendaftaran->isoFormat('D MMM YYYY') : 'N/A' }}</span></div>
-                         <a href="{{-- route('lomba.show', $lomba->lomba_id) --}}" onclick="modalActionLombaAdminCrud('{{ route('lomba.publik.show_ajax', $lomba->lomba_id) }}', 'Detail Lomba', 'modalDetailLombaAdminCrud')" class="btn btn-primary btn-sm mt-2">Lihat Detail</a>
+                         <a href="{{-- route('lomba.show', $lomba->lomba_id) --}}" onclick="modalActionLomba('{{ route('lomba.publik.show_ajax', $lomba->lomba_id) }}', 'Detail Lomba', 'modalDetailLombaAdminCrud')" class="btn btn-primary btn-sm mt-2">Lihat Detail</a>
                     </div>
                 </div>
             </div>
@@ -187,12 +187,12 @@
 
 @push('js')
 <script>
-    // Fungsi modalActionLombaAdminCrud sudah ada di lomba.admin.crud.index.
+    // Fungsi modalActionLomba sudah ada di lomba.admin.crud.index.
     // Jika halaman ini terpisah, Anda mungkin perlu mendefinisikannya di sini atau di template global.
     // Untuk saat ini, saya asumsikan itu tersedia secara global atau akan ditambahkan di layouts.script.
     // Jika belum, ini contohnya:
-    if (typeof modalActionLombaAdminCrud === 'undefined') {
-        function modalActionLombaAdminCrud(url, title = 'Detail', modalId = 'modalDetailLombaAdminCrud') {
+    if (typeof modalActionLomba === 'undefined') {
+        function modalActionLomba(url, title = 'Detail', modalId = 'modalDetailLombaAdminCrud') {
             const targetModal = $(`#${modalId}`);
             const targetModalContent = targetModal.find('.modal-content');
             targetModalContent.html('<div class="modal-body text-center py-5"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Memuat...</p></div>');

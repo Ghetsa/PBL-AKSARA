@@ -22,20 +22,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class LombaController extends Controller
 {
-    //=================================================
-    //|       METHOD UNTUK MAHASISWA DAN DOSEN        |
-    //=================================================
-    public function index()
-    {
-        $breadcrumb = (object) [
-            'title' => 'Manajemen Lomba',
-            'list' => ['Dashboard', 'Lomba']
-        ];
-
-        $activeMenu = 'lomba';
-
-        return view('lomba.mahasiswa.index', compact('breadcrumb', 'activeMenu'));
-    }
+    
 
     /**
      * Method AJAX untuk mengambil detail perhitungan MOORA satu lomba.
@@ -860,58 +847,6 @@ class LombaController extends Controller
         // Jika view Anda adalah 'lomba.edit' yang diunggah
         return view('lomba.mahasiswa.edit', compact('lomba', 'bidangList'));
     }
-
-    // public function updateLombaMhs(Request $request, $id)
-    // {
-    //     $validated = $request->validate([
-    //         'nama_lomba' => 'required|string|max:255',
-    //         'pembukaan_pendaftaran' => 'required|date',
-    //         'batas_pendaftaran' => 'required|date|after_or_equal:pembukaan_pendaftaran',
-    //         'kategori' => 'required|in:individu,kelompok',
-    //         'tingkat' => 'required|in:lokal,nasional,internasional',
-    //         'penyelenggara' => 'required|string|max:255',
-    //         'bidang_keahlian' => 'required|array|min:1',
-    //         'bidang_keahlian.*' => 'exists:bidang,bidang_id',
-    //         'biaya' => 'nullable|numeric|min:0',
-    //         'link_pendaftaran' => 'nullable|url',
-    //         'link_penyelenggara' => 'nullable|url',
-    //         'poster' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-    //     ]);
-
-    //     $lomba = LombaModel::findOrFail($id);
-
-    //     // Simpan poster baru jika ada
-    //     if ($request->hasFile('poster')) {
-    //         if ($lomba->poster && Storage::exists('public/' . $lomba->poster)) {
-    //             Storage::delete('public/' . $lomba->poster);
-    //         }
-
-    //         $poster = $request->file('poster');
-    //         $posterName = time() . '_' . $poster->getClientOriginalName();
-    //         $poster->storeAs('public/poster', $posterName);
-    //         $validated['poster'] = 'poster/' . $posterName;
-    //     }
-
-    //     // Update data utama lomba, kecuali bidang_keahlian
-    //     $lomba->update(collect($validated)->except('bidang_keahlian')->toArray());
-
-    //     // Hapus relasi bidang sebelumnya
-    //     $lomba->detailBidang()->delete();
-
-    //     // Tambah relasi bidang baru ke lomba_detail
-    //     foreach ($validated['bidang_keahlian'] as $bidangId) {
-    //         LombaDetailModel::create([
-    //             'lomba_id' => $lomba->lomba_id,
-    //             'bidang_id' => $bidangId
-    //         ]);
-    //     }
-
-    //     return response()->json([
-    //         'status' => true,
-    //         'message' => 'Lomba berhasil diperbarui.',
-    //     ]);
-    // }
-
     public function updateLombaMhs(Request $request, $id) // Atau updatePengajuanLombaUmum
     {
         $user = Auth::user();
@@ -1019,6 +954,28 @@ class LombaController extends Controller
         // Jika view Anda adalah 'lomba.show' yang diunggah
         return view('lomba.mahasiswa.show', compact('lomba'));
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     /**
@@ -1512,68 +1469,6 @@ class LombaController extends Controller
         return view('lomba.admin.crud.create_lomba', compact('bidangList'));
     }
 
-    // Menyimpan lomba BARU yang diinput admin (AJAX) tanpa hadiah
-    // public function adminStoreLombaAjax(Request $request)
-    // {
-    //     $user = Auth::user();
-
-    //     $validator = Validator::make($request->all(), [
-    //         'nama_lomba' => 'required|string|max:255',
-    //         'pembukaan_pendaftaran' => 'required|date',
-    //         'batas_pendaftaran' => 'required|date|after_or_equal:pembukaan_pendaftaran',
-    //         'kategori' => 'required|in:individu,kelompok',
-    //         'penyelenggara' => 'required|string|max:255',
-    //         'tingkat' => 'required|in:lokal,nasional,internasional',
-    //         'bidang_keahlian' => 'required|array|min:1',
-    //         'bidang_keahlian.*' => 'exists:bidang,bidang_id',
-    //         'biaya' => 'nullable|integer|min:0',
-    //         'link_pendaftaran' => 'nullable|url|max:255',
-    //         'link_penyelenggara' => 'nullable|url|max:255',
-    //         'poster' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-    //     ]);
-
-    //     if ($validator->fails()) {
-    //         return response()->json([
-    //             'status' => false,
-    //             'message' => 'Validasi gagal.',
-    //             'errors' => $validator->errors()
-    //         ], 422);
-    //     }
-
-    //     $posterPath = null;
-    //     if ($request->hasFile('poster')) {
-    //         $posterPath = $request->file('poster')->store('lomba_poster', 'public');
-    //     }
-
-    //     // Simpan data utama lomba
-    //     $lomba = LombaModel::create([
-    //         'nama_lomba' => $request->nama_lomba,
-    //         'pembukaan_pendaftaran' => $request->pembukaan_pendaftaran,
-    //         'batas_pendaftaran' => $request->batas_pendaftaran,
-    //         'kategori' => $request->kategori,
-    //         'penyelenggara' => $request->penyelenggara,
-    //         'tingkat' => $request->tingkat,
-    //         'biaya' => $request->biaya ?? 0,
-    //         'link_pendaftaran' => $request->link_pendaftaran,
-    //         'link_penyelenggara' => $request->link_penyelenggara,
-    //         'status_verifikasi' => 'disetujui',
-    //         'diinput_oleh' => $user->user_id,
-    //         'poster' => $posterPath,
-    //     ]);
-
-    //     // Simpan bidang ke tabel lomba_detail
-    //     foreach ($request->bidang_keahlian as $bidangId) {
-    //         LombaDetailModel::create([
-    //             'lomba_id' => $lomba->lomba_id,
-    //             'bidang_id' => $bidangId
-    //         ]);
-    //     }
-
-    //     return response()->json([
-    //         'status' => true,
-    //         'message' => 'Info lomba baru berhasil ditambahkan.'
-    //     ]);
-    // }
 
     // Tambah hadiah
     public function adminStoreLombaAjax(Request $request)

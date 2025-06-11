@@ -1,7 +1,7 @@
 <?php
 // app/Http/Controllers/DashboardController.php (atau sesuaikan dengan controller Anda)
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Models\PrestasiModel;
 use App\Models\LombaModel;
@@ -142,14 +142,15 @@ class DashboardController extends Controller
         return view('dashboard.mahasiswa', compact('breadcrumb', 'activeMenu', 'prestasiPublik', 'prestasiMahasiswa', 'rekomendasiLomba', 'lombaUmum', 'user'));
     }
 
-    public function adminDashboard()
+    public function adminDashboard() // Atau public function index()
     {
         $breadcrumb = (object) ['title' => 'Dashboard Admin', 'list' => ['Dashboard']];
         $activeMenu = 'dashboard';
 
+        // --- Statistik untuk Kartu (Widgets) ---
         $totalPrestasi = PrestasiModel::count();
-        $prestasiDisetujui = PrestasiModel::where('status_verifikasi', 'disetujui')->count(); // Sesuaikan field status
-        $prestasiPending = PrestasiModel::where('status_verifikasi', 'pending')->count(); // Sesuaikan field status
+        $prestasiDisetujui = PrestasiModel::where('status_verifikasi', 'disetujui')->count();
+        $prestasiPending = PrestasiModel::where('status_verifikasi', 'pending')->count();
 
         $totalLomba = LombaModel::count();
         $lombaAktif = LombaModel::where('status_verifikasi', 'disetujui')
@@ -160,35 +161,61 @@ class DashboardController extends Controller
             ->count();
         $lombaPengajuanPending = LombaModel::where('status_verifikasi', 'pending')->count();
 
-        $totalUser = UserModel::count(); // atau User::count()
+        $totalUser = UserModel::count();
         $totalMahasiswa = UserModel::where('role', 'mahasiswa')->count();
         $totalDosen = UserModel::where('role', 'dosen')->count();
 
-        // Data untuk chart sederhana (contoh: Lomba berdasarkan tingkat)
-        $lombaByTingkat = LombaModel::selectRaw('tingkat, count(*) as total')
+        // --- Data untuk Grafik (Diperbaiki dan Ditingkatkan) ---
+
+        // 1. Grafik Lomba Berdasarkan Tingkat (Doughnut Chart)
+        $lombaByTingkat = LombaModel::select('tingkat', DB::raw('count(*) as total'))
+            ->whereNotNull('tingkat')
+            ->where('tingkat', '!=', '')
             ->groupBy('tingkat')
             ->pluck('total', 'tingkat');
 
+        // 2. Grafik Prestasi Berdasarkan Tingkat (Doughnut Chart)
         $prestasiByTingkat = PrestasiModel::where('status_verifikasi', 'disetujui')
-            ->selectRaw('tingkat, count(*) as total')
+            ->select('tingkat', DB::raw('count(*) as total'))
+            ->whereNotNull('tingkat')
+            ->where('tingkat', '!=', '')
             ->groupBy('tingkat')
             ->pluck('total', 'tingkat');
+            
+        // 3. GRAFIK BARU: Tren Prestasi per Bulan (Line Chart)
+        $prestasiPerBulan = PrestasiModel::select(
+                DB::raw('YEAR(created_at) as year, MONTH(created_at) as month'),
+                DB::raw('COUNT(*) as total')
+            )
+            ->where('status_verifikasi', 'disetujui')
+            ->where('created_at', '>=', Carbon::now()->subMonths(11)->startOfMonth())
+            ->groupBy('year', 'month')
+            ->orderBy('year', 'asc')
+            ->orderBy('month', 'asc')
+            ->get();
 
+        // Memformat data untuk Chart.js
+        $labelsBulan = [];
+        $dataBulan = [];
+        for ($i = 11; $i >= 0; $i--) {
+            $date = Carbon::now()->subMonths($i);
+            $labelsBulan[$date->format('Y-n')] = $date->format('M Y');
+            $dataBulan[$date->format('Y-n')] = 0;
+        }
+        foreach ($prestasiPerBulan as $item) {
+            $key = $item->year . '-' . $item->month;
+            if (isset($dataBulan[$key])) {
+                $dataBulan[$key] = $item->total;
+            }
+        }
 
         return view('dashboard.admin', compact(
-            'breadcrumb',
-            'activeMenu',
-            'totalPrestasi',
-            'prestasiDisetujui',
-            'prestasiPending',
-            'totalLomba',
-            'lombaAktif',
-            'lombaPengajuanPending',
-            'totalUser',
-            'totalMahasiswa',
-            'totalDosen',
-            'lombaByTingkat',
-            'prestasiByTingkat'
+            'breadcrumb', 'activeMenu',
+            'totalPrestasi', 'prestasiDisetujui', 'prestasiPending',
+            'totalLomba', 'lombaAktif', 'lombaPengajuanPending',
+            'totalUser', 'totalMahasiswa', 'totalDosen',
+            'lombaByTingkat', 'prestasiByTingkat',
+            'labelsBulan', 'dataBulan'
         ));
     }
 
