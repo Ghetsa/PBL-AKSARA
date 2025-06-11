@@ -231,16 +231,11 @@ class LombaController extends Controller
                     : '-';
             })
             ->addColumn('aksi', function ($lomba) {
-                $btnDetail = '<button onclick="modalActionLomba(\'' . route('lomba.publik.show_ajax', $lomba->lomba_id) . '\', \'Detail Lomba\', \'modalDetailLombaPublik\')" class="btn btn-sm btn-outline-primary"><i class="fas fa-eye me-1"></i>Detail</button>';
-
-                // =======================================================
-                // === PERBAIKAN DI SINI                               ===
-                // =======================================================
-                // Mengganti tombol `onclick` dengan tombol yang memiliki `class` dan `data-attribute`
-                // agar event handler jQuery yang benar dapat terpanggil.
-                $btnHitung = '<button class="btn btn-sm btn-outline-secondary btn-detail-hitungan" data-lomba-id="' . $lomba->lomba_id . '"><i class="fas fa-calculator me-1"></i>Hitungan</button>';
-
+                $btnDetail = '<button onclick="modalActionLomba(\'' . route('lomba.publik.show_ajax', $lomba->lomba_id) . '\', \'Detail Lomba\', \'modalDetailLombaPublik\')" class="btn btn-sm btn-outline-primary me-2"><i class="fas fa-eye me-1"></i></button>';
+                $btnHitung = '<button class="btn btn-sm btn-outline-secondary btn-detail-hitungan" data-lomba-id="' . $lomba->lomba_id . '"><i class="fas fa-calculator me-1"></i></button>';
                 return '<div class="btn-group">' . $btnDetail . $btnHitung . '</div>';
+
+                // return '<div class="btn-group">' . $btnDetail . $btnHitung . '</div>';
             })
             ->rawColumns(['status_display', 'aksi', 'biaya_display'])
             ->make(true);
@@ -592,6 +587,14 @@ class LombaController extends Controller
             $data = LombaModel::where('status_verifikasi', 'disetujui')
                 ->orderBy('batas_pendaftaran', 'asc');
 
+            if ($request->filled('tingkat_lomba_filter_crud')) {
+                $data->where('tingkat', $request->tingkat_lomba_filter_crud);
+            }
+
+            if ($request->filled('kategori_lomba_filter_crud')) {
+                $data->where('kategori', $request->kategori_lomba_filter_crud);
+            }
+
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->editColumn('nama_lomba', function ($row) {
@@ -602,13 +605,13 @@ class LombaController extends Controller
                     return $html;
                 })
                 ->addColumn('periode_pendaftaran', function ($row) {
-                    $mulai = $row->pembukaan_pendaftaran ? Carbon::parse($row->pembukaan_pendaftaran)->setTimezone('Asia/Jakarta')->isoFormat('D MMM YYYY') : 'N/A';
-                    $selesai = $row->batas_pendaftaran ? Carbon::parse($row->batas_pendaftaran)->setTimezone('Asia/Jakarta')->isoFormat('D MMM YYYY') : 'N/A';
+                    $mulai = $row->pembukaan_pendaftaran ? Carbon::parse($row->pembukaan_pendaftaran)->setTimezone('Asia/Jakarta')->isoFormat('D MMMM YYYY') : 'N/A';
+                    $selesai = $row->batas_pendaftaran ? Carbon::parse($row->batas_pendaftaran)->setTimezone('Asia/Jakarta')->isoFormat('D MMMM YYYY') : 'N/A';
                     return $mulai . ' - ' . $selesai;
                 })
                 ->addColumn('biaya_formatted', fn($row) => $row->biaya > 0 ? 'Rp ' . number_format($row->biaya, 0, ',', '.') : '<span class="badge bg-light-success text-success px-2 py-1">Gratis</span>')
                 ->addColumn('aksi', function ($row) {
-                    return '<button onclick="modalActionLomba(\'' . route('lomba.dosen.show_form', $row->lomba_id) . '\', \'Detail Lomba\', \'modalDetailLomba\')" class="btn btn-sm btn-outline-primary"><i class="fas fa-eye me-1"></i>Detail</button>';
+                    return '<button onclick="modalActionLomba(\'' . route('lomba.publik.show_ajax', $row->lomba_id) . '\', \'Detail Lomba\', \'modalDetailLomba\')" class="btn btn-sm btn-outline-primary"><i class="fas fa-eye me-1"></i></button>';
                 })
                 ->rawColumns(['nama_lomba', 'biaya_formatted', 'aksi'])
                 ->make(true);
@@ -622,7 +625,7 @@ class LombaController extends Controller
     public function historiPengajuanLombaMhs()
     {
         $breadcrumb = (object) [
-            'title' => 'Histori Pengajuan Info Lomba Saya',
+            'title' => 'Histori Pengajuan Info Lomba',
             'list' => ['Info Lomba', 'Histori Pengajuan']
         ];
         $activeMenu = 'histori_lomba_user';
@@ -652,9 +655,9 @@ class LombaController extends Controller
                 ->editColumn('status_verifikasi', fn($row) => $row->status_verifikasi_badge)
                 ->addColumn('aksi', function ($row) {
                     $btnEdit = '';
-                    $btnDetail = '<button onclick="modalActionLomba(\'' . route('lomba.mhs.show_form', $row->lomba_id) . '\', \'Detail Lomba\', \'modalFormLombaUser\')" class="btn btn-sm btn-info me-1" title="Detail"><i class="fas fa-eye"></i></button>';
+                    $btnDetail = '<button onclick="modalActionLomba(\'' . route('lomba.mhs.show_form', $row->lomba_id) . '\', \'Detail Lomba\', \'modalFormLombaUser\')" class="btn btn-sm btn-outline-info me-1" title="Detail"><i class="fas fa-eye"></i></button>';
                     if ($row->status_verifikasi == 'ditolak' || $row->status_verifikasi == 'pending') {
-                        $btnEdit = '<button onclick="modalActionLomba(\'' . route('lomba.mhs.edit_form', $row->lomba_id) . '\', \'Edit Pengajuan\', \'modalFormLombaUser\')" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></button>';
+                        $btnEdit = '<button onclick="modalActionLomba(\'' . route('lomba.mhs.edit_form', $row->lomba_id) . '\', \'Edit Pengajuan\', \'modalFormLombaUser\')" class="btn btn-sm btn-outline-warning"><i class="fas fa-edit"></i></button>';
                     }
                     return '<div class="btn-group">' . $btnDetail . $btnEdit . '</div>';
                 })
@@ -984,7 +987,7 @@ class LombaController extends Controller
     public function historiPengajuanLombaDsn()
     {
         $breadcrumb = (object) [
-            'title' => 'Histori Pengajuan Info Lomba Saya',
+            'title' => 'Histori Pengajuan Info Lomba',
             'list' => ['Info Lomba', 'Histori Pengajuan']
         ];
         $activeMenu = 'histori_lomba_user';
@@ -1009,9 +1012,9 @@ class LombaController extends Controller
                 ->editColumn('status_verifikasi', fn($row) => $row->status_verifikasi_badge)
                 ->addColumn('aksi', function ($row) {
                     $btnEdit = '';
-                    $btnDetail = '<button onclick="modalActionLomba(\'' . route('lomba.dosen.show_form', $row->lomba_id) . '\', \'Detail Lomba\', \'modalFormLombaUser\')" class="btn btn-sm btn-info me-1" title="Detail"><i class="fas fa-eye"></i></button>';
+                    $btnDetail = '<button onclick="modalActionLomba(\'' . route('lomba.dosen.show_form', $row->lomba_id) . '\', \'Detail Lomba\', \'modalFormLombaUser\')" class="btn btn-sm btn-outline-info me-1" title="Detail"><i class="fas fa-eye"></i></button>';
                     if ($row->status_verifikasi == 'ditolak' || $row->status_verifikasi == 'pending') {
-                        $btnEdit = '<button onclick="modalActionLomba(\'' . route('lomba.dosen.edit_form', $row->lomba_id) . '\', \'Edit Pengajuan\', \'modalFormLombaUser\')" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></button>';
+                        $btnEdit = '<button onclick="modalActionLomba(\'' . route('lomba.dosen.edit_form', $row->lomba_id) . '\', \'Edit Pengajuan\', \'modalFormLombaUser\')" class="btn btn-sm btn-outline-warning"><i class="fas fa-edit"></i></button>';
                     }
                     return '<div class="btn-group">' . $btnDetail . $btnEdit . '</div>';
                 })

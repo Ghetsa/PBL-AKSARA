@@ -4,7 +4,7 @@
     @method('PUT')
 
     <div class="modal-header">
-        <h5 class="modal-title">Edit Pengajuan Info Lomba</h5>
+        <h5 class="modal-title"><i class="ti ti-edit-circle me-2"></i>Edit Pengajuan Info Lomba</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
     <div class="modal-body" style="max-height: 68vh; overflow-y: auto;">

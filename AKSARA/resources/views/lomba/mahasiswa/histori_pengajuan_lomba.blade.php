@@ -95,8 +95,7 @@
                 { data: 'created_at', name: 'created_at' }, // Tanggal pengajuan
                 { data: 'status_verifikasi', name: 'status_verifikasi' },
                 { data: 'aksi', name: 'aksi', orderable: false, searchable: false }
-            ],
-            language: { url: "//cdn.datatables.net/plug-ins/1.13.7/i18n/id.json" }
+            ]
         });
 
         // Inisialisasi tooltip Bootstrap jika ada

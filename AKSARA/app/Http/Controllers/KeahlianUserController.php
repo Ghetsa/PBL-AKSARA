@@ -61,14 +61,14 @@ class KeahlianUserController extends Controller
                     $editUrl = route('keahlian_user.edit', $row->keahlian_user_id);
                     $deleteUrl = route('keahlian_user.destroy', $row->keahlian_user_id);
                     $detailUrl = route('keahlian_user.show_ajax', $row->keahlian_user_id);
-                    $btnDetail = '<button onclick="modalAction(\'' . $detailUrl . '\', \'Detail Keahlian\')" class="btn btn-info btn-sm me-1" title="Detail"><i class="fas fa-eye"></i></button>';
+                    $btnDetail = '<button onclick="modalAction(\'' . $detailUrl . '\', \'Detail Keahlian\')" class="btn btn-outline-info btn-sm me-1" title="Detail"><i class="fas fa-eye"></i></button>';
 
                     $btnEdit = '';
                     if (in_array($row->status_verifikasi, ['pending', 'ditolak'])) {
-                        $btnEdit = '<button onclick="modalAction(\'' . $editUrl . '\', \'Edit Keahlian\')" class="btn btn-warning btn-sm me-1" title="Edit"><i class="fas fa-edit"></i></button>';
+                        $btnEdit = '<button onclick="modalAction(\'' . $editUrl . '\', \'Edit Keahlian\')" class="btn btn-outline-warning btn-sm me-1" title="Edit"><i class="fas fa-edit"></i></button>';
                     }
 
-                    $btnDelete = '<button class="btn btn-danger btn-sm btn-delete-keahlian" data-url="' . $deleteUrl . '" data-nama="' . e($row->bidang->bidang_nama ?? 'Keahlian Ini') . '" title="Hapus"><i class="fas fa-trash"></i></button>';
+                    $btnDelete = '<button class="btn btn-outline-danger btn-sm btn-delete-keahlian" data-url="' . $deleteUrl . '" data-nama="' . e($row->bidang->bidang_nama ?? 'Keahlian Ini') . '" title="Hapus"><i class="fas fa-trash"></i></button>';
                     return $btnDetail . $btnEdit . $btnDelete;
                 })
                 ->rawColumns(['aksi', 'status_verifikasi', 'sertifikasi_link'])

@@ -166,12 +166,12 @@ class PrestasiController extends Controller
                 //     return '<span class="badge ' . $badgeClass . '">' . $label . '</span>';
                 // })
                 ->addColumn('aksi', function ($row) {
-                    $btnDetail = '<button type="button" class="btn btn-info btn-sm me-1" onclick="modalAction(\'' . route('prestasi.mahasiswa.show_ajax', $row->prestasi_id) . '\', \'Detail Prestasi\')"><i class="fas fa-eye"></i></button>';
+                    $btnDetail = '<button type="button" class="btn btn-outline-info btn-sm me-1" onclick="modalAction(\'' . route('prestasi.mahasiswa.show_ajax', $row->prestasi_id) . '\', \'Detail Prestasi\')"><i class="fas fa-eye"></i></button>';
                     $btnEdit = '';
                     $btnDelete = '';
 
                     if (in_array($row->status_verifikasi, ['pending', 'ditolak'])) {
-                        $btnEdit = '<button type="button" class="btn btn-warning btn-sm me-1" onclick="modalAction(\'' . route('prestasi.mahasiswa.edit_ajax', $row->prestasi_id) . '\', \'Edit Prestasi\')"><i class="fas fa-edit"></i></button>';
+                        $btnEdit = '<button type="button" class="btn btn-outline-warning btn-sm me-1" onclick="modalAction(\'' . route('prestasi.mahasiswa.edit_ajax', $row->prestasi_id) . '\', \'Edit Prestasi\')"><i class="fas fa-edit"></i></button>';
                     }
 
                     return '<div class="btn-group">' . $btnDetail . $btnEdit . $btnDelete . '</div>';
