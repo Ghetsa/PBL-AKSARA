@@ -85,12 +85,13 @@ Route::middleware(['auth'])->group(function () {
     //     return view('dashboard.mahasiswa', compact('breadcrumb', 'activeMenu'));
     // })->name('dashboardMHS');
 
-    Route::get('/dashboard/dosen', function () {
-        $breadcrumb = (object) ['title' => 'Dashboard', 'list' => ['Dosen', 'Dashboard']];
-        $activeMenu = 'dashboard';
-        return view('dashboard.dosen', compact('breadcrumb', 'activeMenu'));
-    })->name('dashboardDSN');
+    // Route::get('/dashboard/dosen', function () {
+    //     $breadcrumb = (object) ['title' => 'Dashboard', 'list' => ['Dosen', 'Dashboard']];
+    //     $activeMenu = 'dashboard';
+    //     return view('dashboard.dosen', compact('breadcrumb', 'activeMenu'));
+    // })->name('dashboardDSN');
 
+    Route::get('/dashboard/dosen', [DashboardController::class, 'dosenDashboard'])->name('dashboardDSN');
 
     // ===================== PROFILE =====================
     Route::get('/profile', [ProfilController::class, 'index'])->name('profile.index');
@@ -207,6 +208,7 @@ Route::middleware(['auth'])->group(function () {
         Route::prefix('notifikasi')->name('mahasiswa.notifikasi.')->group(function () {
             Route::get('/', [NotifikasiController::class, 'index'])->name('index');
             Route::get('/{id}/show_and_read/{model}', [NotifikasiController::class, 'showAndRead'])->name('show_and_read');
+            Route::post('/{id}/show/{model}', [NotifikasiController::class, 'markAsRead'])->name('mark_as_read');
             Route::post('/mark-all-as-read', [NotifikasiController::class, 'markAllAsRead'])->name('markAllAsRead');
             Route::delete('/{id}/destroy/{model}', [NotifikasiController::class, 'destroy'])->name('destroy');
         });
@@ -265,8 +267,13 @@ Route::middleware(['auth'])->group(function () {
         Route::prefix('admin/notifikasi')->name('admin.notifikasi.')->group(function () {
             Route::get('/', [NotifikasiController::class, 'index'])->name('index');
             Route::get('/{id}/show/{model}', [NotifikasiController::class, 'showAndRead'])->name('show_and_read');
+            Route::post('/{id}/show/{model}', [NotifikasiController::class, 'markAsRead'])->name('mark_as_read');
             Route::post('/mark-all-as-read', [NotifikasiController::class, 'markAllAsRead'])->name('markAllAsRead');
             Route::delete('/{id}/destroy/{model}', [NotifikasiController::class, 'destroy'])->name('destroy');
+            // [PERBAIKAN] Route GET untuk menampilkan detail di modal (sekaligus menandai dibaca)
+            Route::get('/show/{id}/{model}', [NotifikasiController::class, 'show'])->name('show');
+            // [PERBAIKAN] Route POST untuk aksi "tandai dibaca" dari daftar
+            // Route::post('/mark-as-read/{id}/{model}', [NotifikasiController::class, 'markAsRead'])->name('mark_as_read');
         });
     });
 
@@ -330,6 +337,7 @@ Route::middleware(['auth'])->group(function () {
         Route::prefix('dosen/notifikasi')->name('dosen.notifikasi.')->group(function () {
             Route::get('/', [NotifikasiController::class, 'index'])->name('index');
             Route::get('/{id}/show_and_read/{model}', [NotifikasiController::class, 'showAndRead'])->name('show_and_read');
+            Route::post('/{id}/show/{model}', [NotifikasiController::class, 'markAsRead'])->name('mark_as_read');
             Route::post('/mark-all-as-read', [NotifikasiController::class, 'markAllAsRead'])->name('markAllAsRead');
             Route::delete('/{id}/destroy/{model}', [NotifikasiController::class, 'destroy'])->name('destroy');
         });

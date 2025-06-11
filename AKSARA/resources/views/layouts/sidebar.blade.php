@@ -2,11 +2,11 @@
     <div class="navbar-wrapper">
         <div style="height: 60px; display: flex; align-items: center; padding: 16px 24px;">
             @if (Auth::user()->role == 'admin')
-                <a href="{{ url('/dashboard/admin') }}" class="b-brand text-primary">
+                <a href="{{ route('dashboard') }}" class="b-brand text-primary">
             @elseif (Auth::user()->role == 'dosen')
                     <a href="{{ url('/dashboard/dosen') }}" class="b-brand text-primary">
                 @elseif (Auth::user()->role == 'mahasiswa')
-                        <a href="{{ url('/dashboard/mahasiswa') }}" class="b-brand text-primary">
+                        <a href="{{ route('dashboard.mahasiswa') }}" class="b-brand text-primary">
                     @endif
                         <img src="{{ asset('logo/logo.svg') }}" class="img-fluid logo-lg" alt="logo">
                     </a>

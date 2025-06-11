@@ -15,7 +15,7 @@
             @if($isEditMode)
                 <i class="ti ti-edit-circle me-2"></i>Edit Prestasi
             @else
-                Upload Prestasi Terbaru Anda
+                Upload Prestasi Terbaru
             @endif
         </h5>
         {{-- <h5 class="modal-title">{{ $isEditMode ? 'Edit Prestasi' : 'Upload Prestasi Terbaru Anda' }}</h5> --}}
