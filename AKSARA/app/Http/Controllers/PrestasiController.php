@@ -361,151 +361,7 @@ class PrestasiController extends Controller
         }
     }
 
-    // public function indexMahasiswa()
-    // {
-    //     // View ini akan berisi tabel yang diisi oleh DataTables via AJAX call ke listMahasiswa()
-    //     $breadcrumb = (object) [
-    //         'title' => 'Data prestasi',
-    //         'list' => ['Status Verifikasi']
-    //     ];
-    //     $activeMenu = 'dashboard';
-    //     return view('prestasi.mahasiswa.index', compact('breadcrumb', 'activeMenu'));
-    // }
 
-    // /**
-    //  * Menyediakan data prestasi untuk DataTable mahasiswa.
-    //  */
-    // public function listMahasiswa(Request $request)
-    // {
-    //     if ($request->ajax()) {
-    //         $mahasiswa = Auth::user()->mahasiswa;
-    //         if (!$mahasiswa) {
-    //             return response()->json(['error' => 'Profil mahasiswa tidak ditemukan.'], 403);
-    //         }
-
-    //         $data = PrestasiModel::where('mahasiswa_id', $mahasiswa->mahasiswa_id)
-    //             ->select(['prestasi_id', 'nama_prestasi', 'kategori', 'tingkat', 'tahun', 'status_verifikasi', 'file_bukti'])
-    //             ->orderBy('tahun', 'desc');
-
-    //         return DataTables::of($data)
-    //             ->addIndexColumn()
-    //             ->editColumn('kategori', function ($row) {
-    //                 return ucfirst($row->kategori);
-    //             })
-    //             ->editColumn('tingkat', function ($row) {
-    //                 return ucfirst($row->tingkat);
-    //             })
-    //             ->editColumn('status_verifikasi', function ($row) {
-    //                 if ($row->status_verifikasi == 'pending') {
-    //                     return '<span class="badge bg-warning text-dark">Pending</span>';
-    //                 } elseif ($row->status_verifikasi == 'disetujui') {
-    //                     return '<span class="badge bg-success">Disetujui</span>';
-    //                 } elseif ($row->status_verifikasi == 'ditolak') {
-    //                     return '<span class="badge bg-danger">Ditolak</span>';
-    //                 }
-    //                 return '<span class="badge bg-secondary">' . ucfirst($row->status_verifikasi) . '</span>';
-    //             })
-    //             ->addColumn('file_bukti_action', function ($row) {
-    //                 if ($row->file_bukti) {
-    //                     $url = asset('storage/' . $row->file_bukti); // Sesuai struktur URL kamu
-    //                     return '<a href="' . $url . '" target="_blank" class="btn btn-info btn-sm">
-    //                 <i class="fas fa-eye"></i> Lihat
-    //             </a>';
-    //                 }
-    //                 return '-';
-    //             })
-    //             ->addColumn('aksi', function ($row) {
-    //                 $btn = '';
-    //                 // if ($row->status_verifikasi == 'pending') {
-    //                 //     $editUrl = route('mahasiswa.prestasi.edit_ajax', $row->prestasi_id);
-    //                 //     $deleteConfirmUrl = route('mahasiswa.prestasi.confirm_delete_ajax', $row->prestasi_id);
-    //                 //     $btn .= '<button type="button" class="btn btn-warning btn-sm me-1" onclick="modalAction(\'' . $editUrl . '\')">Edit</button>';
-    //                 //     $btn .= '<button type="button" class="btn btn-danger btn-sm" onclick="deleteConfirmAjax(\'' . $row->prestasi_id . '\', \'Data Prestasi Mahasiswa\')">Hapus</button>';
-    //                 // } else {
-    //                 //      $btn = '<button class="btn btn-secondary btn-sm" disabled><i class="fas fa-lock"></i></button>';
-    //                 // }
-    //                 // Untuk sekarang, belum ada aksi edit/hapus dari mahasiswa via AJAX
-    //                 return $btn ?: '-';
-    //             })
-    //             ->rawColumns(['status_verifikasi', 'file_bukti_action', 'aksi'])
-    //             ->make(true);
-    //     }
-    //     return abort(403);
-    // }
-
-    // /**
-    //  * Menampilkan form tambah prestasi (untuk dimuat ke modal AJAX).
-    //  */
-    // public function createFormAjaxMahasiswa()
-    // {
-    //     return view('prestasi.mahasiswa.create_ajax');
-    // }
-
-    // /**
-    //  * Menyimpan prestasi baru yang diinput oleh mahasiswa via AJAX.
-    //  */
-    // public function storeAjaxMahasiswa(Request $request)
-    // {
-    //     $mahasiswa = Auth::user()->mahasiswa;
-    //     if (!$mahasiswa) {
-    //         return response()->json(['status' => false, 'message' => 'Aksi tidak diizinkan. Profil mahasiswa tidak ditemukan.'], 403);
-    //     }
-
-    //     $validator = Validator::make($request->all(), [
-    //         'nama_prestasi' => 'required|string|max:255',
-    //         'kategori' => ['required', Rule::in(['akademik', 'non-akademik'])],
-    //         'penyelenggara' => 'required|string|max:255',
-    //         'tingkat' => ['required', Rule::in(['kota', 'provinsi', 'nasional', 'internasional'])],
-    //         'tahun' => 'required|integer|digits:4|min:1900|max:' . (date('Y') + 1),
-    //         'file_bukti' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048', // Max 2MB
-    //     ]);
-
-    //     if ($validator->fails()) {
-    //         return response()->json([
-    //             'status' => false,
-    //             'message' => 'Validasi gagal.',
-    //             'errors' => $validator->errors()
-    //         ], 422);
-    //     }
-
-    //     $filePath = null;
-    //     if ($request->hasFile('file_bukti')) {
-    //         $file = $request->file('file_bukti');
-    //         $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-    //         $extension = $file->getClientOriginalExtension();
-    //         // Nama file: nim_namaprestasi_timestamp.extension
-    //         $safeNamaPrestasi = substr(preg_replace('/[^A-Za-z0-9\-]/', '_', $request->nama_prestasi), 0, 50);
-    //         $fileName = $mahasiswa->nim . '_' . $safeNamaPrestasi . '_' . time() . '.' . $extension;
-    //         $filePath = $file->storeAs('bukti_prestasi', $fileName, 'public');
-    //     }
-
-    //     try {
-    //         PrestasiModel::create([
-    //             'mahasiswa_id' => $mahasiswa->mahasiswa_id,
-    //             'nama_prestasi' => $request->nama_prestasi,
-    //             'kategori' => $request->kategori,
-    //             'penyelenggara' => $request->penyelenggara,
-    //             'tingkat' => $request->tingkat,
-    //             'tahun' => $request->tahun,
-    //             'file_bukti' => $filePath,
-    //             'status_verifikasi' => 'pending',
-    //             'catatan_verifikasi' => null,
-    //             // Laravel akan mengisi created_at dan updated_at jika $timestamps = true di model
-    //             // Jika $timestamps = false, Anda mungkin perlu menambahkannya manual atau menghapusnya dari fillable jika tidak ada di DB
-    //         ]);
-
-    //         return response()->json(['status' => true, 'message' => 'Prestasi berhasil ditambahkan dan sedang menunggu verifikasi.']);
-    //     } catch (\Exception $e) {
-    //         if ($filePath && Storage::disk('public')->exists($filePath)) {
-    //             Storage::disk('public')->delete($filePath);
-    //         }
-    //         Log::error('Error simpan prestasi (AJAX): ' . $e->getMessage() . ' Trace: ' . $e->getTraceAsString());
-    //         return response()->json([
-    //             'status' => false,
-    //             'message' => 'Gagal menyimpan prestasi. Terjadi kesalahan server.'
-    //         ], 500);
-    //     }
-    // }
 
     // =========================================================================
     // == METHOD UNTUK ROLE ADMIN
@@ -919,13 +775,14 @@ class PrestasiController extends Controller
         }
         return abort(403);
     }
+    
     public function export_excel()
     {
-        $prestasi = PrestasiModel::with(['mahasiswa.user', 'bidang']) // eager load relasi
+        $prestasi = PrestasiModel::with(['mahasiswa.user', 'bidang', 'dosenPembimbing.user'])
+            ->where('status_verifikasi', 'disetujui') // Filter hanya prestasi yang disetujui
             ->orderBy('tahun', 'desc')
             ->get();
 
-        // Load library excel
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
@@ -941,7 +798,6 @@ class PrestasiController extends Controller
         $sheet->setCellValue('I1', 'Dosen Pembimbing');
         $sheet->setCellValue('J1', 'Status Verifikasi');
 
-        // Set style bold untuk header
         $sheet->getStyle('A1:J1')->getFont()->setBold(true);
 
         $no = 1;
@@ -955,32 +811,26 @@ class PrestasiController extends Controller
             $sheet->setCellValue('F' . $baris, $item->penyelenggara);
             $sheet->setCellValue('G' . $baris, ucfirst($item->tingkat));
             $sheet->setCellValue('H' . $baris, $item->tahun);
-            $sheet->setCellValue('I' . $baris, $item->dosen->user->nama ?? '-');
+            // Perbaikan: gunakan relasi dosenPembimbing
+            $sheet->setCellValue('I' . $baris, $item->dosenPembimbing->user->nama ?? '-');
             $sheet->setCellValue('J' . $baris, ucfirst($item->status_verifikasi));
 
             $baris++;
             $no++;
         }
 
-        // Auto size untuk kolom A sampai I
         foreach (range('A', 'J') as $columnID) {
             $sheet->getColumnDimension($columnID)->setAutoSize(true);
         }
 
-        $sheet->setTitle('Data Prestasi');
+        $sheet->setTitle('Data Prestasi Terverifikasi');
 
-        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
-        $filename = 'Data Prestasi ' . date('Y-m-d H_i_s') . '.xlsx';
+        $writer = new Xlsx($spreadsheet); // Menggunakan new Xlsx() lebih disarankan
+        $filename = 'Data_Prestasi_Terverifikasi_' . date('Y-m-d') . '.xlsx';
 
-        // Output file excel
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="' . $filename . '"');
         header('Cache-Control: max-age=0');
-        header('Cache-Control: max-age=1');
-        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
-        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
-        header('Cache-Control: cache, must-revalidate');
-        header('Pragma: public');
 
         $writer->save('php://output');
         exit;
@@ -988,15 +838,14 @@ class PrestasiController extends Controller
 
     public function export_pdf()
     {
-        $prestasi = PrestasiModel::with(['mahasiswa.user', 'bidang'])
+        $prestasi = PrestasiModel::with(['mahasiswa.user', 'bidang', 'dosenPembimbing.user'])
+            ->where('status_verifikasi', 'disetujui') // Filter hanya prestasi yang disetujui
             ->orderBy('tahun', 'desc')
             ->get();
 
         $pdf = Pdf::loadView('prestasi.export_pdf', ['prestasi' => $prestasi]);
         $pdf->setPaper('a4', 'landscape');
-        $pdf->setOption('isRemoteEnabled', true);
-        $pdf->render();
-
-        return $pdf->stream('Data Prestasi ' . date('Y-m-d H:i:s') . '.pdf');
+        
+        return $pdf->stream('Data_Prestasi_Terverifikasi_' . date('Y-m-d') . '.pdf');
     }
 }
