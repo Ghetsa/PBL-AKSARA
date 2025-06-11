@@ -2,11 +2,14 @@
 // app/Http/Controllers/LaporanController.php
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Models\PrestasiModel;
 use App\Models\LombaModel;
 use Yajra\DataTables\Facades\DataTables;
 use Carbon\Carbon;
+use Carbon\CarbonPeriod;
+
 // Untuk Export, Anda perlu install pustaka seperti Maatwebsite/Excel
 // use Maatwebsite\Excel\Facades\Excel;
 // use App\Exports\PrestasiExport; // Buat class Export ini
@@ -14,45 +17,64 @@ use Carbon\Carbon;
 
 class LaporanController extends Controller
 {
-    public function index()
-    {
-        $breadcrumb = (object) ['title' => 'Laporan & Analisis', 'list' => ['Prestasi Mahasiswa', 'Laporan & Analisis']];
-        $activeMenu = 'laporan_analisis';
+public function index()
+{
+    $breadcrumb = (object) [
+        'title' => 'Laporan & Analisis',
+        'list' => ['Prestasi Mahasiswa', 'Laporan & Analisis']
+    ];
+    $activeMenu = 'laporan_analisis';
 
-        // Data untuk filter
-        $tahunAkademikList = PrestasiModel::selectRaw('tahun')
-            ->distinct()
-            ->orderBy('tahun', 'desc')
-            ->pluck('tahun');
-        // Anda mungkin perlu logika lebih kompleks untuk tahun akademik (misal: 2023/2024)
+    // --- Data untuk filter di view ---
+    $tahunAkademikList = PrestasiModel::select('tahun')->distinct()->orderBy('tahun', 'desc')->pluck('tahun');
+    $kategoriLombaList = PrestasiModel::distinct()->pluck('kategori');
+    $tingkatKompetisiList = PrestasiModel::distinct()->pluck('tingkat');
 
-        $kategoriLombaList = PrestasiModel::distinct()->pluck('kategori'); // Atau dari tabel master jika ada
-        $tingkatKompetisiList = PrestasiModel::distinct()->pluck('tingkat');
+    // --- Statistik sederhana ---
+    $totalPrestasiDisetujui = PrestasiModel::where('status_verifikasi', 'disetujui')->count();
+    $totalLombaDisetujui = LombaModel::where('status_verifikasi', 'disetujui')->count();
+    $mahasiswaBerprestasiCount = PrestasiModel::where('status_verifikasi', 'disetujui')
+        ->distinct('mahasiswa_id')->count('mahasiswa_id');
 
-        // Data untuk Statistik Sederhana
-        $totalPrestasiDisetujui = PrestasiModel::where('status_verifikasi', 'disetujui')->count();
-        $totalLombaDisetujui = LombaModel::where('status_verifikasi', 'disetujui')->count();
-        $mahasiswaBerprestasiCount = PrestasiModel::where('status_verifikasi', 'disetujui')
-            ->distinct('mahasiswa_id')->count('mahasiswa_id');
+    // --- Data untuk Chart: Prestasi per Tahun ---
+    $prestasiPerTahun = PrestasiModel::where('status_verifikasi', 'disetujui')
+        ->select(DB::raw('tahun'), DB::raw('COUNT(*) as total'))
+        ->groupBy(DB::raw('tahun'))
+        ->orderBy(DB::raw('tahun'))
+        ->pluck('total', 'tahun');
 
-        // Data untuk Chart (contoh: Prestasi per Tahun)
-        $prestasiPerTahun = PrestasiModel::where('status_verifikasi', 'disetujui')
-            ->selectRaw('tahun, count(*) as jumlah')
-            ->groupBy('tahun')
-            ->orderBy('tahun', 'asc')
-            ->pluck('jumlah', 'tahun');
+    // --- Data untuk Chart: Distribusi Lomba per Bulan (hanya bulan yang ada datanya) ---
+    $lombaPeriode = LombaModel::where('status_verifikasi', 'disetujui')
+        ->selectRaw("DATE_FORMAT(pembukaan_pendaftaran, '%Y-%m') as periode, COUNT(*) as total")
+        ->groupBy('periode')
+        ->orderBy('periode')
+        ->get();
 
-        return view('laporan.index', compact(
-            'breadcrumb',
-            'activeMenu',
-            'tahunAkademikList',
-            'kategoriLombaList',
-            'tingkatKompetisiList',
-            'totalPrestasiDisetujui',
-            'totalLombaDisetujui',
-            'mahasiswaBerprestasiCount'
-        ));
+    $labelsBulan = [];
+    $dataBulan = [];
+
+    foreach ($lombaPeriode as $row) {
+        $date = \Carbon\Carbon::createFromFormat('Y-m', $row->periode);
+        $labelsBulan[] = $date->format('M Y'); // Contoh: Jan 2025
+        $dataBulan[] = $row->total;
     }
+
+    return view('laporan.index', compact(
+        'breadcrumb',
+        'activeMenu',
+        'tahunAkademikList',
+        'kategoriLombaList',
+        'tingkatKompetisiList',
+        'totalPrestasiDisetujui',
+        'totalLombaDisetujui',
+        'mahasiswaBerprestasiCount',
+        'prestasiPerTahun',
+        'labelsBulan',
+        'dataBulan'
+    ));
+}
+
+
 
     public function getPrestasiData(Request $request)
     {
