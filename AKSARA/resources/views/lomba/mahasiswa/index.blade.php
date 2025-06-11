@@ -321,15 +321,16 @@
             $('#search_nama').val('');
             $('#filter_status').val('');
 
-            dtLomba.column('moora_score:name').visible(true); // Tampilkan kolom skor
-            dtLomba.order([dtLomba.column('moora_score:name').index(), 'desc']).draw(); // Order by skor desc
-            Swal.fire({
-                icon: 'info',
-                title: 'Mode Rekomendasi Aktif',
-                text: 'Mencari lomba berdasarkan prioritas Anda...',
-                timer: 1500,
-                showConfirmButton: false
+            // Ambil bobot yang diterapkan
+            const weights = {};
+            $('.bobot-slider').each(function() {
+                weights[$(this).data('kriteria')] = parseInt($(this).val()) / 100;
             });
+
+            // Kirim bobot sebagai bagian dari parameter AJAX
+            dtLomba.ajax.reload();
+            dtLomba.column('moora_score:name').visible(true); // Tampilkan kolom skor
+            dtLomba.order([dtLomba.column('moora_score:name').index(), 'desc']).draw(); // Order berdasarkan skor rekomendasi
         });
 
         $('#filterFormLomba').on('submit', function(e) {
@@ -425,35 +426,44 @@
     {{-- [SKRIP BARU] Skrip untuk memuat dan menampilkan modal detail MOORA --}}
     <script>
         function showMooraDetails(url) {
-            const modal = $('#mooraDetailsModal');
-            
-            // Tampilkan loading spinner
-            modal.find('.modal-content').html(`
-                <div class="modal-body text-center p-5">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                    <p class="mt-3 mb-0">Memuat detail perhitungan...</p>
-                </div>
-            `);
-            modal.modal('show');
+    const modal = $('#mooraDetailsModal');
+    
+    // Tampilkan loading spinner
+    modal.find('.modal-content').html(`
+        <div class="modal-body text-center p-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-3 mb-0">Memuat detail perhitungan...</p>
+        </div>
+    `);
+    modal.modal('show');
 
-            // Ambil konten via AJAX
-            $.get(url, function(res) {
-                modal.find('.modal-content').html(res);
-            }).fail(function() {
-                // Handle jika terjadi error
-                modal.find('.modal-content').html(`
-                    <div class="modal-header">
-                        <h5 class="modal-title text-danger">Terjadi Kesalahan</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p>Gagal memuat detail perhitungan. Silakan coba lagi nanti.</p>
-                    </div>
-                `);
-            });
-        }
+    // Ambil bobot yang diterapkan dan kirimkan ke URL untuk menghitung perhitungan MOORA
+    const weights = {};
+    $('.bobot-slider').each(function() {
+        weights[$(this).data('kriteria')] = parseInt($(this).val()) / 100;
+    });
+
+    const params = new URLSearchParams();
+    for (const key in weights) {
+        params.append(`weights[${key}]`, weights[key]);
+    }
+
+    $.get(url + `?${params.toString()}`, function(res) {
+        modal.find('.modal-content').html(res);
+    }).fail(function() {
+        modal.find('.modal-content').html(`
+            <div class="modal-header">
+                <h5 class="modal-title text-danger">Terjadi Kesalahan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Gagal memuat detail perhitungan. Silakan coba lagi nanti.</p>
+            </div>
+        `);
+    });
+}
     </script>
 @endpush
 
