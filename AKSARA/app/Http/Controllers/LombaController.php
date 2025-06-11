@@ -22,7 +22,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class LombaController extends Controller
 {
-    
+
 
     /**
      * Method AJAX untuk mengambil detail perhitungan MOORA satu lomba.
@@ -232,7 +232,7 @@ class LombaController extends Controller
             })
             ->addColumn('aksi', function ($lomba) {
                 $btnDetail = '<button onclick="modalActionLomba(\'' . route('lomba.publik.show_ajax', $lomba->lomba_id) . '\', \'Detail Lomba\', \'modalDetailLombaPublik\')" class="btn btn-sm btn-outline-primary"><i class="fas fa-eye me-1"></i>Detail</button>';
-                
+
                 // =======================================================
                 // === PERBAIKAN DI SINI                               ===
                 // =======================================================
@@ -329,7 +329,7 @@ class LombaController extends Controller
             $totalCustomWeight = array_sum($customWeights);
             // Cek apakah total bobot mendekati 1.0 (karena dari JS sudah dinormalisasi)
             if (abs($totalCustomWeight - 1.0) < 0.01) {
-                 $weights = $customWeights;
+                $weights = $customWeights;
             } else if ($totalCustomWeight > 0) { // Fallback jika JS tidak menormalisasi
                 $normalizedCustomWeights = [];
                 foreach ($customWeights as $key => $val) {
@@ -349,7 +349,7 @@ class LombaController extends Controller
         // Hitung pembagi untuk normalisasi
         $divisors = [];
         foreach ($criteria as $c) {
-            $sumOfSquares = array_sum(array_map(fn ($data) => pow($data['values'][$c], 2), $dataMatrix));
+            $sumOfSquares = array_sum(array_map(fn($data) => pow($data['values'][$c], 2), $dataMatrix));
             $divisors[$c] = $sumOfSquares > 0 ? sqrt($sumOfSquares) : 1;
         }
 
@@ -380,10 +380,10 @@ class LombaController extends Controller
             ];
         }
 
-        usort($results, fn ($a, $b) => $b['score'] <=> $a['score']);
+        usort($results, fn($a, $b) => $b['score'] <=> $a['score']);
         return $results;
     }
-    
+
     // Method untuk menampilkan halaman utama daftar lomba mahasiswa
     public function indexLomba() // Ini yang dipanggil oleh route lomba.index
     {
@@ -431,7 +431,7 @@ class LombaController extends Controller
         if (!$mooraDetail) {
             return response()->json(['error' => 'Perhitungan tidak ditemukan.'], 404);
         }
-        
+
         return response()->json([
             'lomba' => [
                 'nama_lomba' => $lomba->nama_lomba,
@@ -453,7 +453,7 @@ class LombaController extends Controller
         return $this->calculateMooraScores(Auth::id(), $weights);
     }
 
-    
+
 
     public function create()
     {
@@ -1303,7 +1303,7 @@ class LombaController extends Controller
     // =======================================================================
     public function adminIndexVerifikasiLomba()
     {
-        $breadcrumb = (object) ['title' => 'Verifikasi Pengajuan Lomba', 'list' => ['Lomba', 'Verifikasi Lomba']];
+        $breadcrumb = (object) ['title' => 'Daftar Pengajuan Info Lomba', 'list' => ['Lomba', 'Verifikasi Lomba']];
         $activeMenu = 'admin_verifikasi_lomba';
         return view('lomba.admin.verifikasi.index', compact('breadcrumb', 'activeMenu'));
     }
@@ -1448,11 +1448,11 @@ class LombaController extends Controller
                 ->editColumn('batas_pendaftaran', fn($row) => $row->batas_pendaftaran ? Carbon::parse($row->batas_pendaftaran)->setTimezone('Asia/Jakarta')->isoFormat('D MMM YYYY') : '-')
                 ->addColumn('aksi', function ($row) {
                     // Tombol Detail (menggunakan modal yang sama dengan publik/user)
-                    $btnDetail = '<button onclick="modalActionLombaAdminCrud(\'' . route('lomba.publik.show_ajax', $row->lomba_id) . '\', \'Detail Lomba\', \'modalDetailLombaAdminCrud\')" class="btn btn-sm btn-info me-1" title="Detail"><i class="fas fa-eye"></i></button>';
+                    $btnDetail = '<button onclick="modalActionLombaAdminCrud(\'' . route('lomba.publik.show_ajax', $row->lomba_id) . '\', \'Detail Lomba\', \'modalDetailLombaAdminCrud\')" class="btn btn-sm btn-outline-info me-1" title="Detail"><i class="fas fa-eye"></i></button>';
 
-                    $btnEdit = '<button onclick="modalActionLombaAdminCrud(\'' . route('admin.lomba.crud.edit_form_ajax', $row->lomba_id) . '\', \'Edit Lomba\', \'modalFormLombaAdminCrud\')" class="btn btn-sm btn-warning me-1" title="Edit"><i class="fas fa-edit"></i></button>';
+                    $btnEdit = '<button onclick="modalActionLombaAdminCrud(\'' . route('admin.lomba.crud.edit_form_ajax', $row->lomba_id) . '\', \'Edit Lomba\', \'modalFormLombaAdminCrud\')" class="btn btn-sm btn-outline-warning me-1" title="Edit"><i class="fas fa-edit"></i></button>';
 
-                    $btnDelete = '<button onclick="modalActionLombaAdminCrud(\'' . route('admin.lomba.crud.confirm_delete_ajax', $row->lomba_id) . '\', \'Konfirmasi Hapus Lomba\', \'modalConfirmDeleteLombaAdminCrud\')" class="btn btn-sm btn-danger" title="Hapus"><i class="fas fa-trash"></i></button>';
+                    $btnDelete = '<button onclick="modalActionLombaAdminCrud(\'' . route('admin.lomba.crud.confirm_delete_ajax', $row->lomba_id) . '\', \'Konfirmasi Hapus Lomba\', \'modalConfirmDeleteLombaAdminCrud\')" class="btn btn-sm btn-outline-danger" title="Hapus"><i class="fas fa-trash"></i></button>';
 
                     return '<div class="btn-group">' . $btnDetail . $btnEdit . $btnDelete . '</div>';
                 })

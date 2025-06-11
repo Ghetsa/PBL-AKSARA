@@ -448,7 +448,7 @@ class PrestasiController extends Controller
                 // })
                 ->addColumn('aksi', function ($row) {
                     $verifyUrl = route('prestasi.admin.verify_form_ajax', $row->prestasi_id);
-                    return '<button type="button" class="btn btn-outline-primary btn-sm" onclick="modalAction(\'' . $verifyUrl . '\')"><i class="fas fa-clipboard-check"></i> Verifikasi</button>';
+                    return '<button type="button" class="btn btn-primary btn-sm" onclick="modalAction(\'' . $verifyUrl . '\')"><i class="fas fa-clipboard-check"></i> Verifikasi</button>';
                 })
                 ->rawColumns(['status_verifikasi', 'aksi'])
                 ->make(true);
@@ -775,7 +775,7 @@ class PrestasiController extends Controller
         }
         return abort(403);
     }
-    
+
     public function export_excel()
     {
         $prestasi = PrestasiModel::with(['mahasiswa.user', 'bidang', 'dosenPembimbing.user'])
@@ -845,7 +845,7 @@ class PrestasiController extends Controller
 
         $pdf = Pdf::loadView('prestasi.export_pdf', ['prestasi' => $prestasi]);
         $pdf->setPaper('a4', 'landscape');
-        
+
         return $pdf->stream('Data_Prestasi_Terverifikasi_' . date('Y-m-d') . '.pdf');
     }
 }

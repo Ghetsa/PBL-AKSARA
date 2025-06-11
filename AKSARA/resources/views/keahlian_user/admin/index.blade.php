@@ -14,7 +14,7 @@
                         {{-- Filter Status Verifikasi --}}
                         <div class="col-md-6">
                             <div class="form-group row">
-                                <label class="col-sm-4 col-form-label" for="status_filter_keahlian">Filter Status:</label>
+                                <label class="col-sm-4 form-label" for="status_filter_keahlian">Filter Status:</label>
                                 <div class="col-sm-8">
                                     <select class="form-select form-select-sm" id="status_filter_keahlian" name="status_filter_keahlian">
                                         <option value="">- Semua Status -</option>

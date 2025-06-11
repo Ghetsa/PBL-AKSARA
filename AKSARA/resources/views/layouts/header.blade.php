@@ -163,7 +163,7 @@
         </div>
     </div>
 </li>
-        @php
+    @php
       $user = Auth::user();
       $role = $user->role;
       $avatar = '';

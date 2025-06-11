@@ -36,6 +36,24 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="alamat" class="form-label">Alamat</label>
+                                <input type="text" name="alamat" id="alamat" class="form-control"
+                                    value="{{ old('alamat', $user->alamat ?? '') }}">
+                                <span class="invalid-feedback error-alamat"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="no_telepon" class="form-label">Nomor Telepon</label>
+                                <input type="text" name="no_telepon" id="no_telepon" class="form-control"
+                                    value="{{ old('no_telepon', $user->no_telepon ?? '') }}">
+                                <span class="invalid-feedback error-no_telepon"></span>
+                            </div>
+                        </div>
+                    </div>
                     <div class="form-group mb-3">
                         <label for="edit_foto" class="form-label">Foto Profil</label>
                         <input type="file" name="foto" id="edit_foto" class="form-control">
@@ -49,30 +67,11 @@
                         @endif
                         <span class="invalid-feedback error-foto"></span>
                     </div>
-                    @if ($user->role === 'dosen' && $user->dosen)
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="gelar" class="form-label">Gelar</label>
-                                    <input type="text" name="gelar" id="gelar" class="form-control"
-                                        value="{{ old('gelar', $user->dosen->gelar ?? '') }}">
-                                    <span class="invalid-feedback error-gelar"></span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="no_hp" class="form-label">No. HP</label>
-                                    <input type="text" name="no_hp" id="no_hp" class="form-control"
-                                        value="{{ old('no_hp', $user->dosen->no_hp ?? '') }}">
-                                    <span class="invalid-feedback error-no_hp"></span>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
+
                 </div>
                 <hr class="my-4">
 
-                {{-- Bagian Minat (kode lainnya tetap sama) --}}
+                {{-- Bagian Minat --}}
                 @if ($user->role === 'dosen' || $user->role === 'mahasiswa')
                     <div id="section-minat">
                         <h5><i class="ti ti-heart me-2"></i> Minat</h5>
@@ -121,7 +120,7 @@
                     <hr class="my-4">
                 @endif
 
-                {{-- Bagian Pengalaman (kode lainnya tetap sama) --}}
+                {{-- Bagian Pengalaman --}}
                 @if ($user->role === 'mahasiswa' || $user->role === 'dosen')
                     <div id="section-pengalaman" class="mt-3">
                         <h5><i class="ti ti-briefcase me-2"></i>Pengalaman</h5>
@@ -138,9 +137,8 @@
                                             <label class="form-label">Nama Pengalaman/Posisi <span
                                                     class="text-danger">*</span></label>
                                             <input type="text" name="pengalaman_items[{{ $index }}][pengalaman_nama]"
-                                                class="form-control" value="{{ $pengalaman->pengalaman_nama }}">
-                                            <span
-                                                class="invalid-feedback error-pengalaman_items.{{$index}}.pengalaman_nama"></span>
+                                                class="form-control pengalaman-nama-input" value="{{ $pengalaman->pengalaman_nama }}" required>
+                                            <span class="invalid-feedback error-pengalaman_items.{{$index}}.pengalaman_nama"></span>
                                         </div>
                                         <div class="col-md-6 mb-2">
                                             <label class="form-label">Kategori</label>
@@ -158,8 +156,7 @@
                                                 <option value="Pekerjaan" {{ old('pengalaman_kategori', $pengalaman->pengalaman_kategori ?? '') == 'Pekerjaan' ? 'selected' : '' }}>
                                                     Pekerjaan</option>
                                             </select>
-                                            <span
-                                                class="invalid-feedback error-pengalaman_items.{{$index}}.pengalaman_kategori"></span>
+                                            <span class="invalid-feedback error-pengalaman_items.{{$index}}.pengalaman_kategori"></span>
                                         </div>
                                     </div>
                                 </div>
@@ -173,7 +170,7 @@
                                         <div class="col-md-6 mb-2">
                                             <label class="form-label">Nama Pengalaman/Posisi <span
                                                     class="text-danger">*</span></label>
-                                            <input type="text" name="pengalaman_items[0][pengalaman_nama]" class="form-control">
+                                            <input type="text" name="pengalaman_items[0][pengalaman_nama]" class="form-control pengalaman-nama-input" required>
                                             <span class="invalid-feedback error-pengalaman_items.0.pengalaman_nama"></span>
                                         </div>
                                         <div class="col-md-6 mb-2">
@@ -206,20 +203,13 @@
     </div>
 </div>
 
-{{-- Kode JavaScript di bawah ini tidak perlu diubah untuk error ini, --}}
-{{-- kecuali jika Anda ingin menyesuaikan logika penanganan error validasi --}}
-{{-- berdasarkan perubahan error span class yang saya sarankan sebelumnya. --}}
-{{-- Perubahan sebelumnya pada error span class di JS (menggunakan titik) sudah baik. --}}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/additional-methods.min.js"></script>
+
 <script>
     $(document).ready(function () {
-        // ... (kode JavaScript yang sudah ada dan telah diperbaiki sebelumnya tetap di sini) ...
-        // Pastikan kode JavaScript untuk AJAX submission menggunakan method: 'POST'
-        // dan tidak secara eksplisit menambahkan _method='PUT' ke formData jika
-        // Anda sudah menghapus @method('PUT') dari form.
-        // FormData(form) akan secara otomatis menyertakan semua field dari form.
-        // Jika @method('PUT') dihapus, maka field _method tidak akan ada.
-
+        // Logika untuk menampilkan/menyembunyikan level minat (tetap sama)
         $('.minat-checkbox').each(function () {
             var $checkbox = $(this);
             var bidangId = $checkbox.data('bidang-id');
@@ -237,6 +227,7 @@
             });
         });
 
+        // Logika untuk Tambah/Hapus Pengalaman (tetap sama, dengan sedikit penyesuaian)
         function updatePengalamanRemoveButtons() {
             const itemCount = $('#pengalaman-fields-container .pengalaman-item').length;
             $('#pengalaman-fields-container .pengalaman-item').each(function (index) {
@@ -264,7 +255,7 @@
                 <div class="row">
                     <div class="col-md-6 mb-2">
                         <label class="form-label">Nama Pengalaman/Posisi <span class="text-danger">*</span></label>
-                        <input type="text" name="pengalaman_items[${newIndex}][pengalaman_nama]" class="form-control">
+                        <input type="text" name="pengalaman_items[${newIndex}][pengalaman_nama]" class="form-control pengalaman-nama-input" required>
                         <span class="invalid-feedback error-pengalaman_items.${newIndex}.pengalaman_nama"></span>
                     </div>
                     <div class="col-md-6 mb-2">
@@ -282,6 +273,15 @@
                 </div>
             </div>`;
             $('#pengalaman-fields-container').append(newItemHtml);
+            
+            // Daftarkan rule validasi untuk elemen baru yang ditambahkan
+             $(`[name="pengalaman_items[${newIndex}][pengalaman_nama]"]`).rules('add', {
+                required: true,
+                messages: {
+                    required: "Nama pengalaman wajib diisi."
+                }
+            });
+
             updatePengalamanRemoveButtons();
         });
 
@@ -289,112 +289,160 @@
             $(this).closest('.pengalaman-item').remove();
             updatePengalamanRemoveButtons();
         });
+        
         updatePengalamanRemoveButtons();
 
 
-        $('#formUpdateProfile').on('submit', function (e) {
-            e.preventDefault();
-            let form = this;
-            let formData = new FormData(form); // Jika @method('PUT') dihapus, _method tidak akan ada di sini
-
-            const submitButton = $(this).find('button[type="submit"]');
-            const originalButtonText = submitButton.html();
-            submitButton.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Menyimpan…');
-            $('.invalid-feedback').text('').hide();
-            $('input, select, textarea').removeClass('is-invalid');
-
-            $.ajax({
-                url: $(form).attr('action'),
-                method: 'POST', // Ini sudah benar methodnya POST
-                data: formData,
-                processData: false,
-                contentType: false,
-                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
-                success: function (response) {
-                    let modalElement = $(form).closest('.modal');
-                    modalElement.modal('hide');
-                    setTimeout(function () {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Sukses!',
-                            text: response.message,
-                            timer: 2000,
-                            showConfirmButton: false
-                        }).then(() => {
-                            if (response.redirect) {
-                                window.location.href = response.redirect;
-                            } else {
-                                location.reload();
-                            }
-                        });
-                    }, 300);
+        // =================================================================
+        // IMPLEMENTASI JQUERY VALIDATION
+        // =================================================================
+        $('#formUpdateProfile').validate({
+            // 1. Tentukan Rules (Aturan Validasi)
+            rules: {
+                nama: {
+                    required: true,
+                    maxlength: 50
                 },
-                error: function (xhr) { // Logika error handling yang sudah diperbaiki sebelumnya
-                    if (xhr.status === 422) {
-                        let errors = xhr.responseJSON.errors;
-                        let firstErrorElement = null;
-                        $.each(errors, function (key, messages) {
-                            let nameAttributeForSelector = key.replace(/\.(\d+)\.(.+)/g, '[$1][$2]');
-                            if (!nameAttributeForSelector.includes('[')) {
-                                nameAttributeForSelector = key;
-                            } else {
-                                let parts = key.split('.');
-                                let baseName = parts.shift();
-                                nameAttributeForSelector = baseName + '[' + parts.join('][') + ']';
-                            }
-
-                            let inputElement = $(form).find(`[name="${nameAttributeForSelector}"]`);
-
-                            if (!inputElement.length && key.startsWith('sertifikasi_file.')) {
-                                let bidangIdFromFileKey = key.split('.')[1];
-                                inputElement = $(form).find(`input[name="sertifikasi_file[${bidangIdFromFileKey}]"]`);
-                            }
-                            if (!inputElement.length && key.startsWith('minat_pilihan')) {
-                                inputElement = $(form).find('[name="minat_pilihan[]"]').first();
-                            }
-
-                            if (inputElement.length) {
-                                inputElement.addClass('is-invalid');
-                                let errorKeyForSelector = key.replace(/\./g, '\\.');
-                                let errorContainer = inputElement.closest('.form-group, .mb-2, .mb-3, .ms-1, .card-body').find(`.invalid-feedback.error-${errorKeyForSelector}`);
-
-                                if (!errorContainer.length) {
-                                    errorContainer = inputElement.parent().find(`.invalid-feedback.error-${errorKeyForSelector}`);
-                                }
-                                if (!errorContainer.length && inputElement.parent().hasClass('input-group')) {
-                                    errorContainer = inputElement.parent().parent().find(`.invalid-feedback.error-${errorKeyForSelector}`);
-                                }
-                                if (!errorContainer.length) {
-                                    inputElement.after(`<span class="invalid-feedback d-block error-${key.replace(/\./g, '\\.')}">${messages[0]}</span>`);
-                                    errorContainer = inputElement.siblings(`.invalid-feedback.error-${key.replace(/\./g, '\\.')}`);
-                                }
-                                errorContainer.text(messages[0]).show();
-                                if (!firstErrorElement) firstErrorElement = inputElement;
-                            } else {
-                                if ($(`.modal-body .alert-danger[data-error-key="${key}"]`).length === 0) {
-                                    $('.modal-body').prepend(`<div class="alert alert-danger alert-dismissible fade show small py-2" role="alert" data-error-key="${key}">Error pada ${key}: ${messages[0]}<button type="button" class="btn-close py-2" data-bs-dismiss="alert" aria-label="Close"></button></div>`);
-                                    if (!firstErrorElement) firstErrorElement = $('.modal-body .alert-danger').first();
-                                }
-                            }
-                        });
-                        if (firstErrorElement && firstErrorElement.length) {
-                            $(form).closest('.modal-body').animate({
-                                scrollTop: firstErrorElement.offset().top - $(form).closest('.modal-body').offset().top + $(form).closest('.modal-body').scrollTop() - 20
-                            }, 300);
-                        }
-                        Swal.fire({ icon: 'error', title: 'Validasi Gagal', text: xhr.responseJSON.message || 'Periksa kembali isian Anda.' });
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Gagal',
-                            text: (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'Terjadi kesalahan server. Silakan coba lagi.'
-                        });
-                    }
+                email: {
+                    required: true,
+                    email: true,
+                    maxlength: 50
                 },
-                complete: function () {
-                    submitButton.prop('disabled', false).html(originalButtonText);
+                no_telepon: {
+                    // Sesuai controller, no_telepon nullable
+                    digits: true,
+                    maxlength: 15
+                },
+                alamat: {
+                     // Sesuai controller, alamat nullable
+                    maxlength: 100
+                },
+                foto: {
+                    accept: "image/jpeg, image/png, image/jpg, image/gif",
+                    filesize: 2048000 // 2MB in bytes
+                },
+                // Validasi untuk input dinamis "pengalaman" ditangani dengan menambahkan atribut 'required' langsung di HTML
+            },
+
+            // 2. Tentukan Pesan Error Kustom
+            messages: {
+                nama: {
+                    required: "Nama lengkap wajib diisi.",
+                    maxlength: "Nama tidak boleh lebih dari 50 karakter."
+                },
+                email: {
+                    required: "Email wajib diisi.",
+                    email: "Format email tidak valid.",
+                    maxlength: "Email terlalu panjang."
+                },
+                 no_telepon: {
+                    digits: "Nomor telepon hanya boleh berisi angka.",
+                    maxlength: "Nomor telepon tidak boleh lebih dari 15 karakter."
+                },
+                alamat: {
+                    maxlength: "Alamat tidak boleh lebih dari 100 karakter."
+                },
+                foto: {
+                    accept: "Format file harus berupa gambar (jpg, jpeg, png, gif).",
+                    filesize: "Ukuran file tidak boleh lebih dari 2MB."
                 }
-            });
+            },
+
+            // 3. Atur Penempatan dan Tampilan Error agar Sesuai Bootstrap 5
+            errorElement: 'span',
+            errorPlacement: function (error, element) {
+                error.addClass('invalid-feedback');
+                // Untuk input file, tempatkan error di siblingnya
+                if (element.prop('type') === 'file') {
+                    element.closest('.form-group').find('.invalid-feedback').html(error);
+                } else {
+                    element.closest('.form-group').append(error);
+                }
+            },
+            highlight: function (element, errorClass, validClass) {
+                $(element).addClass('is-invalid');
+            },
+            unhighlight: function (element, errorClass, validClass) {
+                $(element).removeClass('is-invalid');
+            },
+
+            // 4. Submit Handler: Kode yang dijalankan HANYA JIKA form valid
+            submitHandler: function (form) {
+                let formData = new FormData(form);
+                const submitButton = $(form).find('button[type="submit"]');
+                const originalButtonText = submitButton.html();
+                
+                submitButton.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Menyimpan…');
+                
+                // Hapus pesan error lama dari validasi server (jika ada)
+                $('.invalid-feedback').text('').hide();
+                $('input, select, textarea').removeClass('is-invalid');
+
+                // AJAX call yang sudah ada sebelumnya dipindahkan ke sini
+                $.ajax({
+                    url: $(form).attr('action'),
+                    method: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                    success: function (response) {
+                        let modalElement = $(form).closest('.modal');
+                        modalElement.modal('hide');
+                        setTimeout(function () {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Sukses!',
+                                text: response.message,
+                            }).then(() => {
+                                if (response.redirect) {
+                                    window.location.href = response.redirect;
+                                } else {
+                                    location.reload();
+                                }
+                            });
+                        }, 300);
+                    },
+                    error: function (xhr) { 
+                        // Jika validasi client lolos tapi server menolak, tampilkan error dari server
+                        if (xhr.status === 422) {
+                            let errors = xhr.responseJSON.errors;
+                            $.each(errors, function (key, messages) {
+                                let nameAttributeForSelector = key.replace(/\.(\d+)\.(.+)/g, '[$1][$2]');
+                                if (!nameAttributeForSelector.includes('[')) {
+                                    nameAttributeForSelector = key;
+                                } else {
+                                    let parts = key.split('.');
+                                    let baseName = parts.shift();
+                                    nameAttributeForSelector = baseName + '[' + parts.join('][') + ']';
+                                }
+                                let inputElement = $(form).find(`[name="${nameAttributeForSelector}"]`);
+                                if (inputElement.length) {
+                                    inputElement.addClass('is-invalid');
+                                    let errorContainer = inputElement.closest('.form-group, .mb-2, .mb-3').find('.invalid-feedback');
+                                    errorContainer.text(messages[0]).show();
+                                }
+                            });
+                            Swal.fire({ icon: 'error', title: 'Validasi Gagal', text: 'Periksa kembali isian Anda.' });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal',
+                                text: (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'Terjadi kesalahan server.'
+                            });
+                        }
+                    },
+                    complete: function () {
+                        submitButton.prop('disabled', false).html(originalButtonText);
+                    }
+                });
+            }
         });
+
+        // Tambahkan rule untuk validasi ukuran file
+        $.validator.addMethod('filesize', function (value, element, param) {
+            return this.optional(element) || (element.files[0].size <= param);
+        }, 'Ukuran file melebihi batas.');
+
     });
 </script>

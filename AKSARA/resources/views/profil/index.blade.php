@@ -53,17 +53,17 @@
                                                 </div>
                                                 <div class="d-inline-flex align-items-center justify-content-between w-100 mb-3">
                                                     <i class="ti ti-phone"></i>
-                                                    <p class="mb-0">{{ ucfirst($user->no_telepon) }}</p>
+                                                    <p class="mb-0">{{ ($user->no_telepon) }}</p>
                                                 </div>
                                                 <div class="d-inline-flex align-items-center justify-content-between w-100 mb-3">
                                                     <i class="ti ti-map-pin"></i>
-                                                    <p class="mb-0">{{ ucfirst($user->alamat) }}</p>
+                                                    <p class="mb-0">{{ Str::limit($user->alamat, 25) }}</p>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    @if($user->role == 'dosen' || $user->role == 'mahasiswa')
+                                    @if($user->role == 'mahasiswa')
                                         <div class="card mt-3">
                                             <div class="card-header">
                                                 <h4 class="mb-0">Keahlian</h4>
@@ -72,7 +72,8 @@
                                                 <div class="card-body">
                                                     @foreach($user->keahlianUser as $keahlian_item)
                                                         <div class="mb-3 pb-2 @if(!$loop->last) border-bottom @endif">
-                                                            <h6 class="mb-1">{{ $keahlian_item->bidang->bidang_nama ?? '-' }}</h6>
+                                                            {{-- <h6 class="mb-1"><i class="ti ti-certificate me-2 text-info"></i>{{ $keahlian_item->bidang->bidang_nama ?? '-' }}</h6> --}}
+                                                            <h6 class="mb-1"><i class="fas fa-medal me-2 text-info"></i>{{ $keahlian_item->bidang->bidang_nama ?? '-' }}</h6>
 
                                                             @if($keahlian_item->sertifikasi)
                                                                 @php
@@ -81,21 +82,21 @@
                                                                 @if($sertifikasiExists)
                                                                     <small class="d-block">
                                                                         Sertifikasi:
-                                                                        <a href="{{ Storage::url($keahlian_item->sertifikasi) }}"
+                                                                        <a href="{{ asset('storage/' . $keahlian_item->sertifikasi) }}"
                                                                             target="_blank" class="btn-link">Lihat File</a>
                                                                         (
                                                                         @if($keahlian_item->status_verifikasi == 'disetujui')
-                                                                            <span class="badge bg-success"><i
+                                                                            <span class="badge bg-light-success"><i
                                                                                     class="fas fa-check-circle me-1"></i>Disetujui</span>
                                                                         @elseif($keahlian_item->status_verifikasi == 'ditolak')
-                                                                            <span class="badge bg-danger"><i
+                                                                            <span class="badge bg-light-danger"><i
                                                                                     class="fas fa-times-circle me-1"></i>Ditolak</span>
                                                                             @if($keahlian_item->catatan_verifikasi)
                                                                                 <em class="d-block text-danger small fst-italic">Catatan:
                                                                                     {{ $keahlian_item->catatan_verifikasi }}</em>
                                                                             @endif
                                                                         @else
-                                                                            <span class="badge bg-warning text-dark"><i
+                                                                            <span class="badge bg-light-warning"><i
                                                                                     class="fas fa-hourglass-half me-1"></i>Pending</span>
                                                                         @endif
                                                                         )
@@ -171,6 +172,19 @@
                                                         <div class="col-md-6">
                                                             <p class="mb-1 text-muted text-lg">Email</p>
                                                             <p class="mb-0 text-lg">{{ $user->email }}</p>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li class="list-group-item px-0 pt-0">
+                                                    <div class="row">
+                                                        <div class="col-md-6 mb-2 mb-md-0">
+                                                            <p class="mb-1 text-muted text-lg">Alamat</p>
+                                                            {{-- <p class="mb-0 text-lg">{{ Str::limit($user->alamat, 10) }}</p> --}}
+                                                            <p class="mb-0 text-lg">{{ $user->alamat ?? '-' }}</p>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <p class="mb-1 text-muted text-lg">Nomor Telepon</p>
+                                                            <p class="mb-0 text-lg">{{ $user->no_telepon ?? '-' }}</p>
                                                         </div>
                                                     </div>
                                                 </li>
@@ -254,7 +268,7 @@
                                                         @foreach($user->pengalaman as $p)
                                                             <li
                                                                 class="list-group-item px-0 @if(!$loop->first) pt-3 @else pt-0 @endif @if(!$loop->last) pb-3 @else pb-0 @endif">
-                                                                <h6 class="mb-0">{{ $p->pengalaman_nama }}</h6>
+                                                                <h6 class="mb-0"><i class="fas fa-briefcase me-2 text-primary"></i>{{ $p->pengalaman_nama }}</h6>
                                                                 @if($p->pengalaman_kategori)
                                                                     <p class="mb-0 text-sm text-muted">{{ $p->pengalaman_kategori }}</p>
                                                                 @endif
@@ -274,7 +288,7 @@
                                     @if($user->role == 'mahasiswa' && $user->mahasiswa && $user->mahasiswa->prestasi)
                                         @php
                                             $prestasiDisetujui = $user->mahasiswa->prestasi->where('status_verifikasi', 'disetujui');
-                                            $prestasiDisetujuiTerbatas = $prestasiDisetujui->take(3); 
+                                            $prestasiDisetujuiTerbatas = $prestasiDisetujui->take(10); 
                                         @endphp
                                         <div class="card mt-3">
                                             <div class="card-header">
@@ -287,8 +301,8 @@
                                                             @foreach($prestasiDisetujuiTerbatas as $pres)
                                                                 <li
                                                                     class="list-group-item px-0 @if(!$loop->first) pt-3 @else pt-0 @endif @if(!$loop->last) pb-3 @else pb-0 @endif">
-                                                                    <p class="mb-0 text-lg">{{ $pres->nama_prestasi }}
-                                                                        <span class="text-muted">({{ $pres->tingkat }} -
+                                                                    <p class="mb-0 text-lg"><i class="fas fa-award me-2 text-warning"></i>{{ $pres->nama_prestasi }}
+                                                                        <span class="text-muted">({{ ucfirst($pres->tingkat) }} -
                                                                             {{ $pres->tahun }})</span>
                                                                     </p>
                                                                     @if($pres->file_bukti && Storage::disk('public')->exists($pres->file_bukti))
@@ -297,7 +311,7 @@
                                                                     @endif
                                                                 </li>
                                                             @endforeach
-                                                            @if($prestasiDisetujui->count() > 3)
+                                                            @if($prestasiDisetujui->count() > 10)
                                                                 <li class="list-group-item px-0 pt-3 pb-0 text-center">
                                                                     {{-- Pastikan route ini mengarah ke halaman daftar semua prestasi mahasiswa --}}
                                                                     <a href="{{ route('prestasi.mahasiswa.index') }}">Lihat semua

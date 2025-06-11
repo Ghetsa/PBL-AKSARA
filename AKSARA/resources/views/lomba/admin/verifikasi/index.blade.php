@@ -7,7 +7,7 @@
         <div class="col-12">
             <div class="card shadow-sm">
                 <div class="card-header">
-                    <h3 class="card-title mb-0">{{ $breadcrumb->title ?? 'Verifikasi Pengajuan Lomba' }}</h3>
+                    <h3 class="card-title mb-0">{{ $breadcrumb->title ?? 'Daftar Pengajuan Info Lomba' }}</h3>
                     {{-- Tombol Tambah Lomba oleh admin tidak ada di sini, tapi di halaman CRUD Admin --}}
                 </div>
                 <div class="card-body">
