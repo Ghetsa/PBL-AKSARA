@@ -175,11 +175,11 @@
             <div class="col-12">
                 <div class="card shadow mb-4">
                     <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary">Tren Perolehan Prestasi (12 Bulan Terakhir)</h6>
+                        <h6 class="m-0 font-weight-bold text-primary">Tren Banyak Lomba (6 Bulan Terakhir hingga 6 Bulan Mendatang)</h6>
                     </div>
                     <div class="card-body">
                         <div class="chart-area" style="height: 320px;">
-                            <canvas id="prestasiPerBulanChart"></canvas>
+                            <canvas id="lombaPerBulanChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -258,7 +258,7 @@
         document.addEventListener("DOMContentLoaded", function () {
             const labels = @json(array_values($labelsBulan));
             const data = @json(array_values($dataBulan));
-            const ctx = document.getElementById("prestasiPerBulanChart");
+            const ctx = document.getElementById("lombaPerBulanChart");
 
             if (ctx && data.length > 0 && data.some(d => d > 0)) {
                 new Chart(ctx, {

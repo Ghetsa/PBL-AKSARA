@@ -182,13 +182,13 @@ class DashboardController extends Controller
             ->groupBy('tingkat')
             ->pluck('total', 'tingkat');
             
-        // 3. GRAFIK BARU: Tren Prestasi per Bulan (Line Chart)
-        $prestasiPerBulan = PrestasiModel::select(
-                DB::raw('YEAR(created_at) as year, MONTH(created_at) as month'),
+        // 3. GRAFIK BARU: Tren Lomba per Bulan (Line Chart)
+        $lombaPerBulan = LombaModel::select(
+                DB::raw('YEAR(pembukaan_pendaftaran) as year, MONTH(pembukaan_pendaftaran) as month'),
                 DB::raw('COUNT(*) as total')
             )
             ->where('status_verifikasi', 'disetujui')
-            ->where('created_at', '>=', Carbon::now()->subMonths(11)->startOfMonth())
+            ->where('pembukaan_pendaftaran', '>=', Carbon::now()->subMonths(11)->startOfMonth())
             ->groupBy('year', 'month')
             ->orderBy('year', 'asc')
             ->orderBy('month', 'asc')
@@ -197,12 +197,12 @@ class DashboardController extends Controller
         // Memformat data untuk Chart.js
         $labelsBulan = [];
         $dataBulan = [];
-        for ($i = 11; $i >= 0; $i--) {
+        for ($i = 6; $i >= -6; $i--) {
             $date = Carbon::now()->subMonths($i);
             $labelsBulan[$date->format('Y-n')] = $date->format('M Y');
             $dataBulan[$date->format('Y-n')] = 0;
         }
-        foreach ($prestasiPerBulan as $item) {
+        foreach ($lombaPerBulan as $item) {
             $key = $item->year . '-' . $item->month;
             if (isset($dataBulan[$key])) {
                 $dataBulan[$key] = $item->total;
