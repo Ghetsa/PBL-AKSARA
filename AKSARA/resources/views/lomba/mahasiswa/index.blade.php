@@ -214,7 +214,7 @@
 </div>
 {{-- [KONTAINER MODAL BARU] Tempat untuk memuat konten detail perhitungan --}}
 <div class="modal fade" id="mooraDetailsModal" tabindex="-1" role="dialog" aria-labelledby="mooraDetailsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl" role="document"> {{-- Menggunakan modal-xl untuk konten yang lebar --}}
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" role="document"> {{-- Menggunakan modal-xl untuk konten yang lebar --}}
         <div class="modal-content">
             {{-- Konten dari moora_details.blade.php akan dimuat di sini --}}
         </div>
@@ -497,43 +497,52 @@
     {{-- [SKRIP BARU] Skrip untuk memuat dan menampilkan modal detail MOORA --}}
     <script>
         function showMooraDetails(url) {
-    const modal = $('#mooraDetailsModal');
-    
-    // Tampilkan loading spinner
-    modal.find('.modal-content').html(`
-        <div class="modal-body text-center p-5">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-            <p class="mt-3 mb-0">Memuat detail perhitungan...</p>
-        </div>
-    `);
-    modal.modal('show');
+            const modal = $('#mooraDetailsModal');
+            
+            // Tampilkan loading spinner
+            modal.find('.modal-content').html(`
+                <div class="modal-body text-center p-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-3 mb-0">Memuat detail perhitungan...</p>
+                </div>
+            `);
+            modal.modal('show');
 
-    // Ambil bobot yang diterapkan dan kirimkan ke URL untuk menghitung perhitungan MOORA
-    const weights = {};
-    $('.bobot-slider').each(function() {
-        weights[$(this).data('kriteria')] = parseInt($(this).val()) / 100;
-    });
+            // Ambil bobot yang diterapkan dan kirimkan ke URL untuk menghitung perhitungan MOORA
+            const weights = {};
+            $('.bobot-slider').each(function() {
+                weights[$(this).data('kriteria')] = parseInt($(this).val()) / 100;
+            });
 
-    const params = new URLSearchParams();
-    for (const key in weights) {
-        params.append(`weights[${key}]`, weights[key]);
-    }
+            const params = new URLSearchParams();
+            for (const key in weights) {
+                params.append(`weights[${key}]`, weights[key]);
+            }
 
-    $.get(url + `?${params.toString()}`, function(res) {
-        modal.find('.modal-content').html(res);
-    }).fail(function() {
-        modal.find('.modal-content').html(`
-            <div class="modal-header">
-                <h5 class="modal-title text-danger">Terjadi Kesalahan</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Gagal memuat detail perhitungan. Silakan coba lagi nanti.</p>
-            </div>
-        `);
-    });
-}
+            $.get(url + `?${params.toString()}`, function(res) {
+                modal.find('.modal-content').html(res);
+                // [TAMBAHKAN INI] Panggil KaTeX untuk merender rumus di dalam modal
+                // setelah kontennya berhasil dimuat.
+                renderMathInElement(modal.find('.modal-content')[0], {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '\\[', right: '\\]', display: true},
+                        {left: '\\(', right: '\\)', display: false}
+                    ]
+                });
+            }).fail(function() {
+                modal.find('.modal-content').html(`
+                    <div class="modal-header">
+                        <h5 class="modal-title text-danger">Terjadi Kesalahan</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Gagal memuat detail perhitungan. Silakan coba lagi nanti.</p>
+                    </div>
+                `);
+            });
+        }
     </script>
 @endpush
