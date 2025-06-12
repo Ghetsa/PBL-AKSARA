@@ -191,7 +191,7 @@
         formEditUser.validate({
             ignore: ":hidden",
             rules: {
-                nama: { required: true, minlength: 3, maxlength:50 },
+                nama: { required: true, minlength: 3, maxlength:50, lettersonly: true },
                 email: { required: true, email: true },
                 password: { required: true, minlength: 6, maxlength: 100 },
                 role: { required: true },
@@ -204,7 +204,7 @@
                 periode_id: {}, // required diatur dinamis
             },
             messages: {
-                nama: { required: "Nama tidak boleh kosong", minlength: "Nama minimal harus 3 karakter", maxlength: "Nama maksimal 50 karakter"},
+                nama: { required: "Nama tidak boleh kosong", minlength: "Nama minimal harus 3 karakter", maxlength: "Nama maksimal 50 karakter", lettersonly: "Nama hanya boleh berisi huruf" },
                 email: { required: "Email tidak boleh kosong", email: "Format email tidak valid" },
                 password: { required: "Password tidak boleh kosong", minlength: "Password minimal harus 6 karakter", maxlength: "Password maksimal 100 karakter" },
                 role: "Silakan pilih role",
