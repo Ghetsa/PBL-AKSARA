@@ -12,7 +12,7 @@
         <div class="row">
             {{-- Kolom Kiri: Detail Pengajuan --}}
             <div class="col-12 col-lg-7 border-end-lg pe-lg-4">
-                {{-- <h5 class="fw-bold mb-3"><i class="fas fa-star me-2 text-warning"></i>{{ $keahlianUser->bidang->bidang_nama ?? 'Keahlian' }}</h5> --}}
+                <h5 class="fw-bold text-center mb-3"><i class="fas fa-medal me-2 text-info"></i>{{ $keahlianUser->bidang->bidang_nama ?? 'Keahlian' }}</h5>
 
                 {{-- Card Informasi Pengguna --}}
                 <div class="card mb-3">

@@ -115,14 +115,14 @@
                         @foreach($lomba->daftarHadiah as $index => $itemHadiah)
                         <div class="input-group mb-2 hadiah-input-group">
                             <input type="text" name="hadiah[]" class="form-control form-control-sm" placeholder="Contoh: Uang Tunai Rp 1.000.000" value="{{ old('hadiah.'.$index, $itemHadiah->hadiah) }}">
-                            <button type="button" class="btn btn-sm btn-danger remove-hadiah-btn-edit"><i class="ti ti-trash"></i></button>
+                            <button type="button" class="btn btn-sm btn-danger remove-hadiah-btn-edit"><i class="fas fa-trash"></i></button>
                         </div>
                         @endforeach
                     @else
                         {{-- Sediakan minimal satu input jika tidak ada hadiah sebelumnya --}}
                         <div class="input-group mb-2 hadiah-input-group">
                             <input type="text" name="hadiah[]" class="form-control form-control-sm" placeholder="Contoh: Uang Tunai Rp 1.000.000">
-                            <button type="button" class="btn btn-sm btn-danger remove-hadiah-btn-edit"><i class="ti ti-trash"></i></button>
+                            <button type="button" class="btn btn-sm btn-danger remove-hadiah-btn-edit"><i class="fas fa-trash"></i></button>
                         </div>
                     @endif
                 </div>
@@ -154,7 +154,6 @@
             <label for="crud_e_poster" class="col-sm-3 col-form-label">Poster Lomba</label>
             <div class="col-sm-9">
                 <input type="file" name="poster" id="crud_e_poster" class="form-control" accept="image/jpeg,image/png,image/jpg">
-                <small class="form-text text-muted">Format: JPG, JPEG, PNG. Max: 2MB.</small>
                 @if($lomba->poster && Storage::disk('public')->exists($lomba->poster))
                     <small class="form-text text-muted mt-1 d-block">
                         Poster saat ini: <a href="{{ asset('storage/' . $lomba->poster) }}" target="_blank">Lihat Poster</a>. Kosongkan jika tidak ingin mengubah.
@@ -198,7 +197,7 @@ $(document).ready(function () {
         tingkat: { required: true },
         'bidang_keahlian[]': { required: true, minlength: 1 },
         biaya: { number: true, min: 0 },
-        link_pendaftaran: { required:true nullableUrl: true, maxlength: 150 },
+        link_pendaftaran: { nullableUrl: true, maxlength: 150 },
         link_penyelenggara: { nullableUrl: true, maxlength: 150 },
         poster: { extension: "jpg|jpeg|png", filesize: 2097152 },
         'hadiah[]': { maxlength: 20 }
@@ -207,13 +206,13 @@ $(document).ready(function () {
     let validationMessagesEdit = {
         nama_lomba: { required: "Nama lomba wajib diisi.", maxlength: "Nama lomba maksimal 50 karakter.", minlength: "Nama lomba minimal 5 karakter." },
         pembukaan_pendaftaran: { required: "Tanggal pembukaan wajib diisi.", dateISO: "Format tanggal tidak valid." },
-        batas_pendaftaran: { required: "Batas pendaftaran wajib diisi.", dateISO: "Format tanggal tidak valid.", afterDate: "Batas pendaftaran harus sesudah tanggal pembukaan." },
+        batas_pendaftaran: { required: "Batas pendaftaran wajib diisi.", dateISO: "Format tanggal tidak valid.", afterDate: "Batas pendaftaran harus setelah atau sama dengan tanggal pembukaan." },
         kategori: { required: "Kategori peserta wajib dipilih." },
         penyelenggara: { required: "Penyelenggara wajib diisi.", maxlength: "Penyelenggara maksimal 50 karakter.", minlength: "Penyelenggara minimal 2 karakter." },
         tingkat: { required: "Tingkat lomba wajib dipilih." },
         'bidang_keahlian[]': { required: "Pilih minimal satu bidang keahlian.", minlength: "Pilih minimal satu bidang keahlian." },
         biaya: { number: "Biaya harus berupa angka.", min: "Biaya tidak boleh negatif." },
-        link_pendaftaran: { required: "Link pendaftaran wajib diisi.", nullableUrl: "Format URL pendaftaran tidak valid.", maxlength: "Link pendaftaran maksimal 150 karakter." },
+        link_pendaftaran: { nullableUrl: "Format URL pendaftaran tidak valid.", maxlength: "Link pendaftaran maksimal 150 karakter." },
         link_penyelenggara: { nullableUrl: "Format URL penyelenggara tidak valid.", maxlength: "Link penyelenggara maksimal 150 karakter." },
         poster: { extension: "Format file poster tidak valid (hanya JPG, JPEG, PNG).", filesize: "Ukuran file poster maksimal 2MB." },
         'hadiah[]': { maxlength: "Deskripsi hadiah maksimal 20 karakter."}
@@ -364,7 +363,7 @@ $(document).ready(function () {
         const newHadiahInput = `
             <div class="input-group mb-2 hadiah-input-group">
                 <input type="text" name="hadiah[]" class="form-control form-control-sm" placeholder="Deskripsi hadiah lainnya...">
-                <button type="button" class="btn btn-sm btn-danger remove-hadiah-btn-edit"><i class="ti ti-trash"></i></button>
+                <button type="button" class="btn btn-sm btn-danger remove-hadiah-btn-edit"><i class="fas fa-trash"></i></button>
             </div>
         `;
         $('#hadiahInputsContainerEdit').append(newHadiahInput);

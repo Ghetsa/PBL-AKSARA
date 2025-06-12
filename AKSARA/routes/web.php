@@ -67,7 +67,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('detail-moora', [LombaController::class, 'detailMoora'])->name('detailMoora');
         Route::get('/create', [LombaController::class, 'create'])->name('create');
         Route::post('/', [LombaController::class, 'store'])->name('store');
-        Route::get('/{id}/lomba', [LombaController::class, 'show'])->name('show');
+        Route::get('/{id}', [LombaController::class, 'show'])->name('show');
         Route::get('/{id}/edit', [LombaController::class, 'edit'])->name('edit');
         Route::put('/{id}', [LombaController::class, 'update'])->name('update');
         Route::delete('/{id}', [LombaController::class, 'destroy'])->name('destroy');
@@ -84,7 +84,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/histori-pengajuan-mhs/list', [LombaController::class, 'listHistoriPengajuanLombaMhs'])->name('histori.list');
             Route::get('/ajukan-lomba-mhs', [LombaController::class, 'createPengajuanLombaMhs'])->name('create_form');
             Route::post('/simpan-lomba-mhs', [LombaController::class, 'storeLombaMhs'])->name('store');
-            Route::get('/show-lomba-mhs/{id}', [LombaController::class, 'showLombaMhs'])->name('show_form');
+            Route::get('/show-lomba-mhs/{id}', [LombaController::class, 'showLombaMhs'])->name('show');
             Route::get('/edit-lomba-mhs/{id}', [LombaController::class, 'editLombaMhs'])->name('edit_form');
             Route::put('/update-lomba-mhs/{id}', [LombaController::class, 'updateLombaMhs'])->name('update_form');
             Route::get('/get-moora-detail/{id}', [LombaController::class, 'showMooraDetails'])->name('details');
@@ -332,27 +332,12 @@ Route::middleware(['auth'])->group(function () {
         });
     });
 
-
-
-
-    // Route::middleware(['role:mahasiswa, dosen'])->group(function () {
-    //     Route::prefix('lomba-saya')->name('lomba.user.')->group(function () {
-    //         Route::get('/histori-pengajuan', [LombaController::class, 'historiPengajuanLomba'])->name('histori.index');
-    //         Route::get('/histori-pengajuan/list', [LombaController::class, 'listHistoriPengajuanLomba'])->name('histori.list');
-
-    //         Route::get('/ajukan-lomba', [LombaController::class, 'createPengajuanLomba'])->name('create_form');
-    //         Route::post('/simpan-lomba', [LombaController::class, 'storeLomba'])->name('store'); // Route ini digunakan untuk store dari semua role
-
-    //         // Jika Anda ingin user bisa mengedit pengajuan mereka yang belum disetujui:
-    //         // Route::get('/edit-pengajuan/{id}', [LombaController::class, 'editPengajuanLombaForm'])->name('edit_form');
-    //         // Route::put('/update-pengajuan/{id}', [LombaController::class, 'updatePengajuanLomba'])->name('update');
-    //     });
-    // });
-
-    // --- LOMBA UNTUK SEMUA USER LOGIN (Mahasiswa, Dosen, Admin bisa lihat yang disetujui) ---
+    // --- LOMBA UNTUK SEMUA USER LOGIN (PUBLIK) ---
     Route::prefix('informasi-lomba')->name('lomba.publik.')->group(function () {
-        Route::get('/', [LombaController::class, 'indexLombaPublik'])->name('index'); // Halaman daftar lomba publik
-        Route::get('/list', [LombaController::class, 'listLombaPublik'])->name('list'); // DataTables lomba publik
-        Route::get('/{id}/detail-ajax', [LombaController::class, 'showAjaxLombaPublik'])->name('show_ajax'); // Detail modal
+        Route::get('/', [LombaController::class, 'indexLombaPublik'])->name('index'); 
+        Route::get('/list', [LombaController::class, 'listLombaPublik'])->name('list'); 
+        
+        // [KONFIRMASI] Route ini sudah BENAR dan menjadi tumpuan utama untuk modal di dashboard.
+        Route::get('/{id}/detail-ajax', [LombaController::class, 'showAjaxLombaPublik'])->name('show_ajax');
     });
 });
