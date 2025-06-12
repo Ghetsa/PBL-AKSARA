@@ -1,5 +1,4 @@
 <?php
-// app/Http/Controllers/DashboardController.php (atau sesuaikan dengan controller Anda)
 namespace App\Http\Controllers;
 use App\Models\DosenModel;
 use App\Models\LombaModel;
@@ -145,86 +144,70 @@ class DashboardController extends Controller
         return view('dashboard.mahasiswa', compact('breadcrumb', 'activeMenu', 'prestasiPublik', 'prestasiMahasiswa', 'rekomendasiLomba', 'lombaUmum', 'user'));
     }
 
-    public function adminDashboard() // Atau public function index()
+    public function adminDashboard()
     {
         $breadcrumb = (object) ['title' => 'Dashboard Admin', 'list' => ['Dashboard']];
-    $activeMenu = 'dashboard';
+        $activeMenu = 'dashboard';
 
-    // --- Statistik untuk Kartu (Widgets) ---
-    $totalPrestasi = PrestasiModel::count();
-    $prestasiDisetujui = PrestasiModel::where('status_verifikasi', 'disetujui')->count();
-    $prestasiPending = PrestasiModel::where('status_verifikasi', 'pending')->count();
+        // Statistik untuk Widgets
+        $totalPrestasi = PrestasiModel::count();
+        $prestasiDisetujui = PrestasiModel::where('status_verifikasi', 'disetujui')->count();
+        $prestasiPending = PrestasiModel::where('status_verifikasi', 'pending')->count();
+        $totalLomba = LombaModel::count();
+        $lombaAktif = LombaModel::where('status_verifikasi', 'disetujui')
+            ->where(function ($query) {
+                $query->where('batas_pendaftaran', '>=', Carbon::now()->toDateString())
+                      ->orWhereNull('batas_pendaftaran');
+            })->count();
+        $lombaPengajuanPending = LombaModel::where('status_verifikasi', 'pending')->count();
+        $totalUser = UserModel::count();
+        $totalMahasiswa = UserModel::where('role', 'mahasiswa')->count();
+        $totalDosen = UserModel::where('role', 'dosen')->count();
 
-    $totalLomba = LombaModel::count();
-    $lombaAktif = LombaModel::where('status_verifikasi', 'disetujui')
-        ->where(function ($query) {
-            $query->where('batas_pendaftaran', '>=', Carbon::now()->toDateString())
-                  ->orWhereNull('batas_pendaftaran');
-        })
-        ->count();
-    $lombaPengajuanPending = LombaModel::where('status_verifikasi', 'pending')->count();
+        // Data untuk Grafik
+        $lombaByTingkat = LombaModel::select('tingkat', DB::raw('count(*) as total'))
+            ->whereNotNull('tingkat')->where('tingkat', '!=', '')->groupBy('tingkat')->pluck('total', 'tingkat');
+        $prestasiByTingkat = PrestasiModel::where('status_verifikasi', 'disetujui')
+            ->select('tingkat', DB::raw('count(*) as total'))
+            ->whereNotNull('tingkat')->where('tingkat', '!=', '')->groupBy('tingkat')->pluck('total', 'tingkat');
 
-    $totalUser = UserModel::count();
-    $totalMahasiswa = UserModel::where('role', 'mahasiswa')->count();
-    $totalDosen = UserModel::where('role', 'dosen')->count();
+        $lombaPerBulan = LombaModel::select(
+                DB::raw('YEAR(pembukaan_pendaftaran) as year, MONTH(pembukaan_pendaftaran) as month'),
+                DB::raw('COUNT(*) as total')
+            )->where('status_verifikasi', 'disetujui')
+            ->where('pembukaan_pendaftaran', '>=', Carbon::now()->subMonths(11)->startOfMonth())
+            ->groupBy('year', 'month')->orderBy('year', 'asc')->orderBy('month', 'asc')->get();
 
-    // --- Data untuk Grafik ---
-    // (Kode untuk data grafik tetap sama, tidak perlu diubah)
-    $lombaByTingkat = LombaModel::select('tingkat', DB::raw('count(*) as total'))
-        ->whereNotNull('tingkat')->where('tingkat', '!=', '')->groupBy('tingkat')->pluck('total', 'tingkat');
-
-    $prestasiByTingkat = PrestasiModel::where('status_verifikasi', 'disetujui')
-        ->select('tingkat', DB::raw('count(*) as total'))
-        ->whereNotNull('tingkat')->where('tingkat', '!=', '')->groupBy('tingkat')->pluck('total', 'tingkat');
-
-    $lombaPerBulan = LombaModel::select(
-            DB::raw('YEAR(pembukaan_pendaftaran) as year, MONTH(pembukaan_pendaftaran) as month'),
-            DB::raw('COUNT(*) as total')
-        )
-        ->where('status_verifikasi', 'disetujui')
-        ->where('pembukaan_pendaftaran', '>=', Carbon::now()->subMonths(11)->startOfMonth())
-        ->groupBy('year', 'month')->orderBy('year', 'asc')->orderBy('month', 'asc')->get();
-
-    $labelsBulan = [];
-    $dataBulan = [];
-    for ($i = 5; $i >= -6; $i--) { // Koreksi loop untuk 12 bulan
-        $date = Carbon::now()->subMonths($i);
-        $labelsBulan[$date->format('Y-n')] = $date->format('M Y');
-        $dataBulan[$date->format('Y-n')] = 0;
-    }
-    foreach ($lombaPerBulan as $item) {
-        $key = $item->year . '-' . $item->month;
-        if (isset($dataBulan[$key])) {
-            $dataBulan[$key] = $item->total;
+        $labelsBulan = [];
+        $dataBulan = [];
+        for ($i = 5; $i >= -6; $i--) {
+            $date = Carbon::now()->subMonths($i);
+            $labelsBulan[$date->format('Y-n')] = $date->format('M Y');
+            $dataBulan[$date->format('Y-n')] = 0;
         }
-    }
+        foreach ($lombaPerBulan as $item) {
+            $key = $item->year . '-' . $item->month;
+            if (isset($dataBulan[$key])) {
+                $dataBulan[$key] = $item->total;
+            }
+        }
 
-    // --- [BARU] Data untuk List Card di Bawah ---
+        // Data untuk List Card
+        $infoLombaTerbaru = LombaModel::where('status_verifikasi', 'disetujui')
+            ->orderBy('created_at', 'desc')->take(6)->get();
 
-    // 1. Mengambil 6 Lomba Terbaru yang Disetujui
-    $infoLombaTerbaru = LombaModel::where('status_verifikasi', 'disetujui')
-        ->orderBy('created_at', 'desc')
-        ->take(6) // Mengambil 6 data agar tampilan lebih penuh
-        ->get();
+        // [PERBAIKAN] Menghapus orderBy('created_at') karena kolom tidak ada di tabel 'prestasi'
+        $prestasiKeseluruhanTerbaru = PrestasiModel::where('status_verifikasi', 'disetujui')
+            ->with(['mahasiswa.user', 'mahasiswa.prodi'])
+            ->orderBy('tahun', 'desc')
+            ->take(6)->get();
 
-    // 2. Mengambil 6 Prestasi Terbaru dari Seluruh Mahasiswa
-    $prestasiKeseluruhanTerbaru = PrestasiModel::where('status_verifikasi', 'disetujui')
-        ->with(['mahasiswa.user', 'mahasiswa.prodi'])
-        ->orderBy('tahun', 'desc')
-        ->orderBy('created_at', 'desc')
-        ->take(6)
-        ->get();
-
-    return view('dashboard.admin', compact(
-        'breadcrumb', 'activeMenu',
-        'totalPrestasi', 'prestasiDisetujui', 'prestasiPending',
-        'totalLomba', 'lombaAktif', 'lombaPengajuanPending',
-        'totalUser', 'totalMahasiswa', 'totalDosen',
-        'lombaByTingkat', 'prestasiByTingkat',
-        'labelsBulan', 'dataBulan',
-        'infoLombaTerbaru',             // Variabel baru
-        'prestasiKeseluruhanTerbaru'    // Variabel baru
-    ));
+        return view('dashboard.admin', compact(
+            'breadcrumb', 'activeMenu', 'totalPrestasi', 'prestasiDisetujui', 'prestasiPending',
+            'totalLomba', 'lombaAktif', 'lombaPengajuanPending', 'totalUser', 'totalMahasiswa', 'totalDosen',
+            'lombaByTingkat', 'prestasiByTingkat', 'labelsBulan', 'dataBulan',
+            'infoLombaTerbaru', 'prestasiKeseluruhanTerbaru'
+        ));
     }
 
     public function dosenDashboard()
@@ -238,57 +221,37 @@ class DashboardController extends Controller
             return redirect()->route('home')->with('error', 'Data dosen tidak ditemukan.');
         }
 
-        // --- Data untuk Kartu Statistik (Widgets) ---
+        // Data untuk Kartu Statistik
         $jumlahMahasiswaBimbingan = PrestasiModel::where('dosen_id', $dosen->dosen_id)
-            ->where('status_verifikasi', 'disetujui')
-            ->distinct('mahasiswa_id')
-            ->count('mahasiswa_id');
-
+            ->where('status_verifikasi', 'disetujui')->distinct('mahasiswa_id')->count('mahasiswa_id');
         $jumlahPrestasiKeseluruhan = PrestasiModel::where('status_verifikasi', 'disetujui')->count();
         $jumlahLombaDisetujui = LombaModel::where('status_verifikasi', 'disetujui')->count();
 
-        // --- Data untuk List Card di Bawah ---
-
-        // 1. Mengambil 3 Lomba Terbaru yang Masih Aktif
+        // Data untuk List Card
         $infoLombaTerbaru = LombaModel::where('status_verifikasi', 'disetujui')
             ->where(function ($query) {
                 $query->where('batas_pendaftaran', '>=', Carbon::now()->toDateString())
-                    ->orWhereNull('batas_pendaftaran');
+                      ->orWhereNull('batas_pendaftaran');
             })
-            ->orderBy('created_at', 'desc')
-            ->take(3)
-            ->get();
+            ->orderBy('created_at', 'desc')->take(3)->get();
 
-        // 2. Mengambil 3 Prestasi Terbaru dari Mahasiswa Bimbingan Dosen
+        // [PERBAIKAN] Menghapus orderBy('created_at') karena kolom tidak ada di tabel 'prestasi'
         $prestasiBimbingan = PrestasiModel::where('dosen_id', $dosen->dosen_id)
             ->where('status_verifikasi', 'disetujui')
             ->with(['mahasiswa.user', 'mahasiswa.prodi'])
-            // [PERBAIKAN] Mengganti nama kolom untuk pengurutan sesuai skema database
-            ->orderBy('tahun', 'desc') 
-            ->orderBy('created_at', 'desc') // Tambahan untuk pengurutan yang lebih baik
-            ->take(3)
-            ->get();
+            ->orderBy('tahun', 'desc')
+            ->take(3)->get();
 
-        // 3. Mengambil 3 Prestasi Umum Terbaru dari Seluruh Mahasiswa
+        // [PERBAIKAN] Menghapus orderBy('created_at') karena kolom tidak ada di tabel 'prestasi'
         $prestasiKeseluruhan = PrestasiModel::where('status_verifikasi', 'disetujui')
             ->with(['mahasiswa.user', 'mahasiswa.prodi'])
-            // [PERBAIKAN] Mengganti nama kolom untuk pengurutan sesuai skema database
             ->orderBy('tahun', 'desc')
-            ->orderBy('created_at', 'desc') // Tambahan untuk pengurutan yang lebih baik
-            ->take(3)
-            ->get();
+            ->take(3)->get();
 
         return view('dashboard.dosen', compact(
-            'breadcrumb',
-            'activeMenu',
-            'user',
-            'dosen',
-            'jumlahMahasiswaBimbingan',
-            'jumlahPrestasiKeseluruhan',
-            'jumlahLombaDisetujui',
-            'infoLombaTerbaru',
-            'prestasiBimbingan',
-            'prestasiKeseluruhan'
+            'breadcrumb', 'activeMenu', 'user', 'dosen', 'jumlahMahasiswaBimbingan',
+            'jumlahPrestasiKeseluruhan', 'jumlahLombaDisetujui', 'infoLombaTerbaru',
+            'prestasiBimbingan', 'prestasiKeseluruhan'
         ));
     }
 }
