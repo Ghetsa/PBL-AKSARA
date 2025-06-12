@@ -95,7 +95,7 @@ public function index()
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('mahasiswa', function ($row) {
-                    return ($row->mahasiswa->user->nama ?? 'N/A') . '<br><small class="text-muted">(' . ($row->mahasiswa->nim ?? '-') . ' - ' . ($row->mahasiswa->prodi->nama_prodi ?? '-') . ')</small>';
+                    return ($row->mahasiswa->user->nama ?? 'N/A') . '<br><small class="text-muted">(' . ($row->mahasiswa->nim ?? '-') . ' - ' . ($row->mahasiswa->prodi->nama ?? '-') . ')</small>';
                 })
                 ->editColumn('tahun', function ($row) {
                     return Carbon::parse($row->tahun)->isoFormat('D MMM YYYY');

@@ -144,7 +144,7 @@
                                 <th>Nama Prestasi</th>
                                 <th>Tingkat</th>
                                 <th>Kategori</th>
-                                <th>Tanggal</th>
+                                <th>Penyelenggara</th>
                                 {{-- <th>Penyelenggara</th> --}}
                             </tr>
                         </thead>

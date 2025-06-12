@@ -79,8 +79,8 @@
         @forelse ($prestasiMahasiswa as $prestasi)
             <div class="col-xl-4 col-md-6 mb-4">
                 <div class="card card-prestasi border-left-info shadow h-100 py-2">
-                    @if($prestasi->bukti_prestasi && Storage::disk('public')->exists($prestasi->bukti_prestasi))
-                        <img src="{{ asset('storage/'.$prestasi->bukti_prestasi) }}" class="card-img-top" alt="Bukti {{ $prestasi->nama_prestasi }}">
+                    @if($prestasi->file_bukti && Storage::disk('public')->exists($prestasi->file_bukti))
+                        <img src="{{ asset('storage/'.$prestasi->file_bukti) }}" class="card-img-top" alt="Bukti {{ $prestasi->nama_prestasi }}">
                     @else
                         <img src="{{ asset('default/8.png') }}" class="card-img-top" alt="Tidak Ada Bukti">
                     @endif
@@ -101,36 +101,7 @@
         @endforelse
     </div>
     <hr class="my-4">
-    
-    {{-- Prestasi Umum Mahasiswa --}}
-    <div class="row">
-        <div class="col-12">
-            <h4 class="mb-3">🏅 Prestasi Umum Mahasiswa</h4>
-        </div>
-        @forelse ($prestasiPublik as $prestasi)
-             <div class="col-xl-4 col-md-6 mb-4">
-                <div class="card card-prestasi border-left-secondary shadow h-100 py-2">
-                    @if($prestasi->bukti_prestasi && Storage::disk('public')->exists($prestasi->bukti_prestasi))
-                        <img src="{{ asset('storage/'.$prestasi->bukti_prestasi) }}" class="card-img-top" alt="Bukti {{ $prestasi->nama_prestasi }}">
-                    @else
-                        <img src="{{ asset('default/7.png') }}" class="card-img-top" alt="Tidak Ada Bukti">
-                    @endif
-                    <div class="card-body">
-                        <h5 class="card-title text-secondary font-weight-bold text-uppercase mb-1" style="font-size: 1.1rem;">{{ Str::limit($prestasi->nama_prestasi, 45) }}</h5>
-                        <div class="text-xs mb-1">Diraih oleh: {{ $prestasi->mahasiswa->user->nama ?? 'N/A' }} ({{ $prestasi->mahasiswa->prodi->nama_prodi ?? 'N/A' }})</div>
-                        <div class="text-xs mb-1">Penyelenggara: {{ $prestasi->penyelenggara_prestasi }}</div>
-                        <div class="text-xs mb-1">Tingkat: {{ ucfirst($prestasi->tingkat_prestasi) }}</div>
-                        <a href="#" onclick="modalActionPrestasi('{{ route('prestasi.mahasiswa.show_ajax', $prestasi->prestasi_id) }}', 'Detail Prestasi', 'modalDetailPrestasi')" class="btn btn-secondary btn-sm mt-2">Lihat Detail</a>
-                    </div>
-                </div>
-            </div>
-        @empty
-            <div class="col-12">
-                <p class="text-center text-muted">Belum ada prestasi umum untuk ditampilkan.</p>
-            </div>
-        @endforelse
-    </div>
-    <hr class="my-4">
+
 
     {{-- Info Lomba Terkini --}}
     <div class="row">
