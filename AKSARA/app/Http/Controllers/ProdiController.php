@@ -290,4 +290,29 @@ class ProdiController extends Controller
 
         return $pdf->stream('Data Program Studi ' . date('Y-m-d H_i_s') . '.pdf');
     }
+
+    public function checkKode(Request $request)
+    {
+        $kode = $request->input('kode');
+        $ignoreId = $request->input('ignore_id'); // Akan dikirim dari form edit
+
+        $query = ProdiModel::where('kode', $kode);
+
+        // Jika ada ignoreId (saat mengedit), kecualikan prodi dengan ID tersebut dari pengecekan
+        if ($ignoreId) {
+            $query->where('prodi_id', '!=', $ignoreId);
+        }
+
+        $isExists = $query->exists();
+
+        if ($isExists) {
+            // Jika sudah ada, kembalikan string pesan error dalam format JSON.
+            // jQuery validation akan menganggap ini sebagai kegagalan validasi.
+            return response()->json('Kode program studi ini sudah terdaftar.');
+        } else {
+            // Jika unik (tidak ada), kembalikan 'true'.
+            // jQuery validation akan menganggap ini sebagai keberhasilan validasi.
+            return response()->json(true);
+        }
+    }
 }

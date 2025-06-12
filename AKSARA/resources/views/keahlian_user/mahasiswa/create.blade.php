@@ -120,7 +120,7 @@ $(document).ready(function() {
             },
             tanggal_kadaluarsa_sertifikat: {
                 required: "Tanggal kedaluwarsa wajib diisi.",
-                after_or_equal: "Tanggal kadaluwarsa harus setelah atau sama dengan tanggal perolehan."
+                after_or_equal: "Tanggal kedaluwarsa harus sesudah tanggal perolehan."
             },
             sertifikasi: {
                 required: "File bukti wajib diunggah.",

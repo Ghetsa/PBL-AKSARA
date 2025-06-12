@@ -73,18 +73,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/keahlian-user/export/pdf', [App\Http\Controllers\KeahlianUserController::class, 'export_pdf'])->name('keahlian_user.export.pdf');
 
     // ===================== DASHBOARD =====================
-    // Route::get('/dashboard/admin', function () {
-    //     $breadcrumb = (object) ['title' => 'Dashboard', 'list' => ['Admin', 'Dashboard']];
-    //     $activeMenu = 'dashboard';
-    //     return view('dashboard.admin', compact('breadcrumb', 'activeMenu'));
-    // })->name('dashboard');
-
-    // Route::get('/dashboard/mahasiswa', function () {
-    //     $breadcrumb = (object) ['title' => 'Dashboard', 'list' => ['Mahasiswa', 'Dashboard']];
-    //     $activeMenu = 'dashboard';
-    //     return view('dashboard.mahasiswa', compact('breadcrumb', 'activeMenu'));
-    // })->name('dashboardMHS');
-
     // Route::get('/dashboard/dosen', function () {
     //     $breadcrumb = (object) ['title' => 'Dashboard', 'list' => ['Dosen', 'Dashboard']];
     //     $activeMenu = 'dashboard';
@@ -97,68 +85,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfilController::class, 'index'])->name('profile.index');
     Route::get('/user/profile_ajax', [ProfilController::class, 'edit_ajax'])->name('profile.edit_ajax');
     Route::Post('/user/profile_ajax', [ProfilController::class, 'update_ajax'])->name('profile.update_ajax');
-
-    // ===================== LOMBA =====================
-    Route::prefix('lomba')->name('lomba.')->group(function () {
-        Route::get('/', [LombaController::class, 'indexLomba'])->name('index');
-        Route::get('/list', [LombaController::class, 'getList'])->name('getList');
-        Route::get('detail-moora', [LombaController::class, 'detailMoora'])->name('detailMoora');
-        Route::get('/create', [LombaController::class, 'create'])->name('create');
-        Route::post('/', [LombaController::class, 'store'])->name('store');
-        Route::get('/{id}/lomba', [LombaController::class, 'show'])->name('show');
-        Route::get('/{id}/edit', [LombaController::class, 'edit'])->name('edit');
-        Route::put('/{id}', [LombaController::class, 'update'])->name('update');
-        Route::delete('/{id}', [LombaController::class, 'destroy'])->name('destroy');
-
-        Route::get('/verifikasi/{id}', [LombaController::class, 'verifikasi'])->name('verifikasi');
-        Route::post('/verifikasi/{id}', [LombaController::class, 'prosesVerifikasi'])->name('prosesVerifikasi');
-    });
-
-    // ===================== USER CRUD =====================
-    Route::prefix('user')->name('user.')->group(function () {
-        Route::get('/', [UserController::class, 'index'])->name('index');
-        Route::post('/list', [UserController::class, 'list'])->name('list');
-        Route::get('/create', [UserController::class, 'create'])->name('create');
-        Route::post('/', [UserController::class, 'store'])->name('store');
-        Route::get('/create_ajax', [UserController::class, 'create_ajax'])->name('create_ajax');
-        Route::post('/store_ajax', [UserController::class, 'store_ajax'])->name('store_ajax');
-        Route::get('/{id}', [UserController::class, 'show'])->name('show');
-        Route::get('/{id}/show_ajax', [UserController::class, 'show_ajax'])->name('show_ajax');
-        Route::get('/{id}/edit', [UserController::class, 'edit'])->name('edit');
-        Route::get('/{id}/edit_ajax', [UserController::class, 'edit_ajax'])->name('edit_ajax');
-        Route::put('/{id}/update_ajax', [UserController::class, 'update_ajax'])->name('update_ajax');
-        Route::delete('/{id}', [UserController::class, 'destroy'])->name('destroy');
-        Route::get('/{id}/confirm_ajax', [UserController::class, 'confirm_ajax'])->name('confirm_ajax');
-        Route::delete('/{id}/delete-ajax', [UserController::class, 'delete_ajax'])->name('delete_ajax');
-    });
-
-    // ===================== PRODI =====================
-    Route::prefix('prodi')->name('prodi.')->group(function () {
-        Route::get('/', [ProdiController::class, 'index'])->name('index');
-        Route::post('/list', [ProdiController::class, 'list'])->name('list');
-        Route::get('/create', [ProdiController::class, 'create'])->name('create');
-        Route::post('/', [ProdiController::class, 'store'])->name('store');
-        Route::post('/store_ajax', [ProdiController::class, 'store_ajax'])->name('store_ajax');
-        Route::get('/{id}', [ProdiController::class, 'show'])->name('show');
-        Route::get('/{id}/edit', [ProdiController::class, 'edit'])->name('edit');
-        Route::put('/{id}', [ProdiController::class, 'update'])->name('update');
-        Route::get('/{id}/confirm_ajax', [ProdiController::class, 'confirm_ajax'])->name('confirm_ajax');
-        Route::delete('/{id}/delete-ajax', [ProdiController::class, 'delete_ajax'])->name('delete_ajax');
-    });
-
-    // ===================== PERIODE =====================
-    Route::prefix('periode')->name('periode.')->group(function () {
-        Route::get('/', [PeriodeController::class, 'index'])->name('index');
-        Route::post('/list', [PeriodeController::class, 'list'])->name('list');
-        Route::get('/create', [PeriodeController::class, 'create'])->name('create');
-        Route::post('/', [PeriodeController::class, 'store'])->name('store');
-        Route::post('/store_ajax', [PeriodeController::class, 'store_ajax'])->name('store_ajax');
-        Route::get('/{id}', [PeriodeController::class, 'show'])->name('show');
-        Route::get('/{id}/edit', [PeriodeController::class, 'edit'])->name('edit');
-        Route::put('/{id}', [PeriodeController::class, 'update'])->name('update');
-        Route::get('/{id}/confirm_ajax', [PeriodeController::class, 'confirm_ajax'])->name('confirm_ajax');
-        Route::delete('/{id}/delete-ajax', [PeriodeController::class, 'delete_ajax'])->name('delete_ajax');
-    });
 
     // ===================== MAHASISWA =====================
     Route::middleware(['role:mahasiswa'])->group(function () {
@@ -217,6 +143,69 @@ Route::middleware(['auth'])->group(function () {
     // ===================== ADMIN =====================
     Route::middleware(['role:admin'])->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'adminDashboard'])->name('dashboard');
+
+        // ===================== LOMBA =====================
+        Route::prefix('lomba')->name('lomba.')->group(function () {
+            Route::get('/', [LombaController::class, 'indexLomba'])->name('index');
+            Route::get('/list', [LombaController::class, 'getList'])->name('getList');
+            Route::get('detail-moora', [LombaController::class, 'detailMoora'])->name('detailMoora');
+            Route::get('/create', [LombaController::class, 'create'])->name('create');
+            Route::post('/', [LombaController::class, 'store'])->name('store');
+            Route::get('/{id}/lomba', [LombaController::class, 'show'])->name('show');
+            Route::get('/{id}/edit', [LombaController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [LombaController::class, 'update'])->name('update');
+            Route::delete('/{id}', [LombaController::class, 'destroy'])->name('destroy');
+
+            Route::get('/verifikasi/{id}', [LombaController::class, 'verifikasi'])->name('verifikasi');
+            Route::post('/verifikasi/{id}', [LombaController::class, 'prosesVerifikasi'])->name('prosesVerifikasi');
+        });
+
+        // ===================== USER CRUD =====================
+        Route::prefix('user')->name('user.')->group(function () {
+            Route::get('/', [UserController::class, 'index'])->name('index');
+            Route::post('/list', [UserController::class, 'list'])->name('list');
+            Route::get('/create', [UserController::class, 'create'])->name('create');
+            Route::post('/', [UserController::class, 'store'])->name('store');
+            Route::get('/create_ajax', [UserController::class, 'create_ajax'])->name('create_ajax');
+            Route::post('/store_ajax', [UserController::class, 'store_ajax'])->name('store_ajax');
+            Route::get('/{id}', [UserController::class, 'show'])->name('show');
+            Route::get('/{id}/show_ajax', [UserController::class, 'show_ajax'])->name('show_ajax');
+            Route::get('/{id}/edit', [UserController::class, 'edit'])->name('edit');
+            Route::get('/{id}/edit_ajax', [UserController::class, 'edit_ajax'])->name('edit_ajax');
+            Route::put('/{id}/update_ajax', [UserController::class, 'update_ajax'])->name('update_ajax');
+            Route::delete('/{id}', [UserController::class, 'destroy'])->name('destroy');
+            Route::get('/{id}/confirm_ajax', [UserController::class, 'confirm_ajax'])->name('confirm_ajax');
+            Route::delete('/{id}/delete-ajax', [UserController::class, 'delete_ajax'])->name('delete_ajax');
+        });
+
+        // ===================== PRODI =====================
+        Route::prefix('prodi')->name('prodi.')->group(function () {
+            Route::get('/', [ProdiController::class, 'index'])->name('index');
+            Route::post('/list', [ProdiController::class, 'list'])->name('list');
+            Route::get('/create', [ProdiController::class, 'create'])->name('create');
+            Route::post('/', [ProdiController::class, 'store'])->name('store');
+            Route::post('/store_ajax', [ProdiController::class, 'store_ajax'])->name('store_ajax');
+            Route::get('/{id}', [ProdiController::class, 'show'])->name('show');
+            Route::get('/{id}/edit', [ProdiController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [ProdiController::class, 'update'])->name('update');
+            Route::get('/{id}/confirm_ajax', [ProdiController::class, 'confirm_ajax'])->name('confirm_ajax');
+            Route::delete('/{id}/delete-ajax', [ProdiController::class, 'delete_ajax'])->name('delete_ajax');
+            Route::get('/prodi/check-kode', [ProdiController::class, 'checkKode'])->name('checkKode');
+        });
+
+        // ===================== PERIODE =====================
+        Route::prefix('periode')->name('periode.')->group(function () {
+            Route::get('/', [PeriodeController::class, 'index'])->name('index');
+            Route::post('/list', [PeriodeController::class, 'list'])->name('list');
+            Route::get('/create', [PeriodeController::class, 'create'])->name('create');
+            Route::post('/', [PeriodeController::class, 'store'])->name('store');
+            Route::post('/store_ajax', [PeriodeController::class, 'store_ajax'])->name('store_ajax');
+            Route::get('/{id}', [PeriodeController::class, 'show'])->name('show');
+            Route::get('/{id}/edit', [PeriodeController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [PeriodeController::class, 'update'])->name('update');
+            Route::get('/{id}/confirm_ajax', [PeriodeController::class, 'confirm_ajax'])->name('confirm_ajax');
+            Route::delete('/{id}/delete-ajax', [PeriodeController::class, 'delete_ajax'])->name('delete_ajax');
+        });
 
         // ---------- Prestasi Verifikasi ----------
         Route::prefix('admin/prestasi-verifikasi')->name('prestasi.admin.')->group(function () {
