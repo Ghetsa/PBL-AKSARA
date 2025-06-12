@@ -331,7 +331,9 @@ Route::middleware(['auth'])->group(function () {
             Route::delete('/{id}/destroy/{model}', [NotifikasiController::class, 'destroy'])->name('destroy');
         });
     });
-
+    Route::prefix('informasi-prestasi')->name('prestasi.publik.')->group(function () {
+        Route::get('/show-ajax/{id}', [PrestasiController::class, 'showAjaxDosen'])->name('show_ajax');
+    });
     // --- LOMBA UNTUK SEMUA USER LOGIN (PUBLIK) ---
     Route::prefix('informasi-lomba')->name('lomba.publik.')->group(function () {
         Route::get('/', [LombaController::class, 'indexLombaPublik'])->name('index');

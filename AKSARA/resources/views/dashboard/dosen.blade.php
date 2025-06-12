@@ -118,7 +118,7 @@
                             <div class="text-xs mb-1">Penyelenggara: {{ $prestasi->penyelenggara_prestasi }}</div>
                             <div class="text-xs mb-1">Tingkat: {{ ucfirst($prestasi->tingkat_prestasi) }}</div>
                              {{-- Menggunakan route `prestasi.dosen.show_ajax` karena dosen yang melihat --}}
-                            <a href="#" onclick="modalActionPrestasi('{{ route('prestasi.dosen.show_ajax', $prestasi->prestasi_id) }}', 'Detail Prestasi', 'modalDetailPrestasi')" class="btn btn-success btn-sm mt-2">Lihat Detail</a>
+                            <a href="#" onclick="modalActionPrestasi('{{ route('prestasi.publik.show_ajax', $prestasi->prestasi_id) }}', 'Detail Prestasi', 'modalDetailPrestasi')" class="btn btn-success btn-sm mt-2">Lihat Detail</a>
                         </div>
                     </div>
                 </div>

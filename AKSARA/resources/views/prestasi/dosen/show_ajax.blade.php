@@ -30,11 +30,11 @@
                 </tr>
                 <tr>
                     <td><strong>NIM</strong></td>
-                    <td>: {{ $prestasi->mahasiswa->nim_nip ?? 'N/A' }}</td>
+                    <td>: {{ $prestasi->mahasiswa->nim ?? 'N/A' }}</td>
                 </tr>
                  <tr>
                     <td><strong>Program Studi</strong></td>
-                    <td>: {{ $prestasi->mahasiswa->prodi->nama_prodi ?? 'N/A' }}</td>
+                    <td>: {{ $prestasi->mahasiswa->prodi->nama ?? 'N/A' }}</td>
                 </tr>
                 <tr>
                     <td><strong>Pembimbing</strong></td>
@@ -42,19 +42,15 @@
                 </tr>
                 <tr>
                     <td><strong>Tingkat</strong></td>
-                    <td>: {{ ucfirst($prestasi->tingkat_prestasi) }}</td>
+                    <td>: {{ ucfirst($prestasi->tingkat) }}</td>
                 </tr>
                 <tr>
                     <td><strong>Penyelenggara</strong></td>
-                    <td>: {{ $prestasi->penyelenggara_prestasi }}</td>
+                    <td>: {{ $prestasi->penyelenggara }}</td>
                 </tr>
                 <tr>
                     <td><strong>Tahun</strong></td>
                     <td>: {{ $prestasi->tahun }}</td>
-                </tr>
-                <tr>
-                    <td><strong>Tanggal Pelaksanaan</strong></td>
-                    <td>: {{ $prestasi->tanggal_pelaksanaan ? \Carbon\Carbon::parse($prestasi->tanggal_pelaksanaan)->isoFormat('D MMMM YYYY') : 'N/A' }}</td>
                 </tr>
                 <tr>
                     <td><strong>Status Verifikasi</strong></td>
