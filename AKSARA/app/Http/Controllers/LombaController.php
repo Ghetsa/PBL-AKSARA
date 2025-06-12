@@ -646,6 +646,16 @@ class LombaController extends Controller
             $data = LombaModel::where('diinput_oleh', $user->user_id)
                 ->orderBy('created_at', 'desc');
 
+            if ($request->filled('status_verifikasi_filter')) {
+                $data->where('status_verifikasi', $request->status_verifikasi_filter);
+            }
+            if ($request->filled('tingkat_lomba_filter')) { // Jika filter ini tetap ada di view verifikasi
+                $data->where('tingkat', $request->tingkat_lomba_filter);
+            }
+            if ($request->filled('kategori_lomba_filter')) {
+                $data->where('kategori', $request->kategori_lomba_filter);
+            }
+
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->editColumn('nama_lomba', fn($row) => e($row->nama_lomba))
@@ -1007,6 +1017,16 @@ class LombaController extends Controller
             $user = Auth::user();
             $data = LombaModel::where('diinput_oleh', $user->user_id)
                 ->orderBy('created_at', 'desc');
+
+            if ($request->filled('status_verifikasi_filter')) {
+                $data->where('status_verifikasi', $request->status_verifikasi_filter);
+            }
+            if ($request->filled('tingkat_lomba_filter')) { // Jika filter ini tetap ada di view verifikasi
+                $data->where('tingkat', $request->tingkat_lomba_filter);
+            }
+            if ($request->filled('kategori_lomba_filter')) {
+                $data->where('kategori', $request->kategori_lomba_filter);
+            }
 
             return DataTables::of($data)
                 ->addIndexColumn()

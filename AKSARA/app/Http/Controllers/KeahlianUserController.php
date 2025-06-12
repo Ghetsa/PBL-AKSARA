@@ -42,6 +42,10 @@ class KeahlianUserController extends Controller
                 ->where('user_id', $user_id)
                 ->orderBy('created_at', 'desc');
 
+            if ($request->filled('status_verifikasi')) {
+                $data->where('status_verifikasi', $request->status_verifikasi);
+            }
+
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('bidang_nama', fn($row) => $row->bidang->bidang_nama ?? '-')

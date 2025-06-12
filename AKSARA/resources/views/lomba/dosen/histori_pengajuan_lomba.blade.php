@@ -19,6 +19,40 @@
                     <div class="alert alert-light-info bg-light-info text-info border-0" role="alert">
                         <i class="fas fa-history me-2"></i>Halaman ini menampilkan riwayat pengajuan informasi lomba yang telah Anda submit beserta status verifikasinya.
                     </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="status_verifikasi_filter" class="form-label small">Filter Status Verifikasi:</label>
+                                <select class="form-select form-select-sm" id="status_verifikasi_filter">
+                                    <option value="">- Semua Status -</option>
+                                    <option value="pending" selected>Pending</option> 
+                                    <option value="disetujui">Disetujui</option>
+                                    <option value="ditolak">Ditolak</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="tingkat_lomba_filter_verifikasi" class="form-label small">Filter Tingkat Lomba:</label>
+                                <select class="form-select form-select-sm" id="tingkat_lomba_filter_verifikasi">
+                                    <option value="">- Semua Tingkat -</option>
+                                    <option value="lokal">Lokal</option>
+                                    <option value="nasional">Nasional</option>
+                                    <option value="internasional">Internasional</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="kategori_lomba_filter_verifikasi" class="form-label small">Filter Kategori Lomba:</label>
+                                <select class="form-select form-select-sm" id="kategori_lomba_filter_verifikasi">
+                                    <option value="">- Semua Kategori -</option>
+                                    <option value="individu">Individu</option>
+                                    <option value="kelompok">Kelompok</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                     <div class="table-responsive">
                         <table class="table table-bordered table-hover dt-responsive wrap" id="dataHistoriLombaUser" style="width: 100%;">
                             <thead>
@@ -85,7 +119,14 @@
     $(document).ready(function () {
         historiTable = $('#dataHistoriLombaUser').DataTable({
             processing: true, serverSide: true, responsive: true,
-            ajax: "{{ route('lomba.dosen.histori.list') }}", // Route baru untuk data histori
+            ajax: {
+                url: "{{ route('lomba.dosen.histori.list') }}", // Route untuk list data verifikasi
+                data: function (d) {
+                    d.status_verifikasi_filter = $('#status_verifikasi_filter').val(); // ID filter disesuaikan
+                    d.tingkat_lomba_filter = $('#tingkat_lomba_filter_verifikasi').val(); // ID filter disesuaikan
+                    d.kategori_lomba_filter = $('#kategori_lomba_filter_verifikasi').val(); // ID filter disesuaikan
+                }
+            },
             columns: [
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', className: 'text-center', orderable: false, searchable: false },
                 { data: 'nama_lomba', name: 'nama_lomba' },
@@ -97,6 +138,10 @@
                 { data: 'status_verifikasi', name: 'status_verifikasi' },
                 { data: 'aksi', name: 'aksi', orderable: false, searchable: false }
             ]
+        });
+
+        $('#status_verifikasi_filter, #tingkat_lomba_filter_verifikasi, #kategori_lomba_filter_verifikasi').on('change', function () {
+            historiTable.ajax.reload();
         });
 
         // Inisialisasi tooltip Bootstrap jika ada
