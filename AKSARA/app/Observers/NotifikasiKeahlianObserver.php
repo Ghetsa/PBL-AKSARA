@@ -4,19 +4,25 @@ namespace App\Observers;
 
 use App\Models\KeahlianUserModel;
 use App\Models\NotifikasiKeahlianModel;
-use App\Traits\NotifikasiUntukAdmin; // <-- Tambahkan ini
+use App\Traits\NotifikasiUntukAdmin;
 
 class NotifikasiKeahlianObserver
 {
-    use NotifikasiUntukAdmin; // <-- Tambahkan ini
+    use NotifikasiUntukAdmin;
 
     /**
      * Handle the KeahlianUserModel "created" event.
      */
     public function created(KeahlianUserModel $model)
     {
-        $namaPengaju = $model->user->nama ?? 'Mahasiswa';
-        self::kirimNotifikasiKeAdmin($model, 'Keahlian', $namaPengaju);
+        // ===================================================================
+        // PERBAIKAN UTAMA: Cek role user yang membuat data
+        // ===================================================================
+        // Kita hanya kirim notifikasi jika ada relasi 'user' dan rolenya BUKAN 'admin'.
+        if ($model->user && $model->user->role !== 'admin') {
+            $namaPengaju = $model->user->nama ?? 'Mahasiswa';
+            self::kirimNotifikasiKeAdmin($model, 'Keahlian', $namaPengaju);
+        }
     }
 
     /**
@@ -24,7 +30,7 @@ class NotifikasiKeahlianObserver
      */
     public function updated(KeahlianUserModel $model)
     {
-        // ... (kode method updated Anda yang sudah ada, biarkan saja)
+        // Bagian ini sudah benar, tidak perlu diubah.
         if ($model->getOriginal('status_verifikasi') === $model->status_verifikasi) {
             return;
         }
