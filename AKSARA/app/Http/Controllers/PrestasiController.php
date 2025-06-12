@@ -645,8 +645,16 @@ class PrestasiController extends Controller
                             });
                     });
                 }
-                if ($request->filled('filter_status') && in_array($request->filter_status, ['pending', 'disetujui', 'ditolak'])) {
-                    $data->where('status_verifikasi', $request->filter_status);
+                if ($request->filled('status_verifikasi')) {
+                    $data->where('status_verifikasi', $request->status_verifikasi);
+                }
+
+                if ($request->filled('tingkat')) {
+                    $data->where('tingkat', $request->tingkat);
+                }
+
+                if ($request->filled('kategori')) {
+                    $data->where('kategori', $request->kategori);
                 }
 
                 return DataTables::of($data)

@@ -11,7 +11,7 @@
                     </div>
                     <div class="card-body">
                         {{-- Flash messages akan ditampilkan oleh SweetAlert --}}
-                        <form method="GET" id="filterFormDosenPrestasi" class="row g-3 mb-3 align-items-center">
+                        {{-- <form method="GET" id="filterFormDosenPrestasi" class="row g-3 mb-3 align-items-center">
                             <div class="col-md-4">
                                 <input type="text" class="form-control form-control-sm" id="search_nama_dosen"
                                     name="search_nama" placeholder="Cari Nama Prestasi/Mahasiswa/NIM..."
@@ -35,7 +35,43 @@
                                 <a href="{{ route('prestasi.dosen.index') }}"
                                     class="btn btn-secondary btn-sm w-100">Reset</a>
                             </div>
-                        </form>
+                        </form> --}}
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="status" class="form-label small">Filter Status Verifikasi:</label>
+                                    <select class="form-select form-select-sm" id="status" name="status">
+                                        <option value="">- Pilih Status -</option>
+                                        <option value="pending">Pending</option>
+                                        <option value="disetujui">Disetujui</option>
+                                        <option value="ditolak">Ditolak</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="tingkat" class="form-label small">Filter Tingkat Lomba:</label>
+                                    <select class="form-select form-select-sm" id="tingkat" name="tingkat">
+                                        <option value="">- Semua Tingkat -</option>
+                                        <option value="kota">Kota/Kabupaten</option>
+                                        <option value="provinsi">Provinsi</option>
+                                        <option value="nasional">Nasional</option>
+                                        <option value="internasional">Internasional</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="kategori" class="form-label small">Filter Kategori Prestasi:</label>
+                                    <select class="form-select form-select-sm" id="kategori" name="kategori">
+                                        <option value="">- Semua Kategori -</option>
+                                        <option value="akademik">Akademik</option>
+                                        <option value="non-akademik">Non-akademik</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
 
                         <div class="table-responsive">
                             <table class="table table-bordered table-hover dt-responsive wrap" id="dataDaftarPrestasiDosen"
@@ -85,6 +121,7 @@
             const targetModalContent = $(`#${modalId} .modal-content`);
             targetModalContent.html(''); // Kosongkan dulu
             $.ajax({
+
                 url: url,
                 type: 'GET',
                 success: function(response) {
@@ -111,9 +148,10 @@
                 responsive: true,
                 ajax: {
                     url: "{{ route('bimbingan.list') }}",
-                    data: function(d) { // Mengirim data filter
-                        d.search_nama = $('#search_nama_dosen').val();
-                        d.filter_status = $('#filter_status_dosen').val();
+                    data: function(d) {
+                        d.status_verifikasi = $('#status').val();
+                        d.tingkat = $('#tingkat').val();
+                        d.kategori = $('#kategori').val();
                     }
                 },
                 columns: [{
@@ -167,8 +205,7 @@
             });
 
             // Submit form filter akan me-reload datatable
-            $('#filterFormDosenPrestasi').on('submit', function(e) {
-                e.preventDefault();
+            $('#status, #tingkat, #kategori').on('change', function() {
                 dataDaftarPrestasiDosen.ajax.reload();
             });
         });
