@@ -195,7 +195,7 @@
         });
 
         // Handle klik tombol verifikasi
-        $('.btn-verify-action').on('click', function() {
+       $('.btn-verify-prestasi-action').on('click', function() {
             const status = $(this).data('status');
             hiddenStatusInput.val(status);
 
