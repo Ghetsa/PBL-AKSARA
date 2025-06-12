@@ -26,7 +26,7 @@
             <div class="col-md-6 mb-3">
                 <label for="user_edit_batas_pendaftaran" class="form-label">Batas Pendaftaran</label>
                 <input type="date" name="batas_pendaftaran" id="user_edit_batas_pendaftaran" class="form-control form-control-sm" value="{{ old('batas_pendaftaran', optional($lomba->batas_pendaftaran)->format('Y-m-d')) }}">
-                <span class="invalid-feedback error-batas_pendaftaran"></span>x
+                <span class="invalid-feedback error-batas_pendaftaran"></span>
             </div>
 
             {{-- Kategori & Tingkat --}}
