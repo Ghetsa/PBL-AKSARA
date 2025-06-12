@@ -339,12 +339,12 @@
             },
             columns: [
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', className: 'text-center', orderable: false, searchable: false },
-                { data: 'nama_lomba', name: 'lomba.nama_lomba' },
-                { data: 'penyelenggara', name: 'lomba.penyelenggara' },
-                { data: 'bidang_display', name: 'bidang_display', orderable: false, searchable: false },
-                { data: 'tingkat', name: 'lomba.tingkat', render: function(data, type, row) { return data.charAt(0).toUpperCase() + data.slice(1); } },
-                { data: 'batas_pendaftaran', name: 'lomba.batas_pendaftaran' },
-                { data: 'biaya_display', name: 'lomba.biaya', className: 'text-nowrap' },
+                { data: 'nama_lomba', name: 'lomba.nama_lomba', orderable: false, searchable: true },
+                { data: 'penyelenggara', name: 'lomba.penyelenggara', orderable: false, searchable: true },
+                { data: 'bidang_display', name: 'bidang_display', orderable: false, searchable: true },
+                { data: 'tingkat', name: 'lomba.tingkat', render: function(data, type, row) { return data.charAt(0).toUpperCase() + data.slice(1); }, orderable: false, searchable: true },
+                { data: 'batas_pendaftaran', name: 'lomba.batas_pendaftaran', orderable: false, searchable: true },
+                { data: 'biaya_display', name: 'lomba.biaya', className: 'text-nowrap', orderable: false, searchable: false },
                 { data: 'status_display', name: 'status_display', orderable: false, searchable: false },
                 {
                     data: 'moora_score',

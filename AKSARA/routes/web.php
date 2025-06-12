@@ -55,6 +55,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/dashboard/dosen', [DashboardController::class, 'dosenDashboard'])->name('dashboardDSN');
 
+    Route::get('/user/import', [App\Http\Controllers\UserController::class, 'import'])->name('user.import');
+    Route::post('user/import_ajax', [UserController::class, 'import_ajax']); // ajax import excel
+
     // ===================== PROFILE =====================
     Route::get('/profile', [ProfilController::class, 'index'])->name('profile.index');
     Route::get('/user/profile_ajax', [ProfilController::class, 'edit_ajax'])->name('profile.edit_ajax');
@@ -242,9 +245,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/user/export/excel', [App\Http\Controllers\UserController::class, 'export_excel'])->name('user.export.excel');
         Route::get('/user/export/pdf', [App\Http\Controllers\UserController::class, 'export_pdf'])->name('user.export.pdf');
 
-        Route::get('/user/import', [App\Http\Controllers\UserController::class, 'import'])->name('user.import');
-        Route::post('user/import_ajax', [UserController::class, 'import_ajax']); // ajax import excel
-
         // For Prodi
         Route::get('/prodi/export/excel', [App\Http\Controllers\ProdiController::class, 'export_excel'])->name('prodi.export.excel');
         Route::get('/prodi/export/pdf', [App\Http\Controllers\ProdiController::class, 'export_pdf'])->name('prodi.export.pdf');
@@ -334,9 +334,9 @@ Route::middleware(['auth'])->group(function () {
 
     // --- LOMBA UNTUK SEMUA USER LOGIN (PUBLIK) ---
     Route::prefix('informasi-lomba')->name('lomba.publik.')->group(function () {
-        Route::get('/', [LombaController::class, 'indexLombaPublik'])->name('index'); 
-        Route::get('/list', [LombaController::class, 'listLombaPublik'])->name('list'); 
-        
+        Route::get('/', [LombaController::class, 'indexLombaPublik'])->name('index');
+        Route::get('/list', [LombaController::class, 'listLombaPublik'])->name('list');
+
         // [KONFIRMASI] Route ini sudah BENAR dan menjadi tumpuan utama untuk modal di dashboard.
         Route::get('/{id}/detail-ajax', [LombaController::class, 'showAjaxLombaPublik'])->name('show_ajax');
     });

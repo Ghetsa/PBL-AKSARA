@@ -81,10 +81,12 @@ $(document).ready(function() {
             },
             nama_sertifikat: {
                 required: true,
+                minlength: 5,
                 maxlength: 50
             },
             lembaga_sertifikasi: {
                 required: true,
+                minlength: 2,
                 maxlength: 50
             },
             tanggal_perolehan_sertifikat: {
@@ -108,11 +110,13 @@ $(document).ready(function() {
             },
             nama_sertifikat: {
                 required: "Nama sertifikat wajib diisi.",
+                maxlength: "Nama sertifikat minimal 5 karakter.",
                 maxlength: "Nama sertifikat tidak boleh lebih dari 50 karakter."
             },
             lembaga_sertifikasi: {
                 required: "Lembaga sertifikasi wajib diisi.",
-                maxlength: "Lembaga tidak boleh lebih dari 50 karakter."
+                maxlength: "Lembaga sertifikasi minimal 2 karakter.",
+                maxlength: "Lembaga sertifikasi tidak boleh lebih dari 50 karakter."
             },
             tanggal_perolehan_sertifikat: {
                 required: "Tanggal perolehan wajib diisi.",
