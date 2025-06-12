@@ -12,7 +12,7 @@
         <div class="row">
             {{-- Kolom Kiri: Detail Pengajuan --}}
             <div class="col-12 col-lg-7 border-end-lg pe-lg-4">
-                {{-- <h5 class="fw-bold mb-3 text-center font-weight-bold"><i class="fas fa-award me-2 text-warning"></i>{{ $prestasi->nama_prestasi }}</h5> --}}
+                <h5 class="fw-bold mb-3 text-center font-weight-bold"><i class="fas fa-award me-2 text-warning"></i>{{ $prestasi->nama_prestasi }}</h5>
                             {{-- @if($prestasi->file_bukti && Storage::disk('public')->exists($prestasi->file_bukti))
                             @php
                                 $filePath = $prestasi->file_bukti;
