@@ -875,4 +875,18 @@ class PrestasiController extends Controller
 
         return $pdf->stream('Data_Prestasi_Terverifikasi_' . date('Y-m-d') . '.pdf');
     }
+
+    public function showAjaxDosen($id)
+    {
+        // Ambil data prestasi berdasarkan ID, beserta relasi yang dibutuhkan
+        $prestasi = PrestasiModel::with([
+            'mahasiswa.user',
+            'mahasiswa.prodi',
+            'dosen.user'
+            // [PERBAIKAN] Relasi 'lomba' dihapus karena tidak terdefinisi di PrestasiModel
+        ])->findOrFail($id);
+
+        // Kirim data ke view partial yang akan dirender di dalam modal
+        return view('prestasi.dosen.show_ajax', compact('prestasi'));
+    }
 }

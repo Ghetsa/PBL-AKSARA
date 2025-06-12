@@ -227,22 +227,51 @@ class DashboardController extends Controller
         $breadcrumb = (object) ['title' => 'Dashboard Dosen', 'list' => ['Dashboard']];
         $activeMenu = 'dashboard';
         $user = Auth::user();
-        $dosen = $user->dosen; 
+        $dosen = $user->dosen;
 
         if (!$dosen) {
             return redirect()->route('home')->with('error', 'Data dosen tidak ditemukan.');
         }
 
-        // Menghitung jumlah mahasiswa unik yang pernah Anda bimbing (logika ini tetap).
+        // --- Data untuk Kartu Statistik (Widgets) ---
         $jumlahMahasiswaBimbingan = PrestasiModel::where('dosen_id', $dosen->dosen_id)
-                                                 ->where('status_verifikasi', 'disetujui')
-                                                 ->distinct('mahasiswa_id')
-                                                 ->count('mahasiswa_id');
+            ->where('status_verifikasi', 'disetujui')
+            ->distinct('mahasiswa_id')
+            ->count('mahasiswa_id');
 
-        // [PERUBAHAN] Menghitung jumlah TOTAL KESELURUHAN prestasi mahasiswa yang telah disetujui di sistem.
         $jumlahPrestasiKeseluruhan = PrestasiModel::where('status_verifikasi', 'disetujui')->count();
-        // Menghitung jumlah total lomba yang disetujui.
         $jumlahLombaDisetujui = LombaModel::where('status_verifikasi', 'disetujui')->count();
+
+        // --- Data untuk List Card di Bawah ---
+
+        // 1. Mengambil 3 Lomba Terbaru yang Masih Aktif
+        $infoLombaTerbaru = LombaModel::where('status_verifikasi', 'disetujui')
+            ->where(function ($query) {
+                $query->where('batas_pendaftaran', '>=', Carbon::now()->toDateString())
+                    ->orWhereNull('batas_pendaftaran');
+            })
+            ->orderBy('created_at', 'desc')
+            ->take(3)
+            ->get();
+
+        // 2. Mengambil 3 Prestasi Terbaru dari Mahasiswa Bimbingan Dosen
+        $prestasiBimbingan = PrestasiModel::where('dosen_id', $dosen->dosen_id)
+            ->where('status_verifikasi', 'disetujui')
+            ->with(['mahasiswa.user', 'mahasiswa.prodi'])
+            // [PERBAIKAN] Mengganti nama kolom untuk pengurutan sesuai skema database
+            ->orderBy('tahun', 'desc') 
+            ->orderBy('created_at', 'desc') // Tambahan untuk pengurutan yang lebih baik
+            ->take(3)
+            ->get();
+
+        // 3. Mengambil 3 Prestasi Umum Terbaru dari Seluruh Mahasiswa
+        $prestasiKeseluruhan = PrestasiModel::where('status_verifikasi', 'disetujui')
+            ->with(['mahasiswa.user', 'mahasiswa.prodi'])
+            // [PERBAIKAN] Mengganti nama kolom untuk pengurutan sesuai skema database
+            ->orderBy('tahun', 'desc')
+            ->orderBy('created_at', 'desc') // Tambahan untuk pengurutan yang lebih baik
+            ->take(3)
+            ->get();
 
         return view('dashboard.dosen', compact(
             'breadcrumb',
@@ -250,8 +279,11 @@ class DashboardController extends Controller
             'user',
             'dosen',
             'jumlahMahasiswaBimbingan',
-            'jumlahPrestasiKeseluruhan', // Mengirim variabel total prestasi
-            'jumlahLombaDisetujui'
+            'jumlahPrestasiKeseluruhan',
+            'jumlahLombaDisetujui',
+            'infoLombaTerbaru',
+            'prestasiBimbingan',
+            'prestasiKeseluruhan'
         ));
     }
 }
