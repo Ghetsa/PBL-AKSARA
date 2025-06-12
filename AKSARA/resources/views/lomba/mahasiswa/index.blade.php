@@ -174,22 +174,22 @@
                             </select>
                         </div>
                     </form> --}}
-                    <div id="infoRekomendasi" class="alert alert-info alert-dismissible fade show d-none" role="alert">
+                    {{-- <div id="infoRekomendasi" class="alert alert-info alert-dismissible fade show d-none" role="alert">
                         <i class="fas fa-info-circle me-2"></i>Menampilkan rekomendasi lomba berdasarkan preferensi Anda. Untuk pencarian biasa, gunakan filter di atas dan klik "Cari Lomba".
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
+                    </div> --}}
 
                     <table class="table table-bordered table-hover dt-responsive wrap" id="dataTableLomba" style="width:100%;">
                         <thead>
                             <tr>
                                 <th class="text-center" style="width: 5%">No.</th>
-                                <th>Nama Lomba</th>
-                                <th>Penyelenggara</th>
-                                <th>Bidang</th>
-                                <th>Tingkat</th>
-                                <th>Batas Daftar</th>
-                                <th>Biaya</th>
-                                <th>Status</th>
+                                <th class="text-center">Nama Lomba</th>
+                                <th class="text-center">Penyelenggara</th>
+                                <th class="text-center">Bidang</th>
+                                <th class="text-center">Tingkat</th>
+                                <th class="text-center">Batas Daftar</th>
+                                <th class="text-center">Biaya</th>
+                                <th class="text-center">Status</th>
                                 <th id="kolomSkorRekomendasi" style="display:none; width: 10%">Skor Rekomendasi</th>
                                 <th>Aksi</th>
                             </tr>
@@ -379,25 +379,54 @@
 
         $('#terapkanBobotBtn').on('click', function() {
             if (parseInt($('#totalBobotText').text()) !== 100) {
-                Swal.fire('Peringatan', 'Total bobot kriteria harus 100 untuk menerapkan rekomendasi.', 'warning');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Total bobot preferensi harus tepat 100%.',
+                });
                 return;
             }
-            isRekomendasiActive = true;
-            $('#infoRekomendasi').removeClass('d-none');
-            $('#filterFormLomba').trigger('reset'); // Reset form filter lainnya
-            $('#search_nama').val('');
-            $('#filter_status').val('');
 
-            // Ambil bobot yang diterapkan
-            const weights = {};
-            $('.bobot-slider').each(function() {
-                weights[$(this).data('kriteria')] = parseInt($(this).val()) / 100;
+            isRekomendasiActive = true;
+            
+            // [PERBAIKAN] Mengganti alert dengan SweetAlert
+            Swal.fire({
+                icon: 'info',
+                title: 'Mode Rekomendasi Aktif',
+                text: 'Menampilkan hasil yang diurutkan berdasarkan preferensi Anda.',
+                timer: 2000,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
             });
 
-            // Kirim bobot sebagai bagian dari parameter AJAX
-            dtLomba.ajax.reload();
-            dtLomba.column('moora_score:name').visible(true); // Tampilkan kolom skor
-            dtLomba.order([dtLomba.column('moora_score:name').index(), 'desc']).draw(); // Order berdasarkan skor rekomendasi
+            // Reload DataTable dengan callback
+            table.ajax.reload(function(json) {
+                // Cukup tutup loading Swal, tidak perlu menampilkan notifikasi sukses lagi
+                // karena notifikasi info di atas sudah cukup sebagai konfirmasi.
+                Swal.close(); 
+            }, false);
+            // if (parseInt($('#totalBobotText').text()) !== 100) {
+            //     Swal.fire('Peringatan', 'Total bobot kriteria harus 100 untuk menerapkan rekomendasi.', 'warning');
+            //     return;
+            // }
+            // isRekomendasiActive = true;
+            // $('#infoRekomendasi').removeClass('d-none');
+            // $('#filterFormLomba').trigger('reset'); // Reset form filter lainnya
+            // $('#search_nama').val('');
+            // $('#filter_status').val('');
+
+            // // Ambil bobot yang diterapkan
+            // const weights = {};
+            // $('.bobot-slider').each(function() {
+            //     weights[$(this).data('kriteria')] = parseInt($(this).val()) / 100;
+            // });
+
+            // // Kirim bobot sebagai bagian dari parameter AJAX
+            // dtLomba.ajax.reload();
+            // dtLomba.column('moora_score:name').visible(true); // Tampilkan kolom skor
+            // dtLomba.order([dtLomba.column('moora_score:name').index(), 'desc']).draw(); // Order berdasarkan skor rekomendasi
         });
 
         $('#filterFormLomba').on('submit', function(e) {

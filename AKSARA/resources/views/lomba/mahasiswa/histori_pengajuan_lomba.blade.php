@@ -58,12 +58,12 @@
                             <thead>
                                 <tr>
                                     <th class="text-center" style="width: 5%;">No.</th>
-                                    <th>Nama Lomba</th>
-                                    <th>Penyelenggara</th>
-                                    <th>Tingkat</th>
-                                    <th>Batas Pendaftaran</th>
-                                    <th>Tanggal Pengajuan</th>
-                                    <th>Status Verifikasi</th>
+                                    <th class="text-center">Nama Lomba</th>
+                                    <th class="text-center">Penyelenggara</th>
+                                    <th class="text-center">Tingkat</th>
+                                    <th class="text-center">Batas Pendaftaran</th>
+                                    <th class="text-center">Tanggal Pengajuan</th>
+                                    <th class="text-center">Status Verifikasi</th>
                                     <th>Catatan/Aksi</th>
                                 </tr>
                             </thead>
@@ -135,7 +135,7 @@
                 { data: 'batas_pendaftaran', name: 'batas_pendaftaran' },
                 { data: 'created_at', name: 'created_at' }, // Tanggal pengajuan
                 { data: 'status_verifikasi', name: 'status_verifikasi', orderable: false, searchable: false },
-                { data: 'aksi', name: 'aksi', orderable: false, searchable: false }
+                { data: 'aksi', name: 'aksi', className: 'text-center', orderable: false, searchable: false }
             ]
         });
 
