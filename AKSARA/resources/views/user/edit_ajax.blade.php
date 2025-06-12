@@ -188,29 +188,32 @@
 
         $('#edit_role_modal').on('change', toggleEditAdditionalForms);
 
+        $.validator.addMethod("letterswithspace", function(value, element) {
+            // Regex ini akan mengecek apakah string hanya berisi huruf (a-z, A-Z) dan spasi.
+            return this.optional(element) || /^[a-zA-Z\s]+$/.test(value);
+        }, "Nama hanya boleh berisi huruf dan spasi.");
+
         formEditUser.validate({
             ignore: ":hidden",
             rules: {
-                nama: { required: true, minlength: 3, maxlength:50, lettersonly: true },
-                email: { required: true, email: true },
-                password: { required: true, minlength: 6, maxlength: 100 },
+                nama: { required: true, minlength: 3, maxlength:50, letterswithspace: true },
+                email: { required: true, email: true, maxlength:100 },
+                password: { minlength: 6 },
                 role: { required: true },
                 status: { required: true },
-                no_telepon: { required: true, digits: true, minlength:7, maxlength:15 },
-                alamat: {required: true, minlength: 10, maxlength: 100},
-                nip: { digits: true, minlength: 10, maxlength: 16}, // required diatur dinamis
-                nim: { digits: true, minlength: 10, maxlength: 12}, // required diatur dinamis
-                prodi_id: {}, // required diatur dinamis
-                periode_id: {}, // required diatur dinamis
+                no_telepon: { required: true, digits: true, minlength: 7, maxlength:15 },
+                alamat: { required: true, maxlength: 100 },
+                nip: { digits: true, minlength: 10, maxlength: 16 },
+                nim: { digits: true, minlength: 10, maxlength: 12 }
             },
             messages: {
-                nama: { required: "Nama tidak boleh kosong", minlength: "Nama minimal harus 3 karakter", maxlength: "Nama maksimal 50 karakter", lettersonly: "Nama hanya boleh berisi huruf" },
+                nama: { required: "Nama tidak boleh kosong", minlength: "Nama minimal harus 3 karakter", maxlength: "Nama maksimal 50 karakter", letterwhitespace: "Nama hanya boleh berisi huruf dan spasi" },
                 email: { required: "Email tidak boleh kosong", email: "Format email tidak valid" },
                 password: { required: "Password tidak boleh kosong", minlength: "Password minimal harus 6 karakter", maxlength: "Password maksimal 100 karakter" },
                 role: "Silakan pilih role",
                 status: "Silakan pilih status",
-                no_telepon: { required: "Nomor telepon tidak boleh kosong", digits: "Nomor telepon hanya boleh berisi angka", minlength: "Nomor telepon minimal 7 karakter", maxlength: "Nomor telepon maksimal 15 karakter" },
-                alamat: { required: "Alamat tidak boleh kosong", minlength: "Alamat minimal 10 karakter", maxlength: "Alamat maksimal 100 karakter" },
+                no_telepon: { required: "Nomor telepon tidak boleh kosong", digits: "Nomor telepon hanya boleh berisi angka", minlength: "Nomor telepon minimal 7 karakter angka", maxlength: "Nomor telepon maksimal 15 karakter" },
+                alamat: { required: "Alamat tidak boleh kosong", maxlength: "Alamat maksimal 100 karakter" },
                 nip: { required: "NIP wajib diisi untuk role ini", digits: "NIP hanya boleh berisi angka", minlength: "NIP minimal 10 karakter", maxlength: "NIP maksimal 16 karakter" },
                 nim: { required: "NIM wajib diisi untuk role ini", digits: "NIM hanya boleh berisi angka", minlength: "NIM minimal 10 karakter", maxlength: "NIM maksimal 12 karakter" }
             },
