@@ -25,7 +25,7 @@
                                 <label for="status_verifikasi_filter" class="form-label small">Filter Status Verifikasi:</label>
                                 <select class="form-select form-select-sm" id="status_verifikasi_filter">
                                     <option value="">- Semua Status -</option>
-                                    <option value="pending" selected>Pending</option> 
+                                    <option value="pending">Pending</option> 
                                     <option value="disetujui">Disetujui</option>
                                     <option value="ditolak">Ditolak</option>
                                 </select>

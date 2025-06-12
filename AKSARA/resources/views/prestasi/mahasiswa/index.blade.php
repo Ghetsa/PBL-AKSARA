@@ -23,7 +23,7 @@
                                 <label for="status" class="form-label small">Filter Status Verifikasi:</label>
                                 <select class="form-select form-select-sm" id="status" name="status">
                                     <option value="">- Pilih Status -</option>
-                                    <option value="pending" selected>Pending</option>
+                                    <option value="pending">Pending</option>
                                     <option value="disetujui">Disetujui</option>
                                     <option value="ditolak">Ditolak</option>
                                 </select>
@@ -64,7 +64,7 @@
                                     <th>Tahun</th>
                                     <th>Dosen Pembimbing</th> {{-- Kolom Baru --}}
                                     <th>Status</th>
-                                    <th style="width: 15%;">Aksi</th> {{-- Lebar disesuaikan --}}
+                                    <th style="width: 15%;" >Aksi</th> {{-- Lebar disesuaikan --}}
                                 </tr>
                             </thead>
                             <tbody>

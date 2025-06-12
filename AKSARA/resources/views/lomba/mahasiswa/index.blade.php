@@ -361,7 +361,7 @@
                         return data;
                     }
                 },
-                { data: 'aksi', name: 'aksi', className: 'text-center', orderable: false, searchable: false }
+                { data: 'aksi', name: 'aksi', orderable: false, searchable: false }
             ],
             order: [[5, 'asc']], // Default order by batas_pendaftaran
             fnDrawCallback: function (oSettings) {
@@ -402,7 +402,7 @@
             });
 
             // Reload DataTable dengan callback
-            table.ajax.reload(function(json) {
+            dtLomba.ajax.reload(function(json) {
                 // Cukup tutup loading Swal, tidak perlu menampilkan notifikasi sukses lagi
                 // karena notifikasi info di atas sudah cukup sebagai konfirmasi.
                 Swal.close(); 

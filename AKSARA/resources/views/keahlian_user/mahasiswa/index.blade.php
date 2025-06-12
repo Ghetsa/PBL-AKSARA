@@ -26,7 +26,7 @@
                                     <div class="col-sm-8">
                                         <select class="form-select form-select-sm" id="status_filter_keahlian" name="status_filter_keahlian">
                                             <option value="">- Semua Status -</option>
-                                            <option value="pending" selected>Pending</option>
+                                            <option value="pending">Pending</option>
                                             <option value="disetujui">Disetujui</option>
                                             <option value="ditolak">Ditolak</option>
                                         </select>
@@ -38,14 +38,14 @@
                             <table class="table table-bordered table-hover dt-responsive wrap" id="dataKeahlianUser" style="width: 100%;">
                                 <thead>
                                     <tr>
-                                        <th class="text-center" style="width: 5%;">No.</th>
-                                        <th class="text-center">Bidang Keahlian</th>
-                                        <th class="text-center">Sertifikasi</th>
-                                        <th class="text-center">Lembaga Sertifikasi</th>
-                                        <th class="text-center">Tanggal Perolehan</th>
-                                        <th class="text-center">Tanggal Kadaluarsa</th>
-                                        <th class="text-center">Status Verifikasi</th>
-                                        <th class="text-center" style="width: 15%;">Aksi</th> {{-- Sesuaikan width jika perlu --}}
+                                        <th style="width: 5%;">No.</th>
+                                        <th>Bidang Keahlian</th>
+                                        <th>Sertifikasi</th>
+                                        <th>Lembaga Sertifikasi</th>
+                                        <th>Tanggal Perolehan</th>
+                                        <th>Tanggal Kadaluarsa</th>
+                                        <th>Status Verifikasi</th>
+                                        <th style="width: 15%;">Aksi</th> {{-- Sesuaikan width jika perlu --}}
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -140,8 +140,8 @@
                 { data: 'lembaga_sertifikasi', name: 'lembaga_sertifikasi' },
                 { data: 'tanggal_perolehan_sertifikat', name: 'tanggal_perolehan_sertifikat' },
                 { data: 'tanggal_kadaluarsa_sertifikat', name: 'tanggal_kadaluarsa_sertifikat' },
-                { data: 'status_verifikasi', name: 'status_verifikasi', orderable: false, searchable: false , className: 'text-center' },
-                { data: 'aksi', name: 'aksi', className: 'text-nowrap', orderable: false, searchable: false , className: 'text-center' }
+                { data: 'status_verifikasi', name: 'status_verifikasi', orderable: false, searchable: false },
+                { data: 'aksi', name: 'aksi', className: 'text-nowrap', orderable: false, searchable: false }
             ],
         });
 
