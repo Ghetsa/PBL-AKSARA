@@ -39,14 +39,29 @@ $(document).ready(function () {
 
     formEdit.validate({
         rules: {
-            kode: { required: true, minlength: 3, maxlength: 10 }, 
+            kode: {
+                required: true,
+                minlength: 3,
+                maxlength: 10,
+                // --- ATURAN REMOTE DENGAN DATA TAMBAHAN ---
+                remote: {
+                    url: "{{ route('prodi.checkKode') }}",
+                    type: "get",
+                    data: {
+                        // Kirim prodi_id yang sedang diedit agar diabaikan dalam validasi unique
+                        ignore_id: '{{ $prodi->prodi_id }}'
+                    }
+                }
+            },
+            // kode: { required: true, minlength: 3, maxlength: 10 }, 
             nama: { required: true, minlength: 5, maxlength: 50 }  
         },
         messages: {
             kode: {
                 required: "Kode program studi tidak boleh kosong",
                 minlength: "Kode program studi minimal 3 karakter",
-                maxlength: "Kode program studi maksimal 10 karakter"
+                maxlength: "Kode program studi maksimal 10 karakter",
+                remote: "Kode program studi ini sudah digunakan oleh prodi lain."
             },
             nama: {
                 required: "Nama program studi tidak boleh kosong",

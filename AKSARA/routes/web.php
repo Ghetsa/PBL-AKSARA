@@ -46,45 +46,7 @@ Route::middleware(['auth'])->group(function () {
     // Route untuk memproses update password via AJAX
     Route::put('/profil/update-password', [ProfilController::class, 'updatePasswordAjax'])->name('profil.update_password');
 
-    Route::get('/user/export/excel', [App\Http\Controllers\UserController::class, 'export_excel'])->name('user.export.excel');
-    Route::get('/user/export/pdf', [App\Http\Controllers\UserController::class, 'export_pdf'])->name('user.export.pdf');
-
-    Route::get('/user/import', [App\Http\Controllers\UserController::class, 'import'])->name('user.import');
-    Route::post('user/import_ajax', [UserController::class, 'import_ajax']); // ajax import excel
-
-    // For Prodi
-    Route::get('/prodi/export/excel', [App\Http\Controllers\ProdiController::class, 'export_excel'])->name('prodi.export.excel');
-    Route::get('/prodi/export/pdf', [App\Http\Controllers\ProdiController::class, 'export_pdf'])->name('prodi.export.pdf');
-
-    // For Periode
-    Route::get('/periode/export/excel', [App\Http\Controllers\PeriodeController::class, 'export_excel'])->name('periode.export.excel');
-    Route::get('/periode/export/pdf', [App\Http\Controllers\PeriodeController::class, 'export_pdf'])->name('periode.export.pdf');
-
-    // For Lomba
-    Route::get('/lomba/export/excel', [App\Http\Controllers\LombaController::class, 'export_excel'])->name('lomba.export.excel');
-    Route::get('/lomba/export/pdf', [App\Http\Controllers\LombaController::class, 'export_pdf'])->name('lomba.export.pdf');
-
-    // For Prestasi
-    Route::get('/prestasi/export/excel', [App\Http\Controllers\PrestasiController::class, 'export_excel'])->name('prestasi.export.excel');
-    Route::get('/prestasi/export/pdf', [App\Http\Controllers\PrestasiController::class, 'export_pdf'])->name('prestasi.export.pdf');
-
-    // For Keahlian User
-    Route::get('/keahlian-user/export/excel', [App\Http\Controllers\KeahlianUserController::class, 'export_excel'])->name('keahlian_user.export.excel');
-    Route::get('/keahlian-user/export/pdf', [App\Http\Controllers\KeahlianUserController::class, 'export_pdf'])->name('keahlian_user.export.pdf');
-
     // ===================== DASHBOARD =====================
-    // Route::get('/dashboard/admin', function () {
-    //     $breadcrumb = (object) ['title' => 'Dashboard', 'list' => ['Admin', 'Dashboard']];
-    //     $activeMenu = 'dashboard';
-    //     return view('dashboard.admin', compact('breadcrumb', 'activeMenu'));
-    // })->name('dashboard');
-
-    // Route::get('/dashboard/mahasiswa', function () {
-    //     $breadcrumb = (object) ['title' => 'Dashboard', 'list' => ['Mahasiswa', 'Dashboard']];
-    //     $activeMenu = 'dashboard';
-    //     return view('dashboard.mahasiswa', compact('breadcrumb', 'activeMenu'));
-    // })->name('dashboardMHS');
-
     // Route::get('/dashboard/dosen', function () {
     //     $breadcrumb = (object) ['title' => 'Dashboard', 'list' => ['Dosen', 'Dashboard']];
     //     $activeMenu = 'dashboard';
@@ -112,52 +74,6 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('/verifikasi/{id}', [LombaController::class, 'verifikasi'])->name('verifikasi');
         Route::post('/verifikasi/{id}', [LombaController::class, 'prosesVerifikasi'])->name('prosesVerifikasi');
-    });
-
-    // ===================== USER CRUD =====================
-    Route::prefix('user')->name('user.')->group(function () {
-        Route::get('/', [UserController::class, 'index'])->name('index');
-        Route::post('/list', [UserController::class, 'list'])->name('list');
-        Route::get('/create', [UserController::class, 'create'])->name('create');
-        Route::post('/', [UserController::class, 'store'])->name('store');
-        Route::get('/create_ajax', [UserController::class, 'create_ajax'])->name('create_ajax');
-        Route::post('/store_ajax', [UserController::class, 'store_ajax'])->name('store_ajax');
-        Route::get('/{id}', [UserController::class, 'show'])->name('show');
-        Route::get('/{id}/show_ajax', [UserController::class, 'show_ajax'])->name('show_ajax');
-        Route::get('/{id}/edit', [UserController::class, 'edit'])->name('edit');
-        Route::get('/{id}/edit_ajax', [UserController::class, 'edit_ajax'])->name('edit_ajax');
-        Route::put('/{id}/update_ajax', [UserController::class, 'update_ajax'])->name('update_ajax');
-        Route::delete('/{id}', [UserController::class, 'destroy'])->name('destroy');
-        Route::get('/{id}/confirm_ajax', [UserController::class, 'confirm_ajax'])->name('confirm_ajax');
-        Route::delete('/{id}/delete-ajax', [UserController::class, 'delete_ajax'])->name('delete_ajax');
-    });
-
-    // ===================== PRODI =====================
-    Route::prefix('prodi')->name('prodi.')->group(function () {
-        Route::get('/', [ProdiController::class, 'index'])->name('index');
-        Route::post('/list', [ProdiController::class, 'list'])->name('list');
-        Route::get('/create', [ProdiController::class, 'create'])->name('create');
-        Route::post('/', [ProdiController::class, 'store'])->name('store');
-        Route::post('/store_ajax', [ProdiController::class, 'store_ajax'])->name('store_ajax');
-        Route::get('/{id}', [ProdiController::class, 'show'])->name('show');
-        Route::get('/{id}/edit', [ProdiController::class, 'edit'])->name('edit');
-        Route::put('/{id}', [ProdiController::class, 'update'])->name('update');
-        Route::get('/{id}/confirm_ajax', [ProdiController::class, 'confirm_ajax'])->name('confirm_ajax');
-        Route::delete('/{id}/delete-ajax', [ProdiController::class, 'delete_ajax'])->name('delete_ajax');
-    });
-
-    // ===================== PERIODE =====================
-    Route::prefix('periode')->name('periode.')->group(function () {
-        Route::get('/', [PeriodeController::class, 'index'])->name('index');
-        Route::post('/list', [PeriodeController::class, 'list'])->name('list');
-        Route::get('/create', [PeriodeController::class, 'create'])->name('create');
-        Route::post('/', [PeriodeController::class, 'store'])->name('store');
-        Route::post('/store_ajax', [PeriodeController::class, 'store_ajax'])->name('store_ajax');
-        Route::get('/{id}', [PeriodeController::class, 'show'])->name('show');
-        Route::get('/{id}/edit', [PeriodeController::class, 'edit'])->name('edit');
-        Route::put('/{id}', [PeriodeController::class, 'update'])->name('update');
-        Route::get('/{id}/confirm_ajax', [PeriodeController::class, 'confirm_ajax'])->name('confirm_ajax');
-        Route::delete('/{id}/delete-ajax', [PeriodeController::class, 'delete_ajax'])->name('delete_ajax');
     });
 
     // ===================== MAHASISWA =====================
@@ -218,6 +134,53 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:admin'])->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'adminDashboard'])->name('dashboard');
 
+        // ===================== USER CRUD =====================
+        Route::prefix('user')->name('user.')->group(function () {
+            Route::get('/', [UserController::class, 'index'])->name('index');
+            Route::post('/list', [UserController::class, 'list'])->name('list');
+            Route::get('/create', [UserController::class, 'create'])->name('create');
+            Route::post('/', [UserController::class, 'store'])->name('store');
+            Route::get('/create_ajax', [UserController::class, 'create_ajax'])->name('create_ajax');
+            Route::post('/store_ajax', [UserController::class, 'store_ajax'])->name('store_ajax');
+            Route::get('/{id}', [UserController::class, 'show'])->name('show');
+            Route::get('/{id}/show_ajax', [UserController::class, 'show_ajax'])->name('show_ajax');
+            Route::get('/{id}/edit', [UserController::class, 'edit'])->name('edit');
+            Route::get('/{id}/edit_ajax', [UserController::class, 'edit_ajax'])->name('edit_ajax');
+            Route::put('/{id}/update_ajax', [UserController::class, 'update_ajax'])->name('update_ajax');
+            Route::delete('/{id}', [UserController::class, 'destroy'])->name('destroy');
+            Route::get('/{id}/confirm_ajax', [UserController::class, 'confirm_ajax'])->name('confirm_ajax');
+            Route::delete('/{id}/delete-ajax', [UserController::class, 'delete_ajax'])->name('delete_ajax');
+        });
+
+        // ===================== PRODI =====================
+        Route::prefix('prodi')->name('prodi.')->group(function () {
+            Route::get('/', [ProdiController::class, 'index'])->name('index');
+            Route::post('/list', [ProdiController::class, 'list'])->name('list');
+            Route::get('/create', [ProdiController::class, 'create'])->name('create');
+            Route::post('/', [ProdiController::class, 'store'])->name('store');
+            Route::post('/store_ajax', [ProdiController::class, 'store_ajax'])->name('store_ajax');
+            Route::get('/{id}', [ProdiController::class, 'show'])->name('show');
+            Route::get('/{id}/edit', [ProdiController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [ProdiController::class, 'update'])->name('update');
+            Route::get('/{id}/confirm_ajax', [ProdiController::class, 'confirm_ajax'])->name('confirm_ajax');
+            Route::delete('/{id}/delete-ajax', [ProdiController::class, 'delete_ajax'])->name('delete_ajax');
+            Route::get('/prodi/check-kode', [ProdiController::class, 'checkKode'])->name('checkKode');
+        });
+
+        // ===================== PERIODE =====================
+        Route::prefix('periode')->name('periode.')->group(function () {
+            Route::get('/', [PeriodeController::class, 'index'])->name('index');
+            Route::post('/list', [PeriodeController::class, 'list'])->name('list');
+            Route::get('/create', [PeriodeController::class, 'create'])->name('create');
+            Route::post('/', [PeriodeController::class, 'store'])->name('store');
+            Route::post('/store_ajax', [PeriodeController::class, 'store_ajax'])->name('store_ajax');
+            Route::get('/{id}', [PeriodeController::class, 'show'])->name('show');
+            Route::get('/{id}/edit', [PeriodeController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [PeriodeController::class, 'update'])->name('update');
+            Route::get('/{id}/confirm_ajax', [PeriodeController::class, 'confirm_ajax'])->name('confirm_ajax');
+            Route::delete('/{id}/delete-ajax', [PeriodeController::class, 'delete_ajax'])->name('delete_ajax');
+        });
+
         // ---------- Prestasi Verifikasi ----------
         Route::prefix('admin/prestasi-verifikasi')->name('prestasi.admin.')->group(function () {
             Route::get('/', [PrestasiController::class, 'indexAdmin'])->name('index');
@@ -275,6 +238,32 @@ Route::middleware(['auth'])->group(function () {
             // [PERBAIKAN] Route POST untuk aksi "tandai dibaca" dari daftar
             // Route::post('/mark-as-read/{id}/{model}', [NotifikasiController::class, 'markAsRead'])->name('mark_as_read');
         });
+
+        Route::get('/user/export/excel', [App\Http\Controllers\UserController::class, 'export_excel'])->name('user.export.excel');
+        Route::get('/user/export/pdf', [App\Http\Controllers\UserController::class, 'export_pdf'])->name('user.export.pdf');
+
+        Route::get('/user/import', [App\Http\Controllers\UserController::class, 'import'])->name('user.import');
+        Route::post('user/import_ajax', [UserController::class, 'import_ajax']); // ajax import excel
+
+        // For Prodi
+        Route::get('/prodi/export/excel', [App\Http\Controllers\ProdiController::class, 'export_excel'])->name('prodi.export.excel');
+        Route::get('/prodi/export/pdf', [App\Http\Controllers\ProdiController::class, 'export_pdf'])->name('prodi.export.pdf');
+
+        // For Periode
+        Route::get('/periode/export/excel', [App\Http\Controllers\PeriodeController::class, 'export_excel'])->name('periode.export.excel');
+        Route::get('/periode/export/pdf', [App\Http\Controllers\PeriodeController::class, 'export_pdf'])->name('periode.export.pdf');
+
+        // For Lomba
+        Route::get('/lomba/export/excel', [App\Http\Controllers\LombaController::class, 'export_excel'])->name('lomba.export.excel');
+        Route::get('/lomba/export/pdf', [App\Http\Controllers\LombaController::class, 'export_pdf'])->name('lomba.export.pdf');
+
+        // For Prestasi
+        Route::get('/prestasi/export/excel', [App\Http\Controllers\PrestasiController::class, 'export_excel'])->name('prestasi.export.excel');
+        Route::get('/prestasi/export/pdf', [App\Http\Controllers\PrestasiController::class, 'export_pdf'])->name('prestasi.export.pdf');
+
+        // For Keahlian User
+        Route::get('/keahlian-user/export/excel', [App\Http\Controllers\KeahlianUserController::class, 'export_excel'])->name('keahlian_user.export.excel');
+        Route::get('/keahlian-user/export/pdf', [App\Http\Controllers\KeahlianUserController::class, 'export_pdf'])->name('keahlian_user.export.pdf');
     });
 
     // ===================== DOSEN =====================

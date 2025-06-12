@@ -137,11 +137,30 @@ class PrestasiController extends Controller
                 ->with(['dosenPembimbing.user']) // Eager load relasi dosen dan user terkait dosen
                 ->orderBy('tahun', 'desc');
 
+            // Filter data user berdasarkan status
+            if (!empty($request->status_verifikasi)) {
+                $data->where('status_verifikasi', $request->status_verifikasi);
+            }
+            // Filter data user berdasarkan tingkat
+            if (!empty($request->tingkat)) {
+                $data->where('tingkat', $request->tingkat);
+            }
+            // Filter data user berdasarkan kategori
+            if (!empty($request->kategori)) {
+                $data->where('kategori', $request->kategori);
+            }
+
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('bidang_nama', fn($row) => $row->bidang->bidang_nama ?? '-')
                 ->addColumn('dosen_pembimbing', function ($row) {
                     return $row->dosenPembimbing->user->nama ?? ($row->dosenPembimbing->nama ?? '-');
+                })
+                ->editColumn('kategori', function ($row) {
+                    return ucfirst($row->kategori);
+                })
+                ->editColumn('tingkat', function ($row) {
+                    return ucfirst($row->tingkat);
                 })
                 ->editColumn('status_verifikasi', fn($row) => $row->status_verifikasi_badge)
                 // ->addColumn('status_verifikasi_badge', function ($row) { // Ganti nama kolom dari 'status_verifikasi'

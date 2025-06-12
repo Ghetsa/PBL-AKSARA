@@ -18,6 +18,22 @@
                         </div>
                     </div>
                     <div class="card-body">
+                        <div class="row mb-3">
+                            {{-- Filter Status Verifikasi --}}
+                            <div class="col-md-6">
+                                <div class="form-group row">
+                                    <label class="col-sm-4 form-label" for="status_filter_keahlian">Filter Status:</label>
+                                    <div class="col-sm-8">
+                                        <select class="form-select form-select-sm" id="status_filter_keahlian" name="status_filter_keahlian">
+                                            <option value="">- Semua Status -</option>
+                                            <option value="pending" selected>Pending</option>
+                                            <option value="disetujui">Disetujui</option>
+                                            <option value="ditolak">Ditolak</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="table-responsive">
                             <table class="table table-bordered table-hover dt-responsive wrap" id="dataKeahlianUser" style="width: 100%;">
                                 <thead>
@@ -54,6 +70,8 @@
 
 @push('js')
 <script>
+    var dataTableKeahlianMhs;
+
     function tambahKeahlian() {
         $.get("{{ route('keahlian_user.create') }}", function (res) {
             $('#myModal .modal-content').html(res);
@@ -105,11 +123,16 @@
             }
         });
 
-        const table = $('#dataKeahlianUser').DataTable({
+        dataTableKeahlianMhs = $('#dataKeahlianUser').DataTable({
             processing: true,
             serverSide: true,
             responsive: true,
-            ajax: "{{ route('keahlian_user.list') }}",
+            ajax: {
+                url: "{{ route('keahlian_user.list') }}", // Pastikan route ini ada
+                data: function (d) {
+                    d.status_verifikasi = $('#status_filter_keahlian').val();
+                }
+            },
             columns: [
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false, className: 'text-center' },
                 { data: 'bidang_nama', name: 'bidang.bidang_nama' }, // Untuk searching/ordering di server
@@ -154,6 +177,10 @@
                     });
                 }
             });
+        });
+
+        $('#status_filter_keahlian').on('change', function () {
+            dataTableKeahlianMhs.ajax.reload();
         });
     });
 </script>

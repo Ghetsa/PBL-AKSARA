@@ -161,9 +161,10 @@
             <div class="col-md-4 mb-4">
                 <div class="card shadow-sm border-0">
                     <div class="card-body py-4">
-                        <i class="fas fa-users fa-3x text-warning mb-3"></i>
-                        <h5 class="card-title">Manajemen Pengguna</h5>
-                        <p class="card-text">Kelola peran dan akses pengguna sesuai kebutuhan institusi.</p>
+                        <i class="fas fa-bullhorn fa-3x mb-3" style="color: #FFD700;"></i>
+                        <h5 class="card-title">Informasi Lomba</h5>
+                        <p class="card-text">Temukan dan unggah berbagai informasi lomba yang relevan untuk mahasiswa.
+                        </p>
                     </div>
                 </div>
             </div>

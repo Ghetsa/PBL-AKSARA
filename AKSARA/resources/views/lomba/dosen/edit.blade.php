@@ -26,7 +26,7 @@
             <div class="col-md-6 mb-3">
                 <label for="user_edit_batas_pendaftaran" class="form-label">Batas Pendaftaran</label>
                 <input type="date" name="batas_pendaftaran" id="user_edit_batas_pendaftaran" class="form-control form-control-sm" value="{{ old('batas_pendaftaran', optional($lomba->batas_pendaftaran)->format('Y-m-d')) }}">
-                <span class="invalid-feedback error-batas_pendaftaran"></span>
+                <span class="invalid-feedback error-batas_pendaftaran"></span>x
             </div>
 
             {{-- Kategori & Tingkat --}}
@@ -188,7 +188,7 @@ $(document).ready(function() {
          rules: {
             nama_lomba: { required: true, maxlength: 50, minlength: 5 },
             pembukaan_pendaftaran: { required: true, dateISO: true },
-            batas_pendaftaran: { required: true, dateISO: true, afterDate: '#crud_c_pembukaan_pendaftaran' },
+            batas_pendaftaran: { required: true, dateISO: true, afterDate: '#user_edit_pembukaan_pendaftaran' },
             kategori: { required: true },
             penyelenggara: { required: true, maxlength: 50, minlength: 2 },
             tingkat: { required: true },
@@ -202,7 +202,7 @@ $(document).ready(function() {
         messages: {
             nama_lomba: { required: "Nama lomba wajib diisi.", maxlength: "Nama lomba maksimal 50 karakter.", minlength: "Nama lomba minimal 5 karakter." },
             pembukaan_pendaftaran: { required: "Tanggal pembukaan wajib diisi.", dateISO: "Format tanggal tidak valid." },
-            batas_pendaftaran: { required: "Batas pendaftaran wajib diisi.", dateISO: "Format tanggal tidak valid.", afterDate: "Batas pendaftaran harus setelah atau sama dengan tanggal pembukaan." },
+            batas_pendaftaran: { required: "Batas pendaftaran wajib diisi.", dateISO: "Format tanggal tidak valid.", afterDate: "Batas pendaftaran harus sesudah tanggal pembukaan." },
             kategori: { required: "Kategori peserta wajib dipilih." },
             penyelenggara: { required: "Penyelenggara wajib diisi.", maxlength: "Penyelenggara maksimal 50 karakter.", minlength: "Penyelenggara minimal 2 karakter." },
             tingkat: { required: "Tingkat lomba wajib dipilih." },

@@ -17,24 +17,24 @@ class NotifikasiPrestasiObserver
     public function created(PrestasiModel $model)
     {
         // ===================================================================
-        // BAGIAN 1: KIRIM NOTIFIKASI KE SEMUA ADMIN (Tetap berjalan)
+        // BAGIAN 1: KIRIM NOTIFIKASI KE SEMUA ADMIN
         // ===================================================================
-        $namaPengaju = $model->mahasiswa->user->nama ?? 'Mahasiswa';
-        self::kirimNotifikasiKeAdmin($model, 'Prestasi', $namaPengaju);
+        // PERBAIKAN UTAMA: Cek role user yang membuat data
+        // Hanya kirim notif ke admin jika yang mengajukan adalah mahasiswa.
+        if ($model->mahasiswa && $model->mahasiswa->user && $model->mahasiswa->user->role !== 'admin') {
+            $namaPengaju = $model->mahasiswa->user->nama ?? 'Mahasiswa';
+            self::kirimNotifikasiKeAdmin($model, 'Prestasi', $namaPengaju);
+        }
 
         // ===================================================================
-        // BAGIAN 2: KIRIM NOTIFIKASI KE DOSEN PEMBIMBING (Logika Baru)
+        // BAGIAN 2: KIRIM NOTIFIKASI KE DOSEN PEMBIMBING (Logika ini sudah benar)
         // ===================================================================
-        if ($model->dosen_id) { // Cek apakah ada dosen pembimbing yang dipilih
-            
-            // Cari data user dari dosen yang bersangkutan berdasarkan dosen_id
+        if ($model->dosen_id) {
             $dosen = DosenModel::find($model->dosen_id);
-
-            // Jika dosen dan user_id-nya ditemukan
             if ($dosen && $dosen->user_id) {
                 NotifikasiPrestasiModel::create([
                     'prestasi_id'  => $model->prestasi_id,
-                    'user_id'      => $dosen->user_id, // <-- Target notifikasi adalah user_id milik Dosen
+                    'user_id'      => $dosen->user_id,
                     'judul'        => "Penunjukan Pembimbing Prestasi",
                     'isi'          => "Anda telah ditunjuk sebagai pembimbing untuk prestasi '{$model->nama_prestasi}' yang diajukan oleh {$namaPengaju}.",
                     'status_baca'  => 'belum_dibaca',

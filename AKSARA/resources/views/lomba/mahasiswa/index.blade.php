@@ -2,9 +2,9 @@
 @section('title', $breadcrumb->title ?? 'Informasi & Rekomendasi Lomba')
 
 @push('css')
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+{{-- <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css"> --}}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+{{-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> --}}
 <style>
     .form-label-group {
         margin-bottom: 0.5rem;
@@ -38,29 +38,40 @@
     <div class="row">
         <div class="col-12">
             <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                {{-- <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-primary">{{ $breadcrumb->title ?? 'Daftar Lomba' }}</h6>
-                </div>
+                </div> --}}
                 <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
-                    <h4 class="card-title mb-0">Hasil Rekomendasi Lomba</h4>
-                    <div class="card-tools d-flex flex-wrap gap-1 mt-2 mt-md-0">
-                        {{-- [TOMBOL BARU] Tombol untuk membuka modal detail perhitungan MOORA --}}
-                        <button class="btn btn-sm btn-outline-info" 
+                    <h4 class="card-title mb-0">Rekomendasi Lomba Untuk Anda</h4>
+                    {{-- <div class="card-tools d-flex flex-wrap gap-1 mt-2 mt-md-0">
+                        <button class="btn btn-sm btn-outline-primary" 
                                 onclick="showMooraDetails('{{ route('lomba.mhs.details.all') }}')">
                             <i class="fas fa-calculator me-1"></i> Lihat Detail Perhitungan
                         </button>
-                    </div>
+                    </div> --}}
                 </div>
                 <div class="card-body">
                     {{-- Tombol Toggle untuk Form Bobot Kriteria --}}
-                    <div class="mb-3 text-end">
-                        <button class="btn btn-sm btn-info" type="button" data-bs-toggle="collapse" data-bs-target="#collapseBobotKriteria" aria-expanded="false" aria-controls="collapseBobotKriteria">
-                            <i class="fas fa-cogs me-1"></i> Atur Prioritas Rekomendasi Lomba
-                        </button>
+                    <div class="d-flex justify-content-between align-items-center flex-wrap">
+                        <div class="card-tools d-flex flex-wrap gap-1 mt-2 mt-md-0">
+                            <button class="btn btn-sm btn-outline-primary" 
+                                    onclick="showMooraDetails('{{ route('lomba.mhs.details.all') }}')">
+                                <i class="fas fa-calculator me-1"></i> Lihat Detail Perhitungan
+                            </button>
+                        </div>
+                        <div class="card-tools d-flex flex-wrap gap-1 mt-2 mt-md-0">
+                            <button class="btn btn-sm btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseBobotKriteria" aria-expanded="false" aria-controls="collapseBobotKriteria">
+                                <i class="fas fa-cogs me-1"></i> Atur Prioritas Rekomendasi Lomba
+                            </button>
+                        </div>
+                        {{-- <button class="btn btn-sm btn-outline-primary" onclick="showMooraDetails('{{ route('lomba.mhs.details.all') }}')">
+                            <i class="fas fa-calculator me-1"></i> Lihat Detail Perhitungan
+                        </button> --}}
+
                     </div>
 
                     {{-- Form Bobot Kriteria (Collapsible) --}}
-                    <div class="collapse mb-4" id="collapseBobotKriteria">
+                    <div class="collapse mb-4 mt-3" id="collapseBobotKriteria">
                         <div class="card card-body border-info">
                             <h5 class="card-title card-title-small">Sesuaikan Prioritas Kriteria Rekomendasi</h5>
                             <p class="card-text small text-muted">Geser slider untuk menentukan seberapa penting setiap kriteria. Total bobot harus 100.</p>
@@ -80,21 +91,69 @@
                                     <div class="col-sm-4"><strong>Total Bobot:</strong></div>
                                     <div class="col-sm-8"><strong id="totalBobotText">100</strong> <span id="bobotWarningText" class="small bobot-warning"></span></div>
                                 </div>
-                                <div class="mt-3">
+                                <div class="d-flex justify-content-end align-items-center flex-wrap">
+                                    <div class="card-tools d-flex flex-wrap gap-1 mt-3 mt-md-0">
+                                           <button type="button" id="resetBobotBtn" class="btn btn-sm btn-outline-secondary me-2"><i class="fas fa-undo me-1"></i>Reset Bobot</button>
+                                    </div>
+                                    <div class="card-tools d-flex flex-wrap gap-1 mt-3 mt-md-0">
+                                        <button type="button" id="terapkanBobotBtn" class="btn btn-sm btn-success">
+                                            <i class="fas fa-check me-1"></i> Terapkan & Lihat Rekomendasi
+                                        </button>
+                                    </div>
+                                </div>
+                                {{-- <div class="mt-3">
                                     <button type="button" id="resetBobotBtn" class="btn btn-sm btn-outline-secondary me-2"><i class="fas fa-undo me-1"></i>Reset Bobot</button>
                                     <button type="button" id="terapkanBobotBtn" class="btn btn-sm btn-success">
                                         <i class="fas fa-check me-1"></i> Terapkan & Lihat Rekomendasi
                                     </button>
-                                </div>
+                                </div> --}}
                             </form>
                         </div>
                     </div>
                     
-                    {{-- Form Filter Pencarian Biasa --}}
-                    <form id="filterFormLomba" class="row gx-3 gy-2 align-items-center mb-4">
-                        <div class="col-sm-12 col-md-5">
-                            <label class="form-label visually-hidden" for="search_nama">Cari Nama Lomba</label>
-                            <input type="text" class="form-control form-control-sm" id="search_nama" placeholder="Cari nama lomba...">
+                    <div class="row mb-3 mt-4">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="filter_status" class="form-label small">Filter Status Pendaftaran:</label>
+                                <select class="form-select form-select-sm" id="filter_status">
+                                    <option value="">Semua Status Pendaftaran</option>
+                                    <option value="buka">Buka</option>
+                                    <option value="tutup">Tutup</option>
+                                    <option value="segera hadir">Segera Hadir</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="tingkat_lomba_filter_verifikasi" class="form-label small">Filter Tingkat Lomba:</label>
+                                <select class="form-select form-select-sm" id="tingkat_lomba_filter_verifikasi">
+                                    <option value="">- Semua Tingkat -</option>
+                                    <option value="lokal">Lokal</option>
+                                    <option value="nasional">Nasional</option>
+                                    <option value="internasional">Internasional</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="kategori_lomba_filter_verifikasi" class="form-label small">Filter Kategori Lomba:</label>
+                                <select class="form-select form-select-sm" id="kategori_lomba_filter_verifikasi">
+                                    <option value="">- Semua Kategori -</option>
+                                    <option value="individu">Individu</option>
+                                    <option value="kelompok">Kelompok</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    {{-- <form id="filterFormLomba" class="row gx-3 gy-2 align-items-center mb-4">
+                        <div class="col-sm-12 col-md-4">
+                            <label class="form-label visually-hidden" for="filter_status">Status Pendaftaran</label>
+                            <select class="form-select form-select-sm" id="filter_status">
+                                <option value="">Semua Status Pendaftaran</option>
+                                <option value="buka">Buka</option>
+                                <option value="tutup">Tutup</option>
+                                <option value="segera hadir">Segera Hadir</option>
+                            </select>
                         </div>
                         <div class="col-sm-12 col-md-4">
                             <label class="form-label visually-hidden" for="filter_status">Status Pendaftaran</label>
@@ -105,10 +164,16 @@
                                 <option value="segera hadir">Segera Hadir</option>
                             </select>
                         </div>
-                        <div class="col-sm-12 col-md-3">
-                            <button type="submit" class="btn btn-sm btn-primary w-100"><i class="fas fa-search me-1"></i> Cari Lomba</button>
+                        <div class="col-sm-12 col-md-4">
+                            <label class="form-label visually-hidden" for="filter_status">Status Pendaftaran</label>
+                            <select class="form-select form-select-sm" id="filter_status">
+                                <option value="">Semua Status Pendaftaran</option>
+                                <option value="buka">Buka</option>
+                                <option value="tutup">Tutup</option>
+                                <option value="segera hadir">Segera Hadir</option>
+                            </select>
                         </div>
-                    </form>
+                    </form> --}}
                     <div id="infoRekomendasi" class="alert alert-info alert-dismissible fade show d-none" role="alert">
                         <i class="fas fa-info-circle me-2"></i>Menampilkan rekomendasi lomba berdasarkan preferensi Anda. Untuk pencarian biasa, gunakan filter di atas dan klik "Cari Lomba".
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -252,6 +317,8 @@
                 data: function(d) {
                     d.search_nama = $('#search_nama').val();
                     d.filter_status = $('#filter_status').val();
+                    d.tingkat_lomba_filter = $('#tingkat_lomba_filter_verifikasi').val(); // ID filter disesuaikan
+                    d.kategori_lomba_filter = $('#kategori_lomba_filter_verifikasi').val(); // ID filter disesuaikan
                     d.rekomendasi = isRekomendasiActive ? '1' : '0';
                     if (isRekomendasiActive) {
                         d.weights = {};
@@ -275,9 +342,9 @@
                 { data: 'nama_lomba', name: 'lomba.nama_lomba' },
                 { data: 'penyelenggara', name: 'lomba.penyelenggara' },
                 { data: 'bidang_display', name: 'bidang_display', orderable: false, searchable: false },
-                { data: 'tingkat', name: 'lomba.tingkat' },
+                { data: 'tingkat', name: 'lomba.tingkat', render: function(data, type, row) { return data.charAt(0).toUpperCase() + data.slice(1); } },
                 { data: 'batas_pendaftaran', name: 'lomba.batas_pendaftaran' },
-                { data: 'biaya_display', name: 'lomba.biaya' },
+                { data: 'biaya_display', name: 'lomba.biaya', className: 'text-nowrap' },
                 { data: 'status_display', name: 'status_display', orderable: false, searchable: false },
                 {
                     data: 'moora_score',
@@ -303,8 +370,8 @@
                         icon: 'info',
                         title: 'Tidak Ada Rekomendasi',
                         text: 'Tidak ditemukan lomba yang sesuai dengan preferensi bobot Anda saat ini.',
-                        timer: 3000,
-                        showConfirmButton: true
+                        // timer: 3000,
+                        // showConfirmButton: true
                     });
                 }
             }
@@ -341,12 +408,16 @@
                 Swal.fire({
                     icon: 'info',
                     title: 'Mode Rekomendasi Dinonaktifkan',
-                    timer: 1500,
-                    showConfirmButton: false
+                    // timer: 1500,
+                    // showConfirmButton: false
                 });
             }
             dtLomba.column('moora_score:name').visible(false); // Sembunyikan kolom skor saat filter biasa
             dtLomba.order([dtLomba.column('batas_pendaftaran:name').index(), 'asc']).draw(); // Kembalikan order default
+        });
+
+        $('#filter_status, #tingkat_lomba_filter_verifikasi, #kategori_lomba_filter_verifikasi').on('change', function () {
+            dtLomba.ajax.reload();
         });
 
         // =========================================================================

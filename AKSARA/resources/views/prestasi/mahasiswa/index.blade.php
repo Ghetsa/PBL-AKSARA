@@ -17,6 +17,41 @@
                     </div>
                 </div>
                 <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="status" class="form-label small">Filter Status Verifikasi:</label>
+                                <select class="form-select form-select-sm" id="status" name="status">
+                                    <option value="">- Pilih Status -</option>
+                                    <option value="pending" selected>Pending</option>
+                                    <option value="disetujui">Disetujui</option>
+                                    <option value="ditolak">Ditolak</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="tingkat" class="form-label small">Filter Tingkat Lomba:</label>
+                                <select class="form-select form-select-sm" id="tingkat" name="tingkat">
+                                    <option value="">- Semua Tingkat -</option>
+                                    <option value="kota">Kota/Kabupaten</option>
+                                    <option value="provinsi">Provinsi</option>
+                                    <option value="nasional">Nasional</option>
+                                    <option value="internasional">Internasional</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="kategori" class="form-label small">Filter Kategori Prestasi:</label>
+                                <select class="form-select form-select-sm" id="kategori" name="kategori">
+                                    <option value="">- Semua Kategori -</option>
+                                    <option value="akademik">Akademik</option>
+                                    <option value="non-akademik">Non-akademik</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                     <div class="table-responsive">
                         <table class="table table-bordered table-hover dt-responsive wrap" id="dataPrestasiMahasiswa" style="width:100%;">
                             <thead>
@@ -99,7 +134,15 @@
             processing: true,
             serverSide: true,
             responsive: true,
-            ajax: "{{ route('prestasi.mahasiswa.list') }}", 
+            ajax: {
+                url: "{{ route('prestasi.mahasiswa.list') }}",
+                data: function (d) {
+                    d.status_verifikasi = $('#status').val();
+                    d.tingkat = $('#tingkat').val();
+                    d.kategori = $('#kategori').val();
+                }
+            },
+            // ajax: "{{ route('prestasi.mahasiswa.list') }}", 
             columns: [
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', className: 'text-center', orderable: false, searchable: false },
                 { data: 'nama_prestasi', name: 'nama_prestasi' },
@@ -150,6 +193,11 @@
                     });
                 }
             });
+        });
+
+        // Trigger reload DataTables saat filter Status berubah
+        $('#status, #tingkat, #kategori').on('change', function () {
+            dataPrestasiMahasiswa.ajax.reload();
         });
     });
 </script>

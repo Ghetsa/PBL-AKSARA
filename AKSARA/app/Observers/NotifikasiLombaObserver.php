@@ -4,21 +4,28 @@ namespace App\Observers;
 
 use App\Models\LombaModel;
 use App\Models\NotifikasiLombaModel;
-use App\Traits\NotifikasiUntukAdmin; // <-- Tambahkan ini
+use App\Traits\NotifikasiUntukAdmin;
+// use Illuminate\Support\Facades\Auth; // Tidak perlu jika relasi sudah benar
 
 class NotifikasiLombaObserver
 {
-    use NotifikasiUntukAdmin; // <-- Tambahkan ini
+    use NotifikasiUntukAdmin;
 
     /**
      * Handle the LombaModel "created" event.
-     * Mengirim notifikasi ke admin saat lomba baru dibuat.
+     * Mengirim notifikasi ke admin saat lomba baru dibuat oleh mahasiswa.
      */
     public function created(LombaModel $model)
     {
-        // Ambil nama mahasiswa yang menginput
-        $namaPengaju = $model->penginput->nama ?? 'Mahasiswa';
-        self::kirimNotifikasiKeAdmin($model, 'Lomba', $namaPengaju);
+        // ===================================================================
+        // PERBAIKAN UTAMA: Cek role user yang membuat data
+        // ===================================================================
+        // Kita hanya kirim notifikasi jika ada relasi 'penginput' dan rolenya BUKAN 'admin'.
+        if ($model->penginput && $model->penginput->role !== 'admin') {
+            $namaPengaju = $model->penginput->nama ?? 'Mahasiswa';
+            self::kirimNotifikasiKeAdmin($model, 'Lomba', $namaPengaju);
+        }
+        // Jika yang membuat adalah admin, maka tidak ada notifikasi yang dikirim.
     }
 
     /**
@@ -27,7 +34,7 @@ class NotifikasiLombaObserver
      */
     public function updated(LombaModel $model)
     {
-        // ... (kode method updated Anda yang sudah ada, biarkan saja)
+        // Bagian ini sudah benar, tidak perlu diubah.
         if ($model->getOriginal('status_verifikasi') === $model->status_verifikasi) {
             return;
         }

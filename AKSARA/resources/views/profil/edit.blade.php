@@ -10,7 +10,7 @@
                 <h5 class="modal-title">Perbarui Profil</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body" style="max-height: 75vh; overflow-y: auto;">
+            <div class="modal-body" style="max-height: 65vh; overflow-y: auto;">
 
                 {{-- Bagian Info Dasar --}}
                 <div id="section-dasar">
@@ -19,18 +19,18 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group mb-3">
-                                <label for="edit_nama" class="form-label">Nama Lengkap <span
+                                <label for="nama" class="form-label">Nama Lengkap <span
                                         class="text-danger"></span></label>
-                                <input type="text" name="nama" id="edit_nama" class="form-control"
+                                <input type="text" name="nama" id="nama" class="form-control"
                                     value="{{ old('nama', $user->nama) }}" required>
                                 <span class="invalid-feedback error-nama"></span>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group mb-3">
-                                <label for="edit_email" class="form-label">Email <span
+                                <label for="email" class="form-label">Email <span
                                         class="text-danger"></span></label>
-                                <input type="email" name="email" id="edit_email" class="form-control"
+                                <input type="email" name="email" id="email" class="form-control"
                                     value="{{ old('email', $user->email) }}" required>
                                 <span class="invalid-feedback error-email"></span>
                             </div>
@@ -309,12 +309,12 @@
                     maxlength: 50
                 },
                 no_telepon: {
-                    // Sesuai controller, no_telepon nullable
+                    required: true,
                     digits: true,
                     maxlength: 15
                 },
                 alamat: {
-                     // Sesuai controller, alamat nullable
+                    required: true,
                     maxlength: 100
                 },
                 foto: {
@@ -327,19 +327,21 @@
             // 2. Tentukan Pesan Error Kustom
             messages: {
                 nama: {
-                    required: "Nama lengkap wajib diisi.",
+                    required: "Nama lengkap tidak boleh kosong.",
                     maxlength: "Nama tidak boleh lebih dari 50 karakter."
                 },
                 email: {
-                    required: "Email wajib diisi.",
+                    required: "Email tidak boleh kosong.",
                     email: "Format email tidak valid.",
                     maxlength: "Email terlalu panjang."
                 },
-                 no_telepon: {
+                no_telepon: {
+                    required: "Nomor telepon tidak boleh kosong.",
                     digits: "Nomor telepon hanya boleh berisi angka.",
                     maxlength: "Nomor telepon tidak boleh lebih dari 15 karakter."
                 },
                 alamat: {
+                    required: "Alamat tidak boleh kosong.",
                     maxlength: "Alamat tidak boleh lebih dari 100 karakter."
                 },
                 foto: {
