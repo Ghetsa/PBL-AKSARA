@@ -407,6 +407,7 @@
                 // karena notifikasi info di atas sudah cukup sebagai konfirmasi.
                 Swal.close(); 
             }, false);
+            dtLomba.column('moora_score:name').visible(true); // Tampilkan kolom skor
             // if (parseInt($('#totalBobotText').text()) !== 100) {
             //     Swal.fire('Peringatan', 'Total bobot kriteria harus 100 untuk menerapkan rekomendasi.', 'warning');
             //     return;
