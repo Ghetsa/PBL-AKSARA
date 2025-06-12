@@ -32,7 +32,7 @@ class DosenModel extends Model
 
     public function bimbinganMahasiswa()
     {
-        return $this->hasMany(MahasiswaBimbinganModel::class, 'dosen_id', 'dosen_id');
+        return $this->hasMany(MahasiswaModel::class, 'dosen_pembimbing_id', 'dosen_id');
     }
 
     public function pendaftaranLomba()

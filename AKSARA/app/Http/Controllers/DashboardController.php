@@ -1,13 +1,16 @@
 <?php
 // app/Http/Controllers/DashboardController.php (atau sesuaikan dengan controller Anda)
 namespace App\Http\Controllers;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Http\Request;
-use App\Models\PrestasiModel;
+use App\Models\DosenModel;
 use App\Models\LombaModel;
-use App\Models\UserModel; // atau UserModel
+use App\Models\MahasiswaBimbinganModel;
+use App\Models\PrestasiModel;
+use App\Models\UserModel;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon; // Untuk MOORA
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+
 
 class DashboardController extends Controller
 {
@@ -222,69 +225,33 @@ class DashboardController extends Controller
     public function dosenDashboard()
     {
         $breadcrumb = (object) ['title' => 'Dashboard Dosen', 'list' => ['Dashboard']];
-        $activeMenu = 'dashboard_dosen'; // atau 'dashboard'
+        $activeMenu = 'dashboard';
         $user = Auth::user();
-        $dosen = $user->dosen; // Asumsi ada relasi 'dosen' pada UserModel yang merujuk ke DosenModel
+        $dosen = $user->dosen; 
 
         if (!$dosen) {
-            // Handle jika user dosen tidak memiliki record di tabel dosen
             return redirect()->route('home')->with('error', 'Data dosen tidak ditemukan.');
         }
 
-        // Asumsikan DosenModel memiliki relasi bimbinganMahasiswa()
-        // yang mengembalikan mahasiswa yang menjadi bimbingannya.
-        // Dan MahasiswaModel memiliki relasi prestasi()
-        $bimbinganMahasiswaIds = $dosen->bimbinganMahasiswa()->pluck('mahasiswa_id')->toArray();
+        // Menghitung jumlah mahasiswa unik yang pernah Anda bimbing (logika ini tetap).
+        $jumlahMahasiswaBimbingan = PrestasiModel::where('dosen_id', $dosen->dosen_id)
+                                                 ->where('status_verifikasi', 'disetujui')
+                                                 ->distinct('mahasiswa_id')
+                                                 ->count('mahasiswa_id');
 
-        $jumlahbimbinganMahasiswa = count($bimbinganMahasiswaIds);
-
-        $prestasibimbinganMahasiswa = PrestasiModel::whereIn('mahasiswa_id', $bimbinganMahasiswaIds)
-            ->where('status_verifikasi', 'disetujui')
-            // ->orderBy('tanggal_pelaksanaan', 'desc') // Jika itu nama kolom yang benar
-            ->take(5) // Ambil 5 terbaru
-            ->get();
-
-        $jumlahPrestasiBimbingan = PrestasiModel::whereIn('mahasiswa_id', $bimbinganMahasiswaIds)
-            ->where('status_verifikasi', 'disetujui')
-            ->count();
-
-        // Lomba yang diajukan oleh mahasiswa bimbingan (jika relevan)
-        $lombaDiajukanBimbingan = LombaModel::whereIn('diinput_oleh', function ($query) use ($bimbinganMahasiswaIds) {
-            $query->select('users.user_id')
-                ->from('users')
-                ->join('mahasiswa', 'users.user_id', '=', 'mahasiswa.user_id')
-                ->whereIn('mahasiswa.mahasiswa_id', $bimbinganMahasiswaIds);
-        })
-            ->orderBy('created_at', 'desc')
-            ->take(5)
-            ->get();
-
-        // $lombaByTingkat = LombaModel::whereIn('diinput_oleh', function ($query) use ($bimbinganMahasiswaIds) {
-        //     $query->select('users.user_id')
-        //         ->from('users')
-        //         ->join('mahasiswa', 'users.user_id', '=', 'mahasiswa.user_id')
-        //         ->whereIn('mahasiswa.mahasiswa_id', $bimbinganMahasiswaIds);
-        // })
-        //     ->select('tingkat', DB::raw('count(*) as total'))
-        //     ->groupBy('tingkat')
-        //     ->pluck('total', 'tingkat'); // hasil: ['Nasional' => 3, 'Internasional' => 2]
-
-        // $prestasiByTingkat = PrestasiModel::whereIn('mahasiswa_id', $bimbinganMahasiswaIds)
-        //     ->where('status_verifikasi', 'disetujui')
-        //     ->select('tingkat', DB::raw('count(*) as total'))
-        //     ->groupBy('tingkat')
-        //     ->pluck('total', 'tingkat');
-
+        // [PERUBAHAN] Menghitung jumlah TOTAL KESELURUHAN prestasi mahasiswa yang telah disetujui di sistem.
+        $jumlahPrestasiKeseluruhan = PrestasiModel::where('status_verifikasi', 'disetujui')->count();
+        // Menghitung jumlah total lomba yang disetujui.
+        $jumlahLombaDisetujui = LombaModel::where('status_verifikasi', 'disetujui')->count();
 
         return view('dashboard.dosen', compact(
             'breadcrumb',
             'activeMenu',
             'user',
             'dosen',
-            'jumlahbimbinganMahasiswa',
-            'prestasibimbinganMahasiswa',
-            'jumlahPrestasiBimbingan',
-            'lombaDiajukanBimbingan'
+            'jumlahMahasiswaBimbingan',
+            'jumlahPrestasiKeseluruhan', // Mengirim variabel total prestasi
+            'jumlahLombaDisetujui'
         ));
     }
 }
