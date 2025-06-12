@@ -564,9 +564,12 @@ class LombaController extends Controller
         $lomba = LombaModel::where('status_verifikasi', 'disetujui')
             ->with([
                 'inputBy',
-                'bidangKeahlian.bidang' // Eager load LombaDetailModel dan relasi bidang di dalamnya
+                'bidangKeahlian.bidang',
+                'daftarHadiah' // [PERBAIKAN] Tambahkan eager loading untuk relasi hadiah
             ])
             ->findOrFail($id);
+
+        // File view ini akan digunakan untuk mengisi modal di dashboard
         return view('lomba.publik.show_ajax', compact('lomba'));
     }
 
@@ -960,41 +963,21 @@ class LombaController extends Controller
     //     return view('lomba.mahasiswa.show', compact('lomba'));
     // }
 
-    public function showLombaMhs($id) // Atau showPengajuanLombaUmum
+    public function showLombaMhs($id)
     {
         $user = Auth::user();
         $lomba = LombaModel::where('lomba_id', $id)
-            // ->where('diinput_oleh', $user->user_id) // Opsional, jika hanya pemilik yang boleh lihat detail pengajuannya
-            ->with(['inputBy', 'bidangKeahlian.bidang', 'daftarHadiah'])
+            // ->where('diinput_oleh', $user->user_id) // Baris ini bisa diaktifkan jika hanya pemilik yang boleh lihat
+            ->with([
+                'inputBy',
+                'bidangKeahlian.bidang',
+                'daftarHadiah' // [PERBAIKAN] Tambahkan eager loading untuk relasi hadiah
+            ])
             ->firstOrFail();
 
-        // Jika view Anda adalah 'lomba.show' yang diunggah
+        // File view ini untuk halaman detail pengajuan milik mahasiswa
         return view('lomba.mahasiswa.show', compact('lomba'));
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     /**
      * Menampilkan halaman histori pengajuan lomba untuk user yang login.
      */
