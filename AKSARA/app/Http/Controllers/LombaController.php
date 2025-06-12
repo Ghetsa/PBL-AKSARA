@@ -652,7 +652,7 @@ class LombaController extends Controller
             if ($request->filled('status_verifikasi_filter')) {
                 $data->where('status_verifikasi', $request->status_verifikasi_filter);
             }
-            if ($request->filled('tingkat_lomba_filter')) { // Jika filter ini tetap ada di view verifikasi
+            if ($request->filled('tingkat_lomba_filter')) {
                 $data->where('tingkat', $request->tingkat_lomba_filter);
             }
             if ($request->filled('kategori_lomba_filter')) {
@@ -663,16 +663,22 @@ class LombaController extends Controller
                 ->addIndexColumn()
                 ->editColumn('nama_lomba', fn($row) => e($row->nama_lomba))
                 ->addColumn('bidang_lomba', function ($lomba) {
-                    return $lomba->detailBidang->map(function ($detail) {
-                        return ucfirst($detail->kategori) . ' ' . ($detail->bidang->bidang_nama ?? 'N/A');
-                    })->implode(', ');
+                    // Pastikan relasi ada sebelum diakses untuk menghindari error
+                    if ($lomba->relationLoaded('detailBidang') && $lomba->detailBidang) {
+                        return $lomba->detailBidang->map(function ($detail) {
+                            return ucfirst($detail->kategori) . ' ' . ($detail->bidang->bidang_nama ?? 'N/A');
+                        })->implode(', ');
+                    }
+                    return '-';
                 })
                 ->editColumn('batas_pendaftaran', fn($row) => $row->batas_pendaftaran ? Carbon::parse($row->batas_pendaftaran)->setTimezone('Asia/Jakarta')->isoFormat('D MMM YYYY') : '-')
                 ->editColumn('created_at', fn($row) => $row->created_at ? Carbon::parse($row->created_at)->setTimezone('Asia/Jakarta')->isoFormat('D MMM YYYY') : '-')
                 ->editColumn('status_verifikasi', fn($row) => $row->status_verifikasi_badge)
                 ->addColumn('aksi', function ($row) {
                     $btnEdit = '';
-                    $btnDetail = '<button onclick="modalActionLomba(\'' . route('lomba.mhs.show_form', $row->lomba_id) . '\', \'Detail Lomba\', \'modalFormLombaUser\')" class="btn btn-sm btn-outline-info me-1" title="Detail"><i class="fas fa-eye"></i></button>';
+                    // [PERBAIKAN] Ganti 'lomba.mhs.show_form' menjadi 'lomba.mhs.show'
+                    $btnDetail = '<button onclick="modalActionLomba(\'' . route('lomba.mhs.show', $row->lomba_id) . '\', \'Detail Lomba\', \'modalFormLombaUser\')" class="btn btn-sm btn-outline-info me-1" title="Detail"><i class="fas fa-eye"></i></button>';
+                    
                     if ($row->status_verifikasi == 'ditolak' || $row->status_verifikasi == 'pending') {
                         $btnEdit = '<button onclick="modalActionLomba(\'' . route('lomba.mhs.edit_form', $row->lomba_id) . '\', \'Edit Pengajuan\', \'modalFormLombaUser\')" class="btn btn-sm btn-outline-warning"><i class="fas fa-edit"></i></button>';
                     }
@@ -683,7 +689,6 @@ class LombaController extends Controller
         }
         return abort(403);
     }
-
     /**
      * Menampilkan form AJAX untuk mahasiswa/dosen mengajukan lomba.
      */
@@ -1019,7 +1024,9 @@ class LombaController extends Controller
                 ->editColumn('status_verifikasi', fn($row) => $row->status_verifikasi_badge)
                 ->addColumn('aksi', function ($row) {
                     $btnEdit = '';
-                    $btnDetail = '<button onclick="modalActionLomba(\'' . route('lomba.dosen.show_form', $row->lomba_id) . '\', \'Detail Lomba\', \'modalFormLombaUser\')" class="btn btn-sm btn-outline-info me-1" title="Detail"><i class="fas fa-eye"></i></button>';
+                    // [PERBAIKAN KONSISTENSI] Ganti 'lomba.dosen.show_form' menjadi 'lomba.dosen.show'
+                    $btnDetail = '<button onclick="modalActionLomba(\'' . route('lomba.dosen.show', $row->lomba_id) . '\', \'Detail Lomba\', \'modalFormLombaUser\')" class="btn btn-sm btn-outline-info me-1" title="Detail"><i class="fas fa-eye"></i></button>';
+                    
                     if ($row->status_verifikasi == 'ditolak' || $row->status_verifikasi == 'pending') {
                         $btnEdit = '<button onclick="modalActionLomba(\'' . route('lomba.dosen.edit_form', $row->lomba_id) . '\', \'Edit Pengajuan\', \'modalFormLombaUser\')" class="btn btn-sm btn-outline-warning"><i class="fas fa-edit"></i></button>';
                     }
