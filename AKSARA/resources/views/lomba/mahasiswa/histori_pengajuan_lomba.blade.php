@@ -130,11 +130,11 @@
             columns: [
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', className: 'text-center', orderable: false, searchable: false },
                 { data: 'nama_lomba', name: 'nama_lomba' },
-                { data: 'penyelenggara', name: 'penyelenggara' },
+                { data: 'penyelenggara', name: 'penyelenggara', orderable: false, searchable: true },
                 { data: 'tingkat', name: 'tingkat', render: function(data, type, row) { return data.charAt(0).toUpperCase() + data.slice(1); } },
                 { data: 'batas_pendaftaran', name: 'batas_pendaftaran' },
                 { data: 'created_at', name: 'created_at' }, // Tanggal pengajuan
-                { data: 'status_verifikasi', name: 'status_verifikasi' },
+                { data: 'status_verifikasi', name: 'status_verifikasi', orderable: false, searchable: false },
                 { data: 'aksi', name: 'aksi', orderable: false, searchable: false }
             ]
         });

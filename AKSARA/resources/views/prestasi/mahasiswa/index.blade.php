@@ -145,13 +145,13 @@
             // ajax: "{{ route('prestasi.mahasiswa.list') }}", 
             columns: [
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', className: 'text-center', orderable: false, searchable: false },
-                { data: 'nama_prestasi', name: 'nama_prestasi' },
+                { data: 'nama_prestasi', name: 'nama_prestasi', orderable: false, searchable: true },
                 { data: 'bidang_nama', name: 'bidang_nama' },
                 { data: 'kategori', name: 'kategori' },
                 { data: 'tingkat', name: 'tingkat' },
                 { data: 'tahun', name: 'tahun' },
                 { data: 'dosen_pembimbing', name: 'dosen_pembimbing.nama', orderable: false, searchable: false }, 
-                { data: 'status_verifikasi', name: 'status_verifikasi' }, // Akan berisi HTML badge
+                { data: 'status_verifikasi', name: 'status_verifikasi', orderable: false, searchable: false }, // Akan berisi HTML badge
                 { data: 'aksi', name: 'aksi', orderable: false, searchable: false }
             ],
         });

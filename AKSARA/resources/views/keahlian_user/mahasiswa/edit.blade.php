@@ -82,10 +82,12 @@ $(document).ready(function() {
             },
             nama_sertifikat: {
                 required: true, 
+                maxlength: 5,
                 maxlength: 50
             },
             lembaga_sertifikasi: {
                 required: true,
+                minlength: 2,
                 maxlength: 50
             },
             tanggal_perolehan_sertifikat: {
@@ -106,8 +108,8 @@ $(document).ready(function() {
         messages: {
             // (Pesan error sama seperti form create)
             bidang_id: { required: "Bidang keahlian wajib dipilih." },
-            nama_sertifikat: { required: "Nama sertifikat wajib diisi.", maxlength: "Tidak boleh lebih dari 50 karakter." },
-            lembaga_sertifikasi: {  required: "Lembaga sertifikasi wajib diisi.", maxlength: "Tidak boleh lebih dari 50 karakter." },
+            nama_sertifikat: { required: "Nama sertifikat wajib diisi.", maxlength: "Tidak boleh lebih dari 50 karakter.", minlength: "Minimal 5 karakter."  },
+            lembaga_sertifikasi: {  required: "Lembaga sertifikasi wajib diisi.", maxlength: "Tidak boleh lebih dari 50 karakter.", , minlength: "Minimal 2 karakter." },
             tanggal_perolehan_sertifikat: { required: "Tanggal perolehan wajib diisi.", date: "Format tanggal tidak valid." },
             tanggal_kadaluarsa_sertifikat: { required: "Tanggal kedaluwarsa wajib diisi.", after_or_equal: "Tanggal kedaluwarsa harus sesudah tanggal perolehan." },
             sertifikasi: { extension: "Tipe file harus PDF, JPG, JPEG, atau PNG.", filesize: "Ukuran file maksimal adalah 2MB." }

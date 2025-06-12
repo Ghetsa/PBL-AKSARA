@@ -679,16 +679,17 @@ class PrestasiController extends Controller
                     ->addColumn('dosen', function ($row) {
                         return $row->dosen ? $row->dosen->user->nama : '-';
                     })
-                    ->editColumn('status_verifikasi', function ($row) {
-                        if ($row->status_verifikasi == 'pending') {
-                            return '<span class="badge bg-warning text-dark">Pending</span>';
-                        } elseif ($row->status_verifikasi == 'disetujui') {
-                            return '<span class="badge bg-success">Disetujui</span>';
-                        } elseif ($row->status_verifikasi == 'ditolak') {
-                            return '<span class="badge bg-danger">Ditolak</span>';
-                        }
-                        return '<span class="badge bg-secondary">' . ucfirst($row->status_verifikasi) . '</span>';
-                    })
+                    ->editColumn('status_verifikasi', fn($row) => $row->status_verifikasi_badge)
+                    // ->editColumn('status_verifikasi', function ($row) {
+                    //     if ($row->status_verifikasi == 'pending') {
+                    //         return '<span class="badge bg-warning text-dark">Pending</span>';
+                    //     } elseif ($row->status_verifikasi == 'disetujui') {
+                    //         return '<span class="badge bg-success">Disetujui</span>';
+                    //     } elseif ($row->status_verifikasi == 'ditolak') {
+                    //         return '<span class="badge bg-danger">Ditolak</span>';
+                    //     }
+                    //     return '<span class="badge bg-secondary">' . ucfirst($row->status_verifikasi) . '</span>';
+                    // })
                     ->addColumn('aksi', function ($row) {
                         $verifyUrl = route('prestasi.dosen.verify_form_ajax', $row->prestasi_id);
                         return '<button type="button" class="btn btn-primary btn-sm" onclick="modalAction(\'' . $verifyUrl . '\')"><i class="fas fa-clipboard-check"></i> Verifikasi</button>';
