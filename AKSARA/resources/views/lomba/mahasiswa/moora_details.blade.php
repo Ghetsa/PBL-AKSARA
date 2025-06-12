@@ -16,7 +16,7 @@
                         Setiap kriteria diberi bobot untuk menentukan tingkat kepentingannya. Kriteria dibagi menjadi dua jenis: <strong>Benefit</strong> (semakin besar nilainya semakin baik) dan <strong>Cost</strong> (semakin kecil nilainya semakin baik).
                     </p>
                     <div class="table-responsive">
-                        <table class="table table-bordered table-striped">
+                        <table class="table table-bordered table-striped table-hover dt-responsive wrap">
                             <thead>
                                 <tr>
                                     <th>Kode</th>
@@ -26,11 +26,13 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($globalData['weights'] as $key => $weight)
+                                @foreach ($globalData['criteria'] as $key)
+                                {{-- @foreach ($globalData['weights'] as $key => $weight) --}}
                                 <tr>
                                     <td><strong>C{{ $loop->iteration }}</strong></td>
                                     <td>{{ ucwords(str_replace('_', ' ', $key)) }}</td>
-                                    <td>{{ number_format($weight, 4) }}</td>
+                                    <td>{{ number_format($globalData['weights'][$key], 4) }}</td>
+                                    {{-- <td>{{ number_format($weight, 4) }}</td> --}}
                                     <td>
                                         @if (in_array($key, $globalData['benefit_criteria']))
                                             <span class="badge bg-success" >Benefit</span>
@@ -156,7 +158,7 @@
                         <table class="table table-bordered table-hover">
                              <thead>
                                 <tr>
-                                    <th>Peringkat</th>
+                                    <th style="text-center">Peringkat</th>
                                     <th>Nama Lomba</th>
                                     <th>Perhitungan Skor (Benefit - Cost)</th>
                                     <th>Skor Akhir (Y)</th>
@@ -182,7 +184,18 @@
                                         }
                                     @endphp
                                     <tr>
-                                        <td><span class="badge badge-primary" style="font-size: 1.2rem;">{{ $loop->iteration }}</span></td>
+                                        <td class="text-center align-middle">
+                                            @if ($loop->iteration == 1)
+                                                <span class="text-warning font-weight-bold" style="font-size: 1.2rem;">{{ $loop->iteration }}</span>
+                                            @elseif ($loop->iteration == 2)
+                                                <span class="text-success font-weight-bold" style="font-size: 1.2rem;">{{ $loop->iteration }}</span>
+                                            @elseif ($loop->iteration == 3)
+                                                <span class="text-info font-weight-bold" style="font-size: 1.2rem;">{{ $loop->iteration }}</span>
+                                            @else
+                                                <span class="text-secondary" style="font-size: 1.2rem;">{{ $loop->iteration }}</span>
+                                            @endif
+                                        </td>
+                                        {{-- <td class="text-center align-middle"><span class="text-success" style="font-size: 1.2rem;">{{ $loop->iteration }}</span></td> --}}
                                         <td><strong>{{ $result['lomba']->nama_lomba }}</strong></td>
                                         <td>
                                             ( {{ implode(' + ', $benefitCalc) }} )
