@@ -279,7 +279,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/histori-pengajuan/list', [LombaController::class, 'listHistoriPengajuanLombaDsn'])->name('histori.list');
             Route::get('/ajukan-lomba', [LombaController::class, 'createPengajuanLombaDsn'])->name('create_form');
             Route::post('/simpan-lomba', [LombaController::class, 'storeLombaDsn'])->name('store');
-            Route::get('/show-lomba-dsn/{id}', [LombaController::class, 'showLombaDsn'])->name('show_form');
+            Route::get('/show-lomba-dsn/{id}', [LombaController::class, 'showLombaDsn'])->name('show');
             Route::get('/edit-lomba-dsn/{id}', [LombaController::class, 'editLombaDsn'])->name('edit_form');
             Route::put('/update-lomba-dsn/{id}', [LombaController::class, 'updateLombaDsn'])->name('update_form');
         });
