@@ -1,5 +1,5 @@
 {{-- resources/views/bimbingan/verify_ajax.blade.php --}}
-<form id="formVerifikasiBimbingan" method="POST" action="{{ route( 'bimbingan.verify_process',$prestasi->prestasi_id) }}">
+<form id="formVerifikasiBimbingan" method="POST" action="{{ route('bimbingan.verify_process', $prestasi->prestasi_id) }}">
     @csrf
     @method('PUT')
 
@@ -11,65 +11,110 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
 
-    <div class="modal-body">
-        <h6>Detail Prestasi:</h6>
-        <table class="table table-sm table-bordered mb-3">
-            <tr>
-                <th style="width:30%;">Nama Mahasiswa</th>
-                <td>{{ $prestasi->mahasiswa->user->nama ?? 'N/A' }}</td>
-            </tr>
-            <tr>
-                <th>NIM</th>
-                <td>{{ $prestasi->mahasiswa->nim ?? 'N/A' }}</td>
-            </tr>
-            <tr>
-                <th>Prodi</th>
-                <td>{{ $prestasi->mahasiswa->prodi->nama ?? 'N/A' }}</td>
-            </tr>
-            <tr>
-                <th>Nama Prestasi</th>
-                <td>{{ $prestasi->nama_prestasi }}</td>
-            </tr>
-            <tr>
-                <th>Kategori</th>
-                <td>{{ ucfirst($prestasi->kategori) }}</td>
-            </tr>
-            <tr>
-                <th>Penyelenggara</th>
-                <td>{{ $prestasi->penyelenggara }}</td>
-            </tr>
-            <tr>
-                <th>Tingkat</th>
-                <td>{{ ucfirst($prestasi->tingkat) }}</td>
-            </tr>
-            <tr>
-                <th>Tahun</th>
-                <td>{{ $prestasi->tahun }}</td>
-            </tr>
-            <tr>
-                <th>Bukti</th>
-                <td>
-                    @if ($prestasi->file_bukti)
-                        <a href="{{ asset(Storage::url($prestasi->file_bukti)) }}" target="_blank"
-                            class="btn btn-info btn-sm">
-                            <i class="fas fa-file-alt"></i> Lihat Bukti
-                        </a>
-                    @else
-                        Tidak ada bukti.
-                    @endif
-                </td>
-            </tr>
-            <tr>
-                <th>Tgl Pengajuan</th>
-                <td>{{ $prestasi->created_at?->format('d M Y H:i') ?? '-' }}</td>
-            </tr>
-        </table>
+    <div class="modal-body p-lg-4" style="max-height: 68vh; overflow-y: auto;">
+        <div class="row g-3">
+
+            {{-- Informasi Mahasiswa --}}
+            <div class="col-12">
+                <div class="card w-100 h-100">
+                    <div class="card-header bg-white py-2">
+                        <h6 class="mb-0 fw-semibold">
+                            <i class="fas fa-user-graduate me-2 text-primary"></i>Informasi Mahasiswa
+                        </h6>
+                    </div>
+                    <div class="card-body py-2 px-3">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-4 text-muted"><i class="fas fa-user fa-fw me-2"></i>Nama</dt>
+                            <dd class="col-sm-8">{{ $prestasi->mahasiswa->user->nama ?? 'N/A' }}</dd>
+                            <dt class="col-sm-4 text-muted"><i class="fas fa-id-card fa-fw me-2"></i>NIM</dt>
+                            <dd class="col-sm-8">{{ $prestasi->mahasiswa->nim ?? 'N/A' }}</dd>
+                            <dt class="col-sm-4 text-muted"><i class="fas fa-graduation-cap fa-fw me-2"></i>Prodi</dt>
+                            <dd class="col-sm-8">{{ $prestasi->mahasiswa->prodi->nama ?? 'N/A' }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Detail Prestasi --}}
+            <div class="col-12">
+                <div class="card w-100 h-100">
+                    <div class="card-header bg-white py-2">
+                        <h6 class="mb-0 fw-semibold">
+                            <i class="fas fa-award me-2 text-primary"></i>Detail Prestasi
+                        </h6>
+                    </div>
+                    <div class="card-body py-2 px-3">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-4 text-muted"><i class="fas fa-medal fa-fw me-2"></i>Nama Prestasi</dt>
+                            <dd class="col-sm-8">{{ ucfirst($prestasi->nama_prestasi) }}</dd>
+                            <dt class="col-sm-4 text-muted"><i class="fas fa-swatchbook fa-fw me-2"></i>Kategori</dt>
+                            <dd class="col-sm-8">{{ ucfirst($prestasi->kategori) }}</dd>
+                            <dt class="col-sm-4 text-muted"><i class="fas fa-tags fa-fw me-2"></i>Bidang</dt>
+                            <dd class="col-sm-8">{{ ucfirst($prestasi->bidang->bidang_nama) }}</dd>
+                            <dt class="col-sm-4 text-muted"><i class="fas fa-signal fa-fw me-2"></i>Tingkat</dt>
+                            <dd class="col-sm-8">{{ ucfirst($prestasi->tingkat) }}</dd>
+                            <dt class="col-sm-4 text-muted"><i class="fas fa-calendar-alt fa-fw me-2"></i>Tahun</dt>
+                            <dd class="col-sm-8">{{ $prestasi->tahun }}</dd>
+                            <dt class="col-sm-4 text-muted"><i class="fas fa-university fa-fw me-2"></i>Penyelenggara
+                            </dt>
+                            <dd class="col-sm-8">{{ $prestasi->penyelenggara }}</dd>
+                            <dt class="col-sm-4 text-muted"><i class="fas fa-chalkboard-teacher fa-fw me-2"></i>Dosen
+                                Pembina</dt>
+                            <dd class="col-sm-8">{{ $prestasi->dosen->user->nama ?? 'Tidak ada' }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Bukti Prestasi --}}
+            <div class="col-12">
+                <div class="card w-100 h-100">
+                    <div class="card-header bg-white py-2">
+                        <h6 class="mb-0 fw-semibold">
+                            <i class="fas fa-file-alt me-2 text-primary"></i>Bukti Prestasi
+                        </h6>
+                    </div>
+                    <div class="card-body text-center p-3">
+                        @if ($prestasi->file_bukti && Storage::disk('public')->exists($prestasi->file_bukti))
+                            @php
+                                $filePath = $prestasi->file_bukti;
+                                $fileUrl = asset('storage/' . $filePath);
+                                $fileExtension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+                                $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
+                            @endphp
+
+                            @if (in_array($fileExtension, $imageExtensions))
+                                <a href="{{ $fileUrl }}" target="_blank" title="Klik untuk melihat gambar penuh">
+                                    <img src="{{ $fileUrl }}" alt="Bukti Prestasi"
+                                        class="img-fluid rounded border p-1"
+                                        style="width: 100%; max-height: 450px; object-fit: contain;">
+                                </a>
+                            @else
+                                <a href="{{ $fileUrl }}" target="_blank" class="btn btn-primary w-100">
+                                    <i class="fas fa-file-pdf me-2"></i>Lihat / Unduh Bukti
+                                    ({{ strtoupper($fileExtension) }})
+                                </a>
+                            @endif
+                        @else
+                            <div class="alert alert-warning mb-0">
+                                <i class="fas fa-exclamation-triangle me-1"></i> File bukti tidak ditemukan atau belum
+                                diunggah.
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </div>
 
     <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
     </div>
+    </div>
+    </div>
 </form>
+
 
 <script>
     $(document).ready(function() {

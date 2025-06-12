@@ -7,103 +7,153 @@
     {{-- Hidden input status --}}
     <input type="hidden" name="status_verifikasi" id="hidden_status_verifikasi" value="">
 
-    <div class="modal-header">
-        <h5 class="modal-title">Verifikasi Prestasi: {{ Str::limit($prestasi->nama_prestasi, 50) }}</h5>
+    <div class="modal-header bg-light">
+        <h5 class="modal-title"><i class="fas fa-trophy me-2"></i>Verifikasi Prestasi Mahasiswa:
+            {{ Str::limit($prestasi->nama_prestasi, 45) }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
 
-    <div class="modal-body">
-        {{-- Tabel detail prestasi --}}
-        <h6>Detail Pengajuan:</h6>
-        <table class="table table-sm table-bordered mb-3">
-            <tr>
-                <th style="width:30%;">Nama Mahasiswa</th>
-                <td>{{ $prestasi->mahasiswa->user->nama ?? 'N/A' }}</td>
-            </tr>
-            <tr>
-                <th>NIM</th>
-                <td>{{ $prestasi->mahasiswa->nim ?? 'N/A' }}</td>
-            </tr>
-            <tr>
-                <th>Prodi</th>
-                <td>{{ $prestasi->mahasiswa->prodi->nama ?? 'N/A' }}</td>
-            </tr>
-            <tr>
-                <th>Nama Prestasi</th>
-                <td>{{ $prestasi->nama_prestasi }}</td>
-            </tr>
-            <tr>
-                <th>Kategori</th>
-                <td>{{ ucfirst($prestasi->kategori) }}</td>
-            </tr>
-            <tr>
-                <th>Penyelenggara</th>
-                <td>{{ $prestasi->penyelenggara }}</td>
-            </tr>
-            <tr>
-                <th>Tingkat</th>
-                <td>{{ ucfirst($prestasi->tingkat) }}</td>
-            </tr>
-            <tr>
-                <th>Tahun</th>
-                <td>{{ $prestasi->tahun }}</td>
-            </tr>
-            <tr>
-                <th>Bukti</th>
-                <td>
-                    @if ($prestasi->file_bukti)
-                        <a href="{{ asset(Storage::url($prestasi->file_bukti)) }}" target="_blank"
-                            class="btn btn-info btn-sm">
-                            <i class="fas fa-file-alt"></i> Lihat Bukti
-                        </a>
-                    @else
-                        Tidak ada bukti.
-                    @endif
-                </td>
-            </tr>
-            <tr>
-                <th>Tgl Pengajuan</th>
-                <td>{{ $prestasi->created_at?->format('d M Y H:i') ?? '-' }}</td>
-            </tr>
-        </table>
+    <div class="modal-body p-lg-4" style="max-height: 68vh; overflow-y: auto;">
+        <div class="row">
+            {{-- Kolom Kiri: Detail Pengajuan --}}
+            <div class="col-12 col-lg-7 border-end-lg pe-lg-4">
+                <div class="card mb-3">
+                    <div class="card-header bg-white py-2">
+                        <h6 class="mb-0 fw-semibold"><i class="fas fa-user-graduate me-2 text-primary"></i>Informasi
+                            Mahasiswa</h6>
+                    </div>
+                    <div class="card-body py-2 px-3">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-5 text-muted"><i class="fas fa-user fa-fw me-2"></i>Nama</dt>
+                            <dd class="col-sm-7">{{ $prestasi->mahasiswa->user->nama ?? 'N/A' }}</dd>
+                            <dt class="col-sm-5 text-muted"><i class="fas fa-id-card fa-fw me-2"></i>NIM</dt>
+                            <dd class="col-sm-7">{{ $prestasi->mahasiswa->nim ?? 'N/A' }}</dd>
+                            <dt class="col-sm-5 text-muted"><i class="fas fa-graduation-cap fa-fw me-2"></i>Prodi</dt>
+                            <dd class="col-sm-7">{{ $prestasi->mahasiswa->prodi->nama ?? 'N/A' }}</dd>
+                        </dl>
+                    </div>
+                </div>
 
-        <hr>
-        <h6>Form Verifikasi:</h6>
+                {{-- Card Detail Prestasi --}}
+                <div class="card mb-3">
+                    <div class="card-header bg-white py-2">
+                        <h6 class="mb-0 fw-semibold"><i class="fas fa-award me-2 text-primary"></i>Detail Prestasi</h6>
+                    </div>
+                    <div class="card-body py-2 px-3">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-5 text-muted"><i class="fas fa-medal fa-fw me-2"></i>Nama Prestasi</dt>
+                            <dd class="col-sm-7">{{ ucfirst($prestasi->nama_prestasi) }}</dd>
+                            <dt class="col-sm-5 text-muted"><i class="fas fa-swatchbook fa-fw me-2"></i>Kategori</dt>
+                            <dd class="col-sm-7">{{ ucfirst($prestasi->kategori) }}</dd>
+                            <dt class="col-sm-5 text-muted"><i class="fas fa-tags fa-fw me-2"></i>Bidang</dt>
+                            <dd class="col-sm-7">{{ ucfirst($prestasi->bidang->bidang_nama) }}</dd>
+                            <dt class="col-sm-5 text-muted"><i class="fas fa-signal fa-fw me-2"></i>Tingkat</dt>
+                            <dd class="col-sm-7">{{ ucfirst($prestasi->tingkat) }}</dd>
+                            <dt class="col-sm-5 text-muted"><i class="fas fa-calendar-alt fa-fw me-2"></i>Tahun</dt>
+                            <dd class="col-sm-7">{{ $prestasi->tahun }}</dd>
+                            <dt class="col-sm-5 text-muted"><i class="fas fa-university fa-fw me-2"></i>Penyelenggara
+                            </dt>
+                            <dd class="col-sm-7">{{ $prestasi->penyelenggara }}</dd>
+                            <dt class="col-sm-5 text-muted"><i class="fas fa-chalkboard-teacher fa-fw me-2"></i>Dosen
+                                Pembina</dt>
+                            <dd class="col-sm-7">{{ $prestasi->dosen->user->nama ?? 'Tidak ada' }}</dd>
+                        </dl>
+                    </div>
+                </div>
 
-        {{-- Catatan --}}
-        <div class="form-group row mb-3">
-            <label for="verify_catatan_verifikasi" class="col-sm-3 col-form-label">Catatan Verifikasi</label>
-            <div class="col-sm-9">
-                <textarea class="form-control" id="verify_catatan_verifikasi" name="catatan_verifikasi" rows="3"
-                    placeholder="Berikan catatan jika prestasi ditolak...">{{ old('catatan_verifikasi', $prestasi->catatan_verifikasi) }}</textarea>
-                <small class="form-text text-muted">Catatan ini akan tampil jika prestasi ditolak.</small>
-                <span class="invalid-feedback error-text" id="error-catatan_verifikasi"></span>
+                {{-- Card Bukti Prestasi --}}
+                <div class="card mb-3">
+                    <div class="card-header bg-white py-2">
+                        <h6 class="mb-0 fw-semibold"><i class="fas fa-file-alt me-2 text-primary"></i>Bukti Prestasi
+                        </h6>
+                    </div>
+                    <div class="card-body text-center p-3">
+
+                        @if ($prestasi->file_bukti && Storage::disk('public')->exists($prestasi->file_bukti))
+                            @php
+                                $filePath = $prestasi->file_bukti;
+                                $fileUrl = asset('storage/' . $filePath);
+                                $fileExtension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+                                $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
+                            @endphp
+
+                            @if (in_array($fileExtension, $imageExtensions))
+                                <a href="{{ $fileUrl }}" target="_blank" title="Klik untuk melihat gambar penuh">
+                                    <img src="{{ $fileUrl }}" alt="Bukti Prestasi"
+                                        class="img-fluid rounded border p-1 w-100"
+                                        style="max-height: 450px; object-fit: contain;">
+                                </a>
+                            @else
+                                <a href="{{ $fileUrl }}" target="_blank" class="btn btn-primary w-100">
+                                    <i class="fas fa-file-pdf me-2"></i>Lihat / Unduh Bukti
+                                    ({{ strtoupper($fileExtension) }})
+                                </a>
+                            @endif
+                        @else
+                            <div class="alert alert-warning mb-0">
+                                <i class="fas fa-exclamation-triangle me-1"></i> File bukti tidak ditemukan atau belum
+                                diunggah.
+                            </div>
+                        @endif
+                        {{-- 
+                        @else
+                            <div class="alert alert-warning mb-0">
+                                <i class="fas fa-exclamation-triangle me-1"></i> File sertifikat tidak ditemukan atau belum diunggah.
+                            </div>
+                        @endif --}}
+                    </div>
+                </div>
+
             </div>
-        </div>
 
-        {{-- Tombol aksi --}}
-        <div class="form-group row mt-4">
-            <label class="col-sm-3 col-form-label">Aksi</label>
-            <div class="col-sm-9">
-                <button type="button" class="btn btn-success me-2 btn-verify-action" data-status="disetujui">
-                    <i class="fas fa-check-circle me-1"></i> Setujui Prestasi
-                </button>
-                <button type="button" class="btn btn-danger btn-verify-action" data-status="ditolak">
-                    <i class="fas fa-times-circle me-1"></i> Tolak Prestasi
-                </button>
-                @if ($prestasi->status_verifikasi !== 'pending')
-                    <button type="button" class="btn btn-warning ms-2 btn-verify-action" data-status="pending">
-                        <i class="fas fa-history me-1"></i> Kembalikan ke Pending
-                    </button>
-                @endif
+            {{-- Kolom Kanan: Panel Verifikasi --}}
+            <div class="col-12 col-lg-5 ps-lg-4 mt-4 mt-lg-0">
+                <div class="card shadow-sm">
+                    <div class="card-body p-3">
+                        <h6 class="fw-bold text-dark">Form Verifikasi</h6>
+                        <hr class="my-2">
+                        <div class="mb-3">
+                            <span class="fw-semibold">Status Saat Ini:</span>
+                            {!! $prestasi->status_verifikasi_badge !!}
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="catatan_verifikasi" class="form-label fw-semibold">Catatan Verifikasi:</label>
+                            <textarea class="form-control" id="catatan_verifikasi" name="catatan_verifikasi" rows="4"
+                                placeholder="Wajib diisi jika menolak pengajuan.">{{ old('catatan_verifikasi', $prestasi->catatan_verifikasi ?? '') }}</textarea>
+                            <span id="error-catatan_verifikasi" class="invalid-feedback"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label fw-semibold">Aksi:</label>
+                            <div class="d-grid gap-2">
+                                <button type="button" class="btn btn-success btn-verify-prestasi-action"
+                                    data-status="disetujui">
+                                    <i class="fas fa-check-circle me-2"></i>Setujui
+                                </button>
+                                <button type="button" class="btn btn-danger btn-verify-prestasi-action"
+                                    data-status="ditolak">
+                                    <i class="fas fa-times-circle me-2"></i>Tolak
+                                </button>
+                                @if ($prestasi->status_verifikasi != 'pending')
+                                    <button type="button" class="btn btn-warning btn-sm btn-verify-prestasi-action"
+                                        data-status="pending">
+                                        <i class="fas fa-history me-2"></i>Kembalikan ke Pending
+                                    </button>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Tutup</button>
     </div>
 </form>
+
 <script>
     $(document).ready(function() {
         const formVerifikasi = $('#formVerifikasiPrestasi');
