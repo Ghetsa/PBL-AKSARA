@@ -284,7 +284,7 @@ class UserController extends Controller
                 'password' => 'required|string|min:6',
                 'role' => 'required|in:admin,dosen,mahasiswa',
                 'status' => 'required|in:aktif,nonaktif',
-                'no_telepon' => 'nullable|string|max:15|regex:/^[0-9\-\+\(\)\s]*$/', // Validasi nomor telepon sederhana
+                'no_telepon' => 'nullable|string|min:7|max:15|regex:/^[0-9\-\+\(\)\s]*$/', // Validasi nomor telepon sederhana
                 'alamat' => 'nullable|string|max:100',
                 'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             ]);
@@ -299,16 +299,16 @@ class UserController extends Controller
 
             if ($request->role == 'dosen') {
                 $dosenRules = [
-                    'nip' => 'required|string|max:10',
+                    'nip' => 'required|string|min:10|max:16',
                 ];
                 $request->validate($dosenRules);
             } elseif ($request->role == 'admin') {
                 $request->validate([
-                    'nip' => 'required|string|max:10',
+                    'nip' => 'required|string|min:10:max:12',
                 ]);
             } elseif ($request->role == 'mahasiswa') {
                 $request->validate([
-                    'nim' => 'required|string|max:10|unique:mahasiswa,nim',
+                    'nim' => 'required|string|min:10|max:12|unique:mahasiswa,nim',
                     'prodi_id' => 'required|exists:program_studi,prodi_id',
                     'periode_id' => 'required|exists:periode,periode_id',
                 ]);
@@ -390,7 +390,7 @@ class UserController extends Controller
                 Rule::unique('users', 'email')->ignore($user->user_id, 'user_id')
             ],
             'password' => 'nullable|string|min:6', // Password opsional saat update
-            'no_telepon' => 'nullable|string|max:15|regex:/^[0-9\-\+\(\)\s]*$/',
+            'no_telepon' => 'nullable|string|min:7|max:15|regex:/^[0-9\-\+\(\)\s]*$/',
             'alamat' => 'nullable|string|max:100',
             'role' => 'required|in:admin,dosen,mahasiswa',
             'status' => 'required|in:aktif,nonaktif',
@@ -401,15 +401,15 @@ class UserController extends Controller
 
         if ($request->role === 'admin') {
             $roleRules = [
-                'nip' => ['required', 'string', 'max:50', Rule::unique('admin', 'nip')->ignore($user->admin->admin_id ?? null, 'admin_id')],
+                'nip' => ['required', 'string', 'max:16', Rule::unique('admin', 'nip')->ignore($user->admin->admin_id ?? null, 'admin_id')],
             ];
         } elseif ($request->role === 'dosen') {
             $roleRules = [
-                'nip' => ['required', 'string', 'max:50', Rule::unique('dosen', 'nip')->ignore($user->dosen->dosen_id ?? null, 'dosen_id')],
+                'nip' => ['required', 'string', 'max:16', Rule::unique('dosen', 'nip')->ignore($user->dosen->dosen_id ?? null, 'dosen_id')],
             ];
         } elseif ($request->role === 'mahasiswa') {
             $roleRules = [
-                'nim' => ['required', 'string', 'max:50', Rule::unique('mahasiswa', 'nim')->ignore($user->mahasiswa->mahasiswa_id ?? null, 'mahasiswa_id')],
+                'nim' => ['required', 'string', 'max:12', Rule::unique('mahasiswa', 'nim')->ignore($user->mahasiswa->mahasiswa_id ?? null, 'mahasiswa_id')],
                 'prodi_id' => 'required|exists:program_studi,prodi_id',
                 'periode_id' => 'required|exists:periode,periode_id'
             ];
