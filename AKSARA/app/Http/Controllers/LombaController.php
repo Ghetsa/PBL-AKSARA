@@ -166,9 +166,13 @@ class LombaController extends Controller
                 return DataTables::of(collect())->addIndexColumn()->rawColumns(['status_display', 'aksi', 'biaya_display'])->make(true);
             }
         } else {
-            if ($request->filled('search_nama')) {
-                $query->where('nama_lomba', 'like', '%' . $request->search_nama . '%');
+            if ($request->filled('tingkat_lomba_filter')) { // Jika filter ini tetap ada di view verifikasi
+                $query->where('tingkat', $request->tingkat_lomba_filter);
             }
+            if ($request->filled('kategori_lomba_filter')) {
+                $query->where('kategori', $request->kategori_lomba_filter);
+            }
+
             if ($request->filled('filter_status')) {
                 $status = strtolower($request->filter_status);
                 $today = Carbon::now('Asia/Jakarta')->startOfDay();
@@ -204,12 +208,12 @@ class LombaController extends Controller
             })
             ->editColumn('pembukaan_pendaftaran', function ($lomba) {
                 return $lomba->pembukaan_pendaftaran
-                    ? Carbon::parse($lomba->pembukaan_pendaftaran)->setTimezone('Asia/Jakarta')->isoFormat('D MMM YYYY')
+                    ? Carbon::parse($lomba->pembukaan_pendaftaran)->setTimezone('Asia/Jakarta')->isoFormat('D MMMM YYYY')
                     : 'N/A';
             })
             ->editColumn('batas_pendaftaran', function ($lomba) {
                 return $lomba->batas_pendaftaran
-                    ? Carbon::parse($lomba->batas_pendaftaran)->setTimezone('Asia/Jakarta')->isoFormat('D MMM YYYY')
+                    ? Carbon::parse($lomba->batas_pendaftaran)->setTimezone('Asia/Jakarta')->isoFormat('D MMMM YYYY')
                     : 'N/A';
             })
             ->addColumn('biaya_display', function ($lomba) { // Menggunakan nama kolom berbeda untuk display
