@@ -106,11 +106,11 @@
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', className: 'text-center', orderable: false, searchable: false },
                 { data: 'user_nama', name: 'user.nama' }, // Sesuaikan dengan alias di controller
                 { data: 'bidang_nama', name: 'bidang.bidang_nama' },
-                { data: 'nama_sertifikat', name: 'nama_sertifikat' },
+                { data: 'nama_sertifikat', name: 'nama_sertifikat', orderable: false, searchable: true },
                 { data: 'lembaga_sertifikasi', name: 'lembaga_sertifikasi' },
                 // { data: 'tanggal_perolehan_sertifikat', name: 'tanggal_perolehan_sertifikat' },
                 // { data: 'tanggal_kadaluarsa_sertifikat', name: 'tanggal_kadaluarsa_sertifikat' },
-                { data: 'status_verifikasi', name: 'status_verifikasi' },
+                { data: 'status_verifikasi', name: 'status_verifikasi', orderable: false, searchable: false },
                 { data: 'aksi', name: 'aksi', orderable: false, searchable: false }
             ]
         });

@@ -203,18 +203,18 @@
 
 {{-- Modal untuk Detail Lomba Publik --}}
 <div class="modal fade" id="modalDetailLombaPublik" tabindex="-1" aria-labelledby="modalDetailLombaPublikLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content"></div>
     </div>
 </div>
 <div class="modal fade" id="modalDetailHitungan" tabindex="-1" aria-labelledby="modalDetailHitunganLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content" id="modalDetailHitunganContent"></div>
     </div>
 </div>
 {{-- [KONTAINER MODAL BARU] Tempat untuk memuat konten detail perhitungan --}}
 <div class="modal fade" id="mooraDetailsModal" tabindex="-1" role="dialog" aria-labelledby="mooraDetailsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" role="document"> {{-- Menggunakan modal-xl untuk konten yang lebar --}}
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" role="document"> {{-- Menggunakan modal-xl untuk konten yang lebar --}}
         <div class="modal-content">
             {{-- Konten dari moora_details.blade.php akan dimuat di sini --}}
         </div>

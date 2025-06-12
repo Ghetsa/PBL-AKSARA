@@ -84,9 +84,9 @@
                         Normalisasi matriks dilakukan menggunakan rumus berikut:
                     </p>
 
-                    <div class="bg-light p-3 rounded">
+                    <div class="bg-light p-3 rounded mb-3 text-center">
                         \[
-                        r_{ij} = \frac{x_{ij}}{\sqrt{\sum_{i=1}^{m} x_{ij}^2}}
+                        \text{Pembagi}_j = \sqrt{\sum_{i=1}^{m} x_{ij}^2}
                         \]
                     </div>
 
@@ -94,10 +94,9 @@
                         Di mana:
                     </p>
                     <ul>
-                        <li>\( r_{ij} \): nilai ternormalisasi untuk alternatif ke-<em>i</em> dan kriteria ke-<em>j</em>
+                        <li><strong>\( x_{ij} \)</strong>: nilai alternatif ke-<em>i</em> pada kriteria ke-<em>j</em>
                         </li>
-                        <li>\( x_{ij} \): nilai asli untuk alternatif ke-<em>i</em> pada kriteria ke-<em>j</em></li>
-                        <li>\( m \): jumlah total alternatif</li>
+                        <li><strong>\( m \)</strong>: jumlah total alternatif</li>
                     </ul>
                     <strong>Nilai Pembagi:</strong>
                     <ul>
@@ -111,7 +110,7 @@
                     </p>
                     <div class="bg-light p-3 rounded mb-4">
                         \[
-                        r_{ij} = \frac{x_{ij}}{\text{Divisor}_j}
+                        r_{ij} = \frac{x_{ij}}{\text{Pembagi}_j}
                         \]
                     </div>
 

@@ -117,7 +117,7 @@
                 { data: 'nama_lomba_display', name: 'nama_lomba' }, // Menggunakan kolom gabungan
                 { data: 'diajukan_oleh', name: 'inputBy.nama', orderable: false, searchable: true }, // 'penginput.nama' untuk server-side search
                 { data: 'tingkat', name: 'tingkat', render: function(data, type, row) { return data.charAt(0).toUpperCase() + data.slice(1); } }, // Menggunakan kolom gabungan
-                { data: 'status_verifikasi', name: 'status_verifikasi' },
+                { data: 'status_verifikasi', orderable: false, name: 'status_verifikasi' },
                 { data: 'aksi', name: 'aksi', orderable: false, searchable: false }
             ],
             order: [[ 3, "desc" ]] // Default order by tanggal pengajuan (created_at)

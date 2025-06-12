@@ -301,7 +301,8 @@
             rules: {
                 nama: {
                     required: true,
-                    maxlength: 50
+                    maxlength: 50,
+                    lettersonly: true
                 },
                 email: {
                     required: true,
@@ -328,7 +329,8 @@
             messages: {
                 nama: {
                     required: "Nama lengkap tidak boleh kosong.",
-                    maxlength: "Nama tidak boleh lebih dari 50 karakter."
+                    maxlength: "Nama tidak boleh lebih dari 50 karakter.",
+                    lettersonly: "Nama hanya boleh berisi huruf."
                 },
                 email: {
                     required: "Email tidak boleh kosong.",

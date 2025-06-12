@@ -9,7 +9,7 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h3 class="card-title mb-0">{{ $breadcrumb->title ?? 'Informasi Lomba Terverifikasi' }}</h3>
                     @if(in_array(Auth::user()->role, ['mahasiswa', 'dosen']))
-                        <button class="btn btn-sm btn-success" onclick="modalActionLombaPublik('{{ route('lomba.create_form') }}', 'Ajukan Info Lomba Baru', 'modalFormLombaUserPublik')">
+                        <button class="btn btn-sm btn-success" onclick="modalActionLombaPublik('{{ route('lomba.dosen.create_form') }}', 'Ajukan Info Lomba Baru', 'modalFormLombaUserPublik')">
                             <i class="fas fa-plus-circle me-1"></i> Ajukan Info Lomba
                         </button>
                     @endif

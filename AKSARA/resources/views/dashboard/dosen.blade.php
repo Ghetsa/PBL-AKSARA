@@ -131,8 +131,9 @@
         <hr class="my-4">
 
         <div class="row">
-            <div class="col-12">
+            <div class="col-12 d-flex justify-content-between align-items-center">
                 <h4 class="mb-3">🏅 Prestasi Umum Mahasiswa</h4>
+                <a href="{{ route('prestasi.dosen.index') }}" class="btn btn-sm btn-secondary mb-3">Lihat Semua Prestasi</a>
             </div>
             @forelse ($prestasiKeseluruhan as $prestasi)
                 <div class="col-xl-4 col-md-6 mb-4">

@@ -17,62 +17,62 @@ use Carbon\CarbonPeriod;
 
 class LaporanController extends Controller
 {
-public function index()
-{
-    $breadcrumb = (object) [
-        'title' => 'Laporan & Analisis',
-        'list' => ['Prestasi Mahasiswa', 'Laporan & Analisis']
-    ];
-    $activeMenu = 'laporan_analisis';
+    public function index()
+    {
+        $breadcrumb = (object) [
+            'title' => 'Laporan & Analisis',
+            'list' => ['Prestasi Mahasiswa', 'Laporan & Analisis']
+        ];
+        $activeMenu = 'laporan_analisis';
 
-    // --- Data untuk filter di view ---
-    $tahunAkademikList = PrestasiModel::select('tahun')->distinct()->orderBy('tahun', 'desc')->pluck('tahun');
-    $kategoriLombaList = PrestasiModel::distinct()->pluck('kategori');
-    $tingkatKompetisiList = PrestasiModel::distinct()->pluck('tingkat');
+        // --- Data untuk filter di view ---
+        $tahunAkademikList = PrestasiModel::select('tahun')->distinct()->orderBy('tahun', 'desc')->pluck('tahun');
+        $kategoriLombaList = PrestasiModel::distinct()->pluck('kategori');
+        $tingkatKompetisiList = PrestasiModel::distinct()->pluck('tingkat');
 
-    // --- Statistik sederhana ---
-    $totalPrestasiDisetujui = PrestasiModel::where('status_verifikasi', 'disetujui')->count();
-    $totalLombaDisetujui = LombaModel::where('status_verifikasi', 'disetujui')->count();
-    $mahasiswaBerprestasiCount = PrestasiModel::where('status_verifikasi', 'disetujui')
-        ->distinct('mahasiswa_id')->count('mahasiswa_id');
+        // --- Statistik sederhana ---
+        $totalPrestasiDisetujui = PrestasiModel::where('status_verifikasi', 'disetujui')->count();
+        $totalLombaDisetujui = LombaModel::where('status_verifikasi', 'disetujui')->count();
+        $mahasiswaBerprestasiCount = PrestasiModel::where('status_verifikasi', 'disetujui')
+            ->distinct('mahasiswa_id')->count('mahasiswa_id');
 
-    // --- Data untuk Chart: Prestasi per Tahun ---
-    $prestasiPerTahun = PrestasiModel::where('status_verifikasi', 'disetujui')
-        ->select(DB::raw('tahun'), DB::raw('COUNT(*) as total'))
-        ->groupBy(DB::raw('tahun'))
-        ->orderBy(DB::raw('tahun'))
-        ->pluck('total', 'tahun');
+        // --- Data untuk Chart: Prestasi per Tahun ---
+        $prestasiPerTahun = PrestasiModel::where('status_verifikasi', 'disetujui')
+            ->select(DB::raw('tahun'), DB::raw('COUNT(*) as total'))
+            ->groupBy(DB::raw('tahun'))
+            ->orderBy(DB::raw('tahun'))
+            ->pluck('total', 'tahun');
 
-    // --- Data untuk Chart: Distribusi Lomba per Bulan (hanya bulan yang ada datanya) ---
-    $lombaPeriode = LombaModel::where('status_verifikasi', 'disetujui')
-        ->selectRaw("DATE_FORMAT(pembukaan_pendaftaran, '%Y-%m') as periode, COUNT(*) as total")
-        ->groupBy('periode')
-        ->orderBy('periode')
-        ->get();
+        // --- Data untuk Chart: Distribusi Lomba per Bulan (hanya bulan yang ada datanya) ---
+        $lombaPeriode = LombaModel::where('status_verifikasi', 'disetujui')
+            ->selectRaw("DATE_FORMAT(pembukaan_pendaftaran, '%Y-%m') as periode, COUNT(*) as total")
+            ->groupBy('periode')
+            ->orderBy('periode')
+            ->get();
 
-    $labelsBulan = [];
-    $dataBulan = [];
+        $labelsBulan = [];
+        $dataBulan = [];
 
-    foreach ($lombaPeriode as $row) {
-        $date = \Carbon\Carbon::createFromFormat('Y-m', $row->periode);
-        $labelsBulan[] = $date->format('M Y'); // Contoh: Jan 2025
-        $dataBulan[] = $row->total;
+        foreach ($lombaPeriode as $row) {
+            $date = \Carbon\Carbon::createFromFormat('Y-m', $row->periode);
+            $labelsBulan[] = $date->format('M Y'); // Contoh: Jan 2025
+            $dataBulan[] = $row->total;
+        }
+
+        return view('laporan.index', compact(
+            'breadcrumb',
+            'activeMenu',
+            'tahunAkademikList',
+            'kategoriLombaList',
+            'tingkatKompetisiList',
+            'totalPrestasiDisetujui',
+            'totalLombaDisetujui',
+            'mahasiswaBerprestasiCount',
+            'prestasiPerTahun',
+            'labelsBulan',
+            'dataBulan'
+        ));
     }
-
-    return view('laporan.index', compact(
-        'breadcrumb',
-        'activeMenu',
-        'tahunAkademikList',
-        'kategoriLombaList',
-        'tingkatKompetisiList',
-        'totalPrestasiDisetujui',
-        'totalLombaDisetujui',
-        'mahasiswaBerprestasiCount',
-        'prestasiPerTahun',
-        'labelsBulan',
-        'dataBulan'
-    ));
-}
 
 
 
@@ -100,6 +100,12 @@ public function index()
                 ->editColumn('tahun', function ($row) {
                     return Carbon::parse($row->tahun)->isoFormat('D MMM YYYY');
                 })
+                ->editColumn('kategori', function ($row) {
+                    return ucfirst($row->kategori);
+                })
+                ->editColumn('tingkat', function ($row) {
+                    return ucfirst($row->tingkat);
+                })
                 ->rawColumns(['mahasiswa'])
                 ->make(true);
         }
@@ -126,7 +132,13 @@ public function index()
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->editColumn('batas_pendaftaran', function ($row) {
-                    return Carbon::parse($row->batas_pendaftaran)->isoFormat('D MMM YYYY');
+                    return Carbon::parse($row->batas_pendaftaran)->isoFormat('D MMMM YYYY');
+                })
+                ->editColumn('kategori', function ($row) {
+                    return ucfirst($row->kategori);
+                })
+                ->editColumn('tingkat', function ($row) {
+                    return ucfirst($row->tingkat);
                 })
                 ->make(true);
         }

@@ -84,7 +84,7 @@
 <body>
   <table class="border-bottom-header">
     <tr>
-      <td width="15%" class="text-center"><img src="{{ asset('logo/polinema-bw.png') }}" width="100%"></td>
+      <td width="15%" class="text-center"><img src="{{ public_path('polinema-bw.jpeg') }}" class="image" width="100%"></td>
       <td width="100%">
         <span class="text-center d-block font-12 font-bold">KEMENTERIAN PENDIDIKAN, KEBUDAYAAN, RISET, DAN
           TEKNOLOGI</span>
@@ -110,7 +110,6 @@
         <th class="text-center font-12">Tingkat</th>
         <th class="text-center font-12">Tahun</th>
         <th class="text-center font-12">Dosen Pembimbing</th>
-        <th class="text-center font-12">Status</th>
       </tr>
     </thead>
     <tbody>
@@ -125,7 +124,6 @@
       <td class="font-12">{{ ucfirst($item->tingkat) }}</td>
       <td class="font-12">{{ $item->tahun }}</td>
       <td class="font-12">{{ $item->dosen->user->nama ?? '-' }}</td>
-      <td class="font-12">{{ ucfirst($item->status_verifikasi) }}</td>
       </tr>
     @endforeach
     </tbody>
