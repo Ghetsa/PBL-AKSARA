@@ -194,7 +194,7 @@
                             <h5 class="card-title text-primary font-weight-bold text-uppercase mb-1" style="font-size: 1.1rem;">{{ Str::limit($lomba->nama_lomba, 45) }}</h5>
                             <div class="text-xs mb-1">Penyelenggara: {{ $lomba->penyelenggara }}</div>
                             <div class="text-xs mb-2">Batas Daftar: <span class="font-weight-bold">{{ $lomba->batas_pendaftaran ? \Carbon\Carbon::parse($lomba->batas_pendaftaran)->isoFormat('D MMM YY') : 'N/A' }}</span></div>
-                            <a href="#" onclick="modalAction('{{ route('admin.lomba.crud.edit_form_ajax', $lomba->lomba_id) }}', 'Detail Lomba', 'modalForm')" class="btn btn-primary btn-sm mt-2">Lihat Detail</a>
+                            <a href="#" onclick="modalAction('{{ route('lomba.publik.show_ajax', $lomba->lomba_id) }}', 'Detail Lomba', 'modalForm')" class="btn btn-primary btn-sm mt-2">Lihat Detail</a>
                         </div>
                     </div>
                 </div>
@@ -223,7 +223,7 @@
                             <div class="text-xs mb-1">Diraih oleh: <strong>{{ $prestasi->mahasiswa->user->nama ?? 'N/A' }}</strong></div>
                             <div class="text-xs mb-1">Penyelenggara: {{ $prestasi->penyelenggara }}</div>
                             <div class="text-xs mb-1">Tingkat: {{ ucfirst($prestasi->tingkat) }}</div>
-                            <a href="#" onclick="modalAction('{{ route('prestasi.admin.verify_form_ajax', $prestasi->prestasi_id) }}', 'Verifikasi Prestasi', 'modalForm')" class="btn btn-success btn-sm mt-2">Lihat Detail</a>
+                            <a href="#" onclick="modalAction('{{ route('prestasi.publik.show_ajax', $prestasi->prestasi_id) }}', 'Verifikasi Prestasi', 'modalForm')" class="btn btn-success btn-sm mt-2">Lihat Detail</a>
                         </div>
                     </div>
                 </div>

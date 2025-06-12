@@ -119,40 +119,6 @@
                                         </div>
                                     @endif
 
-
-                                    {{-- Card untuk Keahlian --}}
-                                    {{-- @if($user->role == 'dosen' || $user->role == 'mahasiswa')
-                                    <div class="card mt-3">
-                                        <div class="card-header d-flex justify-content-between align-items-center">
-                                            <h4>Keahlian</h4>
-                                        </div>
-                                        @if($user->keahlian && $user->keahlian->count() > 0)
-                                        <div class="card-body">
-                                            @foreach($user->keahlian as $k)
-                                            <div class="mb-2 pb-2 @if(!$loop->last) border-bottom @endif">
-                                                <p class="mb-0 text-lg fw-bold">{{ $k->keahlian_nama }}</p>
-                                                @if($k->sertifikasi && Storage::disk('public')->exists($k->sertifikasi))
-                                                <small class="text-muted d-block">
-                                                    Sertifikasi: <a href="{{ Storage::url($k->sertifikasi) }}"
-                                                        target="_blank" class="btn btn-link btn-sm p-0">Lihat File</a>
-                                                </small>
-                                                @elseif($k->sertifikasi)
-                                                <small class="text-info d-block">Sertifikasi: {{ $k->sertifikasi }}
-                                                    (Catatan)</small>
-                                                @else
-                                                <!-- <small class="text-muted d-block">Sertifikasi: Tidak ada.</small> -->
-                                                @endif
-                                            </div>
-                                            @endforeach
-                                        </div>
-                                        @else
-                                        <div class="card-body">
-                                            <p class="mb-0 text-muted">Belum ada keahlian yang ditambahkan.</p>
-                                        </div>
-                                        @endif
-                                    </div>
-                                    @endif --}}
-
                                 </div>
 
                                 <div class="col-lg-8 col-xxl-9">
