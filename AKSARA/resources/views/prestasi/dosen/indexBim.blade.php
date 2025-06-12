@@ -38,7 +38,7 @@
                         </form>
 
                         <div class="table-responsive">
-                            <table class="table table-bordered table-hover" id="dataDaftarPrestasiDosen"
+                            <table class="table table-bordered table-hover dt-responsive wrap" id="dataDaftarPrestasiDosen"
                                 style="width:100%;">
                                 <thead>
                                     <tr>
@@ -108,6 +108,7 @@
             dataDaftarPrestasiDosen = $('#dataDaftarPrestasiDosen').DataTable({
                 processing: true,
                 serverSide: true,
+                responsive: true,
                 ajax: {
                     url: "{{ route('bimbingan.list') }}",
                     data: function(d) { // Mengirim data filter
@@ -163,9 +164,6 @@
                         searchable: false
                     }
                 ],
-                language: {
-                    url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/id.json"
-                }
             });
 
             // Submit form filter akan me-reload datatable

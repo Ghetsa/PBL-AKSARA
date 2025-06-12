@@ -17,28 +17,10 @@
                                     name="search_nama" placeholder="Cari Nama Prestasi/Mahasiswa/NIM..."
                                     value="{{ request('search_nama') }}">
                             </div>
-                            {{-- <div class="col-md-3">
-                                <select class="form-select form-select-sm" id="filter_status_dosen" name="filter_status">
-                                    <option value="">-- Semua Status --</option>
-                                    <option value="pending" {{ request('filter_status') == 'pending' ? 'selected' : '' }}>
-                                        Pending</option>
-                                    <option value="disetujui"
-                                        {{ request('filter_status') == 'disetujui' ? 'selected' : '' }}>Disetujui</option>
-                                    <option value="ditolak" {{ request('filter_status') == 'ditolak' ? 'selected' : '' }}>
-                                        Ditolak</option>
-                                </select>
-                            </div>
-                            <div class="col-md-2">
-                                <button type="submit" class="btn btn-primary btn-sm w-100">Filter</button>
-                            </div>
-                            <div class="col-md-2">
-                                <a href="{{ route('prestasi.dosen.index') }}"
-                                    class="btn btn-secondary btn-sm w-100">Reset</a>
-                            </div> --}}
                         </form>
 
                         <div class="table-responsive">
-                            <table class="table table-bordered table-hover" id="dataDaftarPrestasiDosen"
+                            <table class="table table-bordered table-hover dt-responsive wrap" id="dataDaftarPrestasiDosen"
                                 style="width:100%;">
                                 <thead>
                                     <tr>
@@ -106,6 +88,7 @@
             dataDaftarPrestasiDosen = $('#dataDaftarPrestasiDosen').DataTable({
                 processing: true,
                 serverSide: true,
+                responsive: true,
                 ajax: {
                     url: "{{ route('prestasi.dosen.list') }}",
                     data: function(d) { // Mengirim data filter
