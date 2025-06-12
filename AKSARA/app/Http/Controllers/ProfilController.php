@@ -19,31 +19,59 @@ use Illuminate\Validation\Rules\Password;
 
 class ProfilController extends Controller
 {
-    // ... (method index() dan edit_ajax() tetap sama seperti jawaban sebelumnya) ...
+    /**
+     * Menampilkan halaman profil utama pengguna.
+     * Keahlian dan Prestasi yang ditampilkan di sini sudah difilter
+     * dan hanya yang berstatus 'disetujui'.
+     */
     public function index()
     {
         $activeMenu = "profil";
         $breadcrumb = (object) [
-            'title' => 'Profil pengguna',
+            'title' => 'Profil Pengguna',
             'list' => ['Dashboard', 'Profil Saya']
         ];
 
         $user = Auth::user();
-        $relationsToLoad = ['pengalaman'];
+        
+        $relationsToLoad = [
+            'pengalaman'
+        ];
 
         if ($user->role === 'dosen') {
-            $relationsToLoad = array_merge($relationsToLoad, ['dosen', 'keahlian', 'minat']);
+            $relationsToLoad = array_merge($relationsToLoad, ['dosen', 'minat']);
+            
+            // PERBAIKAN: Menyamakan nama relasi ke 'keahlianUser' untuk konsistensi
+            $relationsToLoad['keahlianUser'] = function ($query) {
+                $query->where('status_verifikasi', 'disetujui')->with('bidang');
+            };
+
         } elseif ($user->role === 'mahasiswa') {
-            $relationsToLoad = array_merge($relationsToLoad, [
-                'mahasiswa.prodi',
-                'mahasiswa.periode',
-                'mahasiswa.prestasi',
-                'keahlian',
-                'minat'
-            ]);
+            $relationsToLoad[] = 'minat';
+            
+            // --- PERBAIKAN FINAL: Filter Relasi yang Benar ---
+            // Nama relasi diubah dari 'keahlian' menjadi 'keahlianUser' agar cocok dengan view.
+            // Filter 'where' diterapkan pada relasi KeahlianUserModel.
+            // Ditambahkan with('bidang') untuk optimasi query di view (mencegah N+1 problem).
+            $relationsToLoad['keahlianUser'] = function ($query) {
+                $query->where('status_verifikasi', 'disetujui')->with('bidang');
+            };
+
+            // Filter untuk 'prestasi' sudah bekerja dengan baik dan dipertahankan
+            $relationsToLoad['mahasiswa'] = function ($query) {
+                $query->with([
+                    'prodi', 
+                    'periode', 
+                    'prestasi' => function ($prestasiQuery) {
+                        $prestasiQuery->where('status_verifikasi', 'disetujui');
+                    }
+                ]);
+            };
+
         } elseif ($user->role === 'admin') {
             $relationsToLoad[] = 'admin';
         }
+
         if (!empty($relationsToLoad)) {
             $user->load($relationsToLoad);
         }
@@ -51,6 +79,10 @@ class ProfilController extends Controller
         return view('profil.index', compact('user', 'activeMenu', 'breadcrumb'));
     }
 
+    /**
+     * Menampilkan data untuk form edit profil via AJAX.
+     * (Tidak ada perubahan di method ini)
+     */
     public function edit_ajax()
     {
         $user = Auth::user()->load([
@@ -59,14 +91,12 @@ class ProfilController extends Controller
             'dosen',
             'admin',
             'keahlian',
-            'minat',        // Ensure this is loaded for interests
-            'pengalaman',   // Ensure this is loaded for experience
+            'minat',
+            'pengalaman',
         ]);
 
-        // Retrieve all bidangs (fields)
         $allBidangOptions = BidangModel::orderBy('bidang_nama')->get();
 
-        // Collect user data for keahlian (skills) and minat (interests)
         $userKeahlian = $user->keahlian->mapWithKeys(function ($bidang) {
             return [$bidang->bidang_id => [
                 'nama' => $bidang->bidang_nama,
@@ -101,13 +131,16 @@ class ProfilController extends Controller
     }
 
 
+    /**
+     * Mengupdate data profil via AJAX.
+     * (Tidak ada perubahan di method ini)
+     */
     public function update_ajax(Request $request)
     {
         $user = Auth::user();
         DB::beginTransaction();
 
         try {
-            // Aturan validasi
             $validationRules = [
                 'nama' => 'sometimes|string|max:50',
                 'email' => [
@@ -116,7 +149,7 @@ class ProfilController extends Controller
                     'max:255',
                     Rule::unique('users', 'email')->ignore($user->user_id, 'user_id'),
                 ],
-                'no_telepon' => 'nullable|string|max:15|regex:/^[0-9\-\+\(\)\s]*$/', // Validasi nomor telepon sederhana
+                'no_telepon' => 'nullable|string|max:15|regex:/^[0-9\-\+\(\)\s]*$/',
                 'alamat' => 'nullable|string|max:100',
                 'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'minat_pilihan' => 'nullable|array',
@@ -132,7 +165,6 @@ class ProfilController extends Controller
                 return response()->json(['success' => false, 'message' => 'Validasi gagal.', 'errors' => $validator->errors()], 422);
             }
 
-            // Update data dasar (nama dan email)
             $userData = [];
             if ($request->filled('nama')) {
                 $userData['nama'] = $request->nama;
@@ -147,7 +179,6 @@ class ProfilController extends Controller
                 $userData['alamat'] = $request->alamat;
             }
 
-            // Update foto profil
             if ($request->hasFile('foto')) {
                 if ($user->foto && Storage::disk('public')->exists($user->foto)) {
                     Storage::disk('public')->delete($user->foto);
@@ -158,12 +189,10 @@ class ProfilController extends Controller
                 $userData['foto'] = $path;
             }
 
-            // Simpan data dasar jika ada yang berubah
             if (!empty($userData)) {
                 $user->update($userData);
             }
 
-            // Handle Minat - Perbarui atau buat baru jika ada perubahan
             $selectedBidangIdsForMinat = $request->input('minat_pilihan', []);
             $minatLevels = $request->input('minat_level', []);
             $dataToSyncMinat = [];
@@ -172,10 +201,8 @@ class ProfilController extends Controller
                 $dataToSyncMinat[$bidangId] = ['level' => $minatLevels[$bidangId] ?? 'minat'];
             }
 
-            // Update minat dengan sync (mengupdate data yang sudah ada tanpa menghapus yang tidak berubah)
             $user->minat()->sync($dataToSyncMinat);
 
-            // Handle Pengalaman - Perbarui atau buat baru jika ada perubahan
             if ($request->has('pengalaman_items') && is_array($request->input('pengalaman_items'))) {
                 foreach ($request->pengalaman_items as $item) {
                     if (!empty($item['pengalaman_nama'])) {
@@ -184,17 +211,14 @@ class ProfilController extends Controller
                             'pengalaman_nama' => $item['pengalaman_nama'],
                             'pengalaman_kategori' => $item['pengalaman_kategori'] ?? null,
                         ];
-
-                        // Update atau buat pengalaman baru jika tidak ada pengalaman dengan ID yang sama
                         PengalamanModel::updateOrCreate(
-                            ['user_id' => $user->user_id, 'pengalaman_nama' => $item['pengalaman_nama']], // Kondisi pencarian berdasarkan nama pengalaman
+                            ['user_id' => $user->user_id, 'pengalaman_nama' => $item['pengalaman_nama']],
                             $pengalamanData
                         );
                     }
                 }
             }
 
-            // Commit transaction
             DB::commit();
 
             return response()->json(['success' => true, 'message' => 'Profil berhasil diperbarui.', 'redirect' => route('profile.index')]);
@@ -209,11 +233,19 @@ class ProfilController extends Controller
     }
 
 
+    /**
+     * Menampilkan form ganti password.
+     * (Tidak ada perubahan di method ini)
+     */
     public function showChangePasswordFormAjax()
     {
         return view('profil.change_password');
     }
 
+    /**
+     * Mengupdate password pengguna.
+     * (Tidak ada perubahan di method ini)
+     */
     public function updatePasswordAjax(Request $request)
     {
         $user = Auth::user();
@@ -227,19 +259,19 @@ class ProfilController extends Controller
             'new_password' => [
                 'required',
                 'string',
-                Password::min(6) // Minimal 6 karakter
-                    ->mixedCase()    // Harus ada huruf besar dan kecil
-                    ->numbers()      // Harus ada angka
-                    ->symbols(),     // Harus ada simbol
+                Password::min(6)
+                    ->mixedCase()
+                    ->numbers()
+                    ->symbols(),
                 'confirmed'
             ],
         ], [
             'current_password.required' => 'Password lama wajib diisi.',
             'new_password.required' => 'Password baru wajib diisi.',
-            'new_password.min' => 'Password baru minimal  karakter.',
+            'new_password.min' => 'Password baru minimal 6 karakter.',
             'new_password.confirmed' => 'Konfirmasi password baru tidak cocok.',
             'new_password.mixed_case' => 'Password baru harus mengandung setidaknya satu huruf besar dan satu huruf kecil.',
-            'new_password.numbers' => 'Password baru harus mengandung setidakny6a satu angka.',
+            'new_password.numbers' => 'Password baru harus mengandung setidaknya satu angka.',
             'new_password.symbols' => 'Password baru harus mengandung setidaknya satu simbol (contoh: !@#$%^&*).',
         ]);
 
@@ -251,11 +283,9 @@ class ProfilController extends Controller
             $user->password = Hash::make($request->new_password);
             $user->save();
 
-            // Opsional: Logout user dari session lain jika diinginkan setelah ganti password
-            // Auth::logoutOtherDevices($request->current_password);
-
             return response()->json(['success' => true, 'message' => 'Password berhasil diperbarui.']);
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Error update password AJAX: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
             return response()->json(['success' => false, 'message' => 'Gagal memperbarui password. Terjadi kesalahan server.'], 500);
         }
