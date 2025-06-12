@@ -227,7 +227,7 @@
         });
     }
     </script>
-    
+    @include('layouts.script')
     @yield('page-js')
 </body>
 </html>

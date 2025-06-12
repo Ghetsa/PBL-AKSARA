@@ -125,7 +125,7 @@
                         <i class="ti ti-brand-chrome"></i>
                     </li>
                     <li class="pc-item">
-                        <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="pc-link dropdown-item">
+                        <a href="#" onclick="confirmLogout(event)" class="pc-link">
                             <span class="pc-micon"><i class="ti ti-logout"></i></span>
                             <span class="pc-mtext">Logout</span>
                         </a>
@@ -232,7 +232,7 @@
                         <i class="ti ti-brand-chrome"></i>
                     </li>
                     <li class="pc-item">
-                        <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="pc-link dropdown-item">
+                        <a href="#" onclick="confirmLogout(event)" class="pc-link">
                             <span class="pc-micon"><i class="ti ti-logout"></i></span>
                             <span class="pc-mtext">Logout</span>
                         </a>
@@ -292,7 +292,7 @@
                         <i class="ti ti-brand-chrome"></i>
                     </li>
                     <li class="pc-item">
-                        <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="pc-link dropdown-item">
+                        <a href="#" onclick="confirmLogout(event)" class="pc-link">
                             <span class="pc-micon"><i class="ti ti-logout"></i></span>
                             <span class="pc-mtext">Logout</span>
                         </a>

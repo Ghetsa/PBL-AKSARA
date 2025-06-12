@@ -227,10 +227,9 @@
               <i class="ti ti-key"></i>
               <span>Ubah Password</span>
             </a>
-            <a href="{{ route('logout') }}"
-              onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="dropdown-item">
-              <i class="ti ti-power text-danger me-2"></i>
-              <span class="text-danger">Logout</span>
+            <a href="#" onclick="confirmLogout(event)" class="dropdown-item">
+                <i class="ti ti-power text-danger me-2"></i>
+                <span class="text-danger">Logout</span>
             </a>
             <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
               @csrf
