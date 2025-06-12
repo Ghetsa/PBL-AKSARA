@@ -22,10 +22,13 @@
     <link rel="stylesheet" href="{{ asset('mantis/dist/assets/fonts/material.css') }}">
     <link rel="stylesheet" href="{{ asset('mantis/dist/assets/css/style.css') }}" id="main-style-link">
     <link rel="stylesheet" href="{{ asset('mantis/dist/assets/css/style-preset.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+
       <!-- DataTables -->
     <link rel="stylesheet" href="{{ asset('mantis/dist/assets/css/plugins/dataTables.bootstrap5.min.css') }}">
     <link rel="stylesheet" href="{{ asset('mantis/dist/assets/css/plugins/responsive.bootstrap5.min.css') }}">
     <link rel="stylesheet" href="{{ asset('mantis/dist/assets/css/plugins/buttons.bootstrap5.min.css') }}">
+
 
     <script>
         // Variabel global untuk base path aset dari direktori public Laravel
@@ -106,6 +109,26 @@
     {{-- Optional: SweetAlert2 untuk notifikasi yang lebih baik --}}
     {{-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> --}}
     <script src="{{ asset('mantis/dist/assets/js/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Fungsi ini akan dijalankan saat halaman pertama kali dimuat
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '\\[', right: '\\]', display: true},
+                    {left: '\\(', right: '\\)', display: false}
+                ]
+            });
+
+            // Karena Anda memuat konten modal secara dinamis (AJAX),
+            // kita perlu memanggil render ulang setiap kali modal berhasil dimuat.
+            // Kita akan memodifikasi fungsi AJAX yang memuat detail perhitungan.
+        });
+    </script>
 
     <script>
         // Untuk mengirimkan token Laravel CSRF pada setiap request ajax

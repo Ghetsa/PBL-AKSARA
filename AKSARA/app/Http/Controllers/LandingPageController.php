@@ -15,7 +15,6 @@ class LandingPageController extends Controller
         $lombas = LombaModel::where('status_verifikasi', 'disetujui')
             ->whereNotNull('poster')
             ->orderBy('created_at', 'desc') // Tampilkan yang terbaru
-            ->take(6) // Ambil misalnya 6 lomba
             ->get();
 
         // Filter untuk memastikan file poster benar-benar ada di storage
@@ -32,7 +31,6 @@ class LandingPageController extends Controller
         // Ambil data prestasi terbaru yang sudah disetujui/valid
         $prestasiTerbaru = PrestasiModel::where('status_verifikasi', 'disetujui') // Sesuaikan dengan status verifikasi prestasi Anda
             ->orderBy('tahun', 'desc') // Atau field tanggal yang relevan
-            ->take(6)
             ->get();
 
         // Jika Anda punya layout berbeda untuk landing page dan area login,
