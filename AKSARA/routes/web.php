@@ -317,7 +317,7 @@ Route::middleware(['auth'])->group(function () {
         Route::prefix('bimbingan')->name('bimbingan.')->group(function () {
             Route::get('/', [PrestasiController::class, 'indexDosBim'])->name('index');
             Route::get('/list', [PrestasiController::class, 'listDosBim'])->name('list');
-            Route::get('/{prestasi}/verify-form-ajax', [BimbinganController::class, 'showVerifyForm'])->name('verify_form');
+            Route::get('/{prestasi}/verify-form-ajax', [PrestasiController::class, 'showVerifyForm'])->name('verify_form');
             Route::post('/{prestasi}/verify-process-ajax', [PrestasiController::class, 'processVerificationAjaxDosen'])->name('verify_process');
             Route::get('/{prestasi}/show-ajax', [PrestasiController::class, 'showDosen'])->name('show');
         });
