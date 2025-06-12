@@ -592,9 +592,9 @@ class PrestasiController extends Controller
                 })
                 ->addColumn('aksi', function ($row) {
                     $detailbtn = route('bimbingan.show', $row->prestasi_id);
-                    return '<button type="button" class="btn btn-sm btn-info me-1" onclick="modalAction(\'' . $detailbtn . '\')">
-                        <i class="fas fa-eye"></i> Detail
-                    </button>';
+                    return '<button type="button" class="btn btn-sm btn-outline-primary" onclick="modalAction(\'' . $detailbtn . '\')">
+                <i class="fas fa-eye"></i>
+            </button>';
                 })
                 ->rawColumns(['status_verifikasi', 'aksi'])
                 ->make(true);
@@ -645,8 +645,16 @@ class PrestasiController extends Controller
                             });
                     });
                 }
-                if ($request->filled('filter_status') && in_array($request->filter_status, ['pending', 'disetujui', 'ditolak'])) {
-                    $data->where('status_verifikasi', $request->filter_status);
+                if ($request->filled('status_verifikasi')) {
+                    $data->where('status_verifikasi', $request->status_verifikasi);
+                }
+
+                if ($request->filled('tingkat')) {
+                    $data->where('tingkat', $request->tingkat);
+                }
+
+                if ($request->filled('kategori')) {
+                    $data->where('kategori', $request->kategori);
                 }
 
                 return DataTables::of($data)
@@ -678,7 +686,7 @@ class PrestasiController extends Controller
                     })
                     ->addColumn('aksi', function ($row) {
                         $verifyUrl = route('prestasi.dosen.verify_form_ajax', $row->prestasi_id);
-                        return '<button type="button" class="btn btn-info btn-sm" onclick="modalAction(\'' . $verifyUrl . '\')"><i class="fas fa-search-plus"></i> Verifikasi</button>';
+                        return '<button type="button" class="btn btn-primary btn-sm" onclick="modalAction(\'' . $verifyUrl . '\')"><i class="fas fa-clipboard-check"></i> Verifikasi</button>';
                     })
                     ->rawColumns(['status_verifikasi', 'aksi'])
                     ->make(true);
