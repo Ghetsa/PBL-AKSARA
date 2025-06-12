@@ -15,10 +15,9 @@ class LandingPageController extends Controller
         $lombas = LombaModel::where('status_verifikasi', 'disetujui')
             ->whereNotNull('poster')
             ->orderBy('created_at', 'desc') // Tampilkan yang terbaru
+            ->take(6) // Ambil hanya 6 lomba
             ->get();
 
-        // Filter untuk memastikan file poster benar-benar ada di storage
-        // Ini penting agar tidak ada broken image di frontend
         $lombasDenganPosterValid = $lombas->filter(function ($lomba) {
             return $lomba->poster && Storage::disk('public')->exists($lomba->poster);
         });
@@ -33,10 +32,6 @@ class LandingPageController extends Controller
             ->orderBy('tahun', 'desc') // Atau field tanggal yang relevan
             ->get();
 
-        // Jika Anda punya layout berbeda untuk landing page dan area login,
-        // pastikan nama view yang dipanggil benar.
         return view('landing-page', ['lombas' => $lombasDenganPosterValid], compact('breadcrumb', 'prestasiTerbaru'));
-        // Jika file blade Anda bernama welcome.blade.php, gunakan 'welcome'
-        // return view('welcome', ['lombas' => $lombasDenganPosterValid]);
     }
 }

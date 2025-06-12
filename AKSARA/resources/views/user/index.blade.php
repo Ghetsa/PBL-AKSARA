@@ -141,11 +141,11 @@
                     { data: "DT_RowIndex", className: "text-center", orderable: false, searchable: false },
                     // Hapus kolom 'foto_display'
                     { data: "nama_dan_detail", name: "nama", orderable: true, searchable: true }, // Gunakan 'nama_dan_detail' dari controller
-                    { data: "email", name: "email", orderable: true, searchable: true },
+                    { data: "email", name: "email", orderable: false, searchable: true },
                     { data: "no_telepon", name: "no_telepon", orderable: false, searchable: true },
                     // { data: "alamat", name: "alamat", orderable: false, searchable: true }, // Uncomment jika ingin menampilkan alamat
                     { data: "role", name: "role", orderable: true, searchable: true },
-                    { data: "status", name: "status", orderable: true, searchable: true },
+                    { data: "status", name: "status", orderable: false, searchable: true },
                     { data: "aksi", orderable: false, searchable: false }
                 ]
             });

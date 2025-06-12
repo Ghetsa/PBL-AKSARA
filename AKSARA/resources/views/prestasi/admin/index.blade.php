@@ -134,12 +134,12 @@
             columns: [
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', className: 'text-center', orderable: false, searchable: false },
                 { data: 'nama_mahasiswa', name: 'mahasiswa.user.nama' }, // Untuk searching di server-side
-                { data: 'nim_mahasiswa', name: 'mahasiswa.nim' },       // Untuk searching di server-side
+                { data: 'nim_mahasiswa', name: 'mahasiswa.nim', orderable: false },       // Untuk searching di server-side
                 { data: 'nama_prestasi', name: 'nama_prestasi' },
                 { data: 'kategori', name: 'kategori' },
                 { data: 'tingkat', name: 'tingkat' },
                 { data: 'tahun', name: 'tahun' },
-                { data: 'status_verifikasi', name: 'status_verifikasi' },
+                { data: 'status_verifikasi', name: 'status_verifikasi', orderable: false, searchable: false },
                 { data: 'aksi', name: 'aksi', orderable: false, searchable: false }
             ],
         });

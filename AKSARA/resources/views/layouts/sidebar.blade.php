@@ -43,7 +43,7 @@
                         <a href="{{ route('dashboard') }}"
                             class="pc-link {{ $activeMenu == 'dashboard' ? 'active' : '' }} ">
                             <span class="pc-micon"><i class="ti ti-dashboard"></i></span>
-                            <span class="pc-mtext">Dashboard</span>
+                            <span class="pc-mtext">Beranda</span>
                         </a>
                     </li>
 
@@ -127,7 +127,7 @@
                     <li class="pc-item">
                         <a href="#" onclick="confirmLogout(event)" class="pc-link">
                             <span class="pc-micon"><i class="ti ti-logout"></i></span>
-                            <span class="pc-mtext">Logout</span>
+                            <span class="pc-mtext">Keluar</span>
                         </a>
                         <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                         @csrf
@@ -184,7 +184,7 @@
                         <a href="{{ route('dashboard.mahasiswa') }}"
                             class="pc-link {{ $activeMenu == 'dashboard' ? 'active' : '' }} ">
                             <span class="pc-micon"><i class="ti ti-dashboard"></i></span>
-                            <span class="pc-mtext">Dashboard</span>
+                            <span class="pc-mtext">Beranda</span>
                         </a>
                     </li>
                     <li class="pc-item pc-caption">
@@ -234,7 +234,7 @@
                     <li class="pc-item">
                         <a href="#" onclick="confirmLogout(event)" class="pc-link">
                             <span class="pc-micon"><i class="ti ti-logout"></i></span>
-                            <span class="pc-mtext">Logout</span>
+                            <span class="pc-mtext">Keluar</span>
                         </a>
                         <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                         @csrf
@@ -249,7 +249,7 @@
                         <a href="{{ url('/dashboard/dosen') }}"
                             class="pc-link {{ $activeMenu == 'dashboard' ? 'active' : '' }} ">
                             <span class="pc-micon"><i class="ti ti-dashboard"></i></span>
-                            <span class="pc-mtext">Dashboard</span>
+                            <span class="pc-mtext">Beranda</span>
                         </a>
                     </li>
                     <li class="pc-item pc-caption">
@@ -294,7 +294,7 @@
                     <li class="pc-item">
                         <a href="#" onclick="confirmLogout(event)" class="pc-link">
                             <span class="pc-micon"><i class="ti ti-logout"></i></span>
-                            <span class="pc-mtext">Logout</span>
+                            <span class="pc-mtext">Keluar</span>
                         </a>
                         <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                         @csrf

@@ -216,7 +216,7 @@
 
 @push('js')
     {{-- DataTables --}}
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    {{-- <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap5.min.js"></script>
@@ -225,7 +225,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.colVis.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.colVis.min.js"></script> --}}
 
     {{-- Chart.js --}}
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -246,7 +246,7 @@
                 },
                 columns: [
                     { data: 'DT_RowIndex', orderable: false, searchable: false },
-                    { data: 'mahasiswa', name: 'mahasiswa.user.nama', orderable: false },
+                    { data: 'mahasiswa', name: 'mahasiswa.user.nama', orderable: true, searchable: true },
                     { data: 'mahasiswa', name: 'mahasiswa.nim', visible: false, searchable: true },
                     { data: 'dosen', name: 'dosen.user.nama', visible: false, searchable: true },
                     { data: 'nama_prestasi', name: 'nama_prestasi' },
@@ -287,10 +287,10 @@
                 },
                 columns: [
                     { data: 'DT_RowIndex', orderable: false, searchable: false },
-                    { data: 'nama_lomba', name: 'nama_lomba' },
-                    { data: 'penyelenggara', name: 'penyelenggara' },
-                    { data: 'tingkat', name: 'tingkat' },
-                    { data: 'kategori', name: 'kategori' },
+                    { data: 'nama_lomba', name: 'nama_lomba', searchable: true },
+                    { data: 'penyelenggara', name: 'penyelenggara', orderable: false, searchable: true },
+                    { data: 'tingkat', name: 'tingkat', searchable: false },
+                    { data: 'kategori', name: 'kategori', searchable: false },
                     { data: 'batas_pendaftaran', name: 'batas_pendaftaran' }
                 ]
             });

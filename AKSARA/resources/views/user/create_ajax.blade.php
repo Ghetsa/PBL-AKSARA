@@ -204,10 +204,10 @@
                 password: { required: true, minlength: 6, maxlength: 100 },
                 role: { required: true },
                 status: { required: true },
-                no_telepon: { required: true, digits: true, maxlength:15 },
-                alamat: {required: true, maxlength: 100},
-                nip: { digits: true, maxlength: 10}, // required diatur dinamis
-                nim: { digits: true, maxlength: 10}, // required diatur dinamis
+                no_telepon: { required: true, digits: true, minlength:7, maxlength:15 },
+                alamat: {required: true, minlength: 10, maxlength: 100},
+                nip: { digits: true, minlength: 10, maxlength: 16}, // required diatur dinamis
+                nim: { digits: true, minlength: 10, maxlength: 12}, // required diatur dinamis
                 prodi_id: {}, // required diatur dinamis
                 periode_id: {}, // required diatur dinamis
             },
@@ -217,10 +217,10 @@
                 password: { required: "Password tidak boleh kosong", minlength: "Password minimal harus 6 karakter", maxlength: "Password maksimal 100 karakter" },
                 role: "Silakan pilih role",
                 status: "Silakan pilih status",
-                no_telepon: { required: "Nomor telepon tidak boleh kosong", digits: "Nomor telepon hanya boleh berisi angka", maxlength: "Nomor telepon maksimal 15 karakter" },
-                alamat: { required: "Alamat tidak boleh kosong", maxlength: "Alamat maksimal 100 karakter" },
-                nip: { required: "NIP wajib diisi untuk role ini", digits: "NIP hanya boleh berisi angka", maxlength: "NIP maksimal 10 karakter" },
-                nim: { required: "NIM wajib diisi untuk role ini", digits: "NIM hanya boleh berisi angka", maxlength: "NIM maksimal 10 karakter" },
+                no_telepon: { required: "Nomor telepon tidak boleh kosong", digits: "Nomor telepon hanya boleh berisi angka", minlength: "Nomor telepon minimal 7 karakter angka", maxlength: "Nomor telepon maksimal 15 karakter angka" },
+                alamat: { required: "Alamat tidak boleh kosong", minlength: "Alamat minimal 10 karakter", maxlength: "Alamat maksimal 100 karakter" },
+                nip: { required: "NIP wajib diisi untuk role ini", digits: "NIP hanya boleh berisi angka", minlength: "NIP minimal 10 karakter angka", maxlength: "NIP maksimal 16 karakter angka" },
+                nim: { required: "NIM wajib diisi untuk role ini", digits: "NIM hanya boleh berisi angka", minlength: "NIM minimal 10 karakter angka", maxlength: "NIM maksimal 12 karakter angka" },
                 prodi_id: { required: "Prodi wajib diisi untuk Mahasiswa" },
                 periode_id: { required: "Periode wajib diisi untuk Mahasiswa" },
             },

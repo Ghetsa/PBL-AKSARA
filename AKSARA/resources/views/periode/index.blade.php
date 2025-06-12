@@ -120,7 +120,7 @@
                     {
                         data: "semester",
                         className: "text-wrap",
-                        orderable: true,
+                        orderable: false,
                         searchable: true
                     },
                     {

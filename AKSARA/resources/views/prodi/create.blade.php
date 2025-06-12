@@ -42,8 +42,8 @@
             rules: {
                 kode: {
                     required: true,
-                    minlength: 3,
-                    maxlength: 10,
+                    minlength: 4,
+                    maxlength: 6,
                     // --- TAMBAHKAN ATURAN REMOTE DI SINI ---
                     remote: {
                         url: "{{ route('prodi.checkKode') }}", // URL ke controller
@@ -54,7 +54,7 @@
                 nama: { required: true, minlength: 5, maxlength: 50 }
             },
             messages: {
-                kode: { required: "Kode program studi tidak boleh kosong", minlength: "Kode program studi minimal 3 karakter", maxlength: "Kode program studi maksimal 10 karakter", remote: "Kode program studi ini sudah digunakan." },
+                kode: { required: "Kode program studi tidak boleh kosong", minlength: "Kode program studi minimal 4 karakter", maxlength: "Kode program studi maksimal 6 karakter", remote: "Kode program studi ini sudah digunakan." },
                 nama: { required: "Nama program studi tidak boleh kosong", minlength: "Nama program studi minimal 5 karakter", maxlength: "Nama program studi maksimal 50 karakter" }
             },
 

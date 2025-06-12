@@ -229,7 +229,7 @@
             </a>
             <a href="#" onclick="confirmLogout(event)" class="dropdown-item">
                 <i class="ti ti-power text-danger me-2"></i>
-                <span class="text-danger">Logout</span>
+                <span class="text-danger">Keluar</span>
             </a>
             <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
               @csrf
