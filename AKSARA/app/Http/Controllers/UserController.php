@@ -304,7 +304,7 @@ class UserController extends Controller
                 $request->validate($dosenRules);
             } elseif ($request->role == 'admin') {
                 $request->validate([
-                    'nip' => 'required|string|min:10:max:12',
+                    'nip' => 'required|string|min:10|max:12',
                 ]);
             } elseif ($request->role == 'mahasiswa') {
                 $request->validate([
