@@ -678,7 +678,7 @@ class LombaController extends Controller
                     $btnEdit = '';
                     // [PERBAIKAN] Ganti 'lomba.mhs.show_form' menjadi 'lomba.mhs.show'
                     $btnDetail = '<button onclick="modalActionLomba(\'' . route('lomba.mhs.show', $row->lomba_id) . '\', \'Detail Lomba\', \'modalFormLombaUser\')" class="btn btn-sm btn-outline-info me-1" title="Detail"><i class="fas fa-eye"></i></button>';
-                    
+
                     if ($row->status_verifikasi == 'ditolak' || $row->status_verifikasi == 'pending') {
                         $btnEdit = '<button onclick="modalActionLomba(\'' . route('lomba.mhs.edit_form', $row->lomba_id) . '\', \'Edit Pengajuan\', \'modalFormLombaUser\')" class="btn btn-sm btn-outline-warning"><i class="fas fa-edit"></i></button>';
                     }
@@ -771,7 +771,7 @@ class LombaController extends Controller
         $validator = Validator::make($request->all(), [
             'nama_lomba' => 'required|string|max:50',
             'pembukaan_pendaftaran' => 'required|date',
-            'batas_pendaftaran' => 'required|date|after_or_equal:pembukaan_pendaftaran',
+            'batas_pendaftaran' => 'required|date|after_or_equal:pembukaan_pendaftaran|after_or_equal:today',
             'kategori' => 'required|in:individu,kelompok',
             'penyelenggara' => 'required|string|max:50',
             'tingkat' => 'required|in:lokal,nasional,internasional',
@@ -1026,7 +1026,7 @@ class LombaController extends Controller
                     $btnEdit = '';
                     // [PERBAIKAN KONSISTENSI] Ganti 'lomba.dosen.show_form' menjadi 'lomba.dosen.show'
                     $btnDetail = '<button onclick="modalActionLomba(\'' . route('lomba.dosen.show', $row->lomba_id) . '\', \'Detail Lomba\', \'modalFormLombaUser\')" class="btn btn-sm btn-outline-info me-1" title="Detail"><i class="fas fa-eye"></i></button>';
-                    
+
                     if ($row->status_verifikasi == 'ditolak' || $row->status_verifikasi == 'pending') {
                         $btnEdit = '<button onclick="modalActionLomba(\'' . route('lomba.dosen.edit_form', $row->lomba_id) . '\', \'Edit Pengajuan\', \'modalFormLombaUser\')" class="btn btn-sm btn-outline-warning"><i class="fas fa-edit"></i></button>';
                     }

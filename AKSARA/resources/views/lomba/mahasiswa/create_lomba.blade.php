@@ -160,11 +160,22 @@ $(document).ready(function() {
         return /^(ftp|http|https):\/\/[^ "]+$/.test(value);
     }, "Format URL tidak valid.");
 
+    $.validator.addMethod("afterToday", function(value, element) {
+        if (!value) { return true; }
+        const inputDate = new Date(value);
+        const today = new Date();
+        // Hilangkan jam, menit, detik
+        inputDate.setHours(0, 0, 0, 0);
+        today.setHours(0, 0, 0, 0);
+        return inputDate >= today;
+    }, 'Tanggal batas tidak boleh sebelum hari ini.');
+
+
     formUserLomba.validate({
         rules: {
             nama_lomba: { required: true, maxlength: 50, minlength: 5 },
             pembukaan_pendaftaran: { required: true, dateISO: true },
-            batas_pendaftaran: { required: true, dateISO: true, afterDate: '#user_pembukaan_pendaftaran' },
+            batas_pendaftaran: { required: true, dateISO: true, afterDate: '#user_pembukaan_pendaftaran',afterToday: true  },
             kategori: { required: true },
             penyelenggara: { required: true, maxlength: 50, minlength: 2 },
             tingkat: { required: true },
@@ -178,7 +189,8 @@ $(document).ready(function() {
         messages: {
             nama_lomba: { required: "Nama lomba wajib diisi.", maxlength: "Nama lomba maksimal 50 karakter.", minlength: "Nama lomba minimal 5 karakter." },
             pembukaan_pendaftaran: { required: "Tanggal pembukaan wajib diisi.", dateISO: "Format tanggal tidak valid." },
-            batas_pendaftaran: { required: "Batas pendaftaran wajib diisi.", dateISO: "Format tanggal tidak valid.", afterDate: "Batas pendaftaran harus sesudah tanggal pembukaan." },
+            batas_pendaftaran: { required: "Batas pendaftaran wajib diisi.", dateISO: "Format tanggal tidak valid.", afterDate: "Batas pendaftaran harus sesudah tanggal pembukaan." ,
+    afterToday: "Batas pendaftaran tidak boleh sebelum hari ini."},
             kategori: { required: "Kategori peserta wajib dipilih." },
             penyelenggara: { required: "Penyelenggara wajib diisi.", maxlength: "Penyelenggara maksimal 50 karakter.", minlength: "Penyelenggara minimal 2 karakter." },
             tingkat: { required: "Tingkat lomba wajib dipilih." },
