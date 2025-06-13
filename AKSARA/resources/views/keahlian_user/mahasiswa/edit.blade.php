@@ -82,7 +82,7 @@ $(document).ready(function() {
             },
             nama_sertifikat: {
                 required: true, 
-                maxlength: 5,
+                minlength: 5,
                 maxlength: 50
             },
             lembaga_sertifikasi: {
@@ -95,7 +95,7 @@ $(document).ready(function() {
                 date: true
             },
             tanggal_kadaluarsa_sertifikat: {
-                required: true,
+                required: false,
                 date: true,
                 after_or_equal: '#edit_tanggal_perolehan_sertifikat'
             },
