@@ -18,14 +18,14 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group mb-3">
-                                <label for="nama" class="form-label">Nama Lengkap <span class="text-danger">*</span></label>
+                                <label for="nama" class="form-label">Nama Lengkap</label>
                                 <input type="text" name="nama" id="nama" class="form-control"
                                     value="{{ old('nama', $user->nama) }}" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group mb-3">
-                                <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                                <label for="email" class="form-label">Email</label>
                                 <input type="email" name="email" id="email" class="form-control"
                                     value="{{ old('email', $user->email) }}" required>
                             </div>
@@ -124,7 +124,7 @@
                                     <div class="row">
                                         <div class="col-md-6 mb-2">
                                             <div class="form-group">
-                                                <label class="form-label">Nama Pengalaman/Posisi <span class="text-danger">*</span></label>
+                                                <label class="form-label">Nama Pengalaman/Posisi</label>
                                                 <input type="text" name="pengalaman_items[{{ $index }}][pengalaman_nama]"
                                                     class="form-control pengalaman-nama-input" value="{{ $pengalaman->pengalaman_nama }}" required>
                                             </div>
@@ -152,7 +152,7 @@
                                     <div class="row">
                                         <div class="col-md-6 mb-2">
                                             <div class="form-group">
-                                                <label class="form-label">Nama Pengalaman/Posisi <span class="text-danger">*</span></label>
+                                                <label class="form-label">Nama Pengalaman/Posisi</label>
                                                 <input type="text" name="pengalaman_items[0][pengalaman_nama]" class="form-control pengalaman-nama-input" required>
                                             </div>
                                         </div>
@@ -180,15 +180,15 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <button type="submit" class="btn btn-primary" id="submitUpdateProfile">Simpan Perubahan</button>
+                <button type="submit" class="btn btn-primary" id="updateProfilModal">Simpan Perubahan</button>
             </div>
         </form>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/additional-methods.min.js"></script>
+{{-- <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/additional-methods.min.js"></script> --}}
 
 <script>
     $(document).ready(function () {
@@ -230,7 +230,7 @@
                 <div class="row">
                     <div class="col-md-6 mb-2">
                         <div class="form-group">
-                            <label class="form-label">Nama Pengalaman/Posisi <span class="text-danger">*</span></label>
+                            <label class="form-label">Nama Pengalaman/Posisi</label>
                             <input type="text" name="pengalaman_items[${newIndex}][pengalaman_nama]" class="form-control pengalaman-nama-input" required>
                         </div>
                     </div>
@@ -296,10 +296,12 @@
                     maxlength: 50
                 },
                 no_telepon: {
+                    required: true,
                     digits: true,
                     maxlength: 15
                 },
                 alamat: {
+                    required: true,
                     maxlength: 100
                 },
                 foto: {
@@ -319,10 +321,12 @@
                     maxlength: "Email terlalu panjang."
                 },
                 no_telepon: {
+                    required: "Nomor telepon tidak boleh kosong.",
                     digits: "Nomor telepon hanya boleh berisi angka.",
                     maxlength: "Nomor telepon tidak boleh lebih dari 15 digit."
                 },
                 alamat: {
+                    required: "Alamat tidak boleh kosong.",
                     maxlength: "Alamat tidak boleh lebih dari 100 karakter."
                 },
                 foto: {
@@ -366,13 +370,18 @@
                     headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
                     success: function (response) {
                         $('#updateProfileModal').modal('hide'); // Tutup modal
+                        // if ($('#updateProfileModal').length) {
+                        //     $('#updateProfileModal').modal('hide');
+                        // } else {
+                        //     $('.modal').modal('hide');
+                        // }
                         
                         Swal.fire({
                             icon: 'success',
                             title: 'Sukses!',
                             text: response.message,
-                            timer: 2000, // Tampilkan notifikasi selama 2 detik
-                            showConfirmButton: false
+                            // timer: 2000, // Tampilkan notifikasi selama 2 detik
+                            // showConfirmButton: false
                         }).then(() => {
                             // Redirect setelah notifikasi selesai
                             if (response.redirect) {

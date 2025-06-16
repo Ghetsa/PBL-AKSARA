@@ -141,7 +141,7 @@
                                                         </div>
                                                     </div>
                                                 </li>
-                                                <li class="list-group-item px-0 pt-0">
+                                                <li class="list-group-item px-0">
                                                     <div class="row">
                                                         <div class="col-md-6 mb-2 mb-md-0">
                                                             <p class="mb-1 text-muted text-lg">Alamat</p>
