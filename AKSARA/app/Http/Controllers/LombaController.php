@@ -290,6 +290,8 @@ class LombaController extends Controller
                 elseif ($moneyValue > 1000000) $currentPrizeScore += 6;
                 elseif ($moneyValue >= 500000) $currentPrizeScore += 5;
                 elseif ($moneyValue >= 100000) $currentPrizeScore += 4;
+            } elseif (str_contains($prizeString, 'uang')) {
+                $currentPrizeScore += 2; // Beri skor 2, sama seperti sertifikat
             }
 
             $totalScore += $currentPrizeScore;
