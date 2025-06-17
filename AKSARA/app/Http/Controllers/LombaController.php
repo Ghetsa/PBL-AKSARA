@@ -245,6 +245,115 @@ class LombaController extends Controller
             ->make(true);
     }
 
+    /**
+     * [FUNGSI BARU] Menghitung skor hadiah berdasarkan deskripsi teks.
+     */
+    private function calculatePrizeScore(\Illuminate\Support\Collection $daftarHadiah): int
+    {
+        if ($daftarHadiah->isEmpty()) {
+            return 0;
+        }
+
+        $totalScore = 0;
+
+        foreach ($daftarHadiah as $itemHadiah) {
+            $prizeString = strtolower($itemHadiah->hadiah);
+            $currentPrizeScore = 0;
+
+            // 1. Skoring berdasarkan kata kunci dengan skala satuan
+            if (str_contains($prizeString, 'beasiswa')) $currentPrizeScore += 5;
+            if (str_contains($prizeString, 'magang') || str_contains($prizeString, 'internship') || str_contains($prizeString, 'proyek')) $currentPrizeScore += 4;
+            if (str_contains($prizeString, 'medali') || str_contains($prizeString, 'piala') || str_contains($prizeString, 'trophy')) $currentPrizeScore += 3;
+            if (str_contains($prizeString, 'sertifikat')) $currentPrizeScore += 2;
+
+            // 2. Ekstraksi dan skoring berdasarkan nilai uang dengan skala satuan
+            preg_match('/(\d[\d.,]*)\s*(juta|jt|ribu|rb|k)/i', $prizeString, $matches);
+
+            $moneyValue = 0;
+            if (!empty($matches)) {
+                $number = (float) str_replace([',', '.'], '', $matches[1]);
+                $unit = strtolower($matches[2] ?? '');
+                if (in_array($unit, ['juta', 'jt'])) $moneyValue = $number * 1000000;
+                elseif (in_array($unit, ['ribu', 'rb', 'k'])) $moneyValue = $number * 1000;
+            } else {
+                preg_match('/(rp\s*|idr\s*)?(\d[\d.,]*)/i', $prizeString, $plainMatches);
+                if (!empty($plainMatches[2])) {
+                    $moneyValue = (float) str_replace(['.', ','], '', $plainMatches[2]);
+                }
+            }
+
+            // Tambahkan poin berdasarkan tingkatan nominal uang dengan skala satuan
+            if ($moneyValue > 0) {
+                $currentPrizeScore += 1; // Poin dasar karena ada hadiah uang
+                if ($moneyValue > 10000000) $currentPrizeScore += 8;
+                elseif ($moneyValue > 5000000) $currentPrizeScore += 7;
+                elseif ($moneyValue > 1000000) $currentPrizeScore += 6;
+                elseif ($moneyValue >= 500000) $currentPrizeScore += 5;
+                elseif ($moneyValue >= 100000) $currentPrizeScore += 4;
+            }
+
+            $totalScore += $currentPrizeScore;
+        }
+
+        // Bonus berdasarkan jumlah item hadiah dihilangkan agar fokus pada kualitas.
+        // Jika tetap ingin ada, bisa gunakan nilai sangat kecil, misal: $totalScore += $daftarHadiah->count() * 0.5;
+
+        return (int) round($totalScore); // Mengembalikan sebagai integer
+    }
+    // private function calculatePrizeScore(Collection $daftarHadiah): int
+    // {
+    //     if ($daftarHadiah->isEmpty()) {
+    //         return 0;
+    //     }
+
+    //     $totalScore = 0;
+
+    //     foreach ($daftarHadiah as $itemHadiah) {
+    //         $prizeString = strtolower($itemHadiah->hadiah);
+    //         $currentPrizeScore = 0;
+
+    //         // 1. Skoring berdasarkan kata kunci
+    //         if (str_contains($prizeString, 'beasiswa')) $currentPrizeScore += 50;
+    //         if (str_contains($prizeString, 'magang') || str_contains($prizeString, 'internship')) $currentPrizeScore += 30;
+    //         if (str_contains($prizeString, 'pengalaman') || str_contains($prizeString, 'proyek')) $currentPrizeScore += 25;
+    //         if (str_contains($prizeString, 'medali') || str_contains($prizeString, 'piala') || str_contains($prizeString, 'trophy')) $currentPrizeScore += 15;
+    //         if (str_contains($prizeString, 'sertifikat')) $currentPrizeScore += 5;
+
+    //         // 2. Ekstraksi dan skoring berdasarkan nilai uang
+    //         preg_match('/(\d[\d.,]*)\s*(juta|jt|ribu|rb|k)/i', $prizeString, $matches);
+
+    //         $moneyValue = 0;
+    //         if (!empty($matches)) {
+    //             $number = (float) str_replace([',', '.'], '', $matches[1]);
+    //             $unit = strtolower($matches[2] ?? '');
+    //             if (in_array($unit, ['juta', 'jt'])) $moneyValue = $number * 1000000;
+    //             elseif (in_array($unit, ['ribu', 'rb', 'k'])) $moneyValue = $number * 1000;
+    //         } else {
+    //             preg_match('/(rp\s*|idr\s*)?(\d[\d.,]*)/i', $prizeString, $plainMatches);
+    //             if (!empty($plainMatches[2])) {
+    //                 $moneyValue = (float) str_replace(['.', ','], '', $plainMatches[2]);
+    //             }
+    //         }
+
+    //         // Tambahkan poin berdasarkan tingkatan nominal uang
+    //         if ($moneyValue > 0) {
+    //             $currentPrizeScore += 5; // Poin dasar karena ada hadiah uang
+    //             if ($moneyValue > 10000000) $currentPrizeScore += 80;
+    //             elseif ($moneyValue > 5000000) $currentPrizeScore += 60;
+    //             elseif ($moneyValue > 1000000) $currentPrizeScore += 40;
+    //             elseif ($moneyValue >= 500000) $currentPrizeScore += 20;
+    //             elseif ($moneyValue >= 100000) $currentPrizeScore += 10;
+    //         }
+
+    //         $totalScore += $currentPrizeScore;
+    //     }
+
+    //     // 3. Tambahkan bonus kecil berdasarkan jumlah item hadiah
+    //     $totalScore += ($daftarHadiah->count() * 2);
+
+    //     return $totalScore;
+    // }
+
     private function calculateMooraScores($userId, $customWeights = [])
     {
         $user = UserModel::with(['minat', 'keahlian'])->find($userId);
@@ -284,7 +393,8 @@ class LombaController extends Controller
                 default => 0,
             };
             // Kriteria Hadiah: sederhananya, jumlah jenis hadiah. Bisa lebih kompleks.
-            $row['hadiah'] = $lomba->daftarHadiah->count() > 0 ? ($lomba->daftarHadiah->count() <= 5 ? $lomba->daftarHadiah->count() : 5) : 0; // Max skor 5
+            // $row['hadiah'] = $lomba->daftarHadiah->count() > 0 ? ($lomba->daftarHadiah->count() <= 5 ? $lomba->daftarHadiah->count() : 5) : 0; // Max skor 5
+            $row['hadiah'] = $this->calculatePrizeScore($lomba->daftarHadiah);
 
             if ($lomba->batas_pendaftaran) {
                 $sisaHari = Carbon::now()->diffInDays(Carbon::parse($lomba->batas_pendaftaran), false);
@@ -782,7 +892,7 @@ class LombaController extends Controller
             'link_penyelenggara' => 'nullable|url|max:150',
             'poster' => 'nullable|image|mimes:jpg,jpeg,png,pdf|max:2048', // Tambahkan pdf jika diizinkan
             'hadiah' => 'nullable|array',
-            'hadiah.*' => 'nullable|string|max:20',
+            'hadiah.*' => 'nullable|string|max:40',
         ]);
 
         if ($validator->fails()) {
@@ -897,7 +1007,7 @@ class LombaController extends Controller
             'link_penyelenggara' => 'nullable|url|max:150',
             'poster' => 'nullable|image|mimes:jpg,jpeg,png,pdf|max:2048',
             'hadiah' => 'nullable|array',
-            'hadiah.*' => 'nullable|string|max:20',
+            'hadiah.*' => 'nullable|string|max:40',
         ]);
 
         if ($validator->fails()) {
@@ -1062,7 +1172,7 @@ class LombaController extends Controller
             'link_penyelenggara' => 'nullable|url|max:150',
             'poster' => 'nullable|image|mimes:jpg,jpeg,png,pdf|max:2048', // Tambahkan pdf jika diizinkan
             'hadiah' => 'nullable|array',
-            'hadiah.*' => 'nullable|string|max:20',
+            'hadiah.*' => 'nullable|string|max:40',
         ]);
 
         if ($validator->fails()) {
@@ -1167,7 +1277,7 @@ class LombaController extends Controller
             'link_penyelenggara' => 'nullable|url|max:50',
             'poster' => 'nullable|image|mimes:jpg,jpeg,png,pdf|max:2048',
             'hadiah' => 'nullable|array',
-            'hadiah.*' => 'nullable|string|max:20',
+            'hadiah.*' => 'nullable|string|max:40',
         ]);
 
         if ($validator->fails()) {
@@ -1506,7 +1616,7 @@ class LombaController extends Controller
             'link_penyelenggara' => 'nullable|url|max:150',
             'poster' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'hadiah' => 'nullable|array', // Tambahkan validasi untuk hadiah
-            'hadiah.*' => 'nullable|string|max:20', // Setiap item hadiah adalah string
+            'hadiah.*' => 'nullable|string|max:40', // Setiap item hadiah adalah string
         ]);
 
         if ($validator->fails()) {
@@ -1601,7 +1711,7 @@ class LombaController extends Controller
             'link_penyelenggara' => 'nullable|url|max:150',
             'poster' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'hadiah' => 'nullable|array',
-            'hadiah.*' => 'nullable|string|max:20',
+            'hadiah.*' => 'nullable|string|max:40',
         ];
 
         $validator = Validator::make($request->all(), $rules);
