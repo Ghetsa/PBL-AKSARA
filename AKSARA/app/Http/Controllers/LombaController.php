@@ -291,17 +291,15 @@ class LombaController extends Controller
                 elseif ($moneyValue >= 500000) $currentPrizeScore += 5;
                 elseif ($moneyValue >= 100000) $currentPrizeScore += 4;
             } elseif (str_contains($prizeString, 'uang')) {
-                $currentPrizeScore += 2; // Beri skor 2, sama seperti sertifikat
+                $currentPrizeScore += 2; // Skor 2, sama seperti sertifikat
             }
 
             $totalScore += $currentPrizeScore;
         }
 
-        // Bonus berdasarkan jumlah item hadiah dihilangkan agar fokus pada kualitas.
-        // Jika tetap ingin ada, bisa gunakan nilai sangat kecil, misal: $totalScore += $daftarHadiah->count() * 0.5;
-
         return (int) round($totalScore); // Mengembalikan sebagai integer
     }
+
     // private function calculatePrizeScore(Collection $daftarHadiah): int
     // {
     //     if ($daftarHadiah->isEmpty()) {

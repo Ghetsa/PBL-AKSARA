@@ -173,7 +173,7 @@ $(document).ready(function() {
             link_pendaftaran: { required:true, nullableUrl: true, maxlength: 150 },
             link_penyelenggara: { nullableUrl: true, maxlength: 150 },
             poster: { extension: "jpg|jpeg|png", filesize: 2097152 },
-            'hadiah[]': { minlength: 4, maxlength: 20 } // Validasi untuk setiap item hadiah
+            'hadiah[]': { minlength: 4, maxlength: 40 } // Validasi untuk setiap item hadiah
         },
         messages: {
             nama_lomba: { required: "Nama lomba wajib diisi.", maxlength: "Nama lomba maksimal 50 karakter.", minlength: "Nama lomba minimal 5 karakter." },
@@ -187,7 +187,7 @@ $(document).ready(function() {
             link_pendaftaran: { required: "Link pendaftaran wajib diisi.", nullableUrl: "Format URL pendaftaran tidak valid.", maxlength: "Link pendaftaran maksimal 150 karakter." },
             link_penyelenggara: { nullableUrl: "Format URL penyelenggara tidak valid.", maxlength: "Link penyelenggara maksimal 150 karakter." },
             poster: { extension: "Format file poster tidak valid (hanya JPG, JPEG, PNG).", filesize: "Ukuran file poster maksimal 2MB." },
-            'hadiah[]': { minlength: "Deskripsi hadiah minimal 4 karakter.", maxlength: "Deskripsi hadiah maksimal 20 karakter."}
+            'hadiah[]': { minlength: "Deskripsi hadiah minimal 4 karakter.", maxlength: "Deskripsi hadiah maksimal 40 karakter."}
         },
         errorElement: 'span',
         errorPlacement: function (error, element) {
