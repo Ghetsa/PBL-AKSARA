@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\SliderKriteriaModel;
 use App\Models\UserModel;
 use App\Models\LombaModel;
 use App\Models\BidangModel;
@@ -110,7 +111,7 @@ class LombaController extends Controller
     // Fungsi ini akan dipanggil oleh DataTables di view lomba/index.blade.php
     public function getList(Request $request)
     {
-        // Eager load relasi yang akan sering diakses
+        // 1. Query dasar untuk mengambil lomba yang sudah disetujui beserta relasinya.
         $query = LombaModel::query()
             ->with([
                 'bidangKeahlian.bidang', // Untuk menampilkan bidang lomba
@@ -119,54 +120,71 @@ class LombaController extends Controller
             ->where('status_verifikasi', 'disetujui'); // Hanya lomba yang disetujui
 
         $mooraScoresMap = [];
-        $isRekomendasiMode = $request->rekomendasi === '1'; // Gunakan perbandingan ketat
+        $isRekomendasiMode = $request->rekomendasi === '1';
 
+        // 2. Cek apakah pengguna meminta mode rekomendasi.
         if ($isRekomendasiMode) {
             $userId = Auth::id();
             if ($userId) {
+                // Ambil bobot dari request yang dikirim oleh JavaScript
                 $customWeightsInput = $request->input('weights', []);
                 $customWeights = [];
-                // Validasi dan normalisasi bobot dari input pengguna
-                // Pastikan key-nya sesuai dengan yang ada di form slider (minat, keahlian, tingkat, hadiah, penutupan, biaya)
                 $criteriaKeys = ['minat', 'keahlian', 'tingkat', 'hadiah', 'penutupan', 'biaya'];
-                $totalInputWeight = 0;
+                
+                // Validasi dan siapkan bobot untuk kalkulasi
                 foreach ($criteriaKeys as $key) {
                     if (isset($customWeightsInput[$key]) && is_numeric($customWeightsInput[$key])) {
-                        $weightValue = (float) $customWeightsInput[$key];
-                        $customWeights[$key] = $weightValue;
-                        $totalInputWeight += $weightValue;
-                    } else {
-                        // Jika ada bobot yang tidak valid atau tidak ada, mungkin fallback ke default atau error
-                        // Untuk sekarang, kita akan biarkan dan processMooraNormalization akan handle default
+                        $customWeights[$key] = (float) $customWeightsInput[$key];
+                    }
+                }
+                
+                // 3. Simpan atau perbarui preferensi bobot pengguna ke database.
+                //    Ini berjalan setiap kali pengguna menekan "Terapkan & Lihat Rekomendasi".
+                if (!empty($customWeights)) {
+                    // Ubah format dari desimal (0.25) ke persentase (25) untuk disimpan
+                    $weightsToSave = [];
+                    foreach ($customWeights as $key => $value) {
+                        $weightsToSave[$key] = round($value * 100);
+                    }
+
+                    try {
+                        // Gunakan updateOrCreate: jika user_id sudah ada, update; jika belum, buat baru.
+                        SliderKriteriaModel::updateOrCreate(
+                            ['user_id' => $userId], // Kunci pencarian
+                            $weightsToSave          // Data yang akan disimpan/diupdate
+                        );
+                    } catch (\Exception $e) {
+                        // Jika gagal, catat error tapi jangan hentikan proses.
+                        Log::error('Gagal menyimpan bobot slider untuk user_id: ' . $userId . ' - ' . $e->getMessage());
                     }
                 }
 
-                // Jika total input tidak 0, normalisasi agar totalnya 1 (atau 100 jika Anda mengirim % dari view)
-                // Di JavaScript kita kirim sebagai desimal (0-1) yang sudah dinormalisasi totalnya 1
-                // Jadi di sini kita bisa langsung pakai, atau validasi lagi
-                if ($totalInputWeight > 0 && abs($totalInputWeight - 1.0) > 0.001 && abs($totalInputWeight - 100.0) > 0.001) {
-                    // Jika dari JS belum dinormalisasi jadi 1, lakukan di sini
-                    // Tapi dari JS sebelumnya, kita sudah bagi 100, jadi seharusnya sudah mendekati 1
-                }
-
+                // 4. Hitung skor MOORA untuk semua lomba berdasarkan bobot pengguna.
                 $mooraResults = $this->calculateMooraScores($userId, $customWeights);
 
+                // Siapkan ID lomba yang sudah terurut untuk query
                 $orderedLombaIds = [];
                 foreach ($mooraResults as $result) {
                     $mooraScoresMap[$result['lomba']->lomba_id] = $result['score'];
                     $orderedLombaIds[] = $result['lomba']->lomba_id;
                 }
 
+                // Jika tidak ada hasil, kembalikan data kosong.
                 if (empty($orderedLombaIds)) {
                     return DataTables::of(collect())->addIndexColumn()->rawColumns(['status_display', 'aksi', 'biaya_display'])->make(true);
                 }
+
+                // 5. Terapkan urutan kustom ke query utama.
                 $query->whereIn('lomba_id', $orderedLombaIds)
-                    ->orderByRaw("FIELD(lomba_id, " . implode(',', array_map('intval', $orderedLombaIds)) . ")");
+                      ->orderByRaw("FIELD(lomba_id, " . implode(',', array_map('intval', $orderedLombaIds)) . ")");
+
             } else {
+                // Jika user tidak login dalam mode rekomendasi, kembalikan data kosong.
                 return DataTables::of(collect())->addIndexColumn()->rawColumns(['status_display', 'aksi', 'biaya_display'])->make(true);
             }
         } else {
-            if ($request->filled('tingkat_lomba_filter')) { // Jika filter ini tetap ada di view verifikasi
+            // Ini adalah mode standar (tanpa rekomendasi), lakukan filter biasa.
+            if ($request->filled('tingkat_lomba_filter')) {
                 $query->where('tingkat', $request->tingkat_lomba_filter);
             }
             if ($request->filled('kategori_lomba_filter')) {
@@ -179,47 +197,35 @@ class LombaController extends Controller
 
                 if ($status == 'buka') {
                     $query->where(function ($q) use ($today) {
-                        $q->whereNull('pembukaan_pendaftaran')
-                            ->orWhereDate('pembukaan_pendaftaran', '<=', $today);
+                        $q->whereNull('pembukaan_pendaftaran')->orWhereDate('pembukaan_pendaftaran', '<=', $today);
                     })->where(function ($q) use ($today) {
-                        $q->whereNull('batas_pendaftaran')
-                            ->orWhereDate('batas_pendaftaran', '>=', $today);
+                        $q->whereNull('batas_pendaftaran')->orWhereDate('batas_pendaftaran', '>=', $today);
                     });
                 } elseif ($status == 'tutup') {
-                    $query->whereNotNull('batas_pendaftaran')
-                        ->whereDate('batas_pendaftaran', '<', $today);
+                    $query->whereNotNull('batas_pendaftaran')->whereDate('batas_pendaftaran', '<', $today);
                 } elseif ($status == 'segera hadir') {
-                    $query->whereNotNull('pembukaan_pendaftaran')
-                        ->whereDate('pembukaan_pendaftaran', '>', $today);
+                    $query->whereNotNull('pembukaan_pendaftaran')->whereDate('pembukaan_pendaftaran', '>', $today);
                 }
             }
             $query->orderBy('batas_pendaftaran', 'asc');
         }
 
+        // 6. Buat dan kembalikan response DataTables.
         return DataTables::of($query)
             ->addIndexColumn()
             ->addColumn('bidang_display', function ($lomba) {
-                if ($lomba->bidangKeahlian && $lomba->bidangKeahlian->count() > 0) {
-                    return $lomba->bidangKeahlian->map(function ($detail) {
-                        return $detail->bidang->bidang_nama ?? '';
-                    })->filter()->implode(', ');
+                if ($lomba->bidangKeahlian->isNotEmpty()) {
+                    return $lomba->bidangKeahlian->map(fn($detail) => $detail->bidang->bidang_nama ?? '')->filter()->implode(', ');
                 }
                 return '-';
             })
-            ->editColumn('pembukaan_pendaftaran', function ($lomba) {
-                return $lomba->pembukaan_pendaftaran
-                    ? Carbon::parse($lomba->pembukaan_pendaftaran)->setTimezone('Asia/Jakarta')->isoFormat('D MMMM YYYY')
-                    : 'N/A';
-            })
             ->editColumn('batas_pendaftaran', function ($lomba) {
-                return $lomba->batas_pendaftaran
-                    ? Carbon::parse($lomba->batas_pendaftaran)->setTimezone('Asia/Jakarta')->isoFormat('D MMMM YYYY')
-                    : 'N/A';
+                return $lomba->batas_pendaftaran ? Carbon::parse($lomba->batas_pendaftaran)->isoFormat('D MMMM YYYY') : 'N/A';
             })
-            ->addColumn('biaya_display', function ($lomba) { // Menggunakan nama kolom berbeda untuk display
+            ->addColumn('biaya_display', function ($lomba) {
                 return $lomba->biaya > 0 ? 'Rp ' . number_format($lomba->biaya, 0, ',', '.') : '<span class="badge bg-light-success text-success px-2 py-1">Gratis</span>';
             })
-            ->addColumn('status_display', function ($lomba) { // Menggunakan nama kolom berbeda untuk display
+            ->addColumn('status_display', function ($lomba) {
                 $statusDisplay = $lomba->status_pendaftaran_display;
                 $badgeClass = match (strtolower($statusDisplay)) {
                     'buka' => 'success',
@@ -235,11 +241,9 @@ class LombaController extends Controller
                     : '-';
             })
             ->addColumn('aksi', function ($lomba) {
-                $btnDetail = '<button onclick="modalActionLomba(\'' . route('lomba.publik.show_ajax', $lomba->lomba_id) . '\', \'Detail Lomba\', \'modalDetailLombaPublik\')" class="btn btn-sm btn-outline-primary me-2"><i class="fas fa-eye me-1"></i></button>';
-                $btnHitung = '<button class="btn btn-sm btn-outline-secondary btn-detail-hitungan" data-lomba-id="' . $lomba->lomba_id . '"><i class="fas fa-calculator me-1"></i></button>';
+                $btnDetail = '<button onclick="modalActionLomba(\'' . route('lomba.publik.show_ajax', $lomba->lomba_id) . '\', \'Detail Lomba\', \'modalDetailLombaPublik\')" class="btn btn-sm btn-outline-primary me-2" title="Lihat Detail"><i class="fas fa-eye me-1"></i></button>';
+                $btnHitung = '<button class="btn btn-sm btn-outline-secondary btn-detail-hitungan" data-lomba-id="' . $lomba->lomba_id . '" title="Lihat Perhitungan"><i class="fas fa-calculator me-1"></i></button>';
                 return '<div class="btn-group">' . $btnDetail . $btnHitung . '</div>';
-
-                // return '<div class="btn-group">' . $btnDetail . $btnHitung . '</div>';
             })
             ->rawColumns(['status_display', 'aksi', 'biaya_display'])
             ->make(true);
@@ -494,34 +498,40 @@ class LombaController extends Controller
     }
 
     // Method untuk menampilkan halaman utama daftar lomba mahasiswa
-    public function indexLomba() // Ini yang dipanggil oleh route lomba.index
+    public function indexLomba()
     {
         $userRole = Auth::user()->role;
-        // $breadcrumb diatur sesuai kebutuhan, atau bisa dihilangkan jika tidak dipakai di view ini
         $breadcrumb = (object) ['title' => 'Informasi & Rekomendasi Lomba', 'list' => ['Info Lomba', 'Rekomendasi Lomba']];
-        $activeMenu = 'info_lomba'; // Atau 'lomba_mahasiswa'
+        $activeMenu = 'info_lomba';
 
-        // Nama-nama kriteria yang akan digunakan di view untuk slider bobot
         $kriteriaUntukBobot = [
-            'minat' => 'Kesesuaian Minat',
-            'keahlian' => 'Kesesuaian Keahlian',
-            'tingkat' => 'Tingkat Lomba',
-            'hadiah' => 'Potensi Hadiah',
+            'minat'     => 'Kesesuaian Minat',
+            'keahlian'  => 'Kesesuaian Keahlian',
+            'tingkat'   => 'Tingkat Lomba',
+            'hadiah'    => 'Potensi Hadiah',
             'penutupan' => 'Sisa Waktu Pendaftaran',
-            'biaya' => 'Biaya Pendaftaran (Rendah Lebih Baik)',
+            'biaya'     => 'Biaya Pendaftaran (Rendah Lebih Baik)',
         ];
 
-        // Bobot default (dalam persentase untuk ditampilkan di slider)
         $defaultBobotView = [
-            'minat' => 25,
-            'keahlian' => 25,
-            'tingkat' => 15,
-            'hadiah' => 10,
-            'penutupan' => 15,
-            'biaya' => 10
+            'minat'     => 25, 'keahlian'  => 25, 'tingkat'   => 15,
+            'hadiah'    => 10, 'penutupan' => 15, 'biaya'     => 10
         ];
+        
+        // [PERBAIKAN] Logika disederhanakan, langsung menggunakan Auth::id()
+        $userId = Auth::id();
+        $bobotTersimpan = SliderKriteriaModel::where('user_id', $userId)->first();
+        
+        $bobotView = [];
+        if ($bobotTersimpan) {
+            foreach (array_keys($defaultBobotView) as $key) {
+                $bobotView[$key] = $bobotTersimpan->$key ?? $defaultBobotView[$key];
+            }
+        } else {
+            $bobotView = $defaultBobotView;
+        }
 
-        return view('lomba.mahasiswa.index', compact('breadcrumb', 'activeMenu', 'userRole', 'kriteriaUntukBobot', 'defaultBobotView'));
+        return view('lomba.mahasiswa.index', compact('breadcrumb', 'activeMenu', 'userRole', 'kriteriaUntukBobot', 'bobotView', 'defaultBobotView'));
     }
 
     // Sisa dari kode controller Anda (tidak perlu diubah)
