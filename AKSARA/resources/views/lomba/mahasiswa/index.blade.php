@@ -80,10 +80,10 @@
                                 <div class="form-label-group row align-items-center mb-1">
                                     <label for="bobot_{{ $key }}" class="col-sm-4 col-form-label col-form-label-sm pe-0">{{ $label }}:</label>
                                     <div class="col-sm-6 slider-container">
-                                        <input type="range" class="form-range bobot-slider" id="bobot_{{ $key }}" data-kriteria="{{ $key }}" min="0" max="50" value="{{ $defaultBobotView[$key] ?? 20 }}" step="5">
+                                        <input type="range" class="form-range bobot-slider" id="bobot_{{ $key }}" data-kriteria="{{ $key }}" min="0" max="50" value="{{ $bobotView[$key] ?? 20 }}" step="5">
                                     </div>
                                     <div class="col-sm-2 ps-1">
-                                        <span class="weight-value" id="value_{{ $key }}">{{ $defaultBobotView[$key] ?? 20 }}</span>
+                                        <span class="weight-value" id="value_{{ $key }}">{{ $bobotView[$key] ?? 20 }}</span>
                                     </div>
                                 </div>
                                 @endforeach
